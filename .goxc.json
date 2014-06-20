@@ -1,0 +1,7 @@
+{
+	"ArtifactsDest": "output",
+	"Arch": "amd64",
+	"Os": "linux",
+	"PackageVersion": "1.0.0",
+	"ConfigVersion": "0.9"
+}
