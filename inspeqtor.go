@@ -2,23 +2,23 @@ package main
 
 import (
 	"os"
+	"crypto/sha256"
 	"flag"
 	"fmt"
 	"bufio"
+	"errors"
 	"bytes"
 	"strings"
 	"strconv"
 	"io/ioutil"
+	"encoding/hex"
 	"net/smtp"
 	"os/exec"
   "gopkg.in/yaml.v1"
+  "github.com/blackjack/syslog"
 )
 
 var VERSION = "1.0.0"
-
-type Configuration struct {
-  Services []string
-}
 
 type cliOptions struct {
   testConfig bool
@@ -30,21 +30,33 @@ type cliOptions struct {
 // - parse configuration
 // - locate processes
 func main() {
-  var config Configuration
 
-  parseArguments()
+  options := parseArguments()
 
-  b, err := ioutil.ReadFile("inspeqtor.yml")
-  if err != nil { panic(err) }
+  syslog.Openlog("inspeqtor", syslog.LOG_PID, syslog.LOG_USER)
+  syslog.Noticef("Parsed options: %s", options)
 
-  err = yaml.Unmarshal(b, &config)
-  if err != nil { panic(err) }
+  defer syslog.Closelog()
 
-  result, err := FileExists("/mach_kernel")
+  result, err := FileExists("license.yml")
   if err != nil { panic(err) }
 
   if result {
-    data := LaunchctlResolve(config.Services)
+    license, err := verifyLicense()
+    if err != nil {
+      fmt.Println(err)
+      os.Exit(120)
+    }
+    syslog.Noticef("Licensed to %s <%s>, maximum of %d hosts.",
+                   license.Name, license.Email, license.Hosts)
+  }
+
+  result, err = FileExists("/mach_kernel")
+  if err != nil { panic(err) }
+
+  if result {
+    data := LaunchctlResolve([]string{"percona", "redis"})
+    os.Exit(0)
     auth := smtp.PlainAuth("", "mperham", "", "smtp.gmail.com")
     err := smtp.SendMail("smtp.gmail.com:587", auth,
             "mperham@gmail.com",
@@ -54,10 +66,52 @@ func main() {
   }
 }
 
+type License struct {
+  Name string
+  Email string
+  Hosts int
+  Key string
+  Nonce int
+  V int
+}
+
+func (lic *License) verify() (*License, error) {
+  if len(lic.Key) != 64 {
+    return nil, errors.New("Invalid license")
+  }
+  if lic.V == 1 {
+    cat := []byte("TastySalt" + lic.Name + lic.Email +
+          strconv.Itoa(lic.Hosts) +
+          strconv.Itoa(lic.Nonce))
+    hash := sha256.Sum256(cat)
+    should_be := hex.EncodeToString(hash[:])
+//    fmt.Println(should_be)
+    if lic.Key == should_be {
+      return lic, nil
+    } else {
+      return nil, errors.New("Invalid license")
+    }
+  } else {
+    panic("Unknown license format")
+  }
+}
+
+func verifyLicense() (*License, error) {
+  var license License
+  b, err := ioutil.ReadFile("license.yml")
+  if err != nil { return nil, err }
+
+  err = yaml.Unmarshal(b, &license)
+  if err != nil { return nil, err }
+
+  fmt.Println(license)
+  return license.verify()
+}
+
 func parseArguments() cliOptions {
   defaults := cliOptions{}
   flag.BoolVar(&defaults.testConfig, "t", false, "Verify configuration and exit")
-  flag.StringVar(&defaults.configDirectory, "c", "/etc/inspeqtor", "Configuration directory")
+  flag.StringVar(&defaults.configDirectory, "c", ".", "Configuration directory")
   verPtr := flag.Bool("v", false, "Print version and exit")
   helpPtr := flag.Bool("help", false, "You're looking at it")
   help2Ptr := flag.Bool("h", false, "You're looking at it")
