@@ -2,12 +2,14 @@ package main
 
 import (
 	"os"
+	"os/signal"
 	"crypto/sha256"
 	"flag"
 	"fmt"
 	"bufio"
 	"errors"
 	"bytes"
+	"time"
 	"strings"
 	"strconv"
 	"io/ioutil"
@@ -55,15 +57,43 @@ func main() {
   if err != nil { panic(err) }
 
   if result {
-    data := LaunchctlResolve([]string{"percona", "redis"})
-    os.Exit(0)
-    auth := smtp.PlainAuth("", "mperham", "", "smtp.gmail.com")
-    err := smtp.SendMail("smtp.gmail.com:587", auth,
-            "mperham@gmail.com",
-            []string{"mperham@gmail.com"},
-            bytes.NewBufferString(fmt.Sprint(data)).Bytes())
-    if err != nil { panic(err) }
+    LaunchctlResolve([]string{"percona", "redis"})
+    //sendEmail(data)
   }
+
+  shutdown := make(chan int)
+  go pollSystem(shutdown)
+
+  signals := make(chan os.Signal)
+  signal.Notify(signals, os.Interrupt)
+  <-signals
+
+  shutdown <- 1
+  fmt.Println("Complete, bye!")
+}
+
+func pollSystem(shutdown chan int) {
+  scanSystem()
+  select {
+    case <-shutdown:
+      fmt.Println("Exiting poll loop")
+      return
+    case <-time.After(30 * time.Second):
+      scanSystem()
+  }
+}
+
+func scanSystem() {
+  fmt.Println("Scanning...")
+}
+
+func sendEmail(data interface{}) {
+  auth := smtp.PlainAuth("", "mperham", "", "smtp.gmail.com")
+  err := smtp.SendMail("smtp.gmail.com:587", auth,
+          "mperham@gmail.com",
+          []string{"mperham@gmail.com"},
+          bytes.NewBufferString(fmt.Sprint(data)).Bytes())
+  if err != nil { panic(err) }
 }
 
 type License struct {
