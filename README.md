@@ -11,6 +11,9 @@ What it does:
 * Notify if services or system goes over defined utilization
 * Define applications and deploy windows
 * Notification schemes: email, webhook, script
+* Extremely developer friendly:
+  - Test configuration
+  - Test notifications
 
 What it doesn't:
 

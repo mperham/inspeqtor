@@ -9,6 +9,7 @@ import (
 	"strings"
 	"strconv"
 	"io/ioutil"
+	"net/smtp"
 	"os/exec"
   "gopkg.in/yaml.v1"
 )
@@ -33,7 +34,7 @@ func main() {
 
   parseArguments()
 
-  b, err := ioutil.ReadFile("config.yml")
+  b, err := ioutil.ReadFile("inspeqtor.yml")
   if err != nil { panic(err) }
 
   err = yaml.Unmarshal(b, &config)
@@ -41,11 +42,16 @@ func main() {
 
   result, err := FileExists("/mach_kernel")
   if err != nil { panic(err) }
-  if result {
-    LaunchctlResolve(config.Services)
-  }
 
-  fmt.Println(config)
+  if result {
+    data := LaunchctlResolve(config.Services)
+    auth := smtp.PlainAuth("", "mperham", "", "smtp.gmail.com")
+    err := smtp.SendMail("smtp.gmail.com:587", auth,
+            "mperham@gmail.com",
+            []string{"mperham@gmail.com"},
+            bytes.NewBufferString(fmt.Sprint(data)).Bytes())
+    if err != nil { panic(err) }
+  }
 }
 
 func parseArguments() cliOptions {
