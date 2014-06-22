@@ -10,19 +10,18 @@ import (
 	"errors"
 	"bytes"
 	"time"
-	"strings"
 	"strconv"
+	"log/syslog"
 	"io/ioutil"
 	"encoding/hex"
 	"net/smtp"
-	"os/exec"
   "gopkg.in/yaml.v1"
-  "github.com/blackjack/syslog"
 )
 
 var VERSION = "1.0.0"
 
 type cliOptions struct {
+  verbose bool
   testConfig bool
   configDirectory string
 }
@@ -32,13 +31,14 @@ type cliOptions struct {
 // - parse configuration
 // - locate processes
 func main() {
-
   options := parseArguments()
+  if options.verbose {
 
-  syslog.Openlog("inspeqtor", syslog.LOG_PID, syslog.LOG_USER)
-  syslog.Noticef("Parsed options: %s", options)
+  }
 
-  defer syslog.Closelog()
+  log, err := syslog.New(syslog.LOG_USER | syslog.LOG_NOTICE, "inspeqtor")
+  if err != nil { panic("Unable to open log: " + err.Error()) }
+  defer log.Close()
 
   result, err := FileExists("license.yml")
   if err != nil { panic(err) }
@@ -49,17 +49,45 @@ func main() {
       fmt.Println(err)
       os.Exit(120)
     }
-    syslog.Noticef("Licensed to %s <%s>, maximum of %d hosts.",
-                   license.Name, license.Email, license.Hosts)
+    log.Warning(fmt.Sprintf("Licensed to %s <%s>, maximum of %d hosts.",
+                   license.Name, license.Email, license.Hosts))
   }
 
-  result, err = FileExists("/mach_kernel")
+  macosx, err := FileExists("/mach_kernel")
   if err != nil { panic(err) }
 
-  if result {
-    LaunchctlResolve([]string{"percona", "redis"})
-    //sendEmail(data)
+  var serviceMapping map[string]int = make(map[string]int)
+
+  if macosx {
+    osx := Launchctl{}
+    services := []string{"percona", "redis", "bob"}
+    for _, service := range(services) {
+      name, pid, err := osx.FindService(service)
+      if err != nil {
+        log.Warning("Couldn't find service " + service + ", skipping...")
+      } else {
+        serviceMapping[name] = pid
+      }
+    }
   }
+
+  upstart, err := FileExists("/etc/init")
+  if err != nil { panic(err) }
+
+  if upstart {
+    upstart := Upstart{}
+    services := []string{"mysql", "pass", "bob"}
+    for _, service := range(services) {
+      name, pid, err := upstart.FindService(service)
+      if err != nil {
+        log.Warning("Couldn't find service " + service + ", skipping...")
+      } else {
+        serviceMapping[name] = pid
+      }
+    }
+  }
+
+  fmt.Println(serviceMapping)
 
   shutdown := make(chan int)
   go pollSystem(shutdown)
@@ -140,17 +168,12 @@ func verifyLicense() (*License, error) {
 
 func parseArguments() cliOptions {
   defaults := cliOptions{}
+  flag.BoolVar(&defaults.verbose, "v", false, "Enable verbose logging")
   flag.BoolVar(&defaults.testConfig, "t", false, "Verify configuration and exit")
   flag.StringVar(&defaults.configDirectory, "c", ".", "Configuration directory")
-  verPtr := flag.Bool("v", false, "Print version and exit")
   helpPtr := flag.Bool("help", false, "You're looking at it")
   help2Ptr := flag.Bool("h", false, "You're looking at it")
   flag.Parse()
-
-  if *verPtr {
-    fmt.Println("inspeqtor", VERSION)
-    os.Exit(0)
-  }
 
   if *helpPtr || *help2Ptr {
     fmt.Println("inspeqtor", VERSION)
@@ -176,36 +199,6 @@ func FileExists(path string) (bool, error) {
     }
   }
   return true, nil
-}
-
-func LaunchctlResolve(services []string) map[string]int {
-  cmd := exec.Command("launchctl", "list")
-  sout, err := cmd.CombinedOutput()
-  if err != nil { panic(err) }
-
-  lines, err := readLines(sout)
-
-  data := make(map[string]int)
-  for _, sname := range(services) {
-    var found = false
-    for _, line := range(lines) {
-      if strings.Contains(line, sname) {
-        fmt.Println("Found " + sname)
-        parts := strings.SplitN(line, "\t", 3)
-        pid, err := strconv.Atoi(parts[0])
-        if err != nil {
-          continue
-        }
-        pname := parts[len(parts)-1]
-        data[pname] = pid
-        found = true
-        break
-      }
-    }
-
-    if !found { panic("Couldn't find " + sname) }
-  }
-  return data
 }
 
 // readLines reads a whole file into memory
