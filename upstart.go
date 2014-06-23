@@ -29,12 +29,13 @@ func serviceList(serviceName string) ([]string, error) {
       }
 
       if info.Name() == (serviceName + ".conf") {
-        matches = append(matches, info.Name())
+        matches = append(matches, serviceName)
         done = true
       }
       if strings.Contains(info.Name(), serviceName) {
-        fmt.Println("Found " + info.Name())
-        matches = append(matches, info.Name())
+        name := info.Name()
+        fmt.Println("Found " + name)
+        matches = append(matches, name[:len(name)-5])
       }
     }
     return nil
@@ -71,10 +72,13 @@ func (u *Upstart) FindService(serviceName string) (string, int, error) {
     fmt.Println(v)
   }
 
-  pid, err := strconv.Atoi(results[4])
-  if err != nil { return "", 0, err }
-
-  return matches[0], pid, nil
+  if len(results) > 4 {
+    pid, err := strconv.Atoi(results[4])
+    if err != nil { return "", 0, err }
+    return matches[0], pid, nil
+  } else {
+    return "", 0, errors.New("Unknown upstart output: " + line)
+  }
 }
 
 //func readLines(data []byte) ([]string, error) {
