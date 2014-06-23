@@ -14,7 +14,7 @@ import (
 type Upstart struct{}
 
 var (
-  pidScanner *regexp.Regexp = regexp.MustCompile(" (start|stop)/(running/waiting)(, process (\\d+))?")
+  pidScanner *regexp.Regexp = regexp.MustCompile(" (?:start|stop)\\/(?:running|waiting)(?:, process (\\d+))?")
 )
 
 func serviceList(serviceName string) ([]string, error) {
@@ -31,6 +31,7 @@ func serviceList(serviceName string) ([]string, error) {
       if info.Name() == (serviceName + ".conf") {
         matches = append(matches, serviceName)
         done = true
+        return nil
       }
       if strings.Contains(info.Name(), serviceName) {
         name := info.Name()
@@ -41,6 +42,7 @@ func serviceList(serviceName string) ([]string, error) {
     return nil
   })
   if err != nil { return nil, err }
+
   return matches, nil
 }
 
@@ -68,17 +70,18 @@ func (u *Upstart) FindService(serviceName string) (string, int, error) {
   // sshdgenkeys stop/waiting
   line := lines[0]
   results := pidScanner.FindStringSubmatch(line)
-  for _, v := range(results) {
-    fmt.Println(v)
-  }
+  fmt.Println(results)
 
-  if len(results) > 4 {
-    pid, err := strconv.Atoi(results[4])
+  if len(results) > 1 && len(results[1]) > 0 {
+    pid, err := strconv.Atoi(results[1])
     if err != nil { return "", 0, err }
     return matches[0], pid, nil
-  } else {
-    return "", 0, errors.New("Unknown upstart output: " + line)
   }
+  if len(results) > 1 {
+    return matches[0], 0, nil
+  }
+
+  return "", 0, errors.New("Unknown upstart output: " + line)
 }
 
 //func readLines(data []byte) ([]string, error) {

@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"os/signal"
+	"os/user"
 	"crypto/sha256"
 	"flag"
 	"fmt"
@@ -31,6 +32,12 @@ type cliOptions struct {
 // - parse configuration
 // - locate processes
 func main() {
+  u, err := user.Current()
+  if u.Uid != "0" {
+    fmt.Println(u)
+    fmt.Println("Must be root")
+    os.Exit(-1)
+  }
   options := parseArguments()
   if options.verbose {
 
