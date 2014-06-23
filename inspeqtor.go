@@ -59,6 +59,7 @@ func main() {
   var serviceMapping map[string]int = make(map[string]int)
 
   if macosx {
+    fmt.Println("Detected OSX, using launchctl")
     osx := Launchctl{}
     services := []string{"percona", "redis", "bob"}
     for _, service := range(services) {
@@ -75,12 +76,13 @@ func main() {
   if err != nil { panic(err) }
 
   if upstart {
+    fmt.Println("Found upstart in /etc/init")
     upstart := Upstart{}
     services := []string{"mysql", "pass", "bob"}
     for _, service := range(services) {
       name, pid, err := upstart.FindService(service)
       if err != nil {
-        log.Warning("Couldn't find service " + service + ", skipping...")
+        fmt.Println(err.Error())
       } else {
         serviceMapping[name] = pid
       }
@@ -88,6 +90,7 @@ func main() {
   }
 
   fmt.Println(serviceMapping)
+  os.Exit(120)
 
   shutdown := make(chan int)
   go pollSystem(shutdown)

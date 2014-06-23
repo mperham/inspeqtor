@@ -28,13 +28,13 @@ func serviceList(serviceName string) ([]string, error) {
         return nil
       }
 
-      if info.Name() == serviceName {
-        matches = append(matches, path)
+      if info.Name() == (serviceName + ".conf") {
+        matches = append(matches, info.Name())
         done = true
       }
       if strings.Contains(info.Name(), serviceName) {
-        fmt.Println("Found " + path)
-        matches = append(matches, path)
+        fmt.Println("Found " + info.Name())
+        matches = append(matches, info.Name())
       }
     }
     return nil
