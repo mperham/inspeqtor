@@ -21,7 +21,7 @@ type SystemMetrics struct {
 }
 
 var (
-  meminfoParser *regexp.Regexp = regexp.MustCompile("([^:]):\\s+(\\d+)")
+  meminfoParser *regexp.Regexp = regexp.MustCompile("([^:]+):\\s+(\\d+)")
 )
 
 func CollectSystemMetrics() (*SystemMetrics, error) {
@@ -43,7 +43,7 @@ func collectMemory(metrics *SystemMetrics) error {
   content := bytes.NewBuffer(contentBytes).String()
   lines := strings.Split(content, "\n")
 
-  var memMetrics map[string]int
+  memMetrics := make(map[string]int)
   for _, line := range(lines) {
     results := meminfoParser.FindStringSubmatch(line)
     if results == nil {
@@ -60,12 +60,13 @@ func collectMemory(metrics *SystemMetrics) error {
 
   metrics.FreeMem = memMetrics["MemFree"]
   free := memMetrics["SwapFree"]
+  total := memMetrics["SwapTotal"]
   if free == 0 {
     metrics.PercentSwapInUse = 100
-  } else if free == memMetrics["SwapTotal"] {
+  } else if free == total {
     metrics.PercentSwapInUse = 100
   } else {
-    metrics.PercentSwapInUse = 100 - int8(100*(memMetrics["SwapFree"] / memMetrics["SwapTotal"]))
+    metrics.PercentSwapInUse = 100 - int8(100*(float64(free) / float64(total)))
   }
 
   return nil
