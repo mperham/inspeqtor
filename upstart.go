@@ -83,12 +83,3 @@ func (u *Upstart) FindService(serviceName string) (string, int, error) {
 
   return "", 0, errors.New("Unknown upstart output: " + line)
 }
-
-//func readLines(data []byte) ([]string, error) {
-  //var lines []string
-  //scan := bufio.NewScanner(bytes.NewReader(data))
-  //for scan.Scan() {
-    //lines = append(lines, scan.Text())
-  //}
-  //return lines, scan.Err()
-//}

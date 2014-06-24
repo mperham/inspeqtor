@@ -97,7 +97,6 @@ func main() {
   }
 
   fmt.Println(serviceMapping)
-  os.Exit(120)
 
   shutdown := make(chan int)
   go pollSystem(shutdown)
@@ -123,6 +122,12 @@ func pollSystem(shutdown chan int) {
 
 func scanSystem() {
   fmt.Println("Scanning...")
+  metrics, err := CollectSystemMetrics()
+  if err != nil {
+    fmt.Println(err)
+  } else {
+    fmt.Println(metrics)
+  }
 }
 
 func sendEmail(data interface{}) {
