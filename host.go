@@ -1,7 +1,6 @@
 package main
 
 import (
-  "bytes"
   "fmt"
   "io/ioutil"
   "regexp"
@@ -40,8 +39,7 @@ func CollectSystemMetrics() (*SystemMetrics, error) {
 func collectMemory(metrics *SystemMetrics) error {
   contentBytes, err := ioutil.ReadFile("/proc/meminfo")
   if err != nil { return err }
-  content := bytes.NewBuffer(contentBytes).String()
-  lines := strings.Split(content, "\n")
+  lines := strings.Split(string(contentBytes), "\n")
 
   memMetrics := make(map[string]int)
   for _, line := range(lines) {
@@ -76,8 +74,7 @@ func collectLoadAverage(metrics *SystemMetrics) error {
   contentBytes, err := ioutil.ReadFile("/proc/loadavg")
   if err != nil { return err }
 
-  content := bytes.NewBuffer(contentBytes).String()
-  slices := strings.Split(content, " ")
+  slices := strings.Split(string(contentBytes), " ")
   load1, err := strconv.ParseFloat(slices[0], 32)
   if err != nil { return err }
   load5, err := strconv.ParseFloat(slices[1], 32)
