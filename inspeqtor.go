@@ -131,7 +131,7 @@ func pollSystem(shutdown chan int) {
 
 func scanSystem() {
 	fmt.Println("Scanning...")
-	metrics, err := linux.CollectSystemMetrics("/proc")
+	metrics, err := linux.CollectHostMetrics("/proc")
 	if err != nil {
 		fmt.Println(err)
 	} else {

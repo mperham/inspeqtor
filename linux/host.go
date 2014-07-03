@@ -6,11 +6,12 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type SystemMetrics struct {
-	When             float32
-	CpuUsage         *CpuMetrics
+	When             time.Time
+	CpuUsage         CpuMetrics
 	FreeMem          int
 	Load1            float32
 	Load5            float32
@@ -35,10 +36,11 @@ var (
 	meminfoParser *regexp.Regexp = regexp.MustCompile("([^:]+):\\s+(\\d+)")
 )
 
-func CollectSystemMetrics(path string) (*SystemMetrics, error) {
+func CollectHostMetrics(path string) (*SystemMetrics, error) {
 
 	var err error
 	var metrics *SystemMetrics = &SystemMetrics{}
+  metrics.When = time.Now()
 
 	err = collectLoadAverage(path, metrics)
 	if err != nil {
@@ -131,8 +133,8 @@ func collectCpu(path string, metrics *SystemMetrics) error {
 	return nil
 }
 
-func createCpuMetrics(fields []string) *CpuMetrics {
-	s := &CpuMetrics{}
+func createCpuMetrics(fields []string) CpuMetrics {
+	s := CpuMetrics{}
 	s.User, _ = strconv.ParseUint(fields[1], 10, 64)
 	s.Nice, _ = strconv.ParseUint(fields[2], 10, 64)
 	s.System, _ = strconv.ParseUint(fields[3], 10, 64)
