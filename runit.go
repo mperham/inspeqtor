@@ -1,4 +1,5 @@
-// Usually found in /etc/service, /etc/sv or /service with subdirectories:
+// runit manages services usually found in /etc/service or /service, which
+// are soft links to the actual service directories in /etc/sv:
 //    <service_name>/
 //        run
 //        log/
@@ -18,7 +19,7 @@ import (
 )
 
 var (
-  expectedPaths = []string { "/etc/sv", "/etc/service", "/service" }
+  expectedPaths = []string { "/etc/service", "/service", }
 )
 
 type Runit struct{
@@ -26,6 +27,14 @@ type Runit struct{
 }
 
 func DetectRunit() (*Runit, error) {
+  result, err := FileExists("/etc/sv")
+  if err != nil { return nil, err }
+
+  if !result {
+    fmt.Println("runit not detected, no /etc/sv")
+    return nil, nil
+  }
+
   for _, path := range(expectedPaths) {
     matches, err := filepath.Glob(path + "/*/run")
     if err != nil { return nil, err }
