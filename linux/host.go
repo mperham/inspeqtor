@@ -40,7 +40,7 @@ func CollectHostMetrics(path string) (*SystemMetrics, error) {
 
 	var err error
 	var metrics *SystemMetrics = &SystemMetrics{}
-  metrics.When = time.Now()
+	metrics.When = time.Now()
 
 	err = collectLoadAverage(path, metrics)
 	if err != nil {
@@ -67,6 +67,10 @@ func collectMemory(path string, metrics *SystemMetrics) error {
 
 	memMetrics := make(map[string]int)
 	for _, line := range lines {
+		if line == "" {
+			continue
+		}
+
 		results := meminfoParser.FindStringSubmatch(line)
 		if results == nil {
 			fmt.Println("Unknown input: " + line)
