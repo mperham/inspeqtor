@@ -12,7 +12,7 @@ import (
 type SystemMetrics struct {
 	When             time.Time
 	CpuUsage         CpuMetrics
-	FreeMem          int
+	FreeMem          uint64
 	Load1            float32
 	Load5            float32
 	Load15           float32
@@ -65,7 +65,7 @@ func collectMemory(path string, metrics *SystemMetrics) error {
 	}
 	lines := strings.Split(string(contentBytes), "\n")
 
-	memMetrics := make(map[string]int)
+	memMetrics := make(map[string]uint64)
 	for _, line := range lines {
 		if line == "" {
 			continue
@@ -76,12 +76,12 @@ func collectMemory(path string, metrics *SystemMetrics) error {
 			fmt.Println("Unknown input: " + line)
 			continue
 		}
-		val, err := strconv.Atoi(results[2])
+		val, err := strconv.ParseUint(results[2], 10, 64)
 		if err != nil {
 			fmt.Println("Unexpected input: " + results[2] + " in " + line)
 			return err
 		}
-		memMetrics[results[1]] = val
+		memMetrics[results[1]] = uint64(val)
 	}
 
 	metrics.FreeMem = memMetrics["MemFree"]
