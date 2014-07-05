@@ -1,6 +1,8 @@
-package main
+package linux
 
 import (
+	"bufio"
+	"bytes"
 	"errors"
 	"fmt"
 	"os"
@@ -11,56 +13,47 @@ import (
 	"strings"
 )
 
-type Upstart struct{}
+type Upstart struct {
+	Path string
+}
 
 var (
 	pidScanner *regexp.Regexp = regexp.MustCompile(" (?:start|stop)\\/(?:running|waiting)(?:, process (\\d+))?")
 )
 
-func serviceList(serviceName string) ([]string, error) {
-	var matches []string
-	var done bool = false
-
-	err := filepath.Walk("/etc/init", func(path string, info os.FileInfo, err error) error {
-		if done {
-			return nil
-		}
-		if !info.IsDir() {
-			if strings.HasPrefix(info.Name(), ".") {
-				return nil
-			}
-
-			if info.Name() == (serviceName + ".conf") {
-				matches = append(matches, serviceName)
-				done = true
-				return nil
-			}
-			if strings.Contains(info.Name(), serviceName) {
-				name := info.Name()
-				fmt.Println("Found " + name)
-				matches = append(matches, name[:len(name)-5])
-			}
-		}
-		return nil
-	})
+func DetectUpstart(path string) (*Upstart, error) {
+	result, err := fileExists(path)
 	if err != nil {
 		return nil, err
 	}
 
-	return matches, nil
+	if !result {
+		fmt.Println("upstart not detected, no " + path)
+		return nil, nil
+	}
+
+	matches, err := filepath.Glob(path + "/*.conf")
+	if err != nil {
+		return nil, err
+	}
+
+	if len(matches) > 0 {
+		fmt.Println("Detected upstart in " + path)
+		return &Upstart{path}, nil
+	}
+
+	fmt.Println("upstart not detected, empty " + path)
+	return nil, nil
 }
 
 func (u *Upstart) FindService(serviceName string) (string, int, error) {
-	matches, err := serviceList(serviceName)
+	matches, err := filepath.Glob(u.Path + "/" + serviceName + ".conf")
 	if err != nil {
 		return "", 0, err
 	}
 
 	if len(matches) == 0 {
 		return "", 0, errors.New("No service matching " + serviceName + " was found in /etc/init")
-	}
-	if len(matches) > 1 {
-		return "", 0, errors.New("Found multiple services matching " + serviceName + " in /etc/init")
 	}
 
 	cmd := exec.Command("status", matches[0])
@@ -92,4 +85,26 @@ func (u *Upstart) FindService(serviceName string) (string, int, error) {
 	}
 
 	return "", 0, errors.New("Unknown upstart output: " + line)
+}
+
+func fileExists(path string) (bool, error) {
+	if _, err := os.Stat(path); err != nil {
+		if os.IsNotExist(err) {
+			return false, nil
+		} else {
+			return false, err
+		}
+	}
+	return true, nil
+}
+
+// readLines reads a whole file into memory
+// and returns a slice of its lines.
+func readLines(data []byte) ([]string, error) {
+	var lines []string
+	scan := bufio.NewScanner(bytes.NewReader(data))
+	for scan.Scan() {
+		lines = append(lines, scan.Text())
+	}
+	return lines, scan.Err()
 }

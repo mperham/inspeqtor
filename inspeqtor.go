@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
@@ -9,6 +8,7 @@ import (
 	"flag"
 	"fmt"
 	"gopkg.in/yaml.v1"
+	"inspeqtor/darwin"
 	"inspeqtor/linux"
 	"io/ioutil"
 	"log/syslog"
@@ -65,19 +65,17 @@ func main() {
 			license.Name, license.Email, license.Hosts))
 	}
 
-	macosx, err := FileExists("/mach_kernel")
+	var serviceMapping map[string]int = make(map[string]int)
+
+	launchctl, err := darwin.DetectLaunchctl()
 	if err != nil {
 		panic(err)
 	}
 
-	var serviceMapping map[string]int = make(map[string]int)
-
-	if macosx {
-		fmt.Println("Detected OSX, using launchctl")
-		osx := Launchctl{}
-		services := []string{"percona", "redis", "bob"}
+	if launchctl != nil {
+		services := []string{"homebrew.mxcl.memcached", "bob"}
 		for _, service := range services {
-			name, pid, err := osx.FindService(service)
+			name, pid, err := launchctl.FindService(service)
 			if err != nil {
 				log.Warning("Couldn't find service " + service + ", skipping...")
 			} else {
@@ -86,14 +84,12 @@ func main() {
 		}
 	}
 
-	upstart, err := FileExists("/etc/init")
+	upstart, err := linux.DetectUpstart("/etc/init")
 	if err != nil {
 		panic(err)
 	}
 
-	if upstart {
-		fmt.Println("Found upstart in /etc/init")
-		upstart := Upstart{}
+	if upstart != nil {
 		services := []string{"mysql", "pass", "bob"}
 		for _, service := range services {
 			name, pid, err := upstart.FindService(service)
@@ -229,15 +225,4 @@ func FileExists(path string) (bool, error) {
 		}
 	}
 	return true, nil
-}
-
-// readLines reads a whole file into memory
-// and returns a slice of its lines.
-func readLines(data []byte) ([]string, error) {
-	var lines []string
-	scan := bufio.NewScanner(bytes.NewReader(data))
-	for scan.Scan() {
-		lines = append(lines, scan.Text())
-	}
-	return lines, scan.Err()
 }
