@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"errors"
-	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -28,7 +28,7 @@ func DetectUpstart(path string) (*Upstart, error) {
 	}
 
 	if !result {
-		fmt.Println("upstart not detected, no " + path)
+		log.Println("upstart not detected, no " + path)
 		return nil, nil
 	}
 
@@ -38,11 +38,11 @@ func DetectUpstart(path string) (*Upstart, error) {
 	}
 
 	if len(matches) > 0 {
-		fmt.Println("Detected upstart in " + path)
+		log.Println("Detected upstart in " + path)
 		return &Upstart{path}, nil
 	}
 
-	fmt.Println("upstart not detected, empty " + path)
+	log.Println("upstart not detected, empty " + path)
 	return nil, nil
 }
 
@@ -71,7 +71,7 @@ func (u *Upstart) FindService(serviceName string) (string, int, error) {
 	// sshdgenkeys stop/waiting
 	line := lines[0]
 	results := pidScanner.FindStringSubmatch(line)
-	fmt.Println(results)
+	log.Println(results)
 
 	if len(results) > 1 && len(results[1]) > 0 {
 		pid, err := strconv.Atoi(results[1])

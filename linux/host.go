@@ -1,8 +1,8 @@
 package linux
 
 import (
-	"fmt"
 	"io/ioutil"
+	"log"
 	"regexp"
 	"strconv"
 	"strings"
@@ -37,7 +37,6 @@ var (
 )
 
 func CollectHostMetrics(path string) (*SystemMetrics, error) {
-
 	var err error
 	var metrics *SystemMetrics = &SystemMetrics{}
 	metrics.When = time.Now()
@@ -73,12 +72,12 @@ func collectMemory(path string, metrics *SystemMetrics) error {
 
 		results := meminfoParser.FindStringSubmatch(line)
 		if results == nil {
-			fmt.Println("Unknown input: " + line)
+			log.Println("Unknown input: " + line)
 			continue
 		}
 		val, err := strconv.ParseUint(results[2], 10, 64)
 		if err != nil {
-			fmt.Println("Unexpected input: " + results[2] + " in " + line)
+			log.Println("Unexpected input: " + results[2] + " in " + line)
 			return err
 		}
 		memMetrics[results[1]] = uint64(val)

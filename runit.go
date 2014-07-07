@@ -12,8 +12,8 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"io/ioutil"
+	"log"
 	"path/filepath"
 	"strconv"
 )
@@ -33,7 +33,7 @@ func DetectRunit() (*Runit, error) {
 	}
 
 	if !result {
-		fmt.Println("runit not detected, no /etc/sv")
+		log.Println("runit not detected, no /etc/sv")
 		return nil, nil
 	}
 
@@ -44,7 +44,7 @@ func DetectRunit() (*Runit, error) {
 		}
 
 		if len(matches) > 0 {
-			fmt.Println("Detected runit in " + path)
+			log.Println("Detected runit in " + path)
 			return &Runit{path}, nil
 		}
 	}

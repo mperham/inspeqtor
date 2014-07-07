@@ -11,16 +11,17 @@ import (
 	"inspeqtor/darwin"
 	"inspeqtor/linux"
 	"io/ioutil"
-	"log/syslog"
+	"log"
 	"net/smtp"
 	"os"
 	"os/signal"
-	"os/user"
 	"strconv"
 	"time"
 )
 
-var VERSION = "1.0.0"
+var (
+	VERSION = "1.0.0"
+)
 
 type cliOptions struct {
 	verbose         bool
@@ -28,27 +29,11 @@ type cliOptions struct {
 	configDirectory string
 }
 
-// - parse cmd line flags
-// - open logger
-// - parse configuration
-// - locate processes
 func main() {
-	u, err := user.Current()
-	if u.Uid != "0" {
-		fmt.Println(u)
-		fmt.Println("Must be root")
-		os.Exit(-1)
-	}
 	options := parseArguments()
 	if options.verbose {
 
 	}
-
-	log, err := syslog.New(syslog.LOG_USER|syslog.LOG_NOTICE, "inspeqtor")
-	if err != nil {
-		panic("Unable to open log: " + err.Error())
-	}
-	defer log.Close()
 
 	result, err := FileExists("license.yml")
 	if err != nil {
@@ -58,10 +43,10 @@ func main() {
 	if result {
 		license, err := verifyLicense()
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 			os.Exit(120)
 		}
-		log.Warning(fmt.Sprintf("Licensed to %s <%s>, maximum of %d hosts.",
+		log.Println(fmt.Sprintf("Licensed to %s <%s>, maximum of %d hosts.",
 			license.Name, license.Email, license.Hosts))
 	}
 
@@ -77,7 +62,7 @@ func main() {
 		for _, service := range services {
 			name, pid, err := launchctl.FindService(service)
 			if err != nil {
-				log.Warning("Couldn't find service " + service + ", skipping...")
+				log.Println("Couldn't find service " + service + ", skipping...")
 			} else {
 				serviceMapping[name] = pid
 			}
@@ -94,14 +79,14 @@ func main() {
 		for _, service := range services {
 			name, pid, err := upstart.FindService(service)
 			if err != nil {
-				fmt.Println(err.Error())
+				log.Fatalln(err.Error())
 			} else {
 				serviceMapping[name] = pid
 			}
 		}
 	}
 
-	fmt.Println(serviceMapping)
+	log.Println(serviceMapping)
 
 	shutdown := make(chan int)
 	go pollSystem(shutdown)
@@ -111,14 +96,14 @@ func main() {
 	<-signals
 
 	shutdown <- 1
-	fmt.Println("Complete, bye!")
+	log.Println("Complete, bye!")
 }
 
 func pollSystem(shutdown chan int) {
 	scanSystem()
 	select {
 	case <-shutdown:
-		fmt.Println("Exiting poll loop")
+		log.Println("Exiting poll loop")
 		return
 	case <-time.After(30 * time.Second):
 		scanSystem()
@@ -126,12 +111,12 @@ func pollSystem(shutdown chan int) {
 }
 
 func scanSystem() {
-	fmt.Println("Scanning...")
+	log.Println("Scanning...")
 	metrics, err := linux.CollectHostMetrics("/proc")
 	if err != nil {
-		fmt.Println(err)
+		log.Fatalln(err)
 	} else {
-		fmt.Println(metrics)
+		log.Println(metrics)
 	}
 }
 
@@ -188,7 +173,7 @@ func verifyLicense() (*License, error) {
 		return nil, err
 	}
 
-	fmt.Println(license)
+	log.Println(license)
 	return license.verify()
 }
 
@@ -202,14 +187,14 @@ func parseArguments() cliOptions {
 	flag.Parse()
 
 	if *helpPtr || *help2Ptr {
-		fmt.Println("inspeqtor", VERSION)
-		fmt.Println("Copyright (c) 2014 Q Systems Corp")
-		fmt.Println("")
-		fmt.Println("-c [dir]\tConfiguration directory")
-		fmt.Println("-t\t\tVerify configuration and exit")
-		fmt.Println("-v\t\tPrint version and exit")
-		fmt.Println("")
-		fmt.Println("-h\t\tYou're looking at it")
+		log.Println("inspeqtor", VERSION)
+		log.Println("Copyright (c) 2014 Q Systems Corp")
+		log.Println("")
+		log.Println("-c [dir]\tConfiguration directory")
+		log.Println("-t\t\tVerify configuration and exit")
+		log.Println("-v\t\tPrint version and exit")
+		log.Println("")
+		log.Println("-h\t\tYou're looking at it")
 		os.Exit(0)
 	}
 
