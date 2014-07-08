@@ -1,0 +1,30 @@
+// https://github.com/awalterschulze/katydid/blob/master/asm/asm.bnf
+
+
+_lineComment : '#' {.} '\n' ;
+!comment : _lineComment;
+
+!whitespace: ' ' | '\t' | '\n' | '\r' ;
+_letter : 'a'-'z' | 'A'-'Z' ;
+
+_digit : '0'-'9' ;
+
+_idchar : _letter | _digit | '_' | '-';
+
+amount : _digit {_digit} {_letter};
+
+id : (_letter) {_idchar} ;
+
+<< import "inspeqtor/conf/ast" >>
+
+Check:
+    "check" id id id  RuleList                     << ast.NewCheck($1, $2, $3, $4), nil >>
+  | "check" id id RuleList                         << ast.NewCheck(nil, $1, $2, $3), nil >>;
+
+Rule:
+  "if" id ">" amount "then" id      << ast.NewRule($1, $2, $3, $5), nil >>;
+
+RuleList:
+  Rule                              << ast.NewRuleList($0), nil >>
+  | RuleList Rule                   << ast.AppendRule($0, $1), nil >>;
+

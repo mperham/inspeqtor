@@ -1,0 +1,3 @@
+check launchctl service memcached
+#  if not exists then start
+  if memory > 250m then restart
