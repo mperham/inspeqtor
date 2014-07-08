@@ -48,7 +48,7 @@ HumanAmount
   | uint_lit sizecode   << ast.HumanAmount($0, $1) >>;
 
 Rule
-  : "if" id operator HumanAmount "then" Action  << ast.NewRule($1, $2, $3, $5, uint8(1)), nil >>
+  : "if" id operator HumanAmount "then" Action  << ast.NewRule($1, $2, $3, $5, uint64(1)), nil >>
   | "if" id operator HumanAmount "for" IntAmount "cycles" "then" Action  << ast.NewRule($1, $2, $3, $8, $5), nil >>;
 
 RuleList

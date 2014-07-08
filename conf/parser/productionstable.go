@@ -180,13 +180,13 @@ var productionsTable = ProdTab {
 		},
 	},
 	ProdTabEntry{
-		String: `Rule : "if" id operator HumanAmount "then" Action	<< ast.NewRule(X[1], X[2], X[3], X[5], uint8(1)), nil >>`,
+		String: `Rule : "if" id operator HumanAmount "then" Action	<< ast.NewRule(X[1], X[2], X[3], X[5], uint64(1)), nil >>`,
 		Id: "Rule",
 		NTType: 7,
 		Index: 16,
 		NumSymbols: 6,
 		ReduceFunc: func(X []Attrib) (Attrib, error) {
-			return ast.NewRule(X[1], X[2], X[3], X[5], uint8(1)), nil
+			return ast.NewRule(X[1], X[2], X[3], X[5], uint64(1)), nil
 		},
 	},
 	ProdTabEntry{

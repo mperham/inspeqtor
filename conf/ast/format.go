@@ -53,7 +53,7 @@ func NewRule(metric interface{}, operator interface{}, value interface{}, action
 		string(operator.(*token.Token).Lit),
 		value.(uint64),
 		string(action.(*token.Token).Lit),
-		cycleCount.(uint8),
+		uint8(cycleCount.(uint64)),
 	}
 }
 
