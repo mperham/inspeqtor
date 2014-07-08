@@ -24,6 +24,6 @@ func TestBasicServiceParsing(t *testing.T) {
 		t.Error(err)
 	}
 
-	check := obj.(*ast.Check)
+	check := obj.(*ast.ProcessCheck)
 	fmt.Printf("output: %s\n", check)
 }

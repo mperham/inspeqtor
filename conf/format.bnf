@@ -11,20 +11,46 @@ _digit : '0'-'9' ;
 
 _idchar : _letter | _digit | '_' | '-';
 
-amount : _digit {_digit} {_letter};
+sizecode : 'k' | 'm' | 'g' | 't' | 'p';
+uint_lit : _digit {_digit};
 
 id : (_letter) {_idchar} ;
+operator : '>';
 
 << import "inspeqtor/conf/ast" >>
 
-Check:
-    "check" id id id  RuleList                     << ast.NewCheck($1, $2, $3, $4), nil >>
-  | "check" id id RuleList                         << ast.NewCheck(nil, $1, $2, $3), nil >>;
+Check
+  : "check" Checktype id RuleList                  << ast.NewProcessCheck(nil, $1, $2, $3), nil >>
+  | "check" Inittype Checktype id RuleList         << ast.NewProcessCheck($1, $2, $3, $4), nil >>
+  | "check" "host" RuleList                        << ast.NewHostCheck($2), nil >>;
 
-Rule:
-  "if" id ">" amount "then" id      << ast.NewRule($1, $2, $3, $5), nil >>;
+Checktype :
+ : "process"        << $0, nil >>
+ | "service"        << $0, nil >>;
 
-RuleList:
-  Rule                              << ast.NewRuleList($0), nil >>
-  | RuleList Rule                   << ast.AppendRule($0, $1), nil >>;
+Action
+  : "restart"       << $0, nil >>
+  | "alert"         << $0, nil >>;
 
+Inittype
+	: "launchctl"                 << $0, nil >>
+	| "upstart" 									<< $0, nil >>
+	| "runit" 										<< $0, nil >>
+	| "systemd" 									<< $0, nil >>
+	| "init.d" 										<< $0, nil >>
+	;
+
+IntAmount
+  : uint_lit            << ast.ToUint64($0) >>;
+
+HumanAmount
+  : uint_lit            << ast.HumanAmount($0, nil) >>
+  | uint_lit sizecode   << ast.HumanAmount($0, $1) >>;
+
+Rule
+  : "if" id operator HumanAmount "then" Action  << ast.NewRule($1, $2, $3, $5, uint8(1)), nil >>
+  | "if" id operator HumanAmount "for" IntAmount "cycles" "then" Action  << ast.NewRule($1, $2, $3, $8, $5), nil >>;
+
+RuleList
+  : Rule                              << ast.NewRuleList($0), nil >>
+  | RuleList Rule                     << ast.AppendRule($0, $1), nil >>;
