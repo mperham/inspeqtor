@@ -7,7 +7,6 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"gopkg.in/yaml.v1"
 	"inspeqtor/darwin"
 	"inspeqtor/linux"
 	"io/ioutil"
@@ -15,7 +14,7 @@ import (
 	"net/smtp"
 	"os"
 	"os/signal"
-	"strconv"
+	"strings"
 	"time"
 )
 
@@ -30,6 +29,11 @@ type cliOptions struct {
 }
 
 func main() {
+	// Modern POSIX applications should log to STDOUT only
+	// and use a smart init system to manage logging.
+	log.SetOutput(os.Stdout)
+	log.SetPrefix("inspeqtor ")
+
 	options := parseArguments()
 	if options.verbose {
 
@@ -46,11 +50,11 @@ func main() {
 			log.Println(err)
 			os.Exit(120)
 		}
-		log.Println(fmt.Sprintf("Licensed to %s <%s>, maximum of %d hosts.",
+		log.Println(fmt.Sprintf("Licensed to %s <%s>, maximum of %s hosts.",
 			license.Name, license.Email, license.Hosts))
 	}
 
-	var serviceMapping map[string]int = make(map[string]int)
+	serviceMapping := make(map[string]int)
 
 	launchctl, err := darwin.DetectLaunchctl()
 	if err != nil {
@@ -134,47 +138,49 @@ func sendEmail(data interface{}) {
 type License struct {
 	Name  string
 	Email string
-	Hosts int
-	Key   string
-	Nonce int
-	V     int
-}
-
-func (lic *License) verify() (*License, error) {
-	if len(lic.Key) != 64 {
-		return nil, errors.New("Invalid license")
-	}
-	if lic.V == 1 {
-		cat := []byte("TastySalt" + lic.Name + lic.Email +
-			strconv.Itoa(lic.Hosts) +
-			strconv.Itoa(lic.Nonce))
-		hash := sha256.Sum256(cat)
-		should_be := hex.EncodeToString(hash[:])
-		//    fmt.Println(should_be)
-		if lic.Key == should_be {
-			return lic, nil
-		} else {
-			return nil, errors.New("Invalid license")
-		}
-	} else {
-		panic("Unknown license format")
-	}
+	Hosts string
 }
 
 func verifyLicense() (*License, error) {
-	var license License
+	lic := make(map[string]string)
 	b, err := ioutil.ReadFile("license.yml")
 	if err != nil {
 		return nil, err
 	}
 
-	err = yaml.Unmarshal(b, &license)
-	if err != nil {
-		return nil, err
+	lines := strings.Split(string(b), "\n")
+	for _, line := range lines {
+		kv := strings.Split(line, ":")
+		if len(kv) < 2 {
+			continue
+		}
+		lic[strings.TrimSpace(kv[0])] = strings.TrimSpace(kv[1])
 	}
 
-	log.Println(license)
-	return license.verify()
+	log.Println(lic)
+	l := License{
+		Name:  lic["name"],
+		Email: lic["email"],
+		Hosts: lic["hosts"],
+	}
+
+	if len(lic["key"]) != 64 {
+		return nil, errors.New("Invalid license key")
+	}
+	if lic["v"] == "1" {
+		cat := []byte("TastySalt" + l.Name + l.Email +
+			l.Hosts + lic["nonce"])
+		hash := sha256.Sum256(cat)
+		should_be := hex.EncodeToString(hash[:])
+		//    fmt.Println(should_be)
+		if lic["key"] == should_be {
+			return &l, nil
+		} else {
+			return nil, errors.New("Invalid license")
+		}
+	} else {
+		return nil, errors.New("Invalid license")
+	}
 }
 
 func parseArguments() cliOptions {
@@ -188,7 +194,7 @@ func parseArguments() cliOptions {
 
 	if *helpPtr || *help2Ptr {
 		log.Println("inspeqtor", VERSION)
-		log.Println("Copyright (c) 2014 Q Systems Corp")
+		log.Println("Copyright (c) 2014 Contributed Systems LLC")
 		log.Println("")
 		log.Println("-c [dir]\tConfiguration directory")
 		log.Println("-t\t\tVerify configuration and exit")

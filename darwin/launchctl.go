@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"errors"
-	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"strconv"
@@ -40,7 +40,7 @@ func (l *Launchctl) FindService(serviceName string) (string, int, error) {
 
 	for _, line := range lines {
 		if strings.Contains(line, serviceName) {
-			fmt.Println("Found " + serviceName)
+			log.Println("Found " + serviceName)
 			parts := strings.SplitN(line, "\t", 3)
 			pid, err := strconv.Atoi(parts[0])
 			if err != nil {
