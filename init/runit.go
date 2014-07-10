@@ -8,7 +8,7 @@
 //           pid  # => 4994
 //           stat # => run / down
 //
-package linux
+package init
 
 import (
 	"errors"

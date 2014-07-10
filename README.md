@@ -7,10 +7,9 @@ What it does:
 
 * Monitor service memory and CPU usage
 * Monitor system CPU, swap and disk usage
-* Notify if services disappear or change PID outside of a deploy window
+* Notify if services disappear or change PID
 * Notify if services or system goes over defined utilization
-* Define applications and deploy windows
-* Notification schemes: email, webhook, script
+* Email notification
 * Extremely developer friendly:
   - Test configuration
   - Test notifications
@@ -18,7 +17,7 @@ What it does:
 What it doesn't:
 
 * support PID files, which are one big race condition
-* monitor arbitrary processes, processes must be system-managed
+* monitor arbitrary processes, processes must be init-managed
 * know how to start/stop services.  Defers to upstart/systemd/init.d/runit/launchctl
 * complain about multiple operations taking place in parallel
 * have *any* runtime dependencies at all, not even libc.

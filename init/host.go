@@ -1,4 +1,4 @@
-package linux
+package init
 
 import (
 	"io/ioutil"

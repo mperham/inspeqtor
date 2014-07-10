@@ -4,8 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"inspeqtor/conf"
-	"inspeqtor/darwin"
-	"inspeqtor/linux"
+	"inspeqtor/init"
 	"log"
 	"net/smtp"
 	"os"
@@ -24,8 +23,14 @@ type Inspeqtor struct {
 }
 
 type Init interface {
+	// Name of the init system: "upstart", "runit", etc.
 	Name() string
-	FindService(name string) (int32, error)
+
+	// Look up PID for the given service name, returns
+	// positive integer if successful, -1 if the service
+	// name was not found or error if there was an
+	// unexpected failure.
+	FindServicePID(name string) (int32, error)
 }
 
 func New(dir string) (*Inspeqtor, error) {
@@ -92,6 +97,8 @@ func (i *Inspeqtor) Parse() error {
 		return err
 	}
 	i.Checks = checks
+	log.Printf("Host: %+v\n", *checks.Host)
+	log.Printf("Processes: %+v\n", checks.Processes)
 	return nil
 }
 
