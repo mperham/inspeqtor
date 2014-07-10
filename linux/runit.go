@@ -8,12 +8,13 @@
 //           pid  # => 4994
 //           stat # => run / down
 //
-package main
+package linux
 
 import (
 	"errors"
 	"io/ioutil"
 	"log"
+	"os"
 	"path/filepath"
 	"strconv"
 )
@@ -72,4 +73,14 @@ func (r *Runit) FindService(serviceName string) (string, int, error) {
 	}
 
 	return serviceName, pid, nil
+}
+func FileExists(path string) (bool, error) {
+	if _, err := os.Stat(path); err != nil {
+		if os.IsNotExist(err) {
+			return false, nil
+		} else {
+			return false, err
+		}
+	}
+	return true, nil
 }
