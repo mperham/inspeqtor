@@ -12,16 +12,16 @@ What it does:
 * Notify if processes disappear or change PID
 * Notify if processes or system goes over defined RAM or CPU utilization
 * Email notification
-* Extremely developer friendly:
+* As developer friendly as possible:
   - Test configuration
   - Test notifications
 
 What it doesn't:
 
-* support PID files, which are one big race condition
+* support PID files, which are racy and error-prone
 * monitor arbitrary processes, processes must be init-managed
 * know how to start/stop services.  Defers to your OS's init system
-* have *any* runtime dependencies at all, not even libc.
+* have *any* runtime or 3rd party dependencies at all, not even libc.
 
 The default monitoring rules out of the box perform basic health checks:
 
