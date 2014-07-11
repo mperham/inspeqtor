@@ -20,6 +20,7 @@ type SystemMetrics struct {
 }
 
 type CpuMetrics struct {
+	Total     uint64
 	User      uint64
 	Nice      uint64
 	System    uint64
@@ -148,5 +149,7 @@ func createCpuMetrics(fields []string) CpuMetrics {
 	s.Steal, _ = strconv.ParseUint(fields[8], 10, 64)
 	s.Guest, _ = strconv.ParseUint(fields[9], 10, 64)
 	s.GuestNice, _ = strconv.ParseUint(fields[10], 10, 64)
+	s.Total = s.User + s.Nice + s.System + s.Idle + s.IOWait +
+		s.Irq + s.SoftIrq + s.Steal + s.Guest + s.GuestNice
 	return s
 }
