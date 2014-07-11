@@ -1,4 +1,4 @@
-package init
+package metrics
 
 import (
 	"io/ioutil"

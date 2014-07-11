@@ -4,7 +4,8 @@ import (
 	"bytes"
 	"fmt"
 	"inspeqtor/conf"
-	"inspeqtor/init"
+	"inspeqtor/metrics"
+	"inspeqtor/services"
 	"log"
 	"net/smtp"
 	"os"
@@ -38,9 +39,9 @@ func New(dir string) (*Inspeqtor, error) {
 }
 
 func (i *Inspeqtor) DetectManagers() error {
-	serviceMapping := make(map[string]int)
+	serviceMapping := make(map[string]int32)
 
-	launchctl, err := darwin.DetectLaunchctl()
+	launchctl, err := services.DetectLaunchctl("/")
 	if err != nil {
 		return err
 	}
@@ -48,16 +49,16 @@ func (i *Inspeqtor) DetectManagers() error {
 	if launchctl != nil {
 		services := []string{"homebrew.mxcl.memcached", "bob"}
 		for _, service := range services {
-			name, pid, err := launchctl.FindService(service)
+			pid, err := launchctl.FindServicePID(service)
 			if err != nil {
 				log.Println("Couldn't find service " + service + ", skipping...")
 			} else {
-				serviceMapping[name] = pid
+				serviceMapping[service] = pid
 			}
 		}
 	}
 
-	upstart, err := linux.DetectUpstart("/etc/init")
+	upstart, err := services.DetectUpstart("/etc/init")
 	if err != nil {
 		return err
 	}
@@ -65,11 +66,11 @@ func (i *Inspeqtor) DetectManagers() error {
 	if upstart != nil {
 		services := []string{"mysql", "pass", "bob"}
 		for _, service := range services {
-			name, pid, err := upstart.FindService(service)
+			pid, err := upstart.FindServicePID(service)
 			if err != nil {
 				return err
 			} else {
-				serviceMapping[name] = pid
+				serviceMapping[service] = pid
 			}
 		}
 	}
@@ -97,8 +98,7 @@ func (i *Inspeqtor) Parse() error {
 		return err
 	}
 	i.Checks = checks
-	log.Printf("Host: %+v\n", *checks.Host)
-	log.Printf("Processes: %+v\n", checks.Processes)
+	log.Printf("Checks: %+v\n", checks)
 	return nil
 }
 
@@ -115,7 +115,7 @@ func (i *Inspeqtor) pollSystem(shutdown chan int) {
 
 func scanSystem() {
 	log.Println("Scanning...")
-	metrics, err := linux.CollectHostMetrics("/proc")
+	metrics, err := metrics.CollectHostMetrics("/proc")
 	if err != nil {
 		log.Fatalln(err)
 	} else {

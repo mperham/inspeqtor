@@ -8,7 +8,7 @@
 //           pid  # => 4994
 //           stat # => run / down
 //
-package init
+package services
 
 import (
 	"errors"
