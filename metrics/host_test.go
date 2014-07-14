@@ -17,7 +17,7 @@ func TestCollectHostMetrics(t *testing.T) {
 	expected := SystemMetrics{
 		when,
 		CpuMetrics{
-			4670673, 0, 768153, 1298881971, 143718, 844, 10855, 68601, 0, 0,
+			1304544815, 4670673, 0, 768153, 1298881971, 143718, 844, 10855, 68601, 0, 0,
 		},
 		243376,
 		0.02,

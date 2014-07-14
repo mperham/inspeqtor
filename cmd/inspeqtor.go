@@ -5,8 +5,8 @@ import (
 	"encoding/hex"
 	"errors"
 	"flag"
-	"fmt"
 	"inspeqtor"
+	"inspeqtor/util"
 	"io/ioutil"
 	"log"
 	"os"
@@ -27,7 +27,7 @@ func main() {
 
 	options := parseArguments()
 	if options.verbose {
-
+		util.Verbose = true
 	}
 
 	result, err := FileExists("license.yml")
@@ -41,8 +41,8 @@ func main() {
 			log.Println(err)
 			os.Exit(120)
 		}
-		log.Println(fmt.Sprintf("Licensed to %s <%s>, maximum of %s hosts.",
-			license.Name, license.Email, license.Hosts))
+		util.Info("Licensed to %s <%s>, maximum of %s hosts.",
+			license.Name, license.Email, license.Hosts)
 	}
 
 	ins, err := inspeqtor.New(options.configDirectory)
@@ -55,7 +55,7 @@ func main() {
 	}
 
 	if options.testConfig {
-		log.Println("Configuration parsed ok.")
+		util.Info("Configuration parsed ok.")
 		os.Exit(0)
 	} else {
 		ins.Start()
@@ -84,7 +84,7 @@ func verifyLicense() (*License, error) {
 		lic[strings.TrimSpace(kv[0])] = strings.TrimSpace(kv[1])
 	}
 
-	log.Println(lic)
+	util.DebugDebug("%v", lic)
 	l := License{
 		Name:  lic["name"],
 		Email: lic["email"],

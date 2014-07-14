@@ -1,8 +1,8 @@
 package metrics
 
 import (
+	"inspeqtor/util"
 	"io/ioutil"
-	"log"
 	"regexp"
 	"strconv"
 	"strings"
@@ -73,12 +73,12 @@ func collectMemory(path string, metrics *SystemMetrics) error {
 
 		results := meminfoParser.FindStringSubmatch(line)
 		if results == nil {
-			log.Println("Unknown input: " + line)
+			util.Warn("Unknown input: " + line)
 			continue
 		}
 		val, err := strconv.ParseUint(results[2], 10, 64)
 		if err != nil {
-			log.Println("Unexpected input: " + results[2] + " in " + line)
+			util.Warn("Unexpected input: " + results[2] + " in " + line)
 			return err
 		}
 		memMetrics[results[1]] = uint64(val)

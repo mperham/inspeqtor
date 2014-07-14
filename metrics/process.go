@@ -1,11 +1,6 @@
 package metrics
 
 import (
-	"io/ioutil"
-	"log"
-	"regexp"
-	"strconv"
-	"strings"
 	"time"
 )
 
@@ -34,9 +29,6 @@ type Process struct {
 	MetricsHistory []*ProcessMetrics
 }
 
-func New() (*Process, error) {
-}
-
 func (p *Process) CaptureMetrics() (*ProcessMetrics, error) {
-
+	return &ProcessMetrics{time.Now(), Running, p.PID, 0, 0, 0, 0}, nil
 }

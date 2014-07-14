@@ -11,8 +11,8 @@
 package services
 
 import (
+	"inspeqtor/util"
 	"io/ioutil"
-	"log"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -24,21 +24,21 @@ type Runit struct {
 
 func DetectRunit(root string) (*Runit, error) {
 	path := root + "etc/service"
-	result, err := fileExists(path)
+	result, err := util.FileExists(path)
 	if err != nil {
 		return nil, err
 	}
 
 	if !result {
 		path = root + "service"
-		result, err = fileExists(path)
+		result, err = util.FileExists(path)
 		if err != nil {
 			return nil, err
 		}
 	}
 
 	if !result {
-		log.Println("runit not detected in /etc/service or /service")
+		util.Debug("runit not detected in /etc/service or /service")
 		return nil, nil
 	}
 
@@ -48,7 +48,7 @@ func DetectRunit(root string) (*Runit, error) {
 	}
 
 	if len(matches) > 0 {
-		log.Println("Detected runit in " + path)
+		util.Info("Detected runit in " + path)
 		return &Runit{path}, nil
 	}
 

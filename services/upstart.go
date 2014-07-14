@@ -2,7 +2,7 @@ package services
 
 import (
 	"errors"
-	"log"
+	"inspeqtor/util"
 	"os/exec"
 	"path/filepath"
 	"regexp"
@@ -20,13 +20,13 @@ var (
 )
 
 func DetectUpstart(path string) (*Upstart, error) {
-	result, err := fileExists(path)
+	result, err := util.FileExists(path)
 	if err != nil {
 		return nil, err
 	}
 
 	if !result {
-		log.Println("upstart not detected, no " + path)
+		util.Debug("upstart not detected, no " + path)
 		return nil, nil
 	}
 
@@ -36,11 +36,11 @@ func DetectUpstart(path string) (*Upstart, error) {
 	}
 
 	if len(matches) > 0 {
-		log.Println("Detected upstart in " + path)
+		util.Debug("Detected upstart in " + path)
 		return &Upstart{path, ""}, nil
 	}
 
-	log.Println("upstart not detected, empty " + path)
+	util.Debug("upstart not detected, empty " + path)
 	return nil, nil
 }
 
@@ -65,7 +65,7 @@ func (u *Upstart) FindServicePID(serviceName string) (int32, error) {
 		}
 	}
 
-	lines, err := readLines(sout)
+	lines, err := util.ReadLines(sout)
 	if len(lines) != 1 {
 		return 0, errors.New("Unexpected output: " + strings.Join(lines, "\n"))
 	}

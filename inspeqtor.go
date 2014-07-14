@@ -6,6 +6,7 @@ import (
 	"inspeqtor/conf"
 	"inspeqtor/metrics"
 	"inspeqtor/services"
+	"inspeqtor/util"
 	"log"
 	"net/smtp"
 	"os"
@@ -13,7 +14,7 @@ import (
 	"time"
 )
 
-var (
+const (
 	VERSION = "1.0.0"
 )
 
@@ -51,7 +52,7 @@ func (i *Inspeqtor) DetectManagers() error {
 		for _, service := range services {
 			pid, err := launchctl.FindServicePID(service)
 			if err != nil {
-				log.Println("Couldn't find service " + service + ", skipping...")
+				util.Debug("Couldn't find service " + service + ", skipping...")
 			} else {
 				serviceMapping[service] = pid
 			}
@@ -88,7 +89,7 @@ func (i *Inspeqtor) Start() {
 	signal.Notify(signals, os.Interrupt)
 	<-signals
 
-	log.Println("Inspeqtor shutting down...")
+	util.Debug("Inspeqtor shutting down...")
 	shutdown <- 1
 }
 
@@ -98,7 +99,7 @@ func (i *Inspeqtor) Parse() error {
 		return err
 	}
 	i.Checks = checks
-	log.Printf("Checks: %+v\n", checks)
+	util.DebugDebug("Checks: %+v\n", checks)
 	return nil
 }
 
@@ -106,7 +107,7 @@ func (i *Inspeqtor) pollSystem(shutdown chan int) {
 	scanSystem()
 	select {
 	case <-shutdown:
-		log.Println("Exiting poll loop")
+		util.DebugDebug("Exiting poll loop")
 		return
 	case <-time.After(30 * time.Second):
 		scanSystem()
@@ -114,7 +115,7 @@ func (i *Inspeqtor) pollSystem(shutdown chan int) {
 }
 
 func scanSystem() {
-	log.Println("Scanning...")
+	util.DebugDebug("Scanning...")
 	metrics, err := metrics.CollectHostMetrics("/proc")
 	if err != nil {
 		log.Fatalln(err)

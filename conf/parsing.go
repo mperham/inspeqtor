@@ -4,6 +4,7 @@ import (
 	"inspeqtor/conf/ast"
 	"inspeqtor/conf/lexer"
 	"inspeqtor/conf/parser"
+	"inspeqtor/util"
 	"io/ioutil"
 	"log"
 	"path/filepath"
@@ -15,7 +16,7 @@ type Checks struct {
 }
 
 func Parse(rootDir string) (*Checks, error) {
-	log.Println("Parsing config in " + rootDir)
+	util.Debug("Parsing config in " + rootDir)
 	files, err := filepath.Glob(rootDir + "/*.inq")
 	if err != nil {
 		return nil, err
