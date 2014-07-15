@@ -1,0 +1,3 @@
+- Daemon configuration (email, email template)
+- Collect per-process metrics per cycle
+- Write alerting logic
