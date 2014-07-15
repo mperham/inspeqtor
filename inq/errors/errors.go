@@ -4,7 +4,7 @@ package errors
 import(
 	"bytes"
 	"fmt"
-	"inspeqtor/conf/token"
+	"inspeqtor/inq/token"
 )
 
 type ErrorSymbol interface {

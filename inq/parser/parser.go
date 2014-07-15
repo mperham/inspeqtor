@@ -5,8 +5,8 @@ import(
 	"bytes"
 	"fmt"
 	"errors"
-	parseError "inspeqtor/conf/errors"
-	"inspeqtor/conf/token"
+	parseError "inspeqtor/inq/errors"
+	"inspeqtor/inq/token"
 )
 
 const (

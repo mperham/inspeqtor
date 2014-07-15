@@ -3,7 +3,7 @@ package inspeqtor
 import (
 	"bytes"
 	"fmt"
-	"inspeqtor/conf"
+	"inspeqtor/inq"
 	"inspeqtor/metrics"
 	"inspeqtor/services"
 	"inspeqtor/util"
@@ -21,7 +21,7 @@ const (
 type Inspeqtor struct {
 	RootDir         string
 	ServiceManagers []Init
-	Checks          *conf.Checks
+	Checks          *inq.Checks
 }
 
 type Init interface {
@@ -94,7 +94,7 @@ func (i *Inspeqtor) Start() {
 }
 
 func (i *Inspeqtor) Parse() error {
-	checks, err := conf.Parse(i.RootDir)
+	checks, err := inq.Parse(i.RootDir)
 	if err != nil {
 		return err
 	}

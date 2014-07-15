@@ -1,7 +1,7 @@
 
 package parser
 
-import "inspeqtor/conf/ast"
+import "inspeqtor/inq/ast"
 
 type (
 	//TODO: change type and variable names to be consistent with other tables

@@ -17,7 +17,7 @@ uint_lit : _digit {_digit};
 id : (_letter) {_idchar} ;
 operator : '>';
 
-<< import "inspeqtor/conf/ast" >>
+<< import "inspeqtor/inq/ast" >>
 
 Check
   : "check" Checktype id RuleList                  << ast.NewProcessCheck(nil, $1, $2, $3), nil >>

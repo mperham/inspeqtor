@@ -1,10 +1,10 @@
-package conf
+package inq
 
 import (
 	"fmt"
-	"inspeqtor/conf/ast"
-	"inspeqtor/conf/lexer"
-	"inspeqtor/conf/parser"
+	"inspeqtor/inq/ast"
+	"inspeqtor/inq/lexer"
+	"inspeqtor/inq/parser"
 	"io/ioutil"
 	"log"
 	"testing"
