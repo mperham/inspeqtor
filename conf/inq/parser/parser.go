@@ -5,14 +5,14 @@ import(
 	"bytes"
 	"fmt"
 	"errors"
-	parseError "inspeqtor/inq/errors"
-	"inspeqtor/inq/token"
+	parseError "inspeqtor/conf/inq/errors"
+	"inspeqtor/conf/inq/token"
 )
 
 const (
-	numProductions = 20
-	numStates      = 37
-	numSymbols     = 30
+	numProductions = 22
+	numStates      = 39
+	numSymbols     = 32
 )
 
 // Stack

@@ -2,9 +2,9 @@ package inq
 
 import (
 	"fmt"
-	"inspeqtor/inq/ast"
-	"inspeqtor/inq/lexer"
-	"inspeqtor/inq/parser"
+	"inspeqtor/conf/inq/ast"
+	"inspeqtor/conf/inq/lexer"
+	"inspeqtor/conf/inq/parser"
 	"io/ioutil"
 	"log"
 	"testing"

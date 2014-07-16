@@ -1,9 +1,9 @@
 package inq
 
 import (
-	"inspeqtor/inq/ast"
-	"inspeqtor/inq/lexer"
-	"inspeqtor/inq/parser"
+	"inspeqtor/conf/inq/ast"
+	"inspeqtor/conf/inq/lexer"
+	"inspeqtor/conf/inq/parser"
 	"inspeqtor/util"
 	"io/ioutil"
 	"log"

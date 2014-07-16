@@ -3,7 +3,7 @@
 */
 package parser
 
-const numNTSymbols = 9
+const numNTSymbols = 10
 type(
 	gotoTable [numStates]gotoRow
 	gotoRow	[numNTSymbols] int
@@ -14,6 +14,7 @@ var gotoTab = gotoTable{
 		
 		-1, // S'
 		1, // Check
+		2, // Preamble
 		-1, // Checktype
 		-1, // Action
 		-1, // Inittype
@@ -28,6 +29,7 @@ var gotoTab = gotoTable{
 		
 		-1, // S'
 		-1, // Check
+		-1, // Preamble
 		-1, // Checktype
 		-1, // Action
 		-1, // Inittype
@@ -42,9 +44,10 @@ var gotoTab = gotoTable{
 		
 		-1, // S'
 		-1, // Check
-		3, // Checktype
+		-1, // Preamble
+		5, // Checktype
 		-1, // Action
-		4, // Inittype
+		6, // Inittype
 		-1, // IntAmount
 		-1, // HumanAmount
 		-1, // Rule
@@ -56,6 +59,7 @@ var gotoTab = gotoTable{
 		
 		-1, // S'
 		-1, // Check
+		-1, // Preamble
 		-1, // Checktype
 		-1, // Action
 		-1, // Inittype
@@ -70,7 +74,8 @@ var gotoTab = gotoTable{
 		
 		-1, // S'
 		-1, // Check
-		14, // Checktype
+		-1, // Preamble
+		-1, // Checktype
 		-1, // Action
 		-1, // Inittype
 		-1, // IntAmount
@@ -84,13 +89,14 @@ var gotoTab = gotoTable{
 		
 		-1, // S'
 		-1, // Check
+		-1, // Preamble
 		-1, // Checktype
 		-1, // Action
 		-1, // Inittype
 		-1, // IntAmount
 		-1, // HumanAmount
-		16, // Rule
-		15, // RuleList
+		-1, // Rule
+		-1, // RuleList
 		
 
 	},
@@ -98,7 +104,8 @@ var gotoTab = gotoTable{
 		
 		-1, // S'
 		-1, // Check
-		-1, // Checktype
+		-1, // Preamble
+		16, // Checktype
 		-1, // Action
 		-1, // Inittype
 		-1, // IntAmount
@@ -112,13 +119,14 @@ var gotoTab = gotoTable{
 		
 		-1, // S'
 		-1, // Check
+		-1, // Preamble
 		-1, // Checktype
 		-1, // Action
 		-1, // Inittype
 		-1, // IntAmount
 		-1, // HumanAmount
-		-1, // Rule
-		-1, // RuleList
+		18, // Rule
+		17, // RuleList
 		
 
 	},
@@ -126,6 +134,7 @@ var gotoTab = gotoTable{
 		
 		-1, // S'
 		-1, // Check
+		-1, // Preamble
 		-1, // Checktype
 		-1, // Action
 		-1, // Inittype
@@ -140,6 +149,7 @@ var gotoTab = gotoTable{
 		
 		-1, // S'
 		-1, // Check
+		-1, // Preamble
 		-1, // Checktype
 		-1, // Action
 		-1, // Inittype
@@ -154,6 +164,7 @@ var gotoTab = gotoTable{
 		
 		-1, // S'
 		-1, // Check
+		-1, // Preamble
 		-1, // Checktype
 		-1, // Action
 		-1, // Inittype
@@ -168,6 +179,7 @@ var gotoTab = gotoTable{
 		
 		-1, // S'
 		-1, // Check
+		-1, // Preamble
 		-1, // Checktype
 		-1, // Action
 		-1, // Inittype
@@ -182,6 +194,7 @@ var gotoTab = gotoTable{
 		
 		-1, // S'
 		-1, // Check
+		-1, // Preamble
 		-1, // Checktype
 		-1, // Action
 		-1, // Inittype
@@ -196,13 +209,14 @@ var gotoTab = gotoTable{
 		
 		-1, // S'
 		-1, // Check
+		-1, // Preamble
 		-1, // Checktype
 		-1, // Action
 		-1, // Inittype
 		-1, // IntAmount
 		-1, // HumanAmount
-		16, // Rule
-		18, // RuleList
+		-1, // Rule
+		-1, // RuleList
 		
 
 	},
@@ -210,6 +224,7 @@ var gotoTab = gotoTable{
 		
 		-1, // S'
 		-1, // Check
+		-1, // Preamble
 		-1, // Checktype
 		-1, // Action
 		-1, // Inittype
@@ -224,13 +239,14 @@ var gotoTab = gotoTable{
 		
 		-1, // S'
 		-1, // Check
+		-1, // Preamble
 		-1, // Checktype
 		-1, // Action
 		-1, // Inittype
 		-1, // IntAmount
 		-1, // HumanAmount
-		20, // Rule
-		-1, // RuleList
+		18, // Rule
+		20, // RuleList
 		
 
 	},
@@ -238,6 +254,7 @@ var gotoTab = gotoTable{
 		
 		-1, // S'
 		-1, // Check
+		-1, // Preamble
 		-1, // Checktype
 		-1, // Action
 		-1, // Inittype
@@ -252,12 +269,13 @@ var gotoTab = gotoTable{
 		
 		-1, // S'
 		-1, // Check
+		-1, // Preamble
 		-1, // Checktype
 		-1, // Action
 		-1, // Inittype
 		-1, // IntAmount
 		-1, // HumanAmount
-		-1, // Rule
+		22, // Rule
 		-1, // RuleList
 		
 
@@ -266,12 +284,13 @@ var gotoTab = gotoTable{
 		
 		-1, // S'
 		-1, // Check
+		-1, // Preamble
 		-1, // Checktype
 		-1, // Action
 		-1, // Inittype
 		-1, // IntAmount
 		-1, // HumanAmount
-		20, // Rule
+		-1, // Rule
 		-1, // RuleList
 		
 
@@ -280,13 +299,14 @@ var gotoTab = gotoTable{
 		
 		-1, // S'
 		-1, // Check
+		-1, // Preamble
 		-1, // Checktype
 		-1, // Action
 		-1, // Inittype
 		-1, // IntAmount
 		-1, // HumanAmount
-		16, // Rule
-		22, // RuleList
+		-1, // Rule
+		-1, // RuleList
 		
 
 	},
@@ -294,12 +314,13 @@ var gotoTab = gotoTable{
 		
 		-1, // S'
 		-1, // Check
+		-1, // Preamble
 		-1, // Checktype
 		-1, // Action
 		-1, // Inittype
 		-1, // IntAmount
 		-1, // HumanAmount
-		-1, // Rule
+		22, // Rule
 		-1, // RuleList
 		
 
@@ -308,6 +329,22 @@ var gotoTab = gotoTable{
 		
 		-1, // S'
 		-1, // Check
+		-1, // Preamble
+		-1, // Checktype
+		-1, // Action
+		-1, // Inittype
+		-1, // IntAmount
+		-1, // HumanAmount
+		18, // Rule
+		24, // RuleList
+		
+
+	},
+	gotoRow{ // S22
+		
+		-1, // S'
+		-1, // Check
+		-1, // Preamble
 		-1, // Checktype
 		-1, // Action
 		-1, // Inittype
@@ -318,29 +355,16 @@ var gotoTab = gotoTable{
 		
 
 	},
-	gotoRow{ // S22
+	gotoRow{ // S23
 		
 		-1, // S'
 		-1, // Check
+		-1, // Preamble
 		-1, // Checktype
 		-1, // Action
 		-1, // Inittype
 		-1, // IntAmount
 		-1, // HumanAmount
-		20, // Rule
-		-1, // RuleList
-		
-
-	},
-	gotoRow{ // S23
-		
-		-1, // S'
-		-1, // Check
-		-1, // Checktype
-		-1, // Action
-		-1, // Inittype
-		-1, // IntAmount
-		25, // HumanAmount
 		-1, // Rule
 		-1, // RuleList
 		
@@ -350,12 +374,13 @@ var gotoTab = gotoTable{
 		
 		-1, // S'
 		-1, // Check
+		-1, // Preamble
 		-1, // Checktype
 		-1, // Action
 		-1, // Inittype
 		-1, // IntAmount
 		-1, // HumanAmount
-		-1, // Rule
+		22, // Rule
 		-1, // RuleList
 		
 
@@ -364,11 +389,12 @@ var gotoTab = gotoTable{
 		
 		-1, // S'
 		-1, // Check
+		-1, // Preamble
 		-1, // Checktype
 		-1, // Action
 		-1, // Inittype
 		-1, // IntAmount
-		-1, // HumanAmount
+		27, // HumanAmount
 		-1, // Rule
 		-1, // RuleList
 		
@@ -378,6 +404,7 @@ var gotoTab = gotoTable{
 		
 		-1, // S'
 		-1, // Check
+		-1, // Preamble
 		-1, // Checktype
 		-1, // Action
 		-1, // Inittype
@@ -392,8 +419,9 @@ var gotoTab = gotoTable{
 		
 		-1, // S'
 		-1, // Check
+		-1, // Preamble
 		-1, // Checktype
-		29, // Action
+		-1, // Action
 		-1, // Inittype
 		-1, // IntAmount
 		-1, // HumanAmount
@@ -406,10 +434,11 @@ var gotoTab = gotoTable{
 		
 		-1, // S'
 		-1, // Check
+		-1, // Preamble
 		-1, // Checktype
 		-1, // Action
 		-1, // Inittype
-		32, // IntAmount
+		-1, // IntAmount
 		-1, // HumanAmount
 		-1, // Rule
 		-1, // RuleList
@@ -420,8 +449,9 @@ var gotoTab = gotoTable{
 		
 		-1, // S'
 		-1, // Check
+		-1, // Preamble
 		-1, // Checktype
-		-1, // Action
+		31, // Action
 		-1, // Inittype
 		-1, // IntAmount
 		-1, // HumanAmount
@@ -434,10 +464,11 @@ var gotoTab = gotoTable{
 		
 		-1, // S'
 		-1, // Check
+		-1, // Preamble
 		-1, // Checktype
 		-1, // Action
 		-1, // Inittype
-		-1, // IntAmount
+		34, // IntAmount
 		-1, // HumanAmount
 		-1, // Rule
 		-1, // RuleList
@@ -448,6 +479,7 @@ var gotoTab = gotoTable{
 		
 		-1, // S'
 		-1, // Check
+		-1, // Preamble
 		-1, // Checktype
 		-1, // Action
 		-1, // Inittype
@@ -462,6 +494,7 @@ var gotoTab = gotoTable{
 		
 		-1, // S'
 		-1, // Check
+		-1, // Preamble
 		-1, // Checktype
 		-1, // Action
 		-1, // Inittype
@@ -476,6 +509,7 @@ var gotoTab = gotoTable{
 		
 		-1, // S'
 		-1, // Check
+		-1, // Preamble
 		-1, // Checktype
 		-1, // Action
 		-1, // Inittype
@@ -490,6 +524,7 @@ var gotoTab = gotoTable{
 		
 		-1, // S'
 		-1, // Check
+		-1, // Preamble
 		-1, // Checktype
 		-1, // Action
 		-1, // Inittype
@@ -504,8 +539,9 @@ var gotoTab = gotoTable{
 		
 		-1, // S'
 		-1, // Check
+		-1, // Preamble
 		-1, // Checktype
-		36, // Action
+		-1, // Action
 		-1, // Inittype
 		-1, // IntAmount
 		-1, // HumanAmount
@@ -518,6 +554,37 @@ var gotoTab = gotoTable{
 		
 		-1, // S'
 		-1, // Check
+		-1, // Preamble
+		-1, // Checktype
+		-1, // Action
+		-1, // Inittype
+		-1, // IntAmount
+		-1, // HumanAmount
+		-1, // Rule
+		-1, // RuleList
+		
+
+	},
+	gotoRow{ // S37
+		
+		-1, // S'
+		-1, // Check
+		-1, // Preamble
+		-1, // Checktype
+		38, // Action
+		-1, // Inittype
+		-1, // IntAmount
+		-1, // HumanAmount
+		-1, // Rule
+		-1, // RuleList
+		
+
+	},
+	gotoRow{ // S38
+		
+		-1, // S'
+		-1, // Check
+		-1, // Preamble
 		-1, // Checktype
 		-1, // Action
 		-1, // Inittype
