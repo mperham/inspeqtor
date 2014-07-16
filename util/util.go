@@ -39,24 +39,24 @@ func ReadLines(data []byte) ([]string, error) {
 
 // Uh oh, not good but not worthy of process death
 func Warn(msg string, args ...interface{}) {
-	log.Println(msg, args)
+	log.Printf(msg+"\n", args...)
 }
 
 // Typical logging output, the default level
 func Info(msg string, args ...interface{}) {
-	log.Println(msg, args)
+	log.Printf(msg+"\n", args...)
 }
 
 // -v: Verbosity level which helps track down production issues
 func Debug(msg string, args ...interface{}) {
 	if Verbose {
-		log.Println(msg, args)
+		log.Printf(msg+"\n", args...)
 	}
 }
 
 // -v -v: Super verbose for development purposes
 func DebugDebug(msg string, args ...interface{}) {
 	if Verbose {
-		log.Println(msg, args)
+		log.Printf(msg+"\n", args...)
 	}
 }
