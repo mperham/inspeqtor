@@ -6,18 +6,19 @@ import (
 	"inspeqtor/conf/global/parser"
 	"inspeqtor/util"
 	"io/ioutil"
+	"strconv"
 )
 
-var (
-	Defaults = map[string]string{
-		"cycle":         "30",
-		"default_alert": "email",
-	}
-)
+type GlobalConfig struct {
+	CycleTime uint16
+}
 
+var Defaults = GlobalConfig{30}
+
+type Config map[string]string
 type ConfigFile struct {
-	TopConfig  map[string]string
-	Contextual map[string]map[string]string
+	Top              GlobalConfig
+	ContextualConfig map[string]Config
 }
 
 func Parse(rootDir string) (*ConfigFile, error) {
@@ -37,8 +38,23 @@ func Parse(rootDir string) (*ConfigFile, error) {
 		s := lexer.NewLexer([]byte(data))
 		p := parser.NewParser()
 		obj, err := p.Parse(s)
-		ast := obj.(*ast.ConfigFile)
-		return &ConfigFile{ast.TopConfig, ast.Contextual}, nil
+		ast := obj.(ast.ConfigFile)
+
+		var config ConfigFile
+		config.Top = Defaults
+		if val, has := ast.TopConfig["cycle_count"]; has {
+			time, err := strconv.Atoi(val)
+			if err != nil {
+				util.Warn("Invalid cycle time: " + val)
+				time = 30
+			}
+			config.Top.CycleTime = uint16(time)
+		}
+		config.ContextualConfig = map[string]Config{}
+		for k, v := range ast.Contextual {
+			config.ContextualConfig[k] = v
+		}
+		return &config, nil
 	} else {
 		util.Info("No configuration file found at " + rootDir + "/inspector.conf")
 		return &ConfigFile{Defaults, nil}, nil

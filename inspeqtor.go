@@ -23,7 +23,7 @@ type Inspeqtor struct {
 	RootDir         string
 	ServiceManagers []Init
 	Checks          *inq.Checks
-	GlobalConfig    global.ConfigFile
+	GlobalConfig    *global.ConfigFile
 }
 
 type Init interface {
@@ -101,7 +101,15 @@ func (i *Inspeqtor) Parse() error {
 		return err
 	}
 	i.Checks = checks
-	util.DebugDebug("Checks: %+v\n", checks)
+
+	config, err := global.Parse(i.RootDir)
+	if err != nil {
+		return err
+	}
+	i.GlobalConfig = config
+
+	util.DebugDebug("Config: %+v", config)
+	util.DebugDebug("Checks: %+v", checks)
 	return nil
 }
 
