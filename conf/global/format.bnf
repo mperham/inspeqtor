@@ -1,0 +1,56 @@
+// https://github.com/awalterschulze/katydid/blob/master/asm/asm.bnf
+
+/*
+
+Global configuration for inspeqtor:
+
+# This is a comment
+cycle: 30
+
+[gmail]
+username: foobar
+password: fuzzbucket
+
+[email]
+server: smtp.gmail.com
+port: 587
+username: foobar
+password: fuzzbucket
+
+*/
+
+_lineComment : '#' {.} '\n' ;
+!comment : _lineComment;
+
+!whitespace: ' ' | '\t' | '\n' | '\r' ;
+_letter : 'a'-'z' | 'A'-'Z' ;
+_digit : '0'-'9' ;
+_keychar : _letter | _digit | '_';
+
+_quotedpair : '\\' . ;
+_quotedstring : '"' (_quotedpair | .) {_quotedpair | .} '"' ;
+
+_valuechar : _keychar | '!' | '@' | '#' | '$' | '%' | '&' | '\'' | '*' | '+' | '-' | '/' | ';' | '=' | '?' | '^' | '‘' | '{' | '|' | '}' | '~' | '\u0100'-'\U0010FFFF' ;
+_rawvalue :  (_valuechar) {_valuechar} ;
+
+value : _quotedstring | _rawvalue ;
+
+<< import "inspeqtor/conf/global/ast" >>
+
+Config
+  : ConfigList                            << ast.GlobalConfig($0, nil), nil >>
+  | ConfigList ContextList                << ast.GlobalConfig($0, $1), nil >>;
+
+ContextList
+  : "[" value "]" ConfigList                << ast.NewContext($1, $3), nil >>
+  | ContextList "[" value "]" ConfigList    << ast.AppendContext($0, $2, $4), nil >>;
+
+ConfigList
+  : KVPair                                << ast.NewPair($0), nil >>
+  | ConfigList KVPair                     << ast.AppendPair($0, $1), nil >>;
+
+KVPair
+  : Key ":" Value            << ast.NewKVPair($0, $2), nil >>;
+
+Key: value << $0, nil >>;
+Value: value << $0, nil >>;

@@ -3,7 +3,7 @@ package inspeqtor
 import (
 	"bytes"
 	"fmt"
-	"inspeqtor/inq"
+	"inspeqtor/conf/inq"
 	"inspeqtor/metrics"
 	"inspeqtor/services"
 	"inspeqtor/util"

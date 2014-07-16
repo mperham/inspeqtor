@@ -17,12 +17,33 @@ uint_lit : _digit {_digit};
 id : (_letter) {_idchar} ;
 operator : '>';
 
-<< import "inspeqtor/inq/ast" >>
+<< import "inspeqtor/conf/inq/ast" >>
+
+/*
+
+Examples:
+
+inspect runit service mysql
+  if rss > 6g for 2 cycles then alert
+
+inspect service redis
+  if rss > 1g for 2 cycles then alert
+  if user_cpu > 95% for 2 cycles then alert
+
+inspect host
+  if user_cpu > 400% for 2 cycles then alert
+  if swap > 20% for 2 cycles then alert
+
+*/
 
 Check
-  : "check" Checktype id RuleList                  << ast.NewProcessCheck(nil, $1, $2, $3), nil >>
-  | "check" Inittype Checktype id RuleList         << ast.NewProcessCheck($1, $2, $3, $4), nil >>
-  | "check" "host" RuleList                        << ast.NewHostCheck($2), nil >>;
+  : Preamble Checktype id RuleList                  << ast.NewProcessCheck(nil, $1, $2, $3), nil >>
+  | Preamble Inittype Checktype id RuleList         << ast.NewProcessCheck($1, $2, $3, $4), nil >>
+  | Preamble "host" RuleList                        << ast.NewHostCheck($2), nil >>;
+
+Preamble :
+ : "check"          << $0, nil >> // Monit compatibility
+ | "inspect"        << $0, nil >>;
 
 Checktype :
  : "process"        << $0, nil >>
