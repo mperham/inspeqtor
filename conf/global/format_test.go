@@ -1,4 +1,4 @@
-package inq
+package global
 
 import (
 	"inspeqtor/conf/global/ast"

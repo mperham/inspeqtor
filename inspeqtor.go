@@ -3,6 +3,7 @@ package inspeqtor
 import (
 	"bytes"
 	"fmt"
+	"inspeqtor/conf/global"
 	"inspeqtor/conf/inq"
 	"inspeqtor/metrics"
 	"inspeqtor/services"
@@ -22,6 +23,7 @@ type Inspeqtor struct {
 	RootDir         string
 	ServiceManagers []Init
 	Checks          *inq.Checks
+	GlobalConfig    global.ConfigFile
 }
 
 type Init interface {
@@ -94,7 +96,7 @@ func (i *Inspeqtor) Start() {
 }
 
 func (i *Inspeqtor) Parse() error {
-	checks, err := inq.Parse(i.RootDir)
+	checks, err := inq.ParseChecks(i.RootDir + "/conf.d")
 	if err != nil {
 		return err
 	}

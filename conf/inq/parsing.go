@@ -15,7 +15,7 @@ type Checks struct {
 	Processes []*ast.ProcessCheck
 }
 
-func Parse(rootDir string) (*Checks, error) {
+func ParseChecks(rootDir string) (*Checks, error) {
 	util.Debug("Parsing config in " + rootDir)
 	files, err := filepath.Glob(rootDir + "/*.inq")
 	if err != nil {
