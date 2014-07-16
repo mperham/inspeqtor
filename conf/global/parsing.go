@@ -42,7 +42,7 @@ func Parse(rootDir string) (*ConfigFile, error) {
 
 		var config ConfigFile
 		config.Top = Defaults
-		if val, has := ast.TopConfig["cycle_count"]; has {
+		if val, has := ast.TopConfig["cycle_time"]; has {
 			time, err := strconv.Atoi(val)
 			if err != nil {
 				util.Warn("Invalid cycle time: " + val)
