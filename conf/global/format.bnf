@@ -27,13 +27,9 @@ _letter : 'a'-'z' | 'A'-'Z' ;
 _digit : '0'-'9' ;
 _keychar : _letter | _digit | '_';
 
-_quotedpair : '\\' . ;
-_quotedstring : '"' (_quotedpair | .) {_quotedpair | .} '"' ;
+_valuechar : _keychar | '!' | '@' | '#' | '$' | '%' | '&' | '\'' | '*' | '+' | '-' | '/' | ';' | '=' | '?' | '^' | '‘' | '{' | '|' | '}' | '~' | '"' | '\u0100'-'\U0010FFFF' ;
 
-_valuechar : _keychar | '!' | '@' | '#' | '$' | '%' | '&' | '\'' | '*' | '+' | '-' | '/' | ';' | '=' | '?' | '^' | '‘' | '{' | '|' | '}' | '~' | '\u0100'-'\U0010FFFF' ;
-_rawvalue :  (_valuechar) {_valuechar} ;
-
-value : _quotedstring | _rawvalue ;
+value : (_valuechar) {_valuechar} ;
 
 << import "inspeqtor/conf/global/ast" >>
 
