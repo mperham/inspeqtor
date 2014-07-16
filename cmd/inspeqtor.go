@@ -20,10 +20,12 @@ type cliOptions struct {
 }
 
 func main() {
-	// Modern POSIX applications should log to STDOUT only
-	// and use a smart init system to manage logging.
+	// Modern POSIX processes should log to STDOUT only
+	// and use a smart init system to manage logging.  That
+	// logging system should add things like PID, timestamp, etc
+	// to the logging output so we don't add any context at all.
 	log.SetOutput(os.Stdout)
-	log.SetPrefix("inspeqtor ")
+	log.SetFlags(0)
 
 	options := parseArguments()
 	if options.verbose {
