@@ -6,12 +6,11 @@ import (
 	"inspeqtor/conf/global"
 	"inspeqtor/conf/inq"
 	"inspeqtor/metrics"
-	"inspeqtor/services"
 	"inspeqtor/util"
-	"log"
 	"net/smtp"
 	"os"
 	"os/signal"
+	"syscall"
 	"time"
 )
 
@@ -41,58 +40,20 @@ func New(dir string) (*Inspeqtor, error) {
 	return &Inspeqtor{RootDir: dir}, nil
 }
 
-func (i *Inspeqtor) DetectManagers() error {
-	serviceMapping := make(map[string]int32)
-
-	launchctl, err := services.DetectLaunchctl("/")
-	if err != nil {
-		return err
-	}
-
-	if launchctl != nil {
-		services := []string{"homebrew.mxcl.memcached", "bob"}
-		for _, service := range services {
-			pid, err := launchctl.FindServicePID(service)
-			if err != nil {
-				util.Debug("Couldn't find service " + service + ", skipping...")
-			} else {
-				serviceMapping[service] = pid
-			}
-		}
-	}
-
-	upstart, err := services.DetectUpstart("/etc/init")
-	if err != nil {
-		return err
-	}
-
-	if upstart != nil {
-		services := []string{"mysql", "pass", "bob"}
-		for _, service := range services {
-			pid, err := upstart.FindServicePID(service)
-			if err != nil {
-				return err
-			} else {
-				serviceMapping[service] = pid
-			}
-		}
-	}
-
-	log.Println(serviceMapping)
-
-	return nil
-}
+var (
+	Quit os.Signal = syscall.SIGQUIT
+)
 
 func (i *Inspeqtor) Start() {
-	shutdown := make(chan int)
-	go i.pollSystem(shutdown)
+	go i.pollSystem()
 
 	signals := make(chan os.Signal)
 	signal.Notify(signals, os.Interrupt)
+	signal.Notify(signals, Quit)
 	<-signals
 
 	util.Debug("Inspeqtor shutting down...")
-	shutdown <- 1
+	os.Exit(0)
 }
 
 func (i *Inspeqtor) Parse() error {
@@ -113,24 +74,21 @@ func (i *Inspeqtor) Parse() error {
 	return nil
 }
 
-func (i *Inspeqtor) pollSystem(shutdown chan int) {
-	scanSystem()
+func (i *Inspeqtor) pollSystem() {
+	scanSystem(true)
 	select {
-	case <-shutdown:
-		util.DebugDebug("Exiting poll loop")
-		return
-	case <-time.After(30 * time.Second):
-		scanSystem()
+	case <-time.After(time.Duration(i.GlobalConfig.Top.CycleTime) * time.Second):
+		scanSystem(false)
 	}
 }
 
-func scanSystem() {
+func scanSystem(firstTime bool) {
 	util.DebugDebug("Scanning...")
 	metrics, err := metrics.CollectHostMetrics("/proc")
 	if err != nil {
-		log.Fatalln(err)
+		util.Warn("%v", err)
 	} else {
-		log.Println(metrics)
+		util.DebugDebug("%+v", metrics)
 	}
 }
 
