@@ -34,14 +34,12 @@ The system is scanned every 30 seconds, this is called a *cycle*.
 
 ## Upgrade
 
-[Inspeqtor Pro](http://contribsys.com/inspeqtor) has a number of features not available in the open source
-version:
+[Inspeqtor Pro](http://contribsys.com/inspeqtor) has a number of features not available in the open source version:
 
-* Binary .rpm and .deb distribution via a secure, private repository.
+* Binary .rpm and .deb distribution via a secure, private repository for Ubuntu and CentOS systems.
 * Group chat notification - ditch your inbox and pipe notifications to Slack, Campfire, HipChat, etc.
-* Applications and deploys:
-  - describe your application to inspeqtor and the processes it touches
-  - signal inspeqtor when you are deploying
+* Deploys:
+  - signal inspeqtor when you start and finish a deploy
   - all notifications will be muted during a deploy window.
 * init.d support for legacy services
 
@@ -56,7 +54,7 @@ Licensed under GPLv3.
 
 inspeqtor is written by [Mike Perham](http://twitter.com/mperham) of [Contributed Systems](http://contribsys.com).  We build awesome open source-based products.
 
-We also support [Sidekiq](http://sidekiq.org) and sell [Sidekiq
+We also develop [Sidekiq](http://sidekiq.org) and sell [Sidekiq
 Pro](http://sidekiq.org/pro), the best Ruby background job processing
 system.
 
