@@ -1,13 +1,10 @@
 package inspeqtor
 
 import (
-	"bytes"
-	"fmt"
 	"inspeqtor/conf/global"
 	"inspeqtor/conf/inq"
 	"inspeqtor/metrics"
 	"inspeqtor/util"
-	"net/smtp"
 	"os"
 	"os/signal"
 	"syscall"
@@ -45,7 +42,7 @@ var (
 )
 
 func (i *Inspeqtor) Start() {
-	go i.pollSystem()
+	go i.runLoop()
 
 	signals := make(chan os.Signal)
 	signal.Notify(signals, os.Interrupt)
@@ -74,7 +71,7 @@ func (i *Inspeqtor) Parse() error {
 	return nil
 }
 
-func (i *Inspeqtor) pollSystem() {
+func (i *Inspeqtor) runLoop() {
 	scanSystem(true)
 	select {
 	case <-time.After(time.Duration(i.GlobalConfig.Top.CycleTime) * time.Second):
@@ -90,16 +87,4 @@ func scanSystem(firstTime bool) {
 	} else {
 		util.DebugDebug("%+v", metrics)
 	}
-}
-
-func sendEmail(data interface{}) error {
-	auth := smtp.PlainAuth("", "mperham", "", "smtp.gmail.com")
-	err := smtp.SendMail("smtp.gmail.com:587", auth,
-		"mperham@gmail.com",
-		[]string{"mperham@gmail.com"},
-		bytes.NewBufferString(fmt.Sprint(data)).Bytes())
-	if err != nil {
-		return err
-	}
-	return nil
 }

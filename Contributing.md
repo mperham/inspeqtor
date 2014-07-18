@@ -17,7 +17,7 @@ Pull requests should:
 When in doubt, open an issue first and let's chat about what needs to be
 done and how.
 
-### Legal Stuff
+## Legal Stuff
 
 One very important thing to understand about submitting a pull request
 is that I must be the only copyright holder for the inspeqtor code.  **This means
