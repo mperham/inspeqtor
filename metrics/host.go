@@ -90,7 +90,7 @@ func collectMemory(path string, metrics *SystemMetrics) error {
 	if free == 0 {
 		metrics.PercentSwapInUse = 100
 	} else if free == total {
-		metrics.PercentSwapInUse = 100
+		metrics.PercentSwapInUse = 0
 	} else {
 		metrics.PercentSwapInUse = 100 - int8(100*(float64(free)/float64(total)))
 	}
