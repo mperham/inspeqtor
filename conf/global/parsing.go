@@ -13,7 +13,7 @@ type GlobalConfig struct {
 	CycleTime uint16
 }
 
-var Defaults = GlobalConfig{30}
+var Defaults = GlobalConfig{15}
 
 type Config map[string]string
 type ConfigFile struct {
