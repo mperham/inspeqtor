@@ -73,9 +73,11 @@ func (i *Inspeqtor) Parse() error {
 
 func (i *Inspeqtor) runLoop() {
 	scanSystem(true)
-	select {
-	case <-time.After(time.Duration(i.GlobalConfig.Top.CycleTime) * time.Second):
-		scanSystem(false)
+	for {
+		select {
+		case <-time.After(time.Duration(i.GlobalConfig.Top.CycleTime) * time.Second):
+			scanSystem(false)
+		}
 	}
 }
 
