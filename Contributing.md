@@ -6,7 +6,7 @@ Tell us about bugs so we can fix them, please!  Include your inspeqtor
 version, OS version you are running and any relevant configuration or
 log output in /var/log/inspeqtor.
 
-## Submitting Pull Requests
+## Submit a Pull Request
 
 Pull requests should:
 

@@ -8,9 +8,9 @@ What it does:
 
 * Monitor upstart-, runit-, systemd- or launchctl-managed services
 * Monitor process memory and CPU usage
-* Monitor system CPU, swap and disk usage
+* Monitor host CPU, swap and disk usage
 * Notify if processes disappear or change PID
-* Notify if processes or system goes over defined RAM or CPU utilization
+* Notify if processes or host goes over defined RAM or CPU utilization
 * Email notification
 * As developer friendly as possible:
   - Test configuration
@@ -19,7 +19,7 @@ What it does:
 What it doesn't:
 
 * support PID files, which are racy and error-prone
-* monitor arbitrary processes, processes must be init-managed
+* monitor arbitrary processes, services must be init-managed
 * know how to start/stop services.  Defers to your OS's init system
 * have *any* runtime or 3rd party dependencies at all, not even libc.
 
@@ -27,10 +27,9 @@ The default monitoring rules out of the box perform basic health checks:
 
 * / partition is > 90% full
 * Swap is more than 20% utilized
-* CPU(user) is > 90% for more than 2 cycles
+* CPU(user) is > 90% for more than 4 cycles
 * load(5min) is > 10
-
-The system is scanned every 30 seconds, this is called a *cycle*.
+* load(1min) is > 20
 
 ## Upgrade
 
@@ -54,7 +53,5 @@ Licensed under GPLv3.
 
 inspeqtor is written by [Mike Perham](http://twitter.com/mperham) of [Contributed Systems](http://contribsys.com).  We build awesome open source-based products.
 
-We also develop [Sidekiq](http://sidekiq.org) and sell [Sidekiq
-Pro](http://sidekiq.org/pro), the best Ruby background job processing
-system.
+We also develop [Sidekiq](http://sidekiq.org) and sell [Sidekiq Pro](http://sidekiq.org/pro), the best Ruby background job processing system.
 
