@@ -22,7 +22,7 @@ func ParseChecks(rootDir string) (*core.Host, []*core.Service, error) {
 
 	var host *core.Host
 	var checks []*core.Service
-	checks = make([]*core.Service, len(files))
+	checks = make([]*core.Service, 0)
 
 	for _, filename := range files {
 		log.Println("Parsing " + filename)
@@ -40,11 +40,13 @@ func ParseChecks(rootDir string) (*core.Host, []*core.Service, error) {
 			if err != nil {
 				return nil, nil, err
 			}
+			util.DebugDebug("%+v", *host)
 		case *ast.ProcessCheck:
 			svc, err := convertService(obj.(*ast.ProcessCheck))
 			if err != nil {
 				return nil, nil, err
 			}
+			util.DebugDebug("%+v", *svc)
 			checks = append(checks, svc)
 		}
 	}
@@ -61,6 +63,7 @@ func convertHost(inqhost *ast.HostCheck) (*core.Host, error) {
 	rules := make([]*core.Rule, len(inqhost.Rules))
 	for i, rule := range inqhost.Rules {
 		rule, err := convertRule(rule, nil)
+		util.DebugDebug("%+v", *rule)
 		if err != nil {
 			return nil, err
 		}
@@ -90,6 +93,7 @@ func convertService(inqsvc *ast.ProcessCheck) (*core.Service, error) {
 		if err != nil {
 			return nil, err
 		}
+		util.DebugDebug("%+v", *rule)
 		rules[i] = rule
 	}
 	svc := &core.Service{inqsvc.Name, nil, rules}
