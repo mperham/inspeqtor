@@ -2,10 +2,10 @@ package inspeqtor_test
 
 import (
 	"bytes"
-	"fmt"
 	"inspeqtor"
 	"inspeqtor/core"
 	"log"
+	"strings"
 	"testing"
 )
 
@@ -46,13 +46,13 @@ func TestEmailTrigger(t *testing.T) {
 		&core.Service{"mysql", nil, nil},
 		&core.Rule{"rss", core.GT, 64 * 1024 * 1024, 1, core.Ok, nil},
 	}
-	err := validEmailSetup().TriggerEmail(alert, acceptEmail)
-	ok(t, err)
-}
 
-func acceptEmail(e *inspeqtor.EmailConfig, doc bytes.Buffer) error {
-	fmt.Println(string(doc.Bytes()))
-	return nil
+	err := validEmailSetup().TriggerEmail(alert, func(e *inspeqtor.EmailConfig, doc bytes.Buffer) error {
+		content := string(doc.Bytes())
+		assert(t, strings.Index(content, "[mysql]") > 0, "email does not contain expected content")
+		return nil
+	})
+	ok(t, err)
 }
 
 func validEmailSetup() *inspeqtor.EmailConfig {
