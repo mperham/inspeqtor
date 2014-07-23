@@ -3,6 +3,7 @@ package inspeqtor
 import (
 	"inspeqtor/conf/global"
 	"inspeqtor/conf/inq"
+	"inspeqtor/core"
 	"inspeqtor/metrics"
 	"inspeqtor/util"
 	"os"
@@ -17,20 +18,10 @@ const (
 
 type Inspeqtor struct {
 	RootDir         string
-	ServiceManagers []Init
-	Checks          *inq.Checks
+	ServiceManagers []*core.InitSystem
+	Host            *core.Host
+	Services        []*core.Service
 	GlobalConfig    *global.ConfigFile
-}
-
-type Init interface {
-	// Name of the init system: "upstart", "runit", etc.
-	Name() string
-
-	// Look up PID for the given service name, returns
-	// positive integer if successful, -1 if the service
-	// name was not found or error if there was an
-	// unexpected failure.
-	FindServicePID(name string) (int32, error)
 }
 
 func New(dir string) (*Inspeqtor, error) {
@@ -54,11 +45,12 @@ func (i *Inspeqtor) Start() {
 }
 
 func (i *Inspeqtor) Parse() error {
-	checks, err := inq.ParseChecks(i.RootDir + "/conf.d")
+	host, services, err := inq.ParseChecks(i.RootDir + "/conf.d")
 	if err != nil {
 		return err
 	}
-	i.Checks = checks
+	i.Host = host
+	i.Services = services
 
 	config, err := global.Parse(i.RootDir)
 	if err != nil {
@@ -67,7 +59,8 @@ func (i *Inspeqtor) Parse() error {
 	i.GlobalConfig = config
 
 	util.DebugDebug("Config: %+v", config)
-	util.DebugDebug("Checks: %+v", checks)
+	util.DebugDebug("Host: %+v", host)
+	util.DebugDebug("Services: %+v", services)
 	return nil
 }
 
