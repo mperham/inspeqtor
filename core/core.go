@@ -34,7 +34,6 @@ type InitSystem interface {
   A service is a logical named entity we wish to monitor, "mysql".
   A logical service maps onto a physical process with a PID.
   PID 0 means the process did not exist during that cycle.
-  We track metrics associated with the service.
 */
 type Service struct {
 	Name  string
@@ -71,8 +70,13 @@ type Rule struct {
 	Actions    []*Action
 }
 
+type Alert struct {
+	*Service
+	*Rule
+}
+
 type Action interface {
 	Name() string
 	Setup(map[string]string) error
-	Trigger(svc *Service, rule *Rule) error
+	Trigger(alert *Alert) error
 }

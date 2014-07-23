@@ -3,36 +3,54 @@ package inspeqtor
 import (
 	"bytes"
 	"errors"
-	"fmt"
+	"inspeqtor/core"
 	"net/smtp"
+	"text/template"
 )
 
-type Notifier interface {
-	Notify(data interface{}) error
+const (
+	emailTemplate = `
+From: {{.Config.From}}
+To: {{.Config.To}}
+Subject: [{{.Alert.Service.Name}}] {{.Alert.Rule.Metric}} is {{.Alert.Rule.Op}} than {{.Alert.Rule.Threshold}}
+
+[{{.Alert.Service.Name}}] {{.Alert.Rule.Metric}} is {{.Alert.Rule.Op}} than {{.Alert.Rule.Threshold}}
+`
+)
+
+var (
+	email = template.Must(template.New("emailTemplate").Parse(emailTemplate))
+)
+
+type EmailSender func(e *EmailConfig, doc bytes.Buffer) error
+
+type EmailConfig struct {
+	Username string
+	Password string
+	Host     string
+	From     string
+	To       string
 }
 
-type EmailNotifier struct {
-	username string
-	password string
-	host     string
-	from     string
-	to       string
+type EmailAlert struct {
+	Alert  *core.Alert
+	Config *EmailConfig
 }
 
-func SetupNotification(name string, vars map[string]string) (Notifier, error) {
+func SetupNotification(name string, vars map[string]string) (core.Action, error) {
 	switch name {
 	case "email":
-		en, err := setupEmail(vars)
-		// Go's nil semantics around interfaces are a little jacked up
-		// You'd think this could be a simple passthru.  You'd be wrong.
-		if en == nil {
+		en := &EmailConfig{}
+		err := en.Setup(vars)
+		if err != nil {
 			return nil, err
 		}
 		return en, nil
 	case "gmail":
 		vars["hostname"] = "smtp.gmail.com"
-		en, err := setupEmail(vars)
-		if en == nil {
+		en := &EmailConfig{}
+		err := en.Setup(vars)
+		if err != nil {
 			return nil, err
 		}
 		return en, nil
@@ -41,38 +59,60 @@ func SetupNotification(name string, vars map[string]string) (Notifier, error) {
 	}
 }
 
-func setupEmail(hash map[string]string) (*EmailNotifier, error) {
+func (e *EmailConfig) Name() string {
+	return "email"
+}
+
+func (e *EmailConfig) Trigger(alert *core.Alert) error {
+	return e.TriggerEmail(alert, sendEmail)
+}
+
+func (e *EmailConfig) TriggerEmail(alert *core.Alert, sender EmailSender) error {
+	var doc bytes.Buffer
+	err := email.Execute(&doc, &EmailAlert{alert, e})
+	if err != nil {
+		return err
+	}
+	return sender(e, doc)
+}
+
+func sendEmail(e *EmailConfig, doc bytes.Buffer) error {
+	auth := smtp.PlainAuth("", e.Username, "", e.Host)
+	err := smtp.SendMail(e.Host+":587", auth, e.From,
+		[]string{e.To}, doc.Bytes())
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (e *EmailConfig) Setup(hash map[string]string) error {
 	usr, ok := hash["username"]
 	if !ok {
-		return nil, errors.New("You must have a username configured to send email")
+		return errors.New("You must have a username configured to send email")
 	}
 	pwd, ok := hash["password"]
 	if !ok {
-		return nil, errors.New("You must have a password configured to send email")
+		return errors.New("You must have a password configured to send email")
 	}
 	host, ok := hash["hostname"]
 	if !ok {
-		return nil, errors.New("You must have a hostname configured to send email")
+		return errors.New("You must have a hostname configured to send email")
 	}
 	to, ok := hash["to"]
 	if !ok {
-		return nil, errors.New("You must have a to address configured to send email")
+		return errors.New("You must have a to address configured to send email")
 	}
 	from, ok := hash["from"]
 	if !ok {
 		from = "Inspeqtor <noreply@example.com>"
 	}
 
-	return &EmailNotifier{usr, pwd, host, from, to}, nil
-}
+	e.Username = usr
+	e.Password = pwd
+	e.Host = host
+	e.From = from
+	e.To = to
 
-func (e *EmailNotifier) Notify(data interface{}) error {
-	auth := smtp.PlainAuth("", e.username, "", e.host)
-	err := smtp.SendMail(e.host+":587", auth, e.from,
-		[]string{e.to},
-		bytes.NewBufferString(fmt.Sprint(data)).Bytes())
-	if err != nil {
-		return err
-	}
 	return nil
 }
