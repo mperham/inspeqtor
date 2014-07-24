@@ -1,6 +1,7 @@
 package services
 
 import (
+	"inspeqtor/core"
 	"testing"
 )
 
@@ -18,20 +19,26 @@ func TestDetectRunit(t *testing.T) {
 		t.Errorf("Expected %+v, got %+v", expected, runit)
 	}
 
-	pid, err := runit.FindServicePID("memcached")
+	pid, status, err := runit.LookupService("memcached")
 	if err != nil {
 		t.Error(err)
 	}
 	if pid != 1234 {
 		t.Errorf("Expected positive PID, got %d\n", pid)
 	}
+	if status != core.Up {
+		t.Errorf("Service should be unknown, got %v\n", status)
+	}
 
 	// bad service name
-	pid, err = runit.FindServicePID("nonexistent")
+	pid, status, err = runit.LookupService("nonexistent")
 	if err != nil {
 		t.Error(err)
 	}
 	if pid != -1 {
 		t.Errorf("Expected not found PID, got %d\n", pid)
+	}
+	if status != core.Unknown {
+		t.Errorf("Service should be unknown, got %v\n", status)
 	}
 }

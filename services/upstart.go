@@ -2,6 +2,7 @@ package services
 
 import (
 	"errors"
+	"inspeqtor/core"
 	"inspeqtor/util"
 	"os/exec"
 	"path/filepath"
@@ -44,14 +45,14 @@ func DetectUpstart(path string) (*Upstart, error) {
 	return nil, nil
 }
 
-func (u *Upstart) FindServicePID(serviceName string) (int32, error) {
+func (u *Upstart) LookupService(serviceName string) (core.ProcessId, core.ServiceStatus, error) {
 	matches, err := filepath.Glob(u.Path + "/" + serviceName + ".conf")
 	if err != nil {
-		return 0, err
+		return 0, core.Unknown, err
 	}
 
 	if len(matches) == 0 {
-		return -1, nil
+		return -1, core.Unknown, nil
 	}
 
 	var sout []byte
@@ -61,13 +62,13 @@ func (u *Upstart) FindServicePID(serviceName string) (int32, error) {
 		cmd := exec.Command("status", serviceName)
 		sout, err = cmd.CombinedOutput()
 		if err != nil {
-			return 0, err
+			return 0, core.Unknown, err
 		}
 	}
 
 	lines, err := util.ReadLines(sout)
 	if len(lines) != 1 {
-		return 0, errors.New("Unexpected output: " + strings.Join(lines, "\n"))
+		return 0, core.Unknown, errors.New("Unexpected output: " + strings.Join(lines, "\n"))
 	}
 
 	// mysql start/running, process 14190
@@ -78,13 +79,13 @@ func (u *Upstart) FindServicePID(serviceName string) (int32, error) {
 	if len(results) > 1 && len(results[1]) > 0 {
 		pid, err := strconv.ParseInt(results[1], 10, 32)
 		if err != nil {
-			return 0, err
+			return 0, core.Unknown, err
 		}
-		return int32(pid), nil
+		return core.ProcessId(pid), core.Up, nil
 	}
 	if len(results) > 1 {
-		return -1, nil
+		return -1, core.Unknown, nil
 	}
 
-	return 0, errors.New("Unknown upstart output: " + line)
+	return 0, core.Unknown, errors.New("Unknown upstart output: " + line)
 }

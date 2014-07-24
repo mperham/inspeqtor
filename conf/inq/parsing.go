@@ -83,7 +83,7 @@ func convertRule(inqrule *ast.Rule, actionList []*core.Action) (*core.Rule, erro
 		return nil, errors.New("Unknown operator: " + inqrule.Operator)
 	}
 
-	return &core.Rule{inqrule.Metric, op, inqrule.Value, inqrule.CycleCount, core.Unknown, nil}, nil
+	return &core.Rule{inqrule.Metric, op, inqrule.Value, inqrule.CycleCount, core.Undetermined, nil}, nil
 }
 
 func convertService(inqsvc *ast.ProcessCheck) (*core.Service, error) {
@@ -96,6 +96,6 @@ func convertService(inqsvc *ast.ProcessCheck) (*core.Service, error) {
 		util.DebugDebug("%+v", *rule)
 		rules[i] = rule
 	}
-	svc := &core.Service{inqsvc.Name, nil, rules}
+	svc := &core.Service{inqsvc.Name, 0, core.Unknown, rules, nil}
 	return svc, nil
 }

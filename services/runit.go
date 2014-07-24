@@ -11,6 +11,7 @@
 package services
 
 import (
+	"inspeqtor/core"
 	"inspeqtor/util"
 	"io/ioutil"
 	"path/filepath"
@@ -55,25 +56,25 @@ func DetectRunit(root string) (*Runit, error) {
 	return nil, nil
 }
 
-func (r *Runit) FindServicePID(serviceName string) (int32, error) {
+func (r *Runit) LookupService(serviceName string) (core.ProcessId, core.ServiceStatus, error) {
 	matches, err := filepath.Glob(r.path + "/" + serviceName + "/run")
 	if err != nil {
-		return 0, err
+		return 0, core.Unknown, err
 	}
 
 	if len(matches) == 0 {
-		return -1, nil
+		return -1, core.Unknown, nil
 	}
 
 	content, err := ioutil.ReadFile(r.path + "/" + serviceName + "/supervise/pid")
 	if len(content) == 0 {
 		// service exists but is not running
-		return 0, nil
+		return 0, core.Down, nil
 	}
 	pid, err := strconv.ParseInt(strings.TrimSpace(string(content)), 10, 32)
 	if err != nil {
-		return 0, err
+		return 0, core.Unknown, err
 	}
 
-	return int32(pid), nil
+	return core.ProcessId(pid), core.Up, nil
 }

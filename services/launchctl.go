@@ -1,6 +1,7 @@
 package services
 
 import (
+	"inspeqtor/core"
 	"inspeqtor/util"
 	"os/exec"
 	"strconv"
@@ -21,16 +22,16 @@ func DetectLaunchctl(rootDir string) (*Launchctl, error) {
 	return &Launchctl{}, nil
 }
 
-func (l *Launchctl) FindServicePID(serviceName string) (int32, error) {
+func (l *Launchctl) LookupService(serviceName string) (core.ProcessId, core.ServiceStatus, error) {
 	cmd := exec.Command("launchctl", "list")
 	sout, err := cmd.CombinedOutput()
 	if err != nil {
-		return 0, err
+		return 0, 0, err
 	}
 
 	lines, err := util.ReadLines(sout)
 	if err != nil {
-		return 0, err
+		return 0, 0, err
 	}
 
 	for _, line := range lines {
@@ -39,12 +40,12 @@ func (l *Launchctl) FindServicePID(serviceName string) (int32, error) {
 			parts := strings.SplitN(line, "\t", 3)
 			pid, err := strconv.ParseInt(parts[0], 10, 32)
 			if err != nil {
-				return 0, err
+				return 0, 0, err
 			}
 
-			return int32(pid), nil
+			return core.ProcessId(pid), core.Up, nil
 		}
 	}
 
-	return -1, nil
+	return -1, core.Unknown, nil
 }

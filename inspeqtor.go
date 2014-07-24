@@ -65,21 +65,49 @@ func (i *Inspeqtor) Parse() error {
 }
 
 func (i *Inspeqtor) runLoop() {
-	scanSystem(true)
+	i.scanSystem(true)
 	for {
 		select {
 		case <-time.After(time.Duration(i.GlobalConfig.Top.CycleTime) * time.Second):
-			scanSystem(false)
+			i.scanSystem(false)
 		}
 	}
 }
 
-func scanSystem(firstTime bool) {
+func (i *Inspeqtor) scanSystem(firstTime bool) {
 	util.DebugDebug("Scanning...")
 	metrics, err := metrics.CollectHostMetrics("/proc")
 	if err != nil {
 		util.Warn("%v", err)
 	} else {
 		util.DebugDebug("%+v", metrics)
+	}
+
+	for _, svc := range i.Services {
+		if svc.Manager == nil {
+			for _, sm := range i.ServiceManagers {
+				pid, status, err := (*sm).LookupService(svc.Name)
+				if err != nil {
+					util.Warn(err.Error())
+					continue
+				}
+				if pid == -1 {
+					util.Debug((*sm).Name() + " doesn't have " + svc.Name)
+					continue
+				}
+				svc.PID = pid
+				svc.Status = status
+				svc.Manager = sm
+				break
+			}
+		}
+		if svc.Manager == nil {
+			util.Warn("Could not find service for " + svc.Name)
+			continue
+		}
+		if svc.Status == core.Down {
+			(*svc.Manager).Start(svc.Name)
+			svc.Status = core.Starting
+		}
 	}
 }

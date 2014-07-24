@@ -43,7 +43,7 @@ func TestMissingEmailNotifier(t *testing.T) {
 
 func TestEmailTrigger(t *testing.T) {
 	alert := &core.Alert{
-		&core.Service{"mysql", nil, nil},
+		&core.Service{"mysql", 0, core.Down, nil, nil},
 		&core.Rule{"rss", core.GT, 64 * 1024 * 1024, 1, core.Ok, nil},
 	}
 

@@ -1,6 +1,7 @@
 package services
 
 import (
+	"inspeqtor/core"
 	"testing"
 )
 
@@ -16,30 +17,39 @@ func TestDetectUpstart(t *testing.T) {
 	}
 
 	upstart.dummyOutput = "mysql start/running, process 14190"
-	pid, err := upstart.FindServicePID("foo")
+	pid, st, err := upstart.LookupService("foo")
 	if err != nil {
 		t.Error(err)
 	}
 	if pid <= 0 {
 		t.Errorf("Expected positive PID, got %d\n", pid)
 	}
+	if st != core.Up {
+		t.Errorf("Expected Up status, got %v\n", st)
+	}
 
 	// bad service name
-	pid, err = upstart.FindServicePID("nonexistent")
+	pid, st, err = upstart.LookupService("nonexistent")
 	if err != nil {
 		t.Error(err)
 	}
 	if pid != -1 {
 		t.Errorf("Expected not found PID, got %d\n", pid)
 	}
+	if st != core.Unknown {
+		t.Errorf("Expected Unknown status, got %v\n", st)
+	}
 
 	// running as non-root
 	upstart.dummyOutput = "initctl: Unable to connect to system bus: Failed to connect to socket /var/run/dbus/system_bus_socket: No such file or directory"
-	pid, err = upstart.FindServicePID("foo")
+	pid, st, err = upstart.LookupService("foo")
 	if pid != 0 {
 		t.Errorf("Expected zero PID, got %d\n", pid)
 	}
 	if err == nil {
 		t.Error(err)
+	}
+	if st != core.Unknown {
+		t.Errorf("Expected Unknown status, got %v\n", st)
 	}
 }

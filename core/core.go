@@ -23,7 +23,7 @@ type InitSystem interface {
 	// positive integer if successful, -1 if the service
 	// name was not found or error if there was an
 	// unexpected failure.
-	FindServicePID(name string) (int32, error)
+	LookupService(name string) (ProcessId, ServiceStatus, error)
 
 	Start(name string)
 	Stop(name string)
@@ -36,10 +36,26 @@ type InitSystem interface {
   PID 0 means the process did not exist during that cycle.
 */
 type Service struct {
-	Name  string
-	PID   []int32
-	Rules []*Rule
+	Name   string
+	PID    ProcessId
+	Status ServiceStatus
+	Rules  []*Rule
+
+	// Upon bootup, we scan each init system looking for the service
+	// and cache which init system manages it for our lifetime.
+	Manager *InitSystem
 }
+
+type ProcessId int32
+type ServiceStatus uint8
+
+const (
+	Unknown ServiceStatus = iota
+	Down
+	Starting
+	Up
+	Stopping
+)
 
 type Host struct {
 	Name  string
@@ -56,7 +72,7 @@ const (
 type RuleStatus uint8
 
 const (
-	Unknown RuleStatus = iota
+	Undetermined RuleStatus = iota
 	Ok
 	Failed
 )
