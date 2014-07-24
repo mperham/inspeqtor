@@ -17,7 +17,7 @@ func TestDetectUpstart(t *testing.T) {
 	}
 
 	upstart.dummyOutput = "mysql start/running, process 14190"
-	pid, st, err := upstart.LookupService("foo")
+	pid, st, err := upstart.LookupService("mysql")
 	if err != nil {
 		t.Error(err)
 	}
@@ -26,6 +26,19 @@ func TestDetectUpstart(t *testing.T) {
 	}
 	if st != core.Up {
 		t.Errorf("Expected Up status, got %v\n", st)
+	}
+
+	// conf exists, but job is invalid
+	upstart.dummyOutput = "initctl: Unknown job: foo"
+	pid, st, err = upstart.LookupService("foo")
+	if err != nil {
+		t.Error(err)
+	}
+	if pid != -1 {
+		t.Errorf("Expected not found PID, got %d\n", pid)
+	}
+	if st != core.Unknown {
+		t.Errorf("Expected Unknown status, got %v\n", st)
 	}
 
 	// bad service name
@@ -43,11 +56,11 @@ func TestDetectUpstart(t *testing.T) {
 	// running as non-root
 	upstart.dummyOutput = "initctl: Unable to connect to system bus: Failed to connect to socket /var/run/dbus/system_bus_socket: No such file or directory"
 	pid, st, err = upstart.LookupService("foo")
-	if pid != 0 {
-		t.Errorf("Expected zero PID, got %d\n", pid)
-	}
 	if err == nil {
 		t.Error(err)
+	}
+	if pid != 0 {
+		t.Errorf("Expected zero PID, got %d\n", pid)
 	}
 	if st != core.Unknown {
 		t.Errorf("Expected Unknown status, got %v\n", st)

@@ -17,7 +17,7 @@ type Upstart struct {
 }
 
 var (
-	pidScanner *regexp.Regexp = regexp.MustCompile(" (?:start|stop)\\/(?:running|waiting)(?:, process (\\d+))?")
+	pidScanner *regexp.Regexp = regexp.MustCompile(" (start|stop)\\/([a-z\\-]+)(?:, process (\\d+))?")
 )
 
 func DetectUpstart(path string) (*Upstart, error) {
@@ -74,17 +74,29 @@ func (u *Upstart) LookupService(serviceName string) (core.ProcessId, core.Servic
 	// mysql start/running, process 14190
 	// sshdgenkeys stop/waiting
 	line := lines[0]
+	if strings.Contains(line, "Unknown job") {
+		return -1, core.Unknown, nil
+	}
+
 	results := pidScanner.FindStringSubmatch(line)
 
-	if len(results) > 1 && len(results[1]) > 0 {
-		pid, err := strconv.ParseInt(results[1], 10, 32)
+	if len(results) == 4 && len(results[3]) > 0 {
+		pid, err := strconv.ParseInt(results[3], 10, 32)
 		if err != nil {
 			return 0, core.Unknown, err
 		}
 		return core.ProcessId(pid), core.Up, nil
 	}
-	if len(results) > 1 {
-		return -1, core.Unknown, nil
+
+	if len(results) == 3 {
+		switch {
+		case results[1] == "start":
+			return 0, core.Starting, nil
+		case results[1] == "stop" && results[2] != "waiting":
+			return 0, core.Stopping, nil
+		case results[1] == "stop":
+			return 0, core.Down, nil
+		}
 	}
 
 	return 0, core.Unknown, errors.New("Unknown upstart output: " + line)
