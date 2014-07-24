@@ -49,7 +49,7 @@ func DetectRunit(root string) (*Runit, error) {
 	}
 
 	if len(matches) > 0 {
-		util.Info("Detected runit in " + path)
+		util.Debug("Detected runit in " + path)
 		return &Runit{path}, nil
 	}
 
