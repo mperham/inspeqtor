@@ -9,6 +9,9 @@ import (
 	"strconv"
 )
 
+/*
+Parses the global inspeqtor configuration in /etc/inspeqtor/inspeqtor.conf.
+*/
 type GlobalConfig struct {
 	CycleTime uint16
 }

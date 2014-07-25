@@ -12,9 +12,12 @@ import (
 	"path/filepath"
 )
 
-func ParseInq(rootDir string) (*Host, []*Service, error) {
-	util.Debug("Parsing config in " + rootDir)
-	files, err := filepath.Glob(rootDir + "/*.inq")
+/*
+Parses the host- and service-specific rules in /etc/inspeqtor/conf.d/*.inq
+*/
+func ParseInq(confDir string) (*Host, []*Service, error) {
+	util.Debug("Parsing config in " + confDir)
+	files, err := filepath.Glob(confDir + "/*.inq")
 	if err != nil {
 		return nil, nil, err
 	}
@@ -35,6 +38,9 @@ func ParseInq(rootDir string) (*Host, []*Service, error) {
 		obj, err := p.Parse(s)
 		switch obj.(type) {
 		case *ast.HostCheck:
+			if host != nil {
+				panic("Found more than one \"check host\" configuration in " + confDir)
+			}
 			host, err = convertHost(obj.(*ast.HostCheck))
 			if err != nil {
 				return nil, nil, err
