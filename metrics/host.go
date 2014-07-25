@@ -3,11 +3,14 @@ package metrics
 import (
 	"inspeqtor/util"
 	"io/ioutil"
+	"os/exec"
 	"regexp"
 	"strconv"
 	"strings"
 	"time"
 )
+
+type DiskUsage map[string]int8
 
 type SystemMetrics struct {
 	When             time.Time
@@ -17,6 +20,7 @@ type SystemMetrics struct {
 	Load5            float32
 	Load15           float32
 	PercentSwapInUse int8
+	Disk             *DiskUsage
 }
 
 type CpuMetrics struct {
@@ -51,6 +55,11 @@ func CollectHostMetrics(path string) (*SystemMetrics, error) {
 		return nil, err
 	}
 	err = collectCpu(path, metrics)
+	if err != nil {
+		return nil, err
+	}
+
+	err = collectDisk("", metrics)
 	if err != nil {
 		return nil, err
 	}
@@ -152,4 +161,53 @@ func createCpuMetrics(fields []string) CpuMetrics {
 	s.Total = s.User + s.Nice + s.System + s.Idle + s.IOWait +
 		s.Irq + s.SoftIrq + s.Steal + s.Guest + s.GuestNice
 	return s
+}
+
+func collectDisk(path string, metrics *SystemMetrics) error {
+	var lines []string
+
+	if path == "" {
+		cmd := exec.Command("df")
+		sout, err := cmd.CombinedOutput()
+		if err != nil {
+			return err
+		}
+		lines, err = util.ReadLines(sout)
+		if err != nil {
+			return err
+		}
+	} else {
+		data, err := ioutil.ReadFile(path)
+		if err != nil {
+			return err
+		}
+		lines, err = util.ReadLines(data)
+		if err != nil {
+			return err
+		}
+	}
+
+	usage := DiskUsage{}
+
+	for _, line := range lines {
+		if line[0] == '/' {
+			items := strings.Fields(line)
+			if len(items) < 5 {
+				util.Debug("Cannot parse df output: %v", items)
+				continue
+			}
+			pct := items[4]
+			if pct[len(pct)-1] == '%' {
+				val, err := strconv.ParseInt(pct[0:len(pct)-1], 10, 32)
+				if err != nil {
+					util.Debug("Cannot parse df output: " + line)
+				}
+				usage[items[len(items)-1]] = int8(val)
+			}
+
+		}
+	}
+
+	metrics.Disk = &usage
+	return nil
 }

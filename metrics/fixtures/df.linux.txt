@@ -1,0 +1,9 @@
+Filesystem     1K-blocks    Used Available Use% Mounted on
+/dev/xvda       20131844 3332008  16595268  17% /
+none                   4       0         4   0% /sys/fs/cgroup
+devtmpfs         1019296       4   1019292   1% /dev
+none              204120     176    203944   1% /run
+none                5120       0      5120   0% /run/lock
+none             1020580       0   1020580   0% /run/shm
+none              102400       0    102400   0% /run/user
+/dev/xvdc        8029632 2296928   5405028  30% /old
