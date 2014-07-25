@@ -31,19 +31,6 @@ The default monitoring rules out of the box perform basic health checks:
 * load(5min) is > 10
 * load(1min) is > 20
 
-## Upgrade
-
-[Inspeqtor Pro](http://contribsys.com/inspeqtor) has a number of features not available in the open source version:
-
-* Binary .rpm and .deb distribution via a secure, private repository for Ubuntu and CentOS systems.
-* Group chat notification - ditch your inbox and pipe notifications to Slack, Campfire, HipChat, etc.
-* Deploys:
-  - signal inspeqtor when you start and finish a deploy
-  - all notifications will be muted during a deploy window.
-* init.d support for legacy services
-
-See the [product page](http://contribsys.com/inspeqtor) for pricing.
-
 
 ## License
 
