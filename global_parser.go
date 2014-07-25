@@ -1,4 +1,4 @@
-package global
+package inspeqtor
 
 import (
 	"inspeqtor/conf/global/ast"
@@ -21,7 +21,7 @@ type ConfigFile struct {
 	ContextualConfig map[string]Config
 }
 
-func Parse(rootDir string) (*ConfigFile, error) {
+func ParseGlobal(rootDir string) (*ConfigFile, error) {
 	path := rootDir + "/inspeqtor.conf"
 	exists, err := util.FileExists(path)
 	if err != nil {

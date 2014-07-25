@@ -1,7 +1,6 @@
 package services
 
 import (
-	"inspeqtor/core"
 	"testing"
 )
 
@@ -25,7 +24,7 @@ func TestLaunchctl(t *testing.T) {
 	if pid <= 0 {
 		t.Errorf("Expected positive value for PID, got %d\n", pid)
 	}
-	if status != core.Up {
+	if status != Up {
 		t.Errorf("Service should be Up, got %v\n", status)
 	}
 
@@ -36,7 +35,7 @@ func TestLaunchctl(t *testing.T) {
 	if pid != -1 {
 		t.Errorf("Expected not found result PID, got %d\n", pid)
 	}
-	if status != core.Unknown {
+	if status != Unknown {
 		t.Errorf("Service should be Unknown, got %v\n", status)
 	}
 }

@@ -1,12 +1,11 @@
-package inspeqtor_test
+package inspeqtor
 
 import (
-	"inspeqtor"
 	"testing"
 )
 
 func TestInspeqtorParse(t *testing.T) {
-	i, err := inspeqtor.New("test")
+	i, err := New("test")
 	ok(t, err)
 	err = i.Parse()
 	ok(t, err)

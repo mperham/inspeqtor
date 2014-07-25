@@ -1,16 +1,15 @@
-package inspeqtor_test
+package inspeqtor
 
 import (
 	"bytes"
-	"inspeqtor"
-	"inspeqtor/core"
+	"inspeqtor/services"
 	"log"
 	"strings"
 	"testing"
 )
 
 func TestGmailNotifier(t *testing.T) {
-	i, err := inspeqtor.SetupNotification("gmail", map[string]string{
+	i, err := SetupNotification("gmail", map[string]string{
 		"username": "mike",
 		"password": "fuzzbucket",
 		"to":       "mike@example.org",
@@ -20,7 +19,7 @@ func TestGmailNotifier(t *testing.T) {
 }
 
 func TestEmailNotifier(t *testing.T) {
-	i, err := inspeqtor.SetupNotification("email", map[string]string{
+	i, err := SetupNotification("email", map[string]string{
 		"username": "mike",
 		"password": "fuzzbucket",
 		"hostname": "smtp.example.com",
@@ -31,7 +30,7 @@ func TestEmailNotifier(t *testing.T) {
 }
 
 func TestMissingEmailNotifier(t *testing.T) {
-	i, err := inspeqtor.SetupNotification("email", map[string]string{
+	i, err := SetupNotification("email", map[string]string{
 		"username": "mike",
 		"password": "fuzzbucket",
 		"to":       "mike@example.org",
@@ -42,12 +41,12 @@ func TestMissingEmailNotifier(t *testing.T) {
 }
 
 func TestEmailTrigger(t *testing.T) {
-	alert := &core.Alert{
-		&core.Service{"mysql", 0, core.Down, nil, nil},
-		&core.Rule{"rss", core.GT, 64 * 1024 * 1024, 1, core.Ok, nil},
+	alert := &Alert{
+		&Service{"mysql", 0, services.Down, nil, nil},
+		&Rule{"rss", GT, 64 * 1024 * 1024, 1, Ok, nil},
 	}
 
-	err := validEmailSetup().TriggerEmail(alert, func(e *inspeqtor.EmailConfig, doc bytes.Buffer) error {
+	err := validEmailSetup().TriggerEmail(alert, func(e *EmailConfig, doc bytes.Buffer) error {
 		content := string(doc.Bytes())
 		assert(t, strings.Index(content, "[mysql]") > 0, "email does not contain expected content")
 		return nil
@@ -55,7 +54,7 @@ func TestEmailTrigger(t *testing.T) {
 	ok(t, err)
 }
 
-func validEmailSetup() *inspeqtor.EmailConfig {
-	return &inspeqtor.EmailConfig{
+func validEmailSetup() *EmailConfig {
+	return &EmailConfig{
 		"mike", "fuzzbucket", "smtp.gmail.com", "mike@example.org", "mperham@gmail.com"}
 }

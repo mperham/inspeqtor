@@ -1,7 +1,6 @@
 package services
 
 import (
-	"inspeqtor/core"
 	"strings"
 	"testing"
 )
@@ -25,7 +24,7 @@ func TestDetectUpstart(t *testing.T) {
 	if pid <= 0 {
 		t.Errorf("Expected positive PID, got %d\n", pid)
 	}
-	if st != core.Up {
+	if st != Up {
 		t.Errorf("Expected Up status, got %v\n", st)
 	}
 
@@ -38,7 +37,7 @@ func TestDetectUpstart(t *testing.T) {
 	if pid != -1 {
 		t.Errorf("Expected not found PID, got %d\n", pid)
 	}
-	if st != core.Unknown {
+	if st != Unknown {
 		t.Errorf("Expected Unknown status, got %v\n", st)
 	}
 
@@ -50,7 +49,7 @@ func TestDetectUpstart(t *testing.T) {
 	if pid != -1 {
 		t.Errorf("Expected not found PID, got %d\n", pid)
 	}
-	if st != core.Unknown {
+	if st != Unknown {
 		t.Errorf("Expected Unknown status, got %v\n", st)
 	}
 
@@ -63,7 +62,7 @@ func TestDetectUpstart(t *testing.T) {
 	if pid != 0 {
 		t.Errorf("Expected zero PID, got %d\n", pid)
 	}
-	if st != core.Unknown {
+	if st != Unknown {
 		t.Errorf("Expected Unknown status, got %v\n", st)
 	}
 
@@ -79,7 +78,7 @@ func TestDetectUpstart(t *testing.T) {
 	if pid != 0 {
 		t.Errorf("Expected zero PID, got %d\n", pid)
 	}
-	if st != core.Unknown {
+	if st != Unknown {
 		t.Errorf("Expected Unknown status, got %v\n", st)
 	}
 }

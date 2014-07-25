@@ -1,10 +1,8 @@
 package inspeqtor
 
 import (
-	"inspeqtor/conf/global"
-	"inspeqtor/conf/inq"
-	"inspeqtor/core"
 	"inspeqtor/metrics"
+	"inspeqtor/services"
 	"inspeqtor/util"
 	"os"
 	"os/signal"
@@ -18,10 +16,10 @@ const (
 
 type Inspeqtor struct {
 	RootDir         string
-	ServiceManagers []*core.InitSystem
-	Host            *core.Host
-	Services        []*core.Service
-	GlobalConfig    *global.ConfigFile
+	ServiceManagers []*services.InitSystem
+	Host            *Host
+	Services        []*Service
+	GlobalConfig    *ConfigFile
 }
 
 func New(dir string) (*Inspeqtor, error) {
@@ -45,18 +43,18 @@ func (i *Inspeqtor) Start() {
 }
 
 func (i *Inspeqtor) Parse() error {
-	host, services, err := inq.ParseChecks(i.RootDir + "/conf.d")
+	config, err := ParseGlobal(i.RootDir)
+	if err != nil {
+		return err
+	}
+	i.GlobalConfig = config
+
+	host, services, err := ParseInq(i.RootDir + "/conf.d")
 	if err != nil {
 		return err
 	}
 	i.Host = host
 	i.Services = services
-
-	config, err := global.Parse(i.RootDir)
-	if err != nil {
-		return err
-	}
-	i.GlobalConfig = config
 
 	util.DebugDebug("Config: %+v", config)
 	util.DebugDebug("Host: %+v", host)
@@ -105,9 +103,9 @@ func (i *Inspeqtor) scanSystem(firstTime bool) {
 			util.Warn("Could not find service for " + svc.Name)
 			continue
 		}
-		if svc.Status == core.Down {
+		if svc.Status == services.Down {
 			(*svc.Manager).Start(svc.Name)
-			svc.Status = core.Starting
+			svc.Status = services.Starting
 		}
 	}
 }

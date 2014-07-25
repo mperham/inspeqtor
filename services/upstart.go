@@ -2,7 +2,6 @@ package services
 
 import (
 	"errors"
-	"inspeqtor/core"
 	"inspeqtor/util"
 	"os/exec"
 	"path/filepath"
@@ -45,14 +44,14 @@ func DetectUpstart(path string) (*Upstart, error) {
 	return nil, nil
 }
 
-func (u *Upstart) LookupService(serviceName string) (core.ProcessId, core.ServiceStatus, error) {
+func (u *Upstart) LookupService(serviceName string) (ProcessId, Status, error) {
 	matches, err := filepath.Glob(u.Path + "/" + serviceName + ".conf")
 	if err != nil {
-		return 0, core.Unknown, err
+		return 0, Unknown, err
 	}
 
 	if len(matches) == 0 {
-		return -1, core.Unknown, nil
+		return -1, Unknown, nil
 	}
 
 	var sout []byte
@@ -62,20 +61,20 @@ func (u *Upstart) LookupService(serviceName string) (core.ProcessId, core.Servic
 		cmd := exec.Command("status", serviceName)
 		sout, err = cmd.CombinedOutput()
 		if err != nil {
-			return 0, core.Unknown, err
+			return 0, Unknown, err
 		}
 	}
 
 	lines, err := util.ReadLines(sout)
 	if len(lines) != 1 {
-		return 0, core.Unknown, errors.New("Unexpected output: " + strings.Join(lines, "\n"))
+		return 0, Unknown, errors.New("Unexpected output: " + strings.Join(lines, "\n"))
 	}
 
 	// mysql start/running, process 14190
 	// sshdgenkeys stop/waiting
 	line := lines[0]
 	if strings.Contains(line, "Unknown job") {
-		return -1, core.Unknown, nil
+		return -1, Unknown, nil
 	}
 
 	results := pidScanner.FindStringSubmatch(line)
@@ -83,21 +82,21 @@ func (u *Upstart) LookupService(serviceName string) (core.ProcessId, core.Servic
 	if len(results) == 4 && len(results[3]) > 0 {
 		pid, err := strconv.ParseInt(results[3], 10, 32)
 		if err != nil {
-			return 0, core.Unknown, err
+			return 0, Unknown, err
 		}
-		return core.ProcessId(pid), core.Up, nil
+		return ProcessId(pid), Up, nil
 	}
 
 	if len(results) == 3 {
 		switch {
 		case results[1] == "start":
-			return 0, core.Starting, nil
+			return 0, Starting, nil
 		case results[1] == "stop" && results[2] != "waiting":
-			return 0, core.Stopping, nil
+			return 0, Stopping, nil
 		case results[1] == "stop":
-			return 0, core.Down, nil
+			return 0, Down, nil
 		}
 	}
 
-	return 0, core.Unknown, errors.New("Unknown upstart output: " + line)
+	return 0, Unknown, errors.New("Unknown upstart output: " + line)
 }

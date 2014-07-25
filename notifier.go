@@ -3,7 +3,6 @@ package inspeqtor
 import (
 	"bytes"
 	"errors"
-	"inspeqtor/core"
 	"net/smtp"
 	"text/template"
 )
@@ -33,11 +32,11 @@ type EmailConfig struct {
 }
 
 type EmailAlert struct {
-	Alert  *core.Alert
+	Alert  *Alert
 	Config *EmailConfig
 }
 
-func SetupNotification(name string, vars map[string]string) (core.Action, error) {
+func SetupNotification(name string, vars map[string]string) (Action, error) {
 	switch name {
 	case "email":
 		en := &EmailConfig{}
@@ -63,11 +62,11 @@ func (e *EmailConfig) Name() string {
 	return "email"
 }
 
-func (e *EmailConfig) Trigger(alert *core.Alert) error {
+func (e *EmailConfig) Trigger(alert *Alert) error {
 	return e.TriggerEmail(alert, sendEmail)
 }
 
-func (e *EmailConfig) TriggerEmail(alert *core.Alert, sender EmailSender) error {
+func (e *EmailConfig) TriggerEmail(alert *Alert, sender EmailSender) error {
 	var doc bytes.Buffer
 	err := email.Execute(&doc, &EmailAlert{alert, e})
 	if err != nil {

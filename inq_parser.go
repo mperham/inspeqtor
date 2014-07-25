@@ -1,11 +1,10 @@
-package inq
+package inspeqtor
 
 import (
 	"errors"
 	"inspeqtor/conf/inq/ast"
 	"inspeqtor/conf/inq/lexer"
 	"inspeqtor/conf/inq/parser"
-	"inspeqtor/core"
 	"inspeqtor/util"
 	"io/ioutil"
 	"log"
@@ -13,16 +12,16 @@ import (
 	"path/filepath"
 )
 
-func ParseChecks(rootDir string) (*core.Host, []*core.Service, error) {
+func ParseInq(rootDir string) (*Host, []*Service, error) {
 	util.Debug("Parsing config in " + rootDir)
 	files, err := filepath.Glob(rootDir + "/*.inq")
 	if err != nil {
 		return nil, nil, err
 	}
 
-	var host *core.Host
-	var checks []*core.Service
-	checks = make([]*core.Service, 0)
+	var host *Host
+	var checks []*Service
+	checks = make([]*Service, 0)
 
 	for _, filename := range files {
 		log.Println("Parsing " + filename)
@@ -55,12 +54,12 @@ func ParseChecks(rootDir string) (*core.Host, []*core.Service, error) {
 }
 
 // GACK, so ugly
-func convertHost(inqhost *ast.HostCheck) (*core.Host, error) {
+func convertHost(inqhost *ast.HostCheck) (*Host, error) {
 	hostname, err := os.Hostname()
 	if err != nil {
 		return nil, err
 	}
-	rules := make([]*core.Rule, len(inqhost.Rules))
+	rules := make([]*Rule, len(inqhost.Rules))
 	for i, rule := range inqhost.Rules {
 		rule, err := convertRule(rule, nil)
 		util.DebugDebug("%+v", *rule)
@@ -69,25 +68,25 @@ func convertHost(inqhost *ast.HostCheck) (*core.Host, error) {
 		}
 		rules[i] = rule
 	}
-	return &core.Host{hostname, rules}, nil
+	return &Host{hostname, rules}, nil
 }
 
-func convertRule(inqrule *ast.Rule, actionList []*core.Action) (*core.Rule, error) {
-	op := core.GT
+func convertRule(inqrule *ast.Rule, actionList []*Action) (*Rule, error) {
+	op := GT
 	switch inqrule.Operator {
 	case ">":
-		op = core.GT
+		op = GT
 	case "<":
-		op = core.LT
+		op = LT
 	default:
 		return nil, errors.New("Unknown operator: " + inqrule.Operator)
 	}
 
-	return &core.Rule{inqrule.Metric, op, inqrule.Value, inqrule.CycleCount, core.Undetermined, nil}, nil
+	return &Rule{inqrule.Metric, op, inqrule.Value, inqrule.CycleCount, Undetermined, nil}, nil
 }
 
-func convertService(inqsvc *ast.ProcessCheck) (*core.Service, error) {
-	rules := make([]*core.Rule, len(inqsvc.Rules))
+func convertService(inqsvc *ast.ProcessCheck) (*Service, error) {
+	rules := make([]*Rule, len(inqsvc.Rules))
 	for i, rule := range inqsvc.Rules {
 		rule, err := convertRule(rule, nil)
 		if err != nil {
@@ -96,6 +95,6 @@ func convertService(inqsvc *ast.ProcessCheck) (*core.Service, error) {
 		util.DebugDebug("%+v", *rule)
 		rules[i] = rule
 	}
-	svc := &core.Service{inqsvc.Name, 0, core.Unknown, rules, nil}
+	svc := &Service{inqsvc.Name, 0, 0, rules, nil}
 	return svc, nil
 }

@@ -1,7 +1,6 @@
 package services
 
 import (
-	"inspeqtor/core"
 	"testing"
 )
 
@@ -26,7 +25,7 @@ func TestDetectRunit(t *testing.T) {
 	if pid != 1234 {
 		t.Errorf("Expected positive PID, got %d\n", pid)
 	}
-	if status != core.Up {
+	if status != Up {
 		t.Errorf("Service should be unknown, got %v\n", status)
 	}
 
@@ -38,7 +37,7 @@ func TestDetectRunit(t *testing.T) {
 	if pid != -1 {
 		t.Errorf("Expected not found PID, got %d\n", pid)
 	}
-	if status != core.Unknown {
+	if status != Unknown {
 		t.Errorf("Service should be unknown, got %v\n", status)
 	}
 }
