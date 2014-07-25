@@ -5,9 +5,9 @@ import (
 )
 
 /*
-  Inspeqtor metrics are stored in a RingBuffer so we can keep
+  Metrics are stored in a RingBuffer so we can keep
   history while also keeping the total storage constant.
-  You can add things to this RingBuffer but you cannot remove them.
+  You can add things to a RingBuffer but you cannot remove them.
   Older items will be overwritten and garbage collected in time.
 */
 type RingBuffer struct {
