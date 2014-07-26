@@ -49,7 +49,6 @@ func captureCpu(m *ProcessMetrics, rootPath string, pid int32) error {
 	}
 	for _, line := range lines {
 		fields := strings.Fields(line)
-		util.Info("%v", fields)
 		utime, err := strconv.ParseUint(fields[13], 10, 64)
 		if err != nil {
 			return err
