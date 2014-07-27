@@ -32,5 +32,5 @@ type InitSystem interface {
 
 	Start(name string) error
 	Stop(name string) error
-	Status(name string) error
+	Status(name string) Status
 }

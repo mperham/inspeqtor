@@ -1,6 +1,7 @@
 package inspeqtor
 
 import (
+	"fmt"
 	"inspeqtor/metrics"
 	"inspeqtor/services"
 	"inspeqtor/util"
@@ -82,30 +83,61 @@ func (i *Inspeqtor) scanSystem(firstTime bool) {
 	}
 
 	for _, svc := range i.Services {
-		if svc.Manager == nil {
-			for _, sm := range i.ServiceManagers {
-				pid, status, err := (*sm).LookupService(svc.Name)
-				if err != nil {
-					util.Warn(err.Error())
-					continue
-				}
-				if pid == -1 {
-					util.Debug((*sm).Name() + " doesn't have " + svc.Name)
-					continue
-				}
-				svc.PID = pid
-				svc.Status = status
-				svc.Manager = sm
-				break
+		go i.collectService(svc)
+	}
+}
+
+func (i *Inspeqtor) collectService(svc *Service) {
+	if svc.Manager == nil {
+		for _, sm := range i.ServiceManagers {
+			pid, status, err := (*sm).LookupService(svc.Name)
+			if err != nil {
+				util.Warn(err.Error())
+				return
 			}
+			if pid == -1 {
+				util.Debug((*sm).Name() + " doesn't have " + svc.Name)
+				return
+			}
+			svc.PID = pid
+			svc.Status = status
+			svc.Manager = sm
+			break
 		}
-		if svc.Manager == nil {
-			util.Warn("Could not find service for " + svc.Name)
-			continue
-		}
-		if svc.Status == services.Down {
-			(*svc.Manager).Start(svc.Name)
-			svc.Status = services.Starting
-		}
+	}
+	if svc.Manager == nil {
+		util.Warn("Could not find service for " + svc.Name)
+		return
+	}
+	if svc.Status == services.Starting {
+		status := (*svc.Manager).Status(svc.Name)
+		svc.Status = status
+	}
+	if svc.Status == services.Down {
+		util.Info("%s is Down, asking %s to start it", svc.Name, (*svc.Manager).Name())
+		(*svc.Manager).Start(svc.Name)
+		svc.Status = services.Starting
+	}
+	if svc.Status == services.Up {
+		i.captureProcess(svc)
+	}
+}
+
+func (i *Inspeqtor) captureProcess(svc *Service) error {
+	insist(svc.PID > 0 && svc.Status == services.Up,
+		fmt.Sprintf("%+v should be Up with valid PID\n", svc))
+
+	m, err := metrics.CaptureProcess("/proc", int32(svc.PID))
+	if err != nil {
+		return err
+	}
+	svc.Metrics.Add(m)
+	return nil
+}
+
+// assert is taken by testing helpers.
+func insist(expr bool, msg string) {
+	if !expr {
+		panic(msg)
 	}
 }

@@ -10,6 +10,7 @@ import (
 
 type ProcessMetrics struct {
 	When           time.Time
+	PID            int32
 	UserCpu        uint64
 	SystemCpu      uint64
 	UserChildCpu   uint64
@@ -19,7 +20,7 @@ type ProcessMetrics struct {
 }
 
 func CaptureProcess(rootPath string, pid int32) (*ProcessMetrics, error) {
-	m := &ProcessMetrics{time.Now(), 0, 0, 0, 0, 0, 0}
+	m := &ProcessMetrics{time.Now(), pid, 0, 0, 0, 0, 0, 0}
 
 	var err error
 

@@ -2,6 +2,7 @@ package inspeqtor
 
 import (
 	"inspeqtor/services"
+	"inspeqtor/util"
 )
 
 /*
@@ -19,10 +20,11 @@ const (
   PID 0 means the process did not exist during that cycle.
 */
 type Service struct {
-	Name   string
-	PID    services.ProcessId
-	Status services.Status
-	Rules  []*Rule
+	Name    string
+	PID     services.ProcessId
+	Status  services.Status
+	Rules   []*Rule
+	Metrics util.RingBuffer
 
 	// Upon bootup, we scan each init system looking for the service
 	// and cache which init system manages it for our lifetime.
