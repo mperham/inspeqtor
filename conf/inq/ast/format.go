@@ -11,9 +11,8 @@ type HostCheck struct {
 }
 
 type ProcessCheck struct {
-	InitType string
-	Name     string
-	Rules    RuleList
+	Name  string
+	Rules RuleList
 }
 
 type RuleList []*Rule
@@ -26,9 +25,8 @@ type Rule struct {
 	CycleCount uint8
 }
 
-func NewProcessCheck(initType interface{}, checkType interface{}, name interface{}, rules interface{}) *ProcessCheck {
+func NewProcessCheck(checkType interface{}, name interface{}, rules interface{}) *ProcessCheck {
 	return &ProcessCheck{
-		string(initType.(*token.Token).Lit),
 		string(name.(*token.Token).Lit),
 		rules.(RuleList),
 	}
