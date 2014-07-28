@@ -104,6 +104,6 @@ func convertService(inqsvc *ast.ProcessCheck) (*Service, error) {
 		util.DebugDebug("Rule: %+v", *rule)
 		rules[i] = rule
 	}
-	svc := &Service{inqsvc.Name, 0, 0, rules, util.RingBuffer{}, nil}
+	svc := &Service{inqsvc.Name, 0, 0, rules, util.NewRingBuffer(240), nil}
 	return svc, nil
 }

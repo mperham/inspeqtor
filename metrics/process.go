@@ -3,6 +3,7 @@ package metrics
 import (
 	"inspeqtor/util"
 	"io/ioutil"
+	"os/exec"
 	"strconv"
 	"strings"
 	"time"
@@ -24,17 +25,50 @@ func CaptureProcess(rootPath string, pid int32) (*ProcessMetrics, error) {
 
 	var err error
 
-	err = captureVm(m, rootPath, pid)
-	if err != nil {
-		return nil, err
-	}
+	if util.Darwin() {
+		err = capturePs(m, pid)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		err = captureVm(m, rootPath, pid)
+		if err != nil {
+			return nil, err
+		}
 
-	err = captureCpu(m, rootPath, pid)
-	if err != nil {
-		return nil, err
+		err = captureCpu(m, rootPath, pid)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return m, nil
+}
+
+func capturePs(m *ProcessMetrics, pid int32) error {
+	cmd := exec.Command("ps", "So", "rss,vsz,time,utime", "-p", strconv.Itoa(int(pid)))
+	sout, err := cmd.CombinedOutput()
+	if err != nil {
+		return err
+	}
+
+	lines, err := util.ReadLines(sout)
+	if err != nil {
+		return err
+	}
+
+	fields := strings.Fields(lines[1])
+	val, err := strconv.ParseUint(fields[0], 10, 64)
+	if err != nil {
+		return err
+	}
+	m.VmRSS = 1024 * val
+	val, err = strconv.ParseUint(fields[1], 10, 64)
+	if err != nil {
+		return err
+	}
+	m.VmSize = 1024 * val
+	return nil
 }
 
 func captureCpu(m *ProcessMetrics, rootPath string, pid int32) error {

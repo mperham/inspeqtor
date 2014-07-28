@@ -11,6 +11,11 @@ var (
 	Verbose = false
 )
 
+func Darwin() bool {
+	b, _ := FileExists("/mach_kernel")
+	return b
+}
+
 func FileExists(path string) (bool, error) {
 	if _, err := os.Stat(path); err != nil {
 		if os.IsNotExist(err) {

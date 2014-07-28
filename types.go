@@ -24,7 +24,7 @@ type Service struct {
 	PID     services.ProcessId
 	Status  services.Status
 	Rules   []*Rule
-	Metrics util.RingBuffer
+	Metrics *util.RingBuffer
 
 	// Upon bootup, we scan each init system looking for the service
 	// and cache which init system manages it for our lifetime.
