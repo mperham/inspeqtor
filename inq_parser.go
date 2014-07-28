@@ -7,7 +7,6 @@ import (
 	"inspeqtor/conf/inq/parser"
 	"inspeqtor/util"
 	"io/ioutil"
-	"log"
 	"os"
 	"path/filepath"
 )
@@ -24,10 +23,9 @@ func ParseInq(confDir string) (*Host, []*Service, error) {
 
 	var host *Host
 	var checks []*Service
-	checks = make([]*Service, 0)
 
 	for _, filename := range files {
-		log.Println("Parsing " + filename)
+		util.DebugDebug("Parsing " + filename)
 		data, err := ioutil.ReadFile(filename)
 		if err != nil {
 			return nil, nil, err
@@ -36,6 +34,11 @@ func ParseInq(confDir string) (*Host, []*Service, error) {
 		s := lexer.NewLexer([]byte(data))
 		p := parser.NewParser()
 		obj, err := p.Parse(s)
+		if err != nil {
+			util.Warn("Unable to parse " + filename + ": " + err.Error())
+			continue
+		}
+
 		switch obj.(type) {
 		case *ast.HostCheck:
 			if host != nil {
@@ -45,13 +48,13 @@ func ParseInq(confDir string) (*Host, []*Service, error) {
 			if err != nil {
 				return nil, nil, err
 			}
-			util.DebugDebug("%+v", *host)
+			util.DebugDebug("Host: %+v", *host)
 		case *ast.ProcessCheck:
 			svc, err := convertService(obj.(*ast.ProcessCheck))
 			if err != nil {
 				return nil, nil, err
 			}
-			util.DebugDebug("%+v", *svc)
+			util.DebugDebug("Service: %+v", *svc)
 			checks = append(checks, svc)
 		}
 	}
@@ -68,7 +71,7 @@ func convertHost(inqhost *ast.HostCheck) (*Host, error) {
 	rules := make([]*Rule, len(inqhost.Rules))
 	for i, rule := range inqhost.Rules {
 		rule, err := convertRule(rule, nil)
-		util.DebugDebug("%+v", *rule)
+		util.DebugDebug("Rule: %+v", *rule)
 		if err != nil {
 			return nil, err
 		}
@@ -98,7 +101,7 @@ func convertService(inqsvc *ast.ProcessCheck) (*Service, error) {
 		if err != nil {
 			return nil, err
 		}
-		util.DebugDebug("%+v", *rule)
+		util.DebugDebug("Rule: %+v", *rule)
 		rules[i] = rule
 	}
 	svc := &Service{inqsvc.Name, 0, 0, rules, util.RingBuffer{}, nil}

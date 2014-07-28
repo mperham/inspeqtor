@@ -1,4 +1,4 @@
-check launchctl service memcached
+check service homebrew.mxcl.memcached
 #  if not exists then start
   if memory > 250m then restart
   if cpu_user > 4 then alert

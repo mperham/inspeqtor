@@ -7,6 +7,7 @@ import (
 	"inspeqtor/util"
 	"os"
 	"os/signal"
+	"strconv"
 	"syscall"
 	"time"
 )
@@ -131,7 +132,7 @@ func (i *Inspeqtor) resolveServices() {
 				util.Debug(sm.Name() + " doesn't have " + svc.Name)
 				return
 			}
-			util.Info("Found " + sm.Name() + "/" + svc.Name + " with PID " + string(pid))
+			util.Info("Found " + sm.Name() + "/" + svc.Name + " with PID " + strconv.Itoa(int(pid)))
 			svc.PID = pid
 			svc.Status = status
 			svc.Manager = sm
@@ -171,7 +172,7 @@ func (i *Inspeqtor) collectService(svc *Service) {
 	if svc.Status == services.Up {
 		err := i.captureProcess(svc)
 		if err != nil {
-			util.Warn("Error capturing process " + string(svc.PID) + ", marking as Down: " + err.Error())
+			util.Warn("Error capturing process " + strconv.Itoa(int(svc.PID)) + ", marking as Down: " + err.Error())
 			svc.Status = services.Down
 		}
 	}
