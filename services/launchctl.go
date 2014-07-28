@@ -8,9 +8,10 @@ import (
 )
 
 type Launchctl struct {
+	name string
 }
 
-func DetectLaunchctl(rootDir string) (*Launchctl, error) {
+func DetectLaunchctl(rootDir string) (InitSystem, error) {
 	file, err := util.FileExists(rootDir + "mach_kernel")
 	if err != nil {
 		return nil, err
@@ -18,10 +19,15 @@ func DetectLaunchctl(rootDir string) (*Launchctl, error) {
 	if !file {
 		return nil, nil
 	}
-	return &Launchctl{}, nil
+	util.Info("Found launchctl")
+	return &Launchctl{"launchctl"}, nil
 }
 
-func (l *Launchctl) LookupService(serviceName string) (ProcessId, Status, error) {
+func (l Launchctl) Name() string {
+	return l.name
+}
+
+func (l Launchctl) LookupService(serviceName string) (ProcessId, Status, error) {
 	cmd := exec.Command("launchctl", "list")
 	sout, err := cmd.CombinedOutput()
 	if err != nil {

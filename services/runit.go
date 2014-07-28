@@ -19,10 +19,11 @@ import (
 )
 
 type Runit struct {
+	name string
 	path string
 }
 
-func DetectRunit(root string) (*Runit, error) {
+func DetectRunit(root string) (InitSystem, error) {
 	path := root + "etc/service"
 	result, err := util.FileExists(path)
 	if err != nil {
@@ -48,14 +49,18 @@ func DetectRunit(root string) (*Runit, error) {
 	}
 
 	if len(matches) > 0 {
-		util.Debug("Detected runit in " + path)
-		return &Runit{path}, nil
+		util.Info("Detected runit in " + path)
+		return &Runit{"runit", path}, nil
 	}
 
 	return nil, nil
 }
 
-func (r *Runit) LookupService(serviceName string) (ProcessId, Status, error) {
+func (r Runit) Name() string {
+	return r.name
+}
+
+func (r Runit) LookupService(serviceName string) (ProcessId, Status, error) {
 	matches, err := filepath.Glob(r.path + "/" + serviceName + "/run")
 	if err != nil {
 		return 0, Unknown, err

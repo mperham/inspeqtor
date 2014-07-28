@@ -29,8 +29,4 @@ type InitSystem interface {
 	// name was not found or error if there was an
 	// unexpected failure.
 	LookupService(name string) (ProcessId, Status, error)
-
-	Start(name string) error
-	Stop(name string) error
-	Status(name string) Status
 }

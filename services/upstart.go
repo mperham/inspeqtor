@@ -11,7 +11,8 @@ import (
 )
 
 type Upstart struct {
-	Path        string
+	name        string
+	path        string
 	dummyOutput string
 }
 
@@ -19,7 +20,7 @@ var (
 	pidScanner *regexp.Regexp = regexp.MustCompile(" (start|stop)\\/([a-z\\-]+)(?:, process (\\d+))?")
 )
 
-func DetectUpstart(path string) (*Upstart, error) {
+func DetectUpstart(path string) (InitSystem, error) {
 	result, err := util.FileExists(path)
 	if err != nil {
 		return nil, err
@@ -36,16 +37,20 @@ func DetectUpstart(path string) (*Upstart, error) {
 	}
 
 	if len(matches) > 0 {
-		util.Debug("Detected upstart in " + path)
-		return &Upstart{path, ""}, nil
+		util.Info("Detected upstart in " + path)
+		return &Upstart{"upstart", path, ""}, nil
 	}
 
 	util.Debug("upstart not detected, empty " + path)
 	return nil, nil
 }
 
+func (u *Upstart) Name() string {
+	return u.name
+}
+
 func (u *Upstart) LookupService(serviceName string) (ProcessId, Status, error) {
-	matches, err := filepath.Glob(u.Path + "/" + serviceName + ".conf")
+	matches, err := filepath.Glob(u.path + "/" + serviceName + ".conf")
 	if err != nil {
 		return 0, Unknown, err
 	}

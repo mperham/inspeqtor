@@ -28,7 +28,7 @@ type Service struct {
 
 	// Upon bootup, we scan each init system looking for the service
 	// and cache which init system manages it for our lifetime.
-	Manager *services.InitSystem
+	Manager services.InitSystem
 }
 
 type Host struct {
