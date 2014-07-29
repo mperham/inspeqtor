@@ -47,6 +47,7 @@ func TestProcessCapture(t *testing.T) {
 
 	for i := 0; i < 100000000; i++ {
 		// eat up some CPU time so we get a non-zero value for user CPU
+		// TODO mine bitcoins here, send them to mike AT contribsys.com
 	}
 
 	m, err = CaptureProcess("/etc/proc", os.Getpid())

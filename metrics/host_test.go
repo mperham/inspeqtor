@@ -1,6 +1,7 @@
 package metrics
 
 import (
+	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
 )
@@ -20,7 +21,6 @@ func TestCollectHostMetrics(t *testing.T) {
 		CpuMetrics{
 			1304544815, 4670673, 0, 768153, 1298881971, 143718, 844, 10855, 68601, 0, 0,
 		},
-		243376,
 		0.02,
 		0.03,
 		0.05,
@@ -30,6 +30,18 @@ func TestCollectHostMetrics(t *testing.T) {
 	if *metrics != expected {
 		t.Errorf("Expected %+v, got %+v", expected, metrics)
 	}
+}
+
+func TestCollectRealHostMetrics(t *testing.T) {
+	m, err := CollectHostMetrics("/proc")
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Can't really know what we'll collect so we'll check for non-zero.
+	assert.True(t, m.Load1 > 0)
+	assert.True(t, m.Load5 > 0)
+	assert.True(t, m.Load15 > 0)
+	assert.True(t, m.PercentSwapInUse > 0)
 }
 
 func TestCollectDiskMetrics(t *testing.T) {

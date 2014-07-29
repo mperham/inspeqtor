@@ -15,7 +15,6 @@ type DiskUsage map[string]int8
 type SystemMetrics struct {
 	When             time.Time
 	CpuUsage         CpuMetrics
-	FreeMem          uint64
 	Load1            float32
 	Load5            float32
 	Load15           float32
@@ -68,52 +67,131 @@ func CollectHostMetrics(path string) (*SystemMetrics, error) {
 }
 
 func collectMemory(path string, metrics *SystemMetrics) error {
-	contentBytes, err := ioutil.ReadFile(path + "/meminfo")
+	ok, err := util.FileExists(path + "/meminfo")
 	if err != nil {
 		return err
 	}
-	lines := strings.Split(string(contentBytes), "\n")
 
-	memMetrics := make(map[string]uint64)
-	for _, line := range lines {
-		if line == "" {
-			continue
-		}
-
-		results := meminfoParser.FindStringSubmatch(line)
-		if results == nil {
-			util.Warn("Unknown input: " + line)
-			continue
-		}
-		val, err := strconv.ParseUint(results[2], 10, 64)
+	if ok {
+		contentBytes, err := ioutil.ReadFile(path + "/meminfo")
 		if err != nil {
-			util.Warn("Unexpected input: " + results[2] + " in " + line)
 			return err
 		}
-		memMetrics[results[1]] = uint64(val)
-	}
+		lines := strings.Split(string(contentBytes), "\n")
 
-	metrics.FreeMem = memMetrics["MemFree"]
-	free := memMetrics["SwapFree"]
-	total := memMetrics["SwapTotal"]
-	if free == 0 {
-		metrics.PercentSwapInUse = 100
-	} else if free == total {
-		metrics.PercentSwapInUse = 0
+		memMetrics := make(map[string]uint64)
+		for _, line := range lines {
+			if line == "" {
+				continue
+			}
+
+			results := meminfoParser.FindStringSubmatch(line)
+			if results == nil {
+				util.Warn("Unknown input: " + line)
+				continue
+			}
+			val, err := strconv.ParseUint(results[2], 10, 64)
+			if err != nil {
+				util.Warn("Unexpected input: " + results[2] + " in " + line)
+				return err
+			}
+			memMetrics[results[1]] = uint64(val)
+		}
+
+		free := memMetrics["SwapFree"]
+		total := memMetrics["SwapTotal"]
+		if free == 0 {
+			metrics.PercentSwapInUse = 100
+		} else if free == total {
+			metrics.PercentSwapInUse = 0
+		} else {
+			metrics.PercentSwapInUse = 100 - int8(100*(float64(free)/float64(total)))
+		}
 	} else {
-		metrics.PercentSwapInUse = 100 - int8(100*(float64(free)/float64(total)))
+		cmd := exec.Command("sysctl", "-n", "vm.swapusage")
+		sout, err := cmd.CombinedOutput()
+		if err != nil {
+			return err
+		}
+		lines, err := util.ReadLines(sout)
+		if err != nil {
+			return err
+		}
+
+		rest := lines[0]
+		matches := swapRegexp.FindStringSubmatch(rest)
+		total := matches[1]
+		rest = matches[2]
+
+		matches = swapRegexp.FindStringSubmatch(rest)
+		used := matches[1]
+
+		tot, err := strconv.ParseFloat(total[0:len(total)-1], 64)
+		if err != nil {
+			return err
+		}
+		usd, err := strconv.ParseFloat(used[0:len(used)-1], 64)
+		if err != nil {
+			return err
+		}
+
+		t := normalizeSwap(tot, rune(total[len(total)-1]))
+		u := normalizeSwap(usd, rune(used[len(used)-1]))
+		metrics.PercentSwapInUse = int8(100 * (u / t))
 	}
 
 	return nil
 }
 
+func normalizeSwap(val float64, size rune) float64 {
+	switch size {
+	case 'M', 'm':
+		return val * 1024
+	case 'K', 'k':
+		return val
+	case 'G', 'g':
+		return val * 1024 * 1024
+	case 'T', 't':
+		return val * 1024 * 1024 * 1024
+	default:
+		// ¯\_( ツ )_/¯
+		return val
+	}
+}
+
+var (
+	swapRegexp = regexp.MustCompile("= (\\d+\\.\\d{2}[A-Z])(.*)")
+)
+
 func collectLoadAverage(path string, metrics *SystemMetrics) error {
-	contentBytes, err := ioutil.ReadFile(path + "/loadavg")
+	// TODO make this a one-time check so we don't incur the overhead
+	// on every cycle.
+	ok, err := util.FileExists(path + "/loadavg")
 	if err != nil {
 		return err
 	}
 
-	slices := strings.Split(string(contentBytes), " ")
+	var loadavgString string
+	if ok {
+		contentBytes, err := ioutil.ReadFile(path + "/loadavg")
+		if err != nil {
+			return err
+		}
+		loadavgString = string(contentBytes)
+	} else {
+		cmd := exec.Command("sysctl", "-n", "vm.loadavg")
+		sout, err := cmd.CombinedOutput()
+		if err != nil {
+			return err
+		}
+		lines, err := util.ReadLines(sout)
+		if err != nil {
+			return err
+		}
+		loadavgString = lines[0][2 : len(lines[0])-2] // trim braces
+	}
+
+	slices := strings.Split(loadavgString, " ")
 	load1, err := strconv.ParseFloat(slices[0], 32)
 	if err != nil {
 		return err
@@ -134,15 +212,22 @@ func collectLoadAverage(path string, metrics *SystemMetrics) error {
 }
 
 func collectCpu(path string, metrics *SystemMetrics) error {
-	contents, err := ioutil.ReadFile(path + "/stat")
+	ok, err := util.FileExists(path + "/stat")
 	if err != nil {
 		return err
 	}
 
-	lines := strings.Split(string(contents), "\n")
-	line := lines[0]
-	fields := strings.Fields(line)
-	metrics.CpuUsage = createCpuMetrics(fields)
+	if ok {
+		contents, err := ioutil.ReadFile(path + "/stat")
+		if err != nil {
+			return err
+		}
+
+		lines := strings.Split(string(contents), "\n")
+		line := lines[0]
+		fields := strings.Fields(line)
+		metrics.CpuUsage = createCpuMetrics(fields)
+	}
 	return nil
 }
 
