@@ -182,7 +182,7 @@ func (i *Inspeqtor) captureProcess(svc *Service) error {
 	insist(svc.PID > 0 && svc.Status == services.Up,
 		fmt.Sprintf("%+v should be Up with valid PID\n", svc))
 
-	m, err := metrics.CaptureProcess("/proc", int32(svc.PID))
+	m, err := metrics.CaptureProcess("/proc", int(svc.PID))
 	if err != nil {
 		return err
 	}

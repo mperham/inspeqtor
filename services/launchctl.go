@@ -20,7 +20,7 @@ func DetectLaunchctl(rootDir string) (InitSystem, error) {
 		return nil, nil
 	}
 	util.Info("Found launchctl")
-	return &Launchctl{"launchctl"}, nil
+	return Launchctl{"launchctl"}, nil
 }
 
 func (l Launchctl) Name() string {

@@ -6,16 +6,12 @@ import (
 )
 
 func TestDetectUpstart(t *testing.T) {
-	upstart, err := DetectUpstart("etc/init")
+	init, err := DetectUpstart("etc/init")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	expected := Upstart{"etc/init", ""}
-	if *upstart != expected {
-		t.Errorf("Expected %+v, got %+v", expected, upstart)
-	}
-
+	upstart := init.(Upstart)
 	upstart.dummyOutput = "mysql start/running, process 14190"
 	pid, st, err := upstart.LookupService("mysql")
 	if err != nil {

@@ -10,11 +10,6 @@ func TestLaunchctl(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	expected := Launchctl{}
-	if *l != expected {
-		t.Fatalf("Expected %+v, got %+v", expected, *l)
-	}
-
 	// Verify we can find a known good service.
 	// Should be running on all OSX machines, right?
 	pid, status, err := l.LookupService("com.apple.Finder")

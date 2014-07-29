@@ -50,7 +50,7 @@ func DetectRunit(root string) (InitSystem, error) {
 
 	if len(matches) > 0 {
 		util.Info("Detected runit in " + path)
-		return &Runit{"runit", path}, nil
+		return Runit{"runit", path}, nil
 	}
 
 	return nil, nil

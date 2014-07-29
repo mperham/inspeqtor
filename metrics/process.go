@@ -4,14 +4,29 @@ import (
 	"inspeqtor/util"
 	"io/ioutil"
 	"os/exec"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
 )
 
+const (
+	/*
+			CPU time is stored in system clock ticks.  Most
+			modern linux systems use 100 clock ticks per second,
+			or 100 Hz.  Use "getconf CLK_TCK" to verify this.
+		  Since our cycle time is 15 seconds, there's 1500
+		  ticks to spend each cycle.  If a process uses 750
+		  ticks on the CPU, that means it used 50% of the CPU
+		  during that cycle.  Systems with multiple cores or CPUs
+		  can result in a process that uses greater than 100% CPU.
+	*/
+	CLK_TCK = 100
+)
+
 type ProcessMetrics struct {
 	When           time.Time
-	PID            int32
+	PID            int
 	UserCpu        uint64
 	SystemCpu      uint64
 	UserChildCpu   uint64
@@ -20,12 +35,17 @@ type ProcessMetrics struct {
 	VmSize         uint64
 }
 
-func CaptureProcess(rootPath string, pid int32) (*ProcessMetrics, error) {
+func CaptureProcess(rootPath string, pid int) (*ProcessMetrics, error) {
 	m := &ProcessMetrics{time.Now(), pid, 0, 0, 0, 0, 0, 0}
 
 	var err error
 
-	if util.Darwin() {
+	ok, err := util.FileExists(rootPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if !ok {
 		err = capturePs(m, pid)
 		if err != nil {
 			return nil, err
@@ -45,7 +65,10 @@ func CaptureProcess(rootPath string, pid int32) (*ProcessMetrics, error) {
 	return m, nil
 }
 
-func capturePs(m *ProcessMetrics, pid int32) error {
+/*
+So many hacks in this.  OSX support can be seen as "bad" at best.
+*/
+func capturePs(m *ProcessMetrics, pid int) error {
 	cmd := exec.Command("ps", "So", "rss,vsz,time,utime", "-p", strconv.Itoa(int(pid)))
 	sout, err := cmd.CombinedOutput()
 	if err != nil {
@@ -68,10 +91,40 @@ func capturePs(m *ProcessMetrics, pid int32) error {
 		return err
 	}
 	m.VmSize = 1024 * val
+
+	times := timeRegexp.FindStringSubmatch(fields[2])
+	if times == nil {
+		util.Debug("Unable to parse CPU time in " + lines[1])
+		return nil
+	}
+	min, _ := strconv.ParseUint(times[1], 10, 32)
+	sec, _ := strconv.ParseUint(times[2], 10, 32)
+	cs, _ := strconv.ParseUint(times[3], 10, 32)
+
+	ticks := min*60*100 + sec*100 + cs
+
+	times = timeRegexp.FindStringSubmatch(fields[3])
+	if times == nil {
+		util.Debug("Unable to parse User time in " + lines[1])
+		return nil
+	}
+	min, _ = strconv.ParseUint(times[1], 10, 32)
+	sec, _ = strconv.ParseUint(times[2], 10, 32)
+	cs, _ = strconv.ParseUint(times[3], 10, 32)
+
+	uticks := min*60*100 + sec*100 + cs
+
+	m.UserCpu = uticks
+	m.SystemCpu = ticks - uticks
+
 	return nil
 }
 
-func captureCpu(m *ProcessMetrics, rootPath string, pid int32) error {
+var (
+	timeRegexp = regexp.MustCompile("\\A(\\d+):(\\d\\d).(\\d\\d)\\z")
+)
+
+func captureCpu(m *ProcessMetrics, rootPath string, pid int) error {
 	dir := rootPath + "/" + strconv.Itoa(int(pid))
 	data, err := ioutil.ReadFile(dir + "/stat")
 	if err != nil {
@@ -109,7 +162,7 @@ func captureCpu(m *ProcessMetrics, rootPath string, pid int32) error {
 	return nil
 }
 
-func captureVm(m *ProcessMetrics, rootPath string, pid int32) error {
+func captureVm(m *ProcessMetrics, rootPath string, pid int) error {
 	dir := rootPath + "/" + strconv.Itoa(int(pid))
 	data, err := ioutil.ReadFile(dir + "/status")
 	if err != nil {

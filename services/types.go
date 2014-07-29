@@ -1,6 +1,6 @@
 package services
 
-type ProcessId int32
+type ProcessId int
 type Status uint8
 
 const (

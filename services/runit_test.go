@@ -13,11 +13,6 @@ func TestDetectRunit(t *testing.T) {
 		t.Fatal("Runit not detected")
 	}
 
-	expected := Runit{"./etc/service"}
-	if *runit != expected {
-		t.Errorf("Expected %+v, got %+v", expected, runit)
-	}
-
 	pid, status, err := runit.LookupService("memcached")
 	if err != nil {
 		t.Error(err)
