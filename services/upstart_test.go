@@ -6,7 +6,7 @@ import (
 )
 
 func TestDetectUpstart(t *testing.T) {
-	init, err := DetectUpstart("etc/init")
+	init, err := detectUpstart("etc/init")
 	if err != nil {
 		t.Fatal(err)
 	}

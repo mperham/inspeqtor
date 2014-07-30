@@ -1,5 +1,9 @@
 package services
 
+import (
+	"inspeqtor/util"
+)
+
 type ProcessId int
 type Status uint8
 
@@ -29,4 +33,32 @@ type InitSystem interface {
 	// name was not found or error if there was an
 	// unexpected failure.
 	LookupService(name string) (ProcessId, Status, error)
+}
+
+func Detect() []InitSystem {
+	inits := make([]InitSystem, 0)
+	var sm InitSystem
+
+	sm, err := detectLaunchctl("/")
+	if err != nil {
+		util.Warn("Couldn't detect launchctl: " + err.Error())
+	} else {
+		inits = append(inits, sm)
+	}
+
+	sm, err = detectUpstart("/etc/init")
+	if err != nil {
+		util.Warn("Couldn't detect upstart: " + err.Error())
+	} else {
+		inits = append(inits, sm)
+	}
+
+	sm, err = detectRunit("/")
+	if err != nil {
+		util.Warn("Couldn't detect runit: " + err.Error())
+	} else {
+		inits = append(inits, sm)
+	}
+
+	return inits
 }

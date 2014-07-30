@@ -5,7 +5,7 @@ import (
 )
 
 func TestDetectRunit(t *testing.T) {
-	runit, err := DetectRunit("./")
+	runit, err := detectRunit("./")
 	if err != nil {
 		t.Fatal(err)
 	}

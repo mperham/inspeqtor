@@ -11,7 +11,7 @@ type Launchctl struct {
 	name string
 }
 
-func DetectLaunchctl(rootDir string) (InitSystem, error) {
+func detectLaunchctl(rootDir string) (InitSystem, error) {
 	file, err := util.FileExists(rootDir + "mach_kernel")
 	if err != nil {
 		return nil, err

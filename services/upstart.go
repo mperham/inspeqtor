@@ -20,7 +20,7 @@ var (
 	pidScanner *regexp.Regexp = regexp.MustCompile(" (start|stop)\\/([a-z\\-]+)(?:, process (\\d+))?")
 )
 
-func DetectUpstart(path string) (InitSystem, error) {
+func detectUpstart(path string) (InitSystem, error) {
 	result, err := util.FileExists(path)
 	if err != nil {
 		return nil, err

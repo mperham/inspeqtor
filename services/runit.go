@@ -23,7 +23,7 @@ type Runit struct {
 	path string
 }
 
-func DetectRunit(root string) (InitSystem, error) {
+func detectRunit(root string) (InitSystem, error) {
 	path := root + "etc/service"
 	result, err := util.FileExists(path)
 	if err != nil {

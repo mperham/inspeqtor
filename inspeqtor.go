@@ -26,37 +26,15 @@ type Inspeqtor struct {
 
 func New(dir string) (*Inspeqtor, error) {
 	i := &Inspeqtor{RootDir: dir}
-	var sm services.InitSystem
-
-	sm, err := services.DetectLaunchctl("/")
-	if err != nil {
-		util.Warn("Couldn't detect launchctl: " + err.Error())
-	} else {
-		i.ServiceManagers = append(i.ServiceManagers, sm)
-	}
-
-	sm, err = services.DetectUpstart("/etc/init")
-	if err != nil {
-		util.Warn("Couldn't detect upstart: " + err.Error())
-	} else {
-		i.ServiceManagers = append(i.ServiceManagers, sm)
-	}
-
-	sm, err = services.DetectRunit("/")
-	if err != nil {
-		util.Warn("Couldn't detect runit: " + err.Error())
-	} else {
-		i.ServiceManagers = append(i.ServiceManagers, sm)
-	}
-
+	i.ServiceManagers = services.Detect()
 	return i, nil
 }
 
 var (
 	Quit           os.Signal = syscall.SIGQUIT
 	SignalHandlers           = map[os.Signal]func(){
-		Quit:         Exit,
-		os.Interrupt: Exit,
+		Quit:         exit,
+		os.Interrupt: exit,
 	}
 	Name string = "Inspeqtor"
 )
@@ -76,7 +54,7 @@ func (i *Inspeqtor) Start() {
 	}
 }
 
-func Exit() {
+func exit() {
 	util.Info(Name + " exiting")
 	os.Exit(0)
 }
