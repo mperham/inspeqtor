@@ -42,21 +42,8 @@ var (
 func (i *Inspeqtor) Start() {
 	go i.runLoop()
 
-	signals := make(chan os.Signal)
-	for k, _ := range SignalHandlers {
-		signal.Notify(signals, k)
-	}
-	for {
-		sig := <-signals
-		util.Debug("Received signal %d", sig)
-		funk := SignalHandlers[sig]
-		funk()
-	}
-}
-
-func exit() {
-	util.Info(Name + " exiting")
-	os.Exit(0)
+	// This method never returns
+	handleSignals()
 }
 
 func HandleSignal(sig os.Signal, handler func()) {
@@ -81,6 +68,27 @@ func (i *Inspeqtor) Parse() error {
 	util.DebugDebug("Host: %+v", host)
 	util.DebugDebug("Services: %+v", services)
 	return nil
+}
+
+// private
+
+func handleSignals() {
+	signals := make(chan os.Signal)
+	for k, _ := range SignalHandlers {
+		signal.Notify(signals, k)
+	}
+
+	for {
+		sig := <-signals
+		util.Debug("Received signal %d", sig)
+		funk := SignalHandlers[sig]
+		funk()
+	}
+}
+
+func exit() {
+	util.Info(Name + " exiting")
+	os.Exit(0)
 }
 
 func (i *Inspeqtor) runLoop() {
