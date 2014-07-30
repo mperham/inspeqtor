@@ -32,8 +32,9 @@ type Service struct {
 }
 
 type Host struct {
-	Name  string
-	Rules []*Rule
+	Name    string
+	Rules   []*Rule
+	Metrics *util.RingBuffer
 }
 
 type Operator uint8
