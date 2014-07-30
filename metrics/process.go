@@ -12,16 +12,43 @@ import (
 
 const (
 	/*
-			CPU time is stored in system clock ticks.  Most
-			modern linux systems use 100 clock ticks per second,
-			or 100 Hz.  Use "getconf CLK_TCK" to verify this.
-		  Since our cycle time is 15 seconds, there's 1500
-		  ticks to spend each cycle.  If a process uses 750
-		  ticks on the CPU, that means it used 50% of the CPU
-		  during that cycle.  Systems with multiple cores or CPUs
-		  can result in a process that uses greater than 100% CPU.
+	  CPU time is stored in system clock ticks.  Most
+	  modern linux systems use 100 clock ticks per second,
+	  or 100 Hz.  Use "getconf CLK_TCK" to verify this.
+	  Since our cycle time is 15 seconds, there's 1500
+	  ticks to spend each cycle.  If a process uses 750
+	  ticks on the CPU, that means it used 50% of the CPU
+	  during that cycle.  Multithreaded processes running on
+	  systems with multiple CPUs/cores can use more than 100% CPU.
 	*/
 	CLK_TCK = 100
+)
+
+type metricFamily string
+
+var (
+	SupportedProcessMetrics = map[metricFamily]func(*ProcessMetrics, string) uint64{
+		"memory": func(p *ProcessMetrics, param string) uint64 {
+			switch param {
+			case "rss":
+				return p.VmRSS
+			case "vsz":
+				return p.VmSize
+			default:
+				panic("Unknown process metric \"memory(" + param + ")\"")
+			}
+		},
+		"cpu": func(p *ProcessMetrics, param string) uint64 {
+			switch param {
+			case "user":
+				return p.UserCpu
+			case "system":
+				return p.SystemCpu
+			default:
+				panic("Unknown process metric \"cpu(" + param + ")\"")
+			}
+		},
+	}
 )
 
 type ProcessMetrics struct {

@@ -12,12 +12,14 @@ import (
 
 type DiskUsage map[string]int8
 
+// Load is stored as 100x the actual value so it can be represented
+// as an int.  Load of 0.5 == 50 here.
 type SystemMetrics struct {
 	When             time.Time
 	CpuUsage         CpuMetrics
-	Load1            float32
-	Load5            float32
-	Load15           float32
+	Load1            int
+	Load5            int
+	Load15           int
 	PercentSwapInUse int8
 	Disk             *DiskUsage
 }
@@ -35,6 +37,41 @@ type CpuMetrics struct {
 	Guest     uint64
 	GuestNice uint64
 }
+
+var (
+	SupportedHostMetrics = map[metricFamily]func(*SystemMetrics, string) uint64{
+		"load": func(p *SystemMetrics, param string) uint64 {
+			switch param {
+			case "1m":
+				return uint64(p.Load1)
+			case "5m":
+				return uint64(p.Load5)
+			case "15m":
+				return uint64(p.Load15)
+			default:
+				panic("Unknown host metric \"load(" + param + ")\"")
+			}
+		},
+		"cpu": func(p *SystemMetrics, param string) uint64 {
+			switch param {
+			case "user":
+				return p.CpuUsage.User
+			case "system":
+				return p.CpuUsage.System
+			case "steal":
+				return p.CpuUsage.Steal
+			case "iowait":
+				return p.CpuUsage.IOWait
+			default:
+				panic("Unknown host metric \"cpu(" + param + ")\"")
+			}
+		},
+		"swap": func(p *SystemMetrics, _ string) uint64 { return uint64(p.PercentSwapInUse) },
+		"disk": func(p *SystemMetrics, param string) uint64 {
+			return uint64((*p.Disk)[param])
+		},
+	}
+)
 
 var (
 	meminfoParser *regexp.Regexp = regexp.MustCompile("([^:]+):\\s+(\\d+)")
@@ -192,22 +229,22 @@ func collectLoadAverage(path string, metrics *SystemMetrics) error {
 	}
 
 	slices := strings.Split(loadavgString, " ")
-	load1, err := strconv.ParseFloat(slices[0], 32)
+	load1, err := strconv.ParseFloat(slices[0], 64)
 	if err != nil {
 		return err
 	}
-	load5, err := strconv.ParseFloat(slices[1], 32)
+	load5, err := strconv.ParseFloat(slices[1], 64)
 	if err != nil {
 		return err
 	}
-	load15, err := strconv.ParseFloat(slices[2], 32)
+	load15, err := strconv.ParseFloat(slices[2], 64)
 	if err != nil {
 		return err
 	}
 
-	metrics.Load1 = float32(load1)
-	metrics.Load5 = float32(load5)
-	metrics.Load15 = float32(load15)
+	metrics.Load1 = int(load1 * 100)
+	metrics.Load5 = int(load5 * 100)
+	metrics.Load15 = int(load15 * 100)
 	return nil
 }
 
