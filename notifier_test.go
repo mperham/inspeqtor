@@ -2,9 +2,9 @@ package inspeqtor
 
 import (
 	"bytes"
+	"github.com/stretchr/testify/assert"
 	"inspeqtor/services"
 	"inspeqtor/util"
-	"log"
 	"strings"
 	"testing"
 )
@@ -15,8 +15,8 @@ func TestGmailNotifier(t *testing.T) {
 		"password": "fuzzbucket",
 		"to":       "mike@example.org",
 	})
-	ok(t, err)
-	assert(t, i != nil, "Expecting valid notifier")
+	assert.Nil(t, err)
+	assert.NotNil(t, i)
 }
 
 func TestEmailNotifier(t *testing.T) {
@@ -26,8 +26,8 @@ func TestEmailNotifier(t *testing.T) {
 		"hostname": "smtp.example.com",
 		"to":       "mike@example.org",
 	})
-	ok(t, err)
-	assert(t, i != nil, "Expecting valid notifier")
+	assert.Nil(t, err)
+	assert.NotNil(t, i)
 }
 
 func TestMissingEmailNotifier(t *testing.T) {
@@ -36,23 +36,23 @@ func TestMissingEmailNotifier(t *testing.T) {
 		"password": "fuzzbucket",
 		"to":       "mike@example.org",
 	})
-	assert(t, err != nil, "Missing data should cause error")
-	log.Printf("%v", i)
-	assert(t, i == nil, "Missing data should not return notifier")
+	assert.NotNil(t, err)
+	assert.Nil(t, i)
 }
 
 func TestEmailTrigger(t *testing.T) {
 	alert := &Alert{
 		&Service{"mysql", 0, services.Down, nil, &util.RingBuffer{}, nil},
-		&Rule{"rss", GT, 64 * 1024 * 1024, 1, Ok, nil},
+		&Rule{"memory", "rss", GT, 64 * 1024 * 1024, 1, Ok, nil},
 	}
 
 	err := validEmailSetup().TriggerEmail(alert, func(e *EmailConfig, doc bytes.Buffer) error {
 		content := string(doc.Bytes())
-		assert(t, strings.Index(content, "[mysql]") > 0, "email does not contain expected content")
+		assert.True(t, strings.Index(content, "[mysql]") > 0, "email does not contain expected content")
+		assert.True(t, strings.Index(content, "memory(rss)") > 0, "email does not contain expected content")
 		return nil
 	})
-	ok(t, err)
+	assert.Nil(t, err)
 }
 
 func validEmailSetup() *EmailConfig {

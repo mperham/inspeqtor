@@ -17,8 +17,13 @@ type ProcessCheck struct {
 
 type RuleList []*Rule
 
+type RuleMetric struct {
+	Family string
+	Name   string
+}
+
 type Rule struct {
-	Metric     string
+	Metric     RuleMetric
 	Operator   string
 	Value      uint64
 	Action     string
@@ -47,12 +52,20 @@ func AppendRule(list interface{}, rule interface{}) RuleList {
 
 func NewRule(metric interface{}, operator interface{}, value interface{}, action interface{}, cycleCount interface{}) *Rule {
 	return &Rule{
-		string(metric.(*token.Token).Lit),
+		*metric.(*RuleMetric),
 		string(operator.(*token.Token).Lit),
 		value.(uint64),
 		string(action.(*token.Token).Lit),
 		uint8(cycleCount.(uint64)),
 	}
+}
+
+func Metric(family interface{}, name interface{}) (*RuleMetric, error) {
+	m := &RuleMetric{string(family.(*token.Token).Lit), ""}
+	if name != nil {
+		m.Name = string(name.(*token.Token).Lit)
+	}
+	return m, nil
 }
 
 func HumanAmount(digits interface{}, code interface{}) (uint64, error) {
@@ -73,6 +86,8 @@ func HumanAmount(digits interface{}, code interface{}) (uint64, error) {
 			amt *= 1024 * 1024 * 1024 * 1024
 		} else if sizecode == "p" {
 			amt *= 1024 * 1024 * 1024 * 1024 * 1024
+		} else if sizecode == "%" {
+			// nothing to do
 		}
 	}
 	return amt, nil

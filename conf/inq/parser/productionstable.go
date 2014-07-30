@@ -140,20 +140,40 @@ var productionsTable = ProdTab {
 		},
 	},
 	ProdTabEntry{
-		String: `Rule : "if" id operator HumanAmount "then" Action	<< ast.NewRule(X[1], X[2], X[3], X[5], uint64(1)), nil >>`,
-		Id: "Rule",
+		String: `Metric : id	<< ast.Metric(X[0], nil) >>`,
+		Id: "Metric",
 		NTType: 7,
 		Index: 12,
+		NumSymbols: 1,
+		ReduceFunc: func(X []Attrib) (Attrib, error) {
+			return ast.Metric(X[0], nil)
+		},
+	},
+	ProdTabEntry{
+		String: `Metric : id "(" id ")"	<< ast.Metric(X[0], X[2]) >>`,
+		Id: "Metric",
+		NTType: 7,
+		Index: 13,
+		NumSymbols: 4,
+		ReduceFunc: func(X []Attrib) (Attrib, error) {
+			return ast.Metric(X[0], X[2])
+		},
+	},
+	ProdTabEntry{
+		String: `Rule : "if" Metric operator HumanAmount "then" Action	<< ast.NewRule(X[1], X[2], X[3], X[5], uint64(1)), nil >>`,
+		Id: "Rule",
+		NTType: 8,
+		Index: 14,
 		NumSymbols: 6,
 		ReduceFunc: func(X []Attrib) (Attrib, error) {
 			return ast.NewRule(X[1], X[2], X[3], X[5], uint64(1)), nil
 		},
 	},
 	ProdTabEntry{
-		String: `Rule : "if" id operator HumanAmount "for" IntAmount "cycles" "then" Action	<< ast.NewRule(X[1], X[2], X[3], X[8], X[5]), nil >>`,
+		String: `Rule : "if" Metric operator HumanAmount "for" IntAmount "cycles" "then" Action	<< ast.NewRule(X[1], X[2], X[3], X[8], X[5]), nil >>`,
 		Id: "Rule",
-		NTType: 7,
-		Index: 13,
+		NTType: 8,
+		Index: 15,
 		NumSymbols: 9,
 		ReduceFunc: func(X []Attrib) (Attrib, error) {
 			return ast.NewRule(X[1], X[2], X[3], X[8], X[5]), nil
@@ -162,8 +182,8 @@ var productionsTable = ProdTab {
 	ProdTabEntry{
 		String: `RuleList : Rule	<< ast.NewRuleList(X[0]), nil >>`,
 		Id: "RuleList",
-		NTType: 8,
-		Index: 14,
+		NTType: 9,
+		Index: 16,
 		NumSymbols: 1,
 		ReduceFunc: func(X []Attrib) (Attrib, error) {
 			return ast.NewRuleList(X[0]), nil
@@ -172,8 +192,8 @@ var productionsTable = ProdTab {
 	ProdTabEntry{
 		String: `RuleList : RuleList Rule	<< ast.AppendRule(X[0], X[1]), nil >>`,
 		Id: "RuleList",
-		NTType: 8,
-		Index: 15,
+		NTType: 9,
+		Index: 17,
 		NumSymbols: 2,
 		ReduceFunc: func(X []Attrib) (Attrib, error) {
 			return ast.AppendRule(X[0], X[1]), nil

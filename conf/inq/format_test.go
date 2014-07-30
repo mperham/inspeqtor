@@ -6,7 +6,6 @@ import (
 	"inspeqtor/conf/inq/lexer"
 	"inspeqtor/conf/inq/parser"
 	"io/ioutil"
-	"log"
 	"testing"
 )
 
@@ -19,9 +18,8 @@ func TestBasicServiceParsing(t *testing.T) {
 	s := lexer.NewLexer([]byte(data))
 	p := parser.NewParser()
 	obj, err := p.Parse(s)
-	log.Println("%v", obj)
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 
 	check := obj.(*ast.ProcessCheck)
@@ -37,9 +35,8 @@ func TestBasicHostParsing(t *testing.T) {
 	s := lexer.NewLexer([]byte(data))
 	p := parser.NewParser()
 	obj, err := p.Parse(s)
-	log.Println("%v", obj)
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 
 	check := obj.(*ast.HostCheck)

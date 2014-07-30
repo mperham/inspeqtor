@@ -11,11 +11,11 @@ _digit : '0'-'9' ;
 
 _idchar : _letter | _digit | '_' | '-' | '.';
 
-sizecode : 'k' | 'm' | 'g' | 't' | 'p';
+sizecode : 'k' | 'm' | 'g' | 't' | 'p' | '%';
 uint_lit : _digit {_digit};
 
 id : (_letter) {_idchar} ;
-operator : '>';
+operator : '>' | '<';
 
 << import "inspeqtor/conf/inq/ast" >>
 
@@ -23,16 +23,16 @@ operator : '>';
 
 Examples:
 
-inspect runit service mysql
-  if rss > 6g for 2 cycles then alert
+check service mysql
+  if memory(rss) > 6g for 2 cycles then alert
 
-inspect service redis
-  if rss > 1g for 2 cycles then alert
-  if user_cpu > 95% for 2 cycles then alert
+check service redis
+  if memory(rss) > 1g for 2 cycles then alert
+  if cpu(user) > 95% for 2 cycles then alert
 
-inspect host
-  if user_cpu > 400% for 2 cycles then alert
-  if swap > 20% for 2 cycles then alert
+check host
+  if cpu(user) > 400% for 2 cycles then alert
+  if swap(usage) > 20% for 2 cycles then alert
 
 */
 
@@ -59,9 +59,13 @@ HumanAmount
   : uint_lit            << ast.HumanAmount($0, nil) >>
   | uint_lit sizecode   << ast.HumanAmount($0, $1) >>;
 
+Metric
+  : id                  << ast.Metric($0, nil) >>
+  | id "(" id ")"       << ast.Metric($0, $2) >>;
+
 Rule
-  : "if" id operator HumanAmount "then" Action  << ast.NewRule($1, $2, $3, $5, uint64(1)), nil >>
-  | "if" id operator HumanAmount "for" IntAmount "cycles" "then" Action  << ast.NewRule($1, $2, $3, $8, $5), nil >>;
+  : "if" Metric operator HumanAmount "then" Action  << ast.NewRule($1, $2, $3, $5, uint64(1)), nil >>
+  | "if" Metric operator HumanAmount "for" IntAmount "cycles" "then" Action  << ast.NewRule($1, $2, $3, $8, $5), nil >>;
 
 RuleList
   : Rule                              << ast.NewRuleList($0), nil >>

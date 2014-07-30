@@ -91,7 +91,8 @@ func convertRule(inqrule *ast.Rule, actionList []*Action) (*Rule, error) {
 		return nil, errors.New("Unknown operator: " + inqrule.Operator)
 	}
 
-	return &Rule{inqrule.Metric, op, inqrule.Value, inqrule.CycleCount, Undetermined, nil}, nil
+	return &Rule{inqrule.Metric.Family, inqrule.Metric.Name, op,
+		inqrule.Value, inqrule.CycleCount, Undetermined, nil}, nil
 }
 
 func convertService(inqsvc *ast.ProcessCheck) (*Service, error) {

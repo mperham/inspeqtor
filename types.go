@@ -53,17 +53,26 @@ const (
 )
 
 type Rule struct {
-	Metric     string
-	Op         Operator
-	Threshold  uint64
-	CycleCount uint8
-	Status     RuleStatus
-	Actions    []*Action
+	MetricFamily string
+	MetricName   string
+	Op           Operator
+	Threshold    uint64
+	CycleCount   uint8
+	Status       RuleStatus
+	Actions      []*Action
 }
 
 type Alert struct {
 	*Service
 	*Rule
+}
+
+func (r Rule) Metric() string {
+	s := r.MetricFamily
+	if r.MetricName != "" {
+		s += "(" + r.MetricName + ")"
+	}
+	return s
 }
 
 type Action interface {
