@@ -53,19 +53,36 @@ func New(dir string) (*Inspeqtor, error) {
 }
 
 var (
-	Quit os.Signal = syscall.SIGQUIT
+	Quit           os.Signal = syscall.SIGQUIT
+	SignalHandlers           = map[os.Signal]func(){
+		Quit:         Exit,
+		os.Interrupt: Exit,
+	}
+	Name string = "Inspeqtor"
 )
 
 func (i *Inspeqtor) Start() {
 	go i.runLoop()
 
 	signals := make(chan os.Signal)
-	signal.Notify(signals, os.Interrupt)
-	signal.Notify(signals, Quit)
-	<-signals
+	for k, _ := range SignalHandlers {
+		signal.Notify(signals, k)
+	}
+	for {
+		sig := <-signals
+		util.Debug("Received signal %d", sig)
+		funk := SignalHandlers[sig]
+		funk()
+	}
+}
 
-	util.Debug("Inspeqtor shutting down...")
+func Exit() {
+	util.Info(Name + " exiting")
 	os.Exit(0)
+}
+
+func HandleSignal(sig os.Signal, handler func()) {
+	SignalHandlers[sig] = handler
 }
 
 func (i *Inspeqtor) Parse() error {
