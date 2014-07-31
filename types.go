@@ -49,14 +49,14 @@ type RuleStatus uint8
 const (
 	Undetermined RuleStatus = iota
 	Ok
-	Failed
+	Tripped
 )
 
 type Rule struct {
 	MetricFamily string
 	MetricName   string
 	Op           Operator
-	Threshold    uint64
+	Threshold    int64
 	CycleCount   uint8
 	Status       RuleStatus
 	Actions      []*Action

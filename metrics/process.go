@@ -27,8 +27,8 @@ const (
 type metricFamily string
 
 var (
-	SupportedProcessMetrics = map[metricFamily]func(*ProcessMetrics, string) uint64{
-		"memory": func(p *ProcessMetrics, param string) uint64 {
+	SupportedProcessMetrics = map[metricFamily]func(*ProcessMetrics, string) int64{
+		"memory": func(p *ProcessMetrics, param string) int64 {
 			switch param {
 			case "rss":
 				return p.VmRSS
@@ -38,7 +38,7 @@ var (
 				panic("Unknown process metric \"memory(" + param + ")\"")
 			}
 		},
-		"cpu": func(p *ProcessMetrics, param string) uint64 {
+		"cpu": func(p *ProcessMetrics, param string) int64 {
 			switch param {
 			case "user":
 				return p.UserCpu
@@ -51,15 +51,25 @@ var (
 	}
 )
 
+func Lookup(family string, name string, buffer *util.RingBuffer, idx int) int64 {
+	getter := SupportedProcessMetrics[metricFamily(family)]
+	if getter == nil {
+		return 0
+	}
+
+	m := buffer.At(idx).(*ProcessMetrics)
+	return getter(m, name)
+}
+
 type ProcessMetrics struct {
 	When           time.Time
 	PID            int
-	UserCpu        uint64
-	SystemCpu      uint64
-	UserChildCpu   uint64
-	SystemChildCpu uint64
-	VmRSS          uint64
-	VmSize         uint64
+	UserCpu        int64
+	SystemCpu      int64
+	UserChildCpu   int64
+	SystemChildCpu int64
+	VmRSS          int64
+	VmSize         int64
 }
 
 func CaptureProcess(rootPath string, pid int) (*ProcessMetrics, error) {
@@ -108,12 +118,12 @@ func capturePs(m *ProcessMetrics, pid int) error {
 	}
 
 	fields := strings.Fields(lines[1])
-	val, err := strconv.ParseUint(fields[0], 10, 64)
+	val, err := strconv.ParseInt(fields[0], 10, 64)
 	if err != nil {
 		return err
 	}
 	m.VmRSS = 1024 * val
-	val, err = strconv.ParseUint(fields[1], 10, 64)
+	val, err = strconv.ParseInt(fields[1], 10, 64)
 	if err != nil {
 		return err
 	}
@@ -141,8 +151,8 @@ func capturePs(m *ProcessMetrics, pid int) error {
 
 	uticks := min*60*100 + sec*100 + cs
 
-	m.UserCpu = uticks
-	m.SystemCpu = ticks - uticks
+	m.UserCpu = int64(uticks)
+	m.SystemCpu = int64(ticks - uticks)
 
 	return nil
 }
@@ -164,19 +174,19 @@ func captureCpu(m *ProcessMetrics, rootPath string, pid int) error {
 	}
 	for _, line := range lines {
 		fields := strings.Fields(line)
-		utime, err := strconv.ParseUint(fields[13], 10, 64)
+		utime, err := strconv.ParseInt(fields[13], 10, 64)
 		if err != nil {
 			return err
 		}
-		stime, err := strconv.ParseUint(fields[14], 10, 64)
+		stime, err := strconv.ParseInt(fields[14], 10, 64)
 		if err != nil {
 			return err
 		}
-		cutime, err := strconv.ParseUint(fields[15], 10, 64)
+		cutime, err := strconv.ParseInt(fields[15], 10, 64)
 		if err != nil {
 			return err
 		}
-		cstime, err := strconv.ParseUint(fields[16], 10, 64)
+		cstime, err := strconv.ParseInt(fields[16], 10, 64)
 		if err != nil {
 			return err
 		}
@@ -205,13 +215,13 @@ func captureVm(m *ProcessMetrics, rootPath string, pid int) error {
 			items := strings.Fields(line)
 			switch items[0] {
 			case "VmRSS:":
-				val, err := strconv.ParseUint(items[1], 10, 64)
+				val, err := strconv.ParseInt(items[1], 10, 64)
 				if err != nil {
 					return err
 				}
 				m.VmRSS = 1024 * val
 			case "VmSize:":
-				val, err := strconv.ParseUint(items[1], 10, 64)
+				val, err := strconv.ParseInt(items[1], 10, 64)
 				if err != nil {
 					return err
 				}

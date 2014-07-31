@@ -110,13 +110,13 @@ var productionsTable = ProdTab {
 		},
 	},
 	ProdTabEntry{
-		String: `IntAmount : uint_lit	<< ast.ToUint64(X[0]) >>`,
+		String: `IntAmount : uint_lit	<< ast.ToInt64(X[0]) >>`,
 		Id: "IntAmount",
 		NTType: 5,
 		Index: 9,
 		NumSymbols: 1,
 		ReduceFunc: func(X []Attrib) (Attrib, error) {
-			return ast.ToUint64(X[0])
+			return ast.ToInt64(X[0])
 		},
 	},
 	ProdTabEntry{

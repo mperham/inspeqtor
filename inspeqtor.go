@@ -122,7 +122,9 @@ func (i *Inspeqtor) scanSystem(firstTime bool) {
 		})
 	}
 	barrier.Wait()
-	util.DebugDebug("Cycle complete in " + time.Now().Sub(start).String())
+	util.DebugDebug("Collection complete in " + time.Now().Sub(start).String())
+
+	i.check()
 }
 
 func (i *Inspeqtor) collectHost(completeCallback func()) {
@@ -133,6 +135,16 @@ func (i *Inspeqtor) collectHost(completeCallback func()) {
 	} else {
 		i.Host.Metrics.Add(metrics)
 		util.DebugDebug("%+v", metrics)
+	}
+}
+
+/*
+ Run through all Rules and check if we need to trigger actions
+*/
+func (i *Inspeqtor) check() {
+	for _, svc := range i.Services {
+		for _, rule := range svc.Rules {
+		}
 	}
 }
 

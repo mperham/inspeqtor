@@ -53,7 +53,7 @@ Action
   | "alert"         << $0, nil >>;
 
 IntAmount
-  : uint_lit            << ast.ToUint64($0) >>;
+  : uint_lit            << ast.ToInt64($0) >>;
 
 HumanAmount
   : uint_lit            << ast.HumanAmount($0, nil) >>

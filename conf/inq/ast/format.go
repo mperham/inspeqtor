@@ -25,7 +25,7 @@ type RuleMetric struct {
 type Rule struct {
 	Metric     RuleMetric
 	Operator   string
-	Value      uint64
+	Value      int64
 	Action     string
 	CycleCount uint8
 }
@@ -54,9 +54,9 @@ func NewRule(metric interface{}, operator interface{}, value interface{}, action
 	return &Rule{
 		*metric.(*RuleMetric),
 		string(operator.(*token.Token).Lit),
-		value.(uint64),
+		value.(int64),
 		string(action.(*token.Token).Lit),
-		uint8(cycleCount.(uint64)),
+		uint8(cycleCount.(int64)),
 	}
 }
 
@@ -68,8 +68,8 @@ func Metric(family interface{}, name interface{}) (*RuleMetric, error) {
 	return m, nil
 }
 
-func HumanAmount(digits interface{}, code interface{}) (uint64, error) {
-	amt, err := strconv.ParseUint(string(digits.(*token.Token).Lit), 10, 64)
+func HumanAmount(digits interface{}, code interface{}) (int64, error) {
+	amt, err := strconv.ParseInt(string(digits.(*token.Token).Lit), 10, 64)
 	if err != nil {
 		return 0, err
 	}
@@ -93,6 +93,6 @@ func HumanAmount(digits interface{}, code interface{}) (uint64, error) {
 	return amt, nil
 }
 
-func ToUint64(v interface{}) (uint64, error) {
-	return strconv.ParseUint(string(v.(*token.Token).Lit), 10, 64)
+func ToInt64(v interface{}) (int64, error) {
+	return strconv.ParseInt(string(v.(*token.Token).Lit), 10, 64)
 }
