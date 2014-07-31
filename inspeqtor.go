@@ -109,15 +109,20 @@ func (i *Inspeqtor) scanSystem(firstTime bool) {
 		i.resolveServices()
 	}
 
+	go i.collectHost()
 	for _, svc := range i.Services {
 		go i.collectService(svc)
 	}
+
+}
+
+func (i *Inspeqtor) collectHost() {
 	metrics, err := metrics.CollectHostMetrics("/proc")
-	i.Host.Metrics.Add(metrics)
 
 	if err != nil {
 		util.Warn("%v", err)
 	} else {
+		i.Host.Metrics.Add(metrics)
 		util.DebugDebug("%+v", metrics)
 	}
 }
