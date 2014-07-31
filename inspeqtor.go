@@ -124,27 +124,18 @@ func (i *Inspeqtor) scanSystem(firstTime bool) {
 	barrier.Wait()
 	util.DebugDebug("Collection complete in " + time.Now().Sub(start).String())
 
-	i.check()
+	for _, svc := range i.Services {
+		for _, rule := range svc.Rules {
+			checkRule(svc.Name, svc.Metrics, rule)
+		}
+	}
 }
 
 func (i *Inspeqtor) collectHost(completeCallback func()) {
 	defer completeCallback()
-	metrics, err := metrics.CollectHostMetrics("/proc")
+	err := metrics.CollectHostMetrics(i.Host.Metrics, "/proc")
 	if err != nil {
 		util.Warn("%v", err)
-	} else {
-		i.Host.Metrics.Add(metrics)
-		util.DebugDebug("%+v", metrics)
-	}
-}
-
-/*
- Run through all Rules and check if we need to trigger actions
-*/
-func (i *Inspeqtor) check() {
-	for _, svc := range i.Services {
-		for _, rule := range svc.Rules {
-		}
 	}
 }
 
@@ -215,12 +206,10 @@ func (i *Inspeqtor) captureProcess(svc *Service) error {
 	insist(svc.PID > 0 && svc.Status == services.Up,
 		fmt.Sprintf("%+v should be Up with valid PID\n", svc))
 
-	m, err := metrics.CaptureProcess("/proc", int(svc.PID))
+	err := metrics.CaptureProcess(svc.Metrics, "/proc", int(svc.PID))
 	if err != nil {
 		return err
 	}
-	util.DebugDebug(svc.Name+": %+v", m)
-	svc.Metrics.Add(m)
 	return nil
 }
 

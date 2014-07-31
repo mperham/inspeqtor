@@ -64,7 +64,7 @@ Metric
   | id "(" id ")"       << ast.Metric($0, $2) >>;
 
 Rule
-  : "if" Metric operator HumanAmount "then" Action  << ast.NewRule($1, $2, $3, $5, uint64(1)), nil >>
+  : "if" Metric operator HumanAmount "then" Action  << ast.NewRule($1, $2, $3, $5, int64(1)), nil >>
   | "if" Metric operator HumanAmount "for" IntAmount "cycles" "then" Action  << ast.NewRule($1, $2, $3, $8, $5), nil >>;
 
 RuleList

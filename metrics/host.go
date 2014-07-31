@@ -7,103 +7,40 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
-	"time"
 )
 
 type DiskUsage map[string]int8
-
-// Load is stored as 100x the actual value so it can be represented
-// as an int.  Load of 0.5 == 50 here.
-type SystemMetrics struct {
-	When             time.Time
-	CpuUsage         CpuMetrics
-	Load1            int
-	Load5            int
-	Load15           int
-	PercentSwapInUse int8
-	Disk             *DiskUsage
-}
-
-type CpuMetrics struct {
-	Total     uint64
-	User      uint64
-	Nice      uint64
-	System    uint64
-	Idle      uint64
-	IOWait    uint64
-	Irq       uint64
-	SoftIrq   uint64
-	Steal     uint64
-	Guest     uint64
-	GuestNice uint64
-}
-
-var (
-	SupportedHostMetrics = map[metricFamily]func(*SystemMetrics, string) uint64{
-		"load": func(p *SystemMetrics, param string) uint64 {
-			switch param {
-			case "1m":
-				return uint64(p.Load1)
-			case "5m":
-				return uint64(p.Load5)
-			case "15m":
-				return uint64(p.Load15)
-			default:
-				panic("Unknown host metric \"load(" + param + ")\"")
-			}
-		},
-		"cpu": func(p *SystemMetrics, param string) uint64 {
-			switch param {
-			case "user":
-				return p.CpuUsage.User
-			case "system":
-				return p.CpuUsage.System
-			case "steal":
-				return p.CpuUsage.Steal
-			case "iowait":
-				return p.CpuUsage.IOWait
-			default:
-				panic("Unknown host metric \"cpu(" + param + ")\"")
-			}
-		},
-		"swap": func(p *SystemMetrics, _ string) uint64 { return uint64(p.PercentSwapInUse) },
-		"disk": func(p *SystemMetrics, param string) uint64 {
-			return uint64((*p.Disk)[param])
-		},
-	}
-)
 
 var (
 	meminfoParser *regexp.Regexp = regexp.MustCompile("([^:]+):\\s+(\\d+)")
 )
 
-func CollectHostMetrics(path string) (*SystemMetrics, error) {
+func CollectHostMetrics(s interface{}, path string) error {
+	store := s.(storage)
 	var err error
-	var metrics *SystemMetrics = &SystemMetrics{}
-	metrics.When = time.Now()
 
-	err = collectLoadAverage(path, metrics)
+	err = collectLoadAverage(path, store)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	err = collectMemory(path, metrics)
+	err = collectMemory(path, store)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	err = collectCpu(path, metrics)
+	err = collectCpu(path, store)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	err = collectDisk("", metrics)
+	err = collectDisk("", store)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return metrics, nil
+	return nil
 }
 
-func collectMemory(path string, metrics *SystemMetrics) error {
+func collectMemory(path string, store storage) error {
 	ok, err := util.FileExists(path + "/meminfo")
 	if err != nil {
 		return err
@@ -116,7 +53,7 @@ func collectMemory(path string, metrics *SystemMetrics) error {
 		}
 		lines := strings.Split(string(contentBytes), "\n")
 
-		memMetrics := make(map[string]uint64)
+		memMetrics := make(map[string]int64)
 		for _, line := range lines {
 			if line == "" {
 				continue
@@ -127,22 +64,22 @@ func collectMemory(path string, metrics *SystemMetrics) error {
 				util.Warn("Unknown input: " + line)
 				continue
 			}
-			val, err := strconv.ParseUint(results[2], 10, 64)
+			val, err := strconv.ParseInt(results[2], 10, 64)
 			if err != nil {
 				util.Warn("Unexpected input: " + results[2] + " in " + line)
 				return err
 			}
-			memMetrics[results[1]] = uint64(val)
+			memMetrics[results[1]] = val
 		}
 
 		free := memMetrics["SwapFree"]
 		total := memMetrics["SwapTotal"]
 		if free == 0 {
-			metrics.PercentSwapInUse = 100
+			store.save("swap", "", 100)
 		} else if free == total {
-			metrics.PercentSwapInUse = 0
+			store.save("swap", "", 0)
 		} else {
-			metrics.PercentSwapInUse = 100 - int8(100*(float64(free)/float64(total)))
+			store.save("swap", "", int64(100-int8(100*(float64(free)/float64(total)))))
 		}
 	} else {
 		cmd := exec.Command("sysctl", "-n", "vm.swapusage")
@@ -174,7 +111,11 @@ func collectMemory(path string, metrics *SystemMetrics) error {
 
 		t := normalizeSwap(tot, rune(total[len(total)-1]))
 		u := normalizeSwap(usd, rune(used[len(used)-1]))
-		metrics.PercentSwapInUse = int8(100 * (u / t))
+		if t == 0 {
+			store.save("swap", "", 100)
+		} else {
+			store.save("swap", "", int64(100*(u/t)))
+		}
 	}
 
 	return nil
@@ -200,7 +141,7 @@ var (
 	swapRegexp = regexp.MustCompile("= (\\d+\\.\\d{2}[A-Z])(.*)")
 )
 
-func collectLoadAverage(path string, metrics *SystemMetrics) error {
+func collectLoadAverage(path string, store storage) error {
 	// TODO make this a one-time check so we don't incur the overhead
 	// on every cycle.
 	ok, err := util.FileExists(path + "/loadavg")
@@ -242,13 +183,13 @@ func collectLoadAverage(path string, metrics *SystemMetrics) error {
 		return err
 	}
 
-	metrics.Load1 = int(load1 * 100)
-	metrics.Load5 = int(load5 * 100)
-	metrics.Load15 = int(load15 * 100)
+	store.save("load", "1", int64(load1*100))
+	store.save("load", "5", int64(load5*100))
+	store.save("load", "15", int64(load15*100))
 	return nil
 }
 
-func collectCpu(path string, metrics *SystemMetrics) error {
+func collectCpu(path string, store storage) error {
 	ok, err := util.FileExists(path + "/stat")
 	if err != nil {
 		return err
@@ -263,29 +204,28 @@ func collectCpu(path string, metrics *SystemMetrics) error {
 		lines := strings.Split(string(contents), "\n")
 		line := lines[0]
 		fields := strings.Fields(line)
-		metrics.CpuUsage = createCpuMetrics(fields)
+
+		user, _ := strconv.ParseInt(fields[1], 10, 64)
+		nice, _ := strconv.ParseInt(fields[2], 10, 64)
+		system, _ := strconv.ParseInt(fields[3], 10, 64)
+		iowait, _ := strconv.ParseInt(fields[5], 10, 64)
+		irq, _ := strconv.ParseInt(fields[6], 10, 64)
+		softIrq, _ := strconv.ParseInt(fields[7], 10, 64)
+		steal, _ := strconv.ParseInt(fields[8], 10, 64)
+		total := user + nice + system + iowait + irq + softIrq + steal
+
+		// These are the five I can envision writing rules against.
+		// Open an issue if you want access to the other values.
+		store.save("cpu", "", total)
+		store.save("cpu", "user", user)
+		store.save("cpu", "system", system)
+		store.save("cpu", "iowait", iowait)
+		store.save("cpu", "steal", steal)
 	}
 	return nil
 }
 
-func createCpuMetrics(fields []string) CpuMetrics {
-	s := CpuMetrics{}
-	s.User, _ = strconv.ParseUint(fields[1], 10, 64)
-	s.Nice, _ = strconv.ParseUint(fields[2], 10, 64)
-	s.System, _ = strconv.ParseUint(fields[3], 10, 64)
-	s.Idle, _ = strconv.ParseUint(fields[4], 10, 64)
-	s.IOWait, _ = strconv.ParseUint(fields[5], 10, 64)
-	s.Irq, _ = strconv.ParseUint(fields[6], 10, 64)
-	s.SoftIrq, _ = strconv.ParseUint(fields[7], 10, 64)
-	s.Steal, _ = strconv.ParseUint(fields[8], 10, 64)
-	s.Guest, _ = strconv.ParseUint(fields[9], 10, 64)
-	s.GuestNice, _ = strconv.ParseUint(fields[10], 10, 64)
-	s.Total = s.User + s.Nice + s.System + s.Idle + s.IOWait +
-		s.Irq + s.SoftIrq + s.Steal + s.Guest + s.GuestNice
-	return s
-}
-
-func collectDisk(path string, metrics *SystemMetrics) error {
+func collectDisk(path string, store storage) error {
 	var lines []string
 
 	if path == "" {
@@ -309,7 +249,7 @@ func collectDisk(path string, metrics *SystemMetrics) error {
 		}
 	}
 
-	usage := DiskUsage{}
+	usage := map[string]int64{}
 
 	for _, line := range lines {
 		if line[0] == '/' {
@@ -324,12 +264,14 @@ func collectDisk(path string, metrics *SystemMetrics) error {
 				if err != nil {
 					util.Debug("Cannot parse df output: " + line)
 				}
-				usage[items[len(items)-1]] = int8(val)
+				usage[items[len(items)-1]] = val
 			}
 
 		}
 	}
 
-	metrics.Disk = &usage
+	for name, used := range usage {
+		store.save("disk", name, used)
+	}
 	return nil
 }

@@ -5,6 +5,7 @@ import (
 	"inspeqtor/conf/inq/ast"
 	"inspeqtor/conf/inq/lexer"
 	"inspeqtor/conf/inq/parser"
+	"inspeqtor/metrics"
 	"inspeqtor/util"
 	"io/ioutil"
 	"os"
@@ -77,7 +78,7 @@ func convertHost(inqhost *ast.HostCheck) (*Host, error) {
 		}
 		rules[i] = rule
 	}
-	return &Host{hostname, rules, util.NewRingBuffer(SLOTS)}, nil
+	return &Host{hostname, rules, metrics.NewStore()}, nil
 }
 
 func convertRule(inqrule *ast.Rule, actionList []*Action) (*Rule, error) {
@@ -105,6 +106,6 @@ func convertService(inqsvc *ast.ProcessCheck) (*Service, error) {
 		util.DebugDebug("Rule: %+v", *rule)
 		rules[i] = rule
 	}
-	svc := &Service{inqsvc.Name, 0, 0, rules, util.NewRingBuffer(SLOTS), nil}
+	svc := &Service{inqsvc.Name, 0, 0, rules, metrics.NewStore(), nil}
 	return svc, nil
 }

@@ -2,7 +2,6 @@ package inspeqtor
 
 import (
 	"inspeqtor/services"
-	"inspeqtor/util"
 )
 
 /*
@@ -24,7 +23,7 @@ type Service struct {
 	PID     services.ProcessId
 	Status  services.Status
 	Rules   []*Rule
-	Metrics *util.RingBuffer
+	Metrics interface{}
 
 	// Upon bootup, we scan each init system looking for the service
 	// and cache which init system manages it for our lifetime.
@@ -34,7 +33,7 @@ type Service struct {
 type Host struct {
 	Name    string
 	Rules   []*Rule
-	Metrics *util.RingBuffer
+	Metrics interface{}
 }
 
 type Operator uint8
@@ -50,6 +49,8 @@ const (
 	Undetermined RuleStatus = iota
 	Ok
 	Tripped
+	Recovered
+	Unchanged
 )
 
 type Rule struct {

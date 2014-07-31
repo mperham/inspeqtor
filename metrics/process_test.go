@@ -7,59 +7,64 @@ import (
 )
 
 func TestProcessCapture(t *testing.T) {
-	m, err := CaptureProcess("proc", 100)
+	store := storage{}
+	err := CaptureProcess(store, "proc", 100)
 	if err == nil {
 		t.Error("Expected process 100 to not exist")
 	}
 
-	m, err = CaptureProcess("proc", 9051)
+	store = storage{}
+	err = CaptureProcess(store, "proc", 9051)
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.Equal(t, 1024*1024, m.VmRSS)
-	assert.Equal(t, 316964*1024, m.VmSize)
-	assert.Equal(t, 1, m.UserCpu)
-	assert.Equal(t, 0, m.SystemCpu)
-	assert.Equal(t, 0, m.UserChildCpu)
-	assert.Equal(t, 0, m.SystemChildCpu)
+	assert.Equal(t, 1024*1024, store.Get("memory", "rss"))
+	assert.Equal(t, 316964*1024, store.Get("memory", "vsz"))
+	assert.Equal(t, 1, store.Get("cpu", "user"))
+	assert.Equal(t, 0, store.Get("cpu", "system"))
+	assert.Equal(t, 0, store.Get("cpu", "total_user"))
+	assert.Equal(t, 0, store.Get("cpu", "total_system"))
 
-	m, err = CaptureProcess("proc", 14190)
+	store = storage{}
+	err = CaptureProcess(store, "proc", 14190)
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.Equal(t, 324072*1024, m.VmRSS)
-	assert.Equal(t, 1481648*1024, m.VmSize)
-	assert.Equal(t, 524283, m.UserCpu)
-	assert.Equal(t, 270503, m.SystemCpu)
-	assert.Equal(t, 0, m.UserChildCpu)
-	assert.Equal(t, 0, m.SystemChildCpu)
+	assert.Equal(t, 324072*1024, store.Get("memory", "rss"))
+	assert.Equal(t, 1481648*1024, store.Get("memory", "vsz"))
+	assert.Equal(t, 524283, store.Get("cpu", "user"))
+	assert.Equal(t, 270503, store.Get("cpu", "system"))
+	assert.Equal(t, 0, store.Get("cpu", "total_user"))
+	assert.Equal(t, 0, store.Get("cpu", "total_system"))
 
-	m, err = CaptureProcess("proc", 3589)
+	store = storage{}
+	err = CaptureProcess(store, "proc", 3589)
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.Equal(t, 19728*1024, m.VmRSS)
-	assert.Equal(t, 287976*1024, m.VmSize)
-	assert.Equal(t, 258, m.UserCpu)
-	assert.Equal(t, 28954, m.SystemCpu)
-	assert.Equal(t, 2135754, m.UserChildCpu)
-	assert.Equal(t, 259400, m.SystemChildCpu)
+	assert.Equal(t, 19728*1024, store.Get("memory", "rss"))
+	assert.Equal(t, 287976*1024, store.Get("memory", "vsz"))
+	assert.Equal(t, 258, store.Get("cpu", "user"))
+	assert.Equal(t, 28954, store.Get("cpu", "system"))
+	assert.Equal(t, 2135754, store.Get("cpu", "total_user"))
+	assert.Equal(t, 259400, store.Get("cpu", "total_system"))
 
 	for i := 0; i < 100000000; i++ {
 		// eat up some CPU time so we get a non-zero value for user CPU
 		// TODO mine bitcoins here, send them to mike AT contribsys.com
 	}
 
-	m, err = CaptureProcess("/etc/proc", os.Getpid())
+	store = storage{}
+	err = CaptureProcess(store, "/etc/proc", os.Getpid())
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	assert.Equal(t, true, m.VmRSS > 0)
-	assert.Equal(t, true, m.VmSize > 0)
-	assert.Equal(t, true, m.UserCpu > 0)
+	assert.Equal(t, true, store.Get("memory", "rss") > 0)
+	assert.Equal(t, true, store.Get("memory", "vsz") > 0)
+	assert.Equal(t, true, store.Get("cpu", "user") > 0)
 
-	m, err = CaptureProcess("/etc/proc", -1)
-	assert.Nil(t, m)
+	store = storage{}
+	err = CaptureProcess(store, "/etc/proc", -1)
 	assert.Error(t, err)
 }

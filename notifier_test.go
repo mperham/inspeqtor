@@ -3,8 +3,8 @@ package inspeqtor
 import (
 	"bytes"
 	"github.com/stretchr/testify/assert"
+	"inspeqtor/metrics"
 	"inspeqtor/services"
-	"inspeqtor/util"
 	"strings"
 	"testing"
 )
@@ -42,7 +42,7 @@ func TestMissingEmailNotifier(t *testing.T) {
 
 func TestEmailTrigger(t *testing.T) {
 	alert := &Alert{
-		&Service{"mysql", 0, services.Down, nil, &util.RingBuffer{}, nil},
+		&Service{"mysql", 0, services.Down, nil, metrics.NewStore(), nil},
 		&Rule{"memory", "rss", GT, 64 * 1024 * 1024, 1, Ok, nil},
 	}
 
