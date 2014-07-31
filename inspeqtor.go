@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/signal"
 	"strconv"
+	"sync"
 	"syscall"
 	"time"
 )
@@ -102,23 +103,31 @@ func (i *Inspeqtor) runLoop() {
 }
 
 func (i *Inspeqtor) scanSystem(firstTime bool) {
-	util.DebugDebug("Scanning...")
-
 	if firstTime {
-		util.Info("Resolving services")
+		util.Debug("Resolving services")
 		i.resolveServices()
 	}
 
-	go i.collectHost()
-	for _, svc := range i.Services {
-		go i.collectService(svc)
-	}
+	start := time.Now()
+	var barrier sync.WaitGroup
+	barrier.Add(1)
+	barrier.Add(len(i.Services))
 
+	go i.collectHost(func() {
+		barrier.Done()
+	})
+	for _, svc := range i.Services {
+		go i.collectService(svc, func(svc *Service) {
+			barrier.Done()
+		})
+	}
+	barrier.Wait()
+	util.DebugDebug("Cycle complete in " + time.Now().Sub(start).String())
 }
 
-func (i *Inspeqtor) collectHost() {
+func (i *Inspeqtor) collectHost(completeCallback func()) {
+	defer completeCallback()
 	metrics, err := metrics.CollectHostMetrics("/proc")
-
 	if err != nil {
 		util.Warn("%v", err)
 	} else {
@@ -163,7 +172,9 @@ Each cycle we need to:
 3. run rules
 4. trigger any necessary actions
 */
-func (i *Inspeqtor) collectService(svc *Service) {
+func (i *Inspeqtor) collectService(svc *Service, completeCallback func(*Service)) {
+	defer completeCallback(svc)
+
 	if svc.Manager == nil {
 		// Couldn't resolve it when we started up so we can't collect it.
 		return
