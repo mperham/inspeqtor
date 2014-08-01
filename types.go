@@ -43,37 +43,9 @@ const (
 	GT
 )
 
-type RuleStatus uint8
-
-const (
-	Undetermined RuleStatus = iota
-	Ok
-	Tripped
-	Recovered
-	Unchanged
-)
-
-type Rule struct {
-	MetricFamily string
-	MetricName   string
-	Op           Operator
-	Threshold    int64
-	CycleCount   uint8
-	Status       RuleStatus
-	Actions      []*Action
-}
-
 type Alert struct {
 	*Service
 	*Rule
-}
-
-func (r Rule) Metric() string {
-	s := r.MetricFamily
-	if r.MetricName != "" {
-		s += "(" + r.MetricName + ")"
-	}
-	return s
 }
 
 type Action interface {

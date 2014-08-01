@@ -126,7 +126,7 @@ func (i *Inspeqtor) scanSystem(firstTime bool) {
 
 	for _, svc := range i.Services {
 		for _, rule := range svc.Rules {
-			checkRule(svc.Name, svc.Metrics, rule)
+			rule.Check(svc.Name, svc.Metrics)
 		}
 	}
 }

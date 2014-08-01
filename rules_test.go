@@ -9,13 +9,13 @@ import (
 func TestRulesCheck(t *testing.T) {
 	name := "foo"
 	data := metrics.NewStore()
-	rule := &Rule{"memory", "rss", GT, 64 * 1024 * 1024, 1, Ok, nil}
+	rule := &Rule{"memory", "rss", LT, 64 * 1024 * 1024, 1, Ok, nil}
 
 	// no data in the buffer
-	result := checkRule(name, data, rule)
-	assert.Equal(t, Unchanged, result)
+	result := rule.Check(name, data)
+	assert.Equal(t, Undetermined, result)
 
-	data = metrics.NewStore("memory", "rss", 65*1024*1024)
-	result = checkRule(name, data, rule)
+	data = metrics.NewStore("memory", "rss", 63*1024*1024)
+	result = rule.Check(name, data)
 	assert.Equal(t, Tripped, result)
 }

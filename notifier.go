@@ -11,9 +11,9 @@ const (
 	emailTemplate = `
 From: {{.Config.From}}
 To: {{.Config.To}}
-Subject: [{{.Alert.Service.Name}}] {{.Alert.Rule.Metric}} is {{.Alert.Rule.Op}} than {{.Alert.Rule.Threshold}}
+Subject: [{{.Alert.Service.Name}}] {{.Alert.Rule.MetricName}} is {{.Alert.Rule.Op}} than {{.Alert.Rule.Threshold}}
 
-[{{.Alert.Service.Name}}] {{.Alert.Rule.Metric}} is {{.Alert.Rule.Op}} than {{.Alert.Rule.Threshold}}
+[{{.Alert.Service.Name}}] {{.Alert.Rule.MetricName}} is {{.Alert.Rule.Op}} than {{.Alert.Rule.Threshold}}
 `
 )
 

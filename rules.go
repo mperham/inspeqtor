@@ -5,11 +5,49 @@ import (
 	"inspeqtor/util"
 )
 
+type RuleStatus uint8
+
+const (
+	Undetermined RuleStatus = iota
+	Ok
+	Tripped
+	Recovered
+	Unchanged
+)
+
+type Rule struct {
+	metricFamily string
+	metricName   string
+	Op           Operator
+	Threshold    int64
+	CycleCount   uint8
+	Status       RuleStatus
+	Actions      []*Action
+}
+
+func (r Rule) MetricName() string {
+	s := r.metricFamily
+	if r.metricName != "" {
+		s += "(" + r.metricName + ")"
+	}
+	return s
+}
+
+func (r Rule) Trippable() bool {
+	return r.Status == Ok ||
+		r.Status == Undetermined
+}
+
 /*
  Run through all Rules and check if we need to trigger actions
 */
-func checkRule(svcName string, svcData interface{}, rule *Rule) RuleStatus {
-	curval := metrics.Lookup(svcData, rule.MetricFamily, rule.MetricName)
+func (rule *Rule) Check(svcName string, svcData interface{}) RuleStatus {
+	curval := metrics.Lookup(svcData, rule.metricFamily, rule.metricName)
+	if curval == -1 {
+		rule.Status = Undetermined
+		return Undetermined
+	}
+
 	tripped := false
 
 	switch rule.Op {
@@ -21,13 +59,13 @@ func checkRule(svcName string, svcData interface{}, rule *Rule) RuleStatus {
 		util.Warn("Unknown operator: %d", rule.Op)
 	}
 
-	if rule.Status == Ok && tripped {
-		util.Warn(svcName + "[" + rule.Metric() + "] just tripped")
+	if rule.Trippable() && tripped {
+		util.Warn(svcName + "[" + rule.MetricName() + "] just tripped")
 		rule.Status = Tripped
 		return Tripped
 	}
 	if rule.Status == Tripped && !tripped {
-		util.Warn(svcName + "[" + rule.Metric() + "] just recovered")
+		util.Warn(svcName + "[" + rule.MetricName() + "] just recovered")
 		rule.Status = Ok
 		return Recovered
 	}
