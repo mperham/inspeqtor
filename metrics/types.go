@@ -56,14 +56,6 @@ func (store Storage) save(family string, name string, value int64) {
 	data.Add(value)
 }
 
-func Lookup(store Storage, family string, name string) int64 {
-	return store.Get(family, name)
-}
-
-func LookupAt(store Storage, family string, name string, idx int) int64 {
-	return store.GetAt(family, name, idx)
-}
-
 func (store Storage) GetAt(family string, name string, idx int) int64 {
 	buf := store.data[family][name]
 	if buf == nil {

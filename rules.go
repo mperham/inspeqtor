@@ -42,7 +42,7 @@ func (r Rule) Trippable() bool {
  Run through all Rules and check if we need to trigger actions
 */
 func (rule *Rule) Check(svcName string, svcData metrics.Storage) RuleStatus {
-	curval := metrics.Lookup(svcData, rule.metricFamily, rule.metricName)
+	curval := svcData.Get(rule.metricFamily, rule.metricName)
 	if curval == -1 {
 		rule.Status = Undetermined
 		return Undetermined
