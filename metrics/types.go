@@ -22,10 +22,14 @@ var (
 	SLOTS = 3600 / 15
 )
 
-type storage map[string]map[string]*util.RingBuffer
+type Storage struct {
+	data map[string]map[string]*util.RingBuffer
+}
 
-func NewStore(values ...interface{}) interface{} {
-	s := storage{}
+func NewStore(values ...interface{}) Storage {
+	s := Storage{
+		make(map[string]map[string]*util.RingBuffer),
+	}
 	if len(values) > 0 {
 		fam := values[0].(string)
 		name := values[1].(string)
@@ -36,11 +40,11 @@ func NewStore(values ...interface{}) interface{} {
 	return s
 }
 
-func (store storage) save(family string, name string, value int64) {
-	fam := store[family]
+func (store Storage) save(family string, name string, value int64) {
+	fam := store.data[family]
 	if fam == nil {
-		store[family] = map[string]*util.RingBuffer{}
-		fam = store[family]
+		store.data[family] = map[string]*util.RingBuffer{}
+		fam = store.data[family]
 	}
 
 	data := fam[name]
@@ -52,22 +56,22 @@ func (store storage) save(family string, name string, value int64) {
 	data.Add(value)
 }
 
-func Lookup(store interface{}, family string, name string) int64 {
-	return store.(storage).Get(family, name)
+func Lookup(store Storage, family string, name string) int64 {
+	return store.Get(family, name)
 }
 
-func LookupAt(store interface{}, family string, name string, idx int) int64 {
-	return store.(storage).GetAt(family, name, idx)
+func LookupAt(store Storage, family string, name string, idx int) int64 {
+	return store.GetAt(family, name, idx)
 }
 
-func (store storage) GetAt(family string, name string, idx int) int64 {
-	buf := store[family][name]
+func (store Storage) GetAt(family string, name string, idx int) int64 {
+	buf := store.data[family][name]
 	if buf == nil {
 		return -1
 	}
 	return buf.At(-1 * idx).(int64)
 }
 
-func (store storage) Get(family string, name string) int64 {
+func (store Storage) Get(family string, name string) int64 {
 	return store.GetAt(family, name, 0)
 }

@@ -9,8 +9,7 @@ import (
 	"strings"
 )
 
-func CaptureProcess(s interface{}, rootPath string, pid int) error {
-	store := s.(storage)
+func CaptureProcess(store Storage, rootPath string, pid int) error {
 	var err error
 
 	ok, err := util.FileExists(rootPath)
@@ -41,7 +40,7 @@ func CaptureProcess(s interface{}, rootPath string, pid int) error {
 /*
 So many hacks in this.  OSX support can be seen as "bad" at best.
 */
-func capturePs(store storage, pid int) error {
+func capturePs(store Storage, pid int) error {
 	cmd := exec.Command("ps", "So", "rss,vsz,time,utime", "-p", strconv.Itoa(int(pid)))
 	sout, err := cmd.CombinedOutput()
 	if err != nil {
@@ -98,7 +97,7 @@ var (
 	timeRegexp = regexp.MustCompile("\\A(\\d+):(\\d\\d).(\\d\\d)\\z")
 )
 
-func captureCpu(store storage, rootPath string, pid int) error {
+func captureCpu(store Storage, rootPath string, pid int) error {
 	dir := rootPath + "/" + strconv.Itoa(int(pid))
 	data, err := ioutil.ReadFile(dir + "/stat")
 	if err != nil {
@@ -136,7 +135,7 @@ func captureCpu(store storage, rootPath string, pid int) error {
 	return nil
 }
 
-func captureVm(store storage, rootPath string, pid int) error {
+func captureVm(store Storage, rootPath string, pid int) error {
 	dir := rootPath + "/" + strconv.Itoa(int(pid))
 	data, err := ioutil.ReadFile(dir + "/status")
 	if err != nil {

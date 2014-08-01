@@ -1,6 +1,7 @@
 package inspeqtor
 
 import (
+	"inspeqtor/metrics"
 	"inspeqtor/services"
 )
 
@@ -23,7 +24,7 @@ type Service struct {
 	PID     services.ProcessId
 	Status  services.Status
 	Rules   []*Rule
-	Metrics interface{}
+	Metrics metrics.Storage
 
 	// Upon bootup, we scan each init system looking for the service
 	// and cache which init system manages it for our lifetime.
@@ -33,7 +34,7 @@ type Service struct {
 type Host struct {
 	Name    string
 	Rules   []*Rule
-	Metrics interface{}
+	Metrics metrics.Storage
 }
 
 type Operator uint8

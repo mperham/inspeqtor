@@ -15,8 +15,7 @@ var (
 	meminfoParser *regexp.Regexp = regexp.MustCompile("([^:]+):\\s+(\\d+)")
 )
 
-func CollectHostMetrics(s interface{}, path string) error {
-	store := s.(storage)
+func CollectHostMetrics(store Storage, path string) error {
 	var err error
 
 	err = collectLoadAverage(path, store)
@@ -40,7 +39,7 @@ func CollectHostMetrics(s interface{}, path string) error {
 	return nil
 }
 
-func collectMemory(path string, store storage) error {
+func collectMemory(path string, store Storage) error {
 	ok, err := util.FileExists(path + "/meminfo")
 	if err != nil {
 		return err
@@ -141,7 +140,7 @@ var (
 	swapRegexp = regexp.MustCompile("= (\\d+\\.\\d{2}[A-Z])(.*)")
 )
 
-func collectLoadAverage(path string, store storage) error {
+func collectLoadAverage(path string, store Storage) error {
 	// TODO make this a one-time check so we don't incur the overhead
 	// on every cycle.
 	ok, err := util.FileExists(path + "/loadavg")
@@ -189,7 +188,7 @@ func collectLoadAverage(path string, store storage) error {
 	return nil
 }
 
-func collectCpu(path string, store storage) error {
+func collectCpu(path string, store Storage) error {
 	ok, err := util.FileExists(path + "/stat")
 	if err != nil {
 		return err
@@ -225,7 +224,7 @@ func collectCpu(path string, store storage) error {
 	return nil
 }
 
-func collectDisk(path string, store storage) error {
+func collectDisk(path string, store Storage) error {
 	var lines []string
 
 	if path == "" {

@@ -7,13 +7,13 @@ import (
 )
 
 func TestProcessCapture(t *testing.T) {
-	store := storage{}
+	store := NewStore()
 	err := CaptureProcess(store, "proc", 100)
 	if err == nil {
 		t.Error("Expected process 100 to not exist")
 	}
 
-	store = storage{}
+	store = NewStore()
 	err = CaptureProcess(store, "proc", 9051)
 	if err != nil {
 		t.Fatal(err)
@@ -25,7 +25,7 @@ func TestProcessCapture(t *testing.T) {
 	assert.Equal(t, 0, store.Get("cpu", "total_user"))
 	assert.Equal(t, 0, store.Get("cpu", "total_system"))
 
-	store = storage{}
+	store = NewStore()
 	err = CaptureProcess(store, "proc", 14190)
 	if err != nil {
 		t.Fatal(err)
@@ -37,7 +37,7 @@ func TestProcessCapture(t *testing.T) {
 	assert.Equal(t, 0, store.Get("cpu", "total_user"))
 	assert.Equal(t, 0, store.Get("cpu", "total_system"))
 
-	store = storage{}
+	store = NewStore()
 	err = CaptureProcess(store, "proc", 3589)
 	if err != nil {
 		t.Fatal(err)
@@ -54,7 +54,7 @@ func TestProcessCapture(t *testing.T) {
 		// TODO mine bitcoins here, send them to mike AT contribsys.com
 	}
 
-	store = storage{}
+	store = NewStore()
 	err = CaptureProcess(store, "/etc/proc", os.Getpid())
 	if err != nil {
 		t.Fatal(err)
@@ -64,7 +64,7 @@ func TestProcessCapture(t *testing.T) {
 	assert.Equal(t, true, store.Get("memory", "vsz") > 0)
 	assert.Equal(t, true, store.Get("cpu", "user") > 0)
 
-	store = storage{}
+	store = NewStore()
 	err = CaptureProcess(store, "/etc/proc", -1)
 	assert.Error(t, err)
 }
