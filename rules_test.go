@@ -9,7 +9,7 @@ import (
 func TestRulesCheck(t *testing.T) {
 	name := "foo"
 	data := metrics.NewStore()
-	rule := &Rule{"memory", "rss", LT, 64 * 1024 * 1024, 1, Ok, nil}
+	rule := &Rule{"memory", "rss", LT, 64 * 1024 * 1024, 1, 0, nil}
 
 	// no data in the buffer
 	result := rule.Check(name, data)
@@ -17,5 +17,5 @@ func TestRulesCheck(t *testing.T) {
 
 	data = metrics.NewStore("memory", "rss", 63*1024*1024)
 	result = rule.Check(name, data)
-	assert.Equal(t, Tripped, result)
+	assert.Equal(t, Triggered, result)
 }

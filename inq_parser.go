@@ -93,7 +93,7 @@ func convertRule(inqrule *ast.Rule, actionList []*Action) (*Rule, error) {
 	}
 
 	return &Rule{inqrule.Metric.Family, inqrule.Metric.Name, op,
-		inqrule.Value, inqrule.CycleCount, Undetermined, nil}, nil
+		inqrule.Value, inqrule.CycleCount, 0, nil}, nil
 }
 
 func convertService(inqsvc *ast.ProcessCheck) (*Service, error) {

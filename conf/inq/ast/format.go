@@ -27,7 +27,7 @@ type Rule struct {
 	Operator   string
 	Value      int64
 	Action     string
-	CycleCount uint8
+	CycleCount int
 }
 
 func NewProcessCheck(checkType interface{}, name interface{}, rules interface{}) *ProcessCheck {
@@ -56,7 +56,7 @@ func NewRule(metric interface{}, operator interface{}, value interface{}, action
 		string(operator.(*token.Token).Lit),
 		value.(int64),
 		string(action.(*token.Token).Lit),
-		uint8(cycleCount.(int64)),
+		int(cycleCount.(int64)),
 	}
 }
 

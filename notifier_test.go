@@ -43,7 +43,7 @@ func TestMissingEmailNotifier(t *testing.T) {
 func TestEmailTrigger(t *testing.T) {
 	alert := &Alert{
 		&Service{"mysql", 0, services.Down, nil, metrics.NewStore(), nil},
-		&Rule{"memory", "rss", GT, 64 * 1024 * 1024, 1, Ok, nil},
+		&Rule{"memory", "rss", GT, 64 * 1024 * 1024, 1, 0, nil},
 	}
 
 	err := validEmailSetup().TriggerEmail(alert, func(e *EmailConfig, doc bytes.Buffer) error {

@@ -10,7 +10,7 @@ type RuleStatus uint8
 const (
 	Undetermined RuleStatus = iota
 	Ok
-	Tripped
+	Triggered
 	Recovered
 	Unchanged
 )
@@ -20,8 +20,8 @@ type Rule struct {
 	metricName   string
 	Op           Operator
 	Threshold    int64
-	CycleCount   uint8
-	Status       RuleStatus
+	CycleCount   int
+	TrippedCount int
 	Actions      []*Action
 }
 
@@ -33,18 +33,16 @@ func (r Rule) MetricName() string {
 	return s
 }
 
-func (r Rule) Trippable() bool {
-	return r.Status == Ok ||
-		r.Status == Undetermined
-}
-
 /*
- Run through all Rules and check if we need to trigger actions
+ Run through all Rules and check if we need to trigger actions.
+
+ "tripped" means the Rule threshold was breached **this cycle**.
+ "triggered" means the Rule threshold was breached enough cycles in
+ a row to fire the alerts associated with the Rule.
 */
 func (rule *Rule) Check(svcName string, svcData metrics.Storage) RuleStatus {
 	curval := svcData.Get(rule.metricFamily, rule.metricName)
 	if curval == -1 {
-		rule.Status = Undetermined
 		return Undetermined
 	}
 
@@ -59,14 +57,17 @@ func (rule *Rule) Check(svcName string, svcData metrics.Storage) RuleStatus {
 		util.Warn("Unknown operator: %d", rule.Op)
 	}
 
-	if rule.Trippable() && tripped {
-		util.Warn(svcName + "[" + rule.MetricName() + "] just tripped")
-		rule.Status = Tripped
-		return Tripped
+	if tripped {
+		rule.TrippedCount++
 	}
-	if rule.Status == Tripped && !tripped {
-		util.Warn(svcName + "[" + rule.MetricName() + "] just recovered")
-		rule.Status = Ok
+
+	if rule.TrippedCount == rule.CycleCount && tripped {
+		util.Warn(svcName + "[" + rule.MetricName() + "] triggered")
+		return Triggered
+	}
+	if rule.TrippedCount != 0 && !tripped {
+		util.Warn(svcName + "[" + rule.MetricName() + "] recovered")
+		rule.TrippedCount = 0
 		return Recovered
 	}
 
