@@ -17,5 +17,5 @@ func TestRulesCheck(t *testing.T) {
 
 	data = metrics.NewStore("memory", "rss", 65*1024*1024)
 	result = checkRule(name, data, rule)
-	assert.Equal(t, Unchanged, result)
+	assert.Equal(t, Tripped, result)
 }

@@ -10,8 +10,7 @@ import (
 */
 func checkRule(svcName string, svcData interface{}, rule *Rule) RuleStatus {
 	curval := metrics.Lookup(svcData, rule.MetricFamily, rule.MetricName)
-
-	var tripped bool
+	tripped := false
 
 	switch rule.Op {
 	case LT:
@@ -20,7 +19,6 @@ func checkRule(svcName string, svcData interface{}, rule *Rule) RuleStatus {
 		tripped = curval > rule.Threshold
 	default:
 		util.Warn("Unknown operator: %d", rule.Op)
-		tripped = false
 	}
 
 	if rule.Status == Ok && tripped {

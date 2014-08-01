@@ -26,14 +26,14 @@ type storage map[string]map[string]*util.RingBuffer
 
 func NewStore(values ...interface{}) interface{} {
 	s := storage{}
-	if len(values) >= 3 {
+	if len(values) > 0 {
 		fam := values[0].(string)
 		name := values[1].(string)
 		for _, val := range values[2:] {
 			s.save(fam, name, int64(val.(int)))
 		}
 	}
-	return storage{}
+	return s
 }
 
 func (store storage) save(family string, name string, value int64) {
