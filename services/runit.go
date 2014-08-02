@@ -19,7 +19,6 @@ import (
 )
 
 type Runit struct {
-	name string
 	path string
 }
 
@@ -50,14 +49,14 @@ func detectRunit(root string) (InitSystem, error) {
 
 	if len(matches) > 0 {
 		util.Info("Detected runit in " + path)
-		return Runit{"runit", path}, nil
+		return Runit{path}, nil
 	}
 
 	return nil, nil
 }
 
 func (r Runit) Name() string {
-	return r.name
+	return "runit"
 }
 
 func (r Runit) LookupService(serviceName string) (ProcessId, Status, error) {

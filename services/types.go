@@ -35,29 +35,30 @@ type InitSystem interface {
 	LookupService(name string) (ProcessId, Status, error)
 }
 
+var (
+	SupportedInits = map[string]func() (InitSystem, error){
+		"launchctl": func() (InitSystem, error) {
+			return detectLaunchctl("/")
+		},
+		"upstart": func() (InitSystem, error) {
+			return detectUpstart("/etc/init")
+		},
+		"runit": func() (InitSystem, error) {
+			return detectRunit("/")
+		},
+	}
+)
+
 func Detect() []InitSystem {
 	inits := make([]InitSystem, 0)
-	var sm InitSystem
 
-	sm, err := detectLaunchctl("/")
-	if err != nil {
-		util.Warn("Couldn't detect launchctl: " + err.Error())
-	} else {
-		inits = append(inits, sm)
-	}
-
-	sm, err = detectUpstart("/etc/init")
-	if err != nil {
-		util.Warn("Couldn't detect upstart: " + err.Error())
-	} else {
-		inits = append(inits, sm)
-	}
-
-	sm, err = detectRunit("/")
-	if err != nil {
-		util.Warn("Couldn't detect runit: " + err.Error())
-	} else {
-		inits = append(inits, sm)
+	for name, funk := range SupportedInits {
+		sm, err := funk()
+		if err != nil {
+			util.Warn("Couldn't detect %s: %s", name, err.Error())
+		} else {
+			inits = append(inits, sm)
+		}
 	}
 
 	return inits

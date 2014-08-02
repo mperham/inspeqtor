@@ -11,7 +11,6 @@ import (
 )
 
 type Upstart struct {
-	name        string
 	path        string
 	dummyOutput string
 }
@@ -38,7 +37,7 @@ func detectUpstart(path string) (InitSystem, error) {
 
 	if len(matches) > 0 {
 		util.Info("Detected upstart in " + path)
-		return Upstart{"upstart", path, ""}, nil
+		return Upstart{path, ""}, nil
 	}
 
 	util.Debug("upstart not detected, empty " + path)
@@ -46,7 +45,7 @@ func detectUpstart(path string) (InitSystem, error) {
 }
 
 func (u Upstart) Name() string {
-	return u.name
+	return "upstart"
 }
 
 func (u Upstart) LookupService(serviceName string) (ProcessId, Status, error) {

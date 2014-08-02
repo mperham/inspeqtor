@@ -8,7 +8,6 @@ import (
 )
 
 type Launchctl struct {
-	name string
 }
 
 func detectLaunchctl(rootDir string) (InitSystem, error) {
@@ -20,11 +19,11 @@ func detectLaunchctl(rootDir string) (InitSystem, error) {
 		return nil, nil
 	}
 	util.Info("Found launchctl")
-	return Launchctl{"launchctl"}, nil
+	return Launchctl{}, nil
 }
 
 func (l Launchctl) Name() string {
-	return l.name
+	return "launchctl"
 }
 
 func (l Launchctl) LookupService(serviceName string) (ProcessId, Status, error) {
