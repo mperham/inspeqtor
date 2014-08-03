@@ -67,7 +67,9 @@ func (i *Inspeqtor) Parse() error {
 
 	util.DebugDebug("Config: %+v", config)
 	util.DebugDebug("Host: %+v", host)
-	util.DebugDebug("Services: %+v", services)
+	for _, val := range services {
+		util.DebugDebug("Service: %+v", *val)
+	}
 	return nil
 }
 

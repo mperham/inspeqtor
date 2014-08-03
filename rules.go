@@ -62,11 +62,11 @@ func (rule *Rule) Check(svcName string, svcData metrics.Storage) RuleStatus {
 	}
 
 	if rule.TrippedCount == rule.CycleCount && tripped {
-		util.Warn(svcName + "[" + rule.MetricName() + "] triggered")
+		util.Warn("%s[%s] triggered.  Current value = %d", svcName, rule.MetricName(), curval)
 		return Triggered
 	}
 	if rule.TrippedCount != 0 && !tripped {
-		util.Warn(svcName + "[" + rule.MetricName() + "] recovered")
+		util.Info("%s[%s] recovered.", svcName, rule.MetricName())
 		rule.TrippedCount = 0
 		return Recovered
 	}

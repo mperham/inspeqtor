@@ -60,6 +60,10 @@ func ParseInq(confDir string) (*Host, []*Service, error) {
 		}
 	}
 
+	if host == nil {
+		return nil, nil, errors.New("No " + confDir + "/system.inq file found for host monitoring")
+	}
+
 	return host, checks, nil
 }
 
