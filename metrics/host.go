@@ -9,7 +9,23 @@ import (
 	"strings"
 )
 
-type DiskUsage map[string]int8
+func NewHostStore() Storage {
+	store := Storage{
+		make(map[string]map[string]metric),
+	}
+
+	store.declare("swap", "", Gauge)
+	store.declare("load", "1", Gauge)
+	store.declare("load", "5", Gauge)
+	store.declare("load", "15", Gauge)
+	store.declare("cpu", "", Counter)
+	store.declare("cpu", "user", Counter)
+	store.declare("cpu", "system", Counter)
+	store.declare("cpu", "iowait", Counter)
+	store.declare("cpu", "steal", Counter)
+	store.declare("disk", "/", Gauge)
+	return store
+}
 
 var (
 	meminfoParser *regexp.Regexp = regexp.MustCompile("([^:]+):\\s+(\\d+)")
@@ -270,7 +286,7 @@ func collectDisk(path string, store Storage) error {
 	}
 
 	for name, used := range usage {
-		store.save("disk", name, used)
+		store.saveType("disk", name, used, Gauge)
 	}
 	return nil
 }

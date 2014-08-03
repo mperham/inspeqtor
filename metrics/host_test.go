@@ -6,39 +6,39 @@ import (
 )
 
 func TestCollectHostMetrics(t *testing.T) {
-	store := NewStore()
+	store := NewHostStore()
 	err := CollectHostMetrics(store, "proc")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	assert.Equal(t, store.Get("cpu", ""), 5662844)
-	assert.Equal(t, store.Get("cpu", "user"), 4670673)
-	assert.Equal(t, store.Get("cpu", "system"), 768153)
-	assert.Equal(t, store.Get("cpu", "iowait"), 143718)
-	assert.Equal(t, store.Get("cpu", "steal"), 68601)
+	assert.Equal(t, store.Get("cpu", ""), 0)
+	assert.Equal(t, store.Get("cpu", "user"), 0)
+	assert.Equal(t, store.Get("cpu", "system"), 0)
+	assert.Equal(t, store.Get("cpu", "iowait"), 0)
+	assert.Equal(t, store.Get("cpu", "steal"), 0)
 	assert.Equal(t, store.Get("load", "1"), 2)
 	assert.Equal(t, store.Get("load", "5"), 3)
 	assert.Equal(t, store.Get("load", "15"), 5)
 	assert.Equal(t, store.Get("swap", ""), 2)
-	//expected := SystemMetrics{
-	//when,
-	//CpuMetrics{
-	//1304544815, 4670673, 0, 768153, 1298881971, 143718, 844, 10855, 68601, 0, 0,
-	//},
-	//2,
-	//3,
-	//5,
-	//2,
-	//nil,
-	//}
-	//if *metrics != expected {
-	//t.Errorf("Expected %+v, got %+v", expected, metrics)
-	//}
+
+	err = CollectHostMetrics(store, "proc2")
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Equal(t, store.Get("cpu", ""), 10)
+	assert.Equal(t, store.Get("cpu", "user"), 1)
+	assert.Equal(t, store.Get("cpu", "system"), 2)
+	assert.Equal(t, store.Get("cpu", "iowait"), 3)
+	assert.Equal(t, store.Get("cpu", "steal"), 4)
+	assert.Equal(t, store.Get("load", "1"), 2)
+	assert.Equal(t, store.Get("load", "5"), 3)
+	assert.Equal(t, store.Get("load", "15"), 5)
+	assert.Equal(t, store.Get("swap", ""), 2)
 }
 
 func TestCollectRealHostMetrics(t *testing.T) {
-	store := NewStore()
+	store := NewHostStore()
 	err := CollectHostMetrics(store, "/proc")
 	if err != nil {
 		t.Fatal(err)
@@ -51,7 +51,7 @@ func TestCollectRealHostMetrics(t *testing.T) {
 }
 
 func TestCollectDiskMetrics(t *testing.T) {
-	store := NewStore()
+	store := NewHostStore()
 	err := collectDisk("fixtures/df.linux.txt", store)
 	if err != nil {
 		t.Error(err)
@@ -63,7 +63,7 @@ func TestCollectDiskMetrics(t *testing.T) {
 		t.Error("Unexpected results: %v", store.Get("disk", "/old"))
 	}
 
-	store = NewStore()
+	store = NewHostStore()
 	err = collectDisk("fixtures/df.darwin.txt", store)
 	if err != nil {
 		t.Error(err)
@@ -72,7 +72,7 @@ func TestCollectDiskMetrics(t *testing.T) {
 		t.Error("Unexpected results: %v", store.Get("disk", "/"))
 	}
 
-	store = NewStore()
+	store = NewHostStore()
 	err = collectDisk("", store)
 	if err != nil {
 		t.Error(err)

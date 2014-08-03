@@ -9,6 +9,21 @@ import (
 	"strings"
 )
 
+func NewProcessStore(values ...interface{}) Storage {
+	store := Storage{
+		make(map[string]map[string]metric),
+	}
+
+	store.declare("memory", "rss", Gauge)
+	store.declare("memory", "vsz", Gauge)
+	store.declare("cpu", "user", Counter)
+	store.declare("cpu", "system", Counter)
+	store.declare("cpu", "total_user", Counter)
+	store.declare("cpu", "total_system", Counter)
+	store.fill(values...)
+	return store
+}
+
 func CaptureProcess(store Storage, rootPath string, pid int) error {
 	var err error
 
@@ -38,8 +53,8 @@ func CaptureProcess(store Storage, rootPath string, pid int) error {
 }
 
 /*
-So many hacks in this.  OSX support can be seen as "bad" at best.
-*/
+ * So many hacks in this.  OSX support can be seen as "bad" at best.
+ */
 func capturePs(store Storage, pid int) error {
 	cmd := exec.Command("ps", "So", "rss,vsz,time,utime", "-p", strconv.Itoa(int(pid)))
 	sout, err := cmd.CombinedOutput()

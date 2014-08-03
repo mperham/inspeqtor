@@ -82,7 +82,7 @@ func convertHost(inqhost *ast.HostCheck) (*Host, error) {
 		}
 		rules[i] = rule
 	}
-	return &Host{hostname, rules, metrics.NewStore()}, nil
+	return &Host{hostname, rules, metrics.NewHostStore()}, nil
 }
 
 func convertRule(inqrule *ast.Rule, actionList []*Action) (*Rule, error) {
@@ -110,6 +110,6 @@ func convertService(inqsvc *ast.ProcessCheck) (*Service, error) {
 		util.DebugDebug("Rule: %+v", *rule)
 		rules[i] = rule
 	}
-	svc := &Service{inqsvc.Name, 0, 0, rules, metrics.NewStore(), nil}
+	svc := &Service{inqsvc.Name, 0, 0, rules, metrics.NewProcessStore(), nil}
 	return svc, nil
 }

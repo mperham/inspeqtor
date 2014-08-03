@@ -23,47 +23,112 @@ var (
 )
 
 type Storage struct {
-	data map[string]map[string]*util.RingBuffer
+	data map[string]map[string]metric
 }
 
-func NewStore(values ...interface{}) Storage {
-	s := Storage{
-		make(map[string]map[string]*util.RingBuffer),
+type metricType uint8
+
+const (
+	Counter metricType = iota
+	Gauge
+)
+
+type metric interface {
+	put(val int64)
+	get() int64
+}
+
+type gauge struct {
+	buf *util.RingBuffer
+}
+
+type counter struct {
+	buf *util.RingBuffer
+}
+
+func newMetric(t metricType) metric {
+	if t == Gauge {
+		g := gauge{}
+		g.buf = util.NewRingBuffer(SLOTS)
+		return g
+	} else {
+		c := counter{}
+		c.buf = util.NewRingBuffer(SLOTS)
+		return c
 	}
+}
+
+func (g gauge) put(val int64) {
+	g.buf.Add(val)
+}
+
+func (c counter) put(val int64) {
+	c.buf.Add(val)
+}
+
+func (g gauge) get() int64 {
+	cur := g.buf.At(0)
+	if cur == nil {
+		return -1
+	}
+	return cur.(int64)
+}
+
+/*
+ * Counter values should be monotonically increasing.
+ * The value of a counter is actually the difference between two values.
+ */
+func (c counter) get() int64 {
+	cur := c.buf.At(0)
+	prev := c.buf.At(-1)
+	if cur == nil || prev == nil {
+		return 0
+	}
+	return cur.(int64) - prev.(int64)
+}
+
+func (store Storage) fill(values ...interface{}) {
 	if len(values) > 0 {
 		fam := values[0].(string)
 		name := values[1].(string)
 		for _, val := range values[2:] {
-			s.save(fam, name, int64(val.(int)))
+			store.save(fam, name, int64(val.(int)))
 		}
 	}
-	return s
 }
 
-func (store Storage) save(family string, name string, value int64) {
+func (store Storage) declare(family string, name string, t metricType) {
 	fam := store.data[family]
 	if fam == nil {
-		store.data[family] = map[string]*util.RingBuffer{}
+		store.data[family] = map[string]metric{}
 		fam = store.data[family]
 	}
 
 	data := fam[name]
 	if data == nil {
-		fam[name] = util.NewRingBuffer(SLOTS)
+		fam[name] = newMetric(t)
 		data = fam[name]
 	}
-
-	data.Add(value)
 }
 
-func (store Storage) GetAt(family string, name string, idx int) int64 {
-	buf := store.data[family][name]
-	if buf == nil {
-		return -1
+func (store Storage) save(family string, name string, value int64) {
+	m := store.data[family][name]
+	if m == nil {
+		panic(family + "/" + name)
 	}
-	return buf.At(-1 * idx).(int64)
+	m.put(value)
+}
+
+func (store Storage) saveType(family string, name string, value int64, t metricType) {
+	m := store.data[family][name]
+	if m == nil {
+		store.declare(family, name, t)
+		m = store.data[family][name]
+	}
+	m.put(value)
 }
 
 func (store Storage) Get(family string, name string) int64 {
-	return store.GetAt(family, name, 0)
+	buf := store.data[family][name]
+	return buf.get()
 }
