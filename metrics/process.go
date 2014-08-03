@@ -33,6 +33,8 @@ func CaptureProcess(store Storage, rootPath string, pid int) error {
 	}
 
 	if !ok {
+		// we don't have the /proc filesystem, e.g. darwin or freebsd
+		// use `ps` output instead.
 		err = capturePs(store, pid)
 		if err != nil {
 			return err

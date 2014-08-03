@@ -32,13 +32,26 @@ The default monitoring rules out of the box perform basic health checks:
 * load(1min) is > 20
 
 
+## Platforms
+
+inspeqtor's platform target is Linux 3.0+.  Other platforms (OSX,
+FreeBSD) aren't as well-supported but I welcome help to improve it.
+Non-Unix platforms, e.g. Windows, aren't supported at this time, mostly
+because I don't have a Windows machine and so have no way of testing on it.
+
+
+## Requirements
+
+inspeqtor has no third-party dependencies.  It uses about 5-10MB of RAM at runtime.
+
+
 ## License
 
 Licensed under GPLv3.
+
 
 # Author
 
 inspeqtor is written by [Mike Perham](http://twitter.com/mperham) of [Contributed Systems](http://contribsys.com).  We build awesome open source-based products.
 
 We also develop [Sidekiq](http://sidekiq.org) and sell [Sidekiq Pro](http://sidekiq.org/pro), the best Ruby background job processing system.
-
