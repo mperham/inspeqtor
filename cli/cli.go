@@ -9,6 +9,7 @@ import (
 
 type CmdOptions struct {
 	Verbose         bool
+	VeryVerbose     bool
 	TestConfig      bool
 	ConfigDirectory string
 }
@@ -23,9 +24,10 @@ func SetupLogging() {
 }
 
 func ParseArguments(name string, version string) CmdOptions {
-	defaults := CmdOptions{false, false, "/etc/inspeqtor"}
+	defaults := CmdOptions{false, false, false, "/etc/inspeqtor"}
 
 	flag.BoolVar(&defaults.Verbose, "v", false, "Enable verbose logging")
+	flag.BoolVar(&defaults.VeryVerbose, "V", false, "Enable very verbose logging")
 	flag.BoolVar(&defaults.TestConfig, "t", false, "Verify configuration and exit")
 	flag.StringVar(&defaults.ConfigDirectory, "c", "/etc/inspeqtor", "Configuration directory")
 	helpPtr := flag.Bool("help", false, "You're looking at it")
@@ -36,12 +38,13 @@ func ParseArguments(name string, version string) CmdOptions {
 		log.Println(name, version)
 		log.Println("Copyright (c) 2014 Contributed Systems LLC")
 		log.Println("")
-		log.Println("Upgrading to Inspeqtor Pro gives you more features and dedicated support.")
+		log.Println("Upgrading to Inspeqtor Pro gives you more features and better support.")
 		log.Println("See http://contribsys.com/inspeqtor for details.")
 		log.Println("")
 		log.Println("-c [dir]\tConfiguration directory")
 		log.Println("-t\t\tVerify configuration and exit")
 		log.Println("-v\t\tEnable verbose logging")
+		log.Println("-V\t\tEnable very verbose logging")
 		log.Println("")
 		log.Println("-h\t\tYou're looking at it")
 		os.Exit(0)
@@ -49,6 +52,11 @@ func ParseArguments(name string, version string) CmdOptions {
 
 	if defaults.Verbose {
 		util.Verbose = true
+	}
+
+	if defaults.VeryVerbose {
+		util.Verbose = true
+		util.VeryVerbose = true
 	}
 
 	return defaults

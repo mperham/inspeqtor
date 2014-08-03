@@ -8,7 +8,8 @@ import (
 )
 
 var (
-	Verbose = false
+	Verbose     = false
+	VeryVerbose = false
 )
 
 func Darwin() bool {
@@ -59,9 +60,9 @@ func Debug(msg string, args ...interface{}) {
 	}
 }
 
-// -v -v: Super verbose for development purposes
+// -V: Very verbose for development purposes
 func DebugDebug(msg string, args ...interface{}) {
-	if Verbose {
+	if VeryVerbose {
 		log.Printf(msg+"\n", args...)
 	}
 }
