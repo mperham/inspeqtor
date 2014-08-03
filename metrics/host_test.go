@@ -26,11 +26,11 @@ func TestCollectHostMetrics(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.Equal(t, store.Get("cpu", ""), 10)
-	assert.Equal(t, store.Get("cpu", "user"), 1)
-	assert.Equal(t, store.Get("cpu", "system"), 2)
-	assert.Equal(t, store.Get("cpu", "iowait"), 3)
-	assert.Equal(t, store.Get("cpu", "steal"), 4)
+	assert.Equal(t, store.Get("cpu", ""), 147)
+	assert.Equal(t, store.Get("cpu", "user"), 66)
+	assert.Equal(t, store.Get("cpu", "system"), 40)
+	assert.Equal(t, store.Get("cpu", "iowait"), 20)
+	assert.Equal(t, store.Get("cpu", "steal"), 20)
 	assert.Equal(t, store.Get("load", "1"), 2)
 	assert.Equal(t, store.Get("load", "5"), 3)
 	assert.Equal(t, store.Get("load", "15"), 5)

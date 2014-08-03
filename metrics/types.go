@@ -26,6 +26,13 @@ type Storage struct {
 	data map[string]map[string]metric
 }
 
+func (store Storage) Get(family string, name string) int64 {
+	metric := store.data[family][name]
+	return metric.get()
+}
+
+// private
+
 type metricType uint8
 
 const (
@@ -43,19 +50,8 @@ type gauge struct {
 }
 
 type counter struct {
-	buf *util.RingBuffer
-}
-
-func newMetric(t metricType) metric {
-	if t == Gauge {
-		g := gauge{}
-		g.buf = util.NewRingBuffer(SLOTS)
-		return g
-	} else {
-		c := counter{}
-		c.buf = util.NewRingBuffer(SLOTS)
-		return c
-	}
+	buf       *util.RingBuffer
+	transform func(cur, prev int64) int64
 }
 
 func (g gauge) put(val int64) {
@@ -84,20 +80,22 @@ func (c counter) get() int64 {
 	if cur == nil || prev == nil {
 		return 0
 	}
-	return cur.(int64) - prev.(int64)
-}
-
-func (store Storage) fill(values ...interface{}) {
-	if len(values) > 0 {
-		fam := values[0].(string)
-		name := values[1].(string)
-		for _, val := range values[2:] {
-			store.save(fam, name, int64(val.(int)))
-		}
+	if c.transform != nil {
+		return c.transform(cur.(int64), prev.(int64))
+	} else {
+		return cur.(int64) - prev.(int64)
 	}
 }
 
-func (store Storage) declare(family string, name string, t metricType) {
+func (store Storage) fill(values ...interface{}) {
+	fam := values[0].(string)
+	name := values[1].(string)
+	for _, val := range values[2:] {
+		store.save(fam, name, int64(val.(int)))
+	}
+}
+
+func (store Storage) declareGauge(family string, name string) {
 	fam := store.data[family]
 	if fam == nil {
 		store.data[family] = map[string]metric{}
@@ -106,7 +104,21 @@ func (store Storage) declare(family string, name string, t metricType) {
 
 	data := fam[name]
 	if data == nil {
-		fam[name] = newMetric(t)
+		fam[name] = gauge{util.NewRingBuffer(SLOTS)}
+		data = fam[name]
+	}
+}
+
+func (store Storage) declareCounter(family string, name string, xform func(cur, prev int64) int64) {
+	fam := store.data[family]
+	if fam == nil {
+		store.data[family] = map[string]metric{}
+		fam = store.data[family]
+	}
+
+	data := fam[name]
+	if data == nil {
+		fam[name] = counter{util.NewRingBuffer(SLOTS), xform}
 		data = fam[name]
 	}
 }
@@ -122,13 +134,10 @@ func (store Storage) save(family string, name string, value int64) {
 func (store Storage) saveType(family string, name string, value int64, t metricType) {
 	m := store.data[family][name]
 	if m == nil {
-		store.declare(family, name, t)
+		// dynamically declare metrics for disk metrics where the name
+		// is dynamic based on the mount point
+		store.declareGauge(family, name)
 		m = store.data[family][name]
 	}
 	m.put(value)
-}
-
-func (store Storage) Get(family string, name string) int64 {
-	buf := store.data[family][name]
-	return buf.get()
 }

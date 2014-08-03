@@ -14,13 +14,15 @@ func NewProcessStore(values ...interface{}) Storage {
 		make(map[string]map[string]metric),
 	}
 
-	store.declare("memory", "rss", Gauge)
-	store.declare("memory", "vsz", Gauge)
-	store.declare("cpu", "user", Counter)
-	store.declare("cpu", "system", Counter)
-	store.declare("cpu", "total_user", Counter)
-	store.declare("cpu", "total_system", Counter)
-	store.fill(values...)
+	store.declareGauge("memory", "rss")
+	store.declareGauge("memory", "vsz")
+	store.declareCounter("cpu", "user", PERCENTAGE)
+	store.declareCounter("cpu", "system", PERCENTAGE)
+	store.declareCounter("cpu", "total_user", PERCENTAGE)
+	store.declareCounter("cpu", "total_system", PERCENTAGE)
+	if len(values) > 0 {
+		store.fill(values...)
+	}
 	return store
 }
 

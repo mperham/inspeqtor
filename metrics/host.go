@@ -14,20 +14,27 @@ func NewHostStore() Storage {
 		make(map[string]map[string]metric),
 	}
 
-	store.declare("swap", "", Gauge)
-	store.declare("load", "1", Gauge)
-	store.declare("load", "5", Gauge)
-	store.declare("load", "15", Gauge)
-	store.declare("cpu", "", Counter)
-	store.declare("cpu", "user", Counter)
-	store.declare("cpu", "system", Counter)
-	store.declare("cpu", "iowait", Counter)
-	store.declare("cpu", "steal", Counter)
-	store.declare("disk", "/", Gauge)
+	store.declareGauge("swap", "")
+	store.declareGauge("load", "1")
+	store.declareGauge("load", "5")
+	store.declareGauge("load", "15")
+	store.declareCounter("cpu", "", PERCENTAGE)
+	store.declareCounter("cpu", "user", PERCENTAGE)
+	store.declareCounter("cpu", "system", PERCENTAGE)
+	store.declareCounter("cpu", "iowait", PERCENTAGE)
+	store.declareCounter("cpu", "steal", PERCENTAGE)
+	store.declareGauge("disk", "/")
 	return store
 }
 
+const (
+	CYCLE_TICKS float64 = CLK_TCK * 15
+)
+
 var (
+	PERCENTAGE = func(cur, prev int64) int64 {
+		return int64((float64(cur-prev) / CYCLE_TICKS) * 100)
+	}
 	meminfoParser *regexp.Regexp = regexp.MustCompile("([^:]+):\\s+(\\d+)")
 )
 
