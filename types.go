@@ -8,11 +8,6 @@ import (
 /*
  Core Inspeqtor types, interfaces, etc.
 */
-const (
-	CYCLE_TIME = 15
-	ONE_HOUR   = 3600
-	SLOTS      = ONE_HOUR / CYCLE_TIME
-)
 
 /*
   A service is a logical named entity we wish to monitor, "mysql".

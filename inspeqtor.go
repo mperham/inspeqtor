@@ -1,7 +1,6 @@
 package inspeqtor
 
 import (
-	"fmt"
 	"inspeqtor/metrics"
 	"inspeqtor/services"
 	"inspeqtor/util"
@@ -106,7 +105,7 @@ func (i *Inspeqtor) runLoop() {
 
 func (i *Inspeqtor) scanSystem(firstTime bool) {
 	if firstTime {
-		util.Debug("Resolving services")
+		util.DebugDebug("Resolving services")
 		i.resolveServices()
 	}
 
@@ -124,7 +123,7 @@ func (i *Inspeqtor) scanSystem(firstTime bool) {
 		})
 	}
 	barrier.Wait()
-	util.DebugDebug("Collection complete in " + time.Now().Sub(start).String())
+	util.Debug("Collection complete in " + time.Now().Sub(start).String())
 
 	for _, svc := range i.Services {
 		for _, rule := range svc.Rules {
@@ -196,28 +195,10 @@ func (i *Inspeqtor) collectService(svc *Service, completeCallback func(*Service)
 		return
 	}
 	if svc.Status == services.Up {
-		err := i.captureProcess(svc)
+		err := metrics.CaptureProcess(svc.Metrics, "/proc", int(svc.PID))
 		if err != nil {
 			util.Warn("Error capturing process " + strconv.Itoa(int(svc.PID)) + ", marking as Down: " + err.Error())
 			svc.Status = services.Down
 		}
-	}
-}
-
-func (i *Inspeqtor) captureProcess(svc *Service) error {
-	insist(svc.PID > 0 && svc.Status == services.Up,
-		fmt.Sprintf("%+v should be Up with valid PID\n", svc))
-
-	err := metrics.CaptureProcess(svc.Metrics, "/proc", int(svc.PID))
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-// assert is taken by testing helpers.
-func insist(expr bool, msg string) {
-	if !expr {
-		panic(msg)
 	}
 }
