@@ -28,8 +28,8 @@ The default monitoring rules out of the box perform basic health checks:
 * / partition is > 90% full
 * Swap is more than 20% utilized
 * CPU(user) is > 90% for more than 4 cycles
-* load(5min) is > 10
-* load(1min) is > 20
+* load(5) is > 10
+* load(1) is > 20
 
 
 ## Platforms

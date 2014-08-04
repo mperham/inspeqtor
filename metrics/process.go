@@ -11,7 +11,7 @@ import (
 
 func NewProcessStore(values ...interface{}) Storage {
 	store := Storage{
-		make(map[string]map[string]metric),
+		map[string]*family{},
 	}
 
 	store.declareGauge("memory", "rss")
