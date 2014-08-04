@@ -3,8 +3,10 @@ package util
 import (
 	"bufio"
 	"bytes"
+	"fmt"
 	"log"
 	"os"
+	"time"
 )
 
 var (
@@ -45,24 +47,32 @@ func ReadLines(data []byte) ([]string, error) {
 
 // Uh oh, not good but not worthy of process death
 func Warn(msg string, args ...interface{}) {
-	log.Printf("W "+msg+"\n", args...)
+	log.Printf(preamble('W')+msg+"\n", args...)
 }
 
 // Typical logging output, the default level
 func Info(msg string, args ...interface{}) {
-	log.Printf("I "+msg+"\n", args...)
+	log.Printf(preamble('I')+msg+"\n", args...)
 }
 
 // -v: Verbosity level which helps track down production issues
 func Debug(msg string, args ...interface{}) {
 	if Verbose {
-		log.Printf("D "+msg+"\n", args...)
+		log.Printf(preamble('D')+msg+"\n", args...)
 	}
 }
 
 // -V: Very verbose for development purposes
 func DebugDebug(msg string, args ...interface{}) {
 	if VeryVerbose {
-		log.Printf("V "+msg+"\n", args...)
+		log.Printf(preamble('V')+msg+"\n", args...)
 	}
+}
+
+const (
+	TimestampFormat = "2006-01-02T15:04:05.000000Z"
+)
+
+func preamble(lvl rune) string {
+	return fmt.Sprintf("%c %s %d ", lvl, time.Now().UTC().Format(TimestampFormat), os.Getpid())
 }
