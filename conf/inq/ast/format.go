@@ -11,8 +11,9 @@ type HostCheck struct {
 }
 
 type ProcessCheck struct {
-	Name  string
-	Rules RuleList
+	Name       string
+	Rules      RuleList
+	Parameters map[string]string
 }
 
 type RuleList []*Rule
@@ -30,10 +31,26 @@ type Rule struct {
 	CycleCount int
 }
 
-func NewProcessCheck(checkType interface{}, name interface{}, rules interface{}) *ProcessCheck {
+func AddParam(key interface{}, val interface{}, hash interface{}) (map[string]string, error) {
+	k := string(key.(*token.Token).Lit)
+	v := string(val.(*token.Token).Lit)
+	var h map[string]string
+
+	if hash == nil {
+		h = map[string]string{}
+	} else {
+		h = hash.(map[string]string)
+	}
+	h[k] = v
+
+	return h, nil
+}
+
+func NewProcessCheck(checkType interface{}, name interface{}, rules interface{}, params interface{}) *ProcessCheck {
 	return &ProcessCheck{
 		string(name.(*token.Token).Lit),
 		rules.(RuleList),
+		params.(map[string]string),
 	}
 }
 func NewHostCheck(rules interface{}) *HostCheck {

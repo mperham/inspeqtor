@@ -22,6 +22,8 @@ var actionTab = actionTable{
 			nil,		/* service */
 			nil,		/* restart */
 			nil,		/* alert */
+			nil,		/* with */
+			nil,		/* , */
 			nil,		/* uint_lit */
 			nil,		/* sized_uint_lit */
 			nil,		/* ( */
@@ -47,6 +49,8 @@ var actionTab = actionTable{
 			nil,		/* service */
 			nil,		/* restart */
 			nil,		/* alert */
+			nil,		/* with */
+			nil,		/* , */
 			nil,		/* uint_lit */
 			nil,		/* sized_uint_lit */
 			nil,		/* ( */
@@ -72,6 +76,8 @@ var actionTab = actionTable{
 			shift(7),		/* service */
 			nil,		/* restart */
 			nil,		/* alert */
+			nil,		/* with */
+			nil,		/* , */
 			nil,		/* uint_lit */
 			nil,		/* sized_uint_lit */
 			nil,		/* ( */
@@ -97,6 +103,8 @@ var actionTab = actionTable{
 			reduce(3),		/* service, reduce: Preamble */
 			nil,		/* restart */
 			nil,		/* alert */
+			nil,		/* with */
+			nil,		/* , */
 			nil,		/* uint_lit */
 			nil,		/* sized_uint_lit */
 			nil,		/* ( */
@@ -122,6 +130,8 @@ var actionTab = actionTable{
 			nil,		/* service */
 			nil,		/* restart */
 			nil,		/* alert */
+			nil,		/* with */
+			nil,		/* , */
 			nil,		/* uint_lit */
 			nil,		/* sized_uint_lit */
 			nil,		/* ( */
@@ -147,6 +157,8 @@ var actionTab = actionTable{
 			nil,		/* service */
 			nil,		/* restart */
 			nil,		/* alert */
+			nil,		/* with */
+			nil,		/* , */
 			nil,		/* uint_lit */
 			nil,		/* sized_uint_lit */
 			nil,		/* ( */
@@ -172,6 +184,8 @@ var actionTab = actionTable{
 			nil,		/* service */
 			nil,		/* restart */
 			nil,		/* alert */
+			nil,		/* with */
+			nil,		/* , */
 			nil,		/* uint_lit */
 			nil,		/* sized_uint_lit */
 			nil,		/* ( */
@@ -197,6 +211,8 @@ var actionTab = actionTable{
 			nil,		/* service */
 			nil,		/* restart */
 			nil,		/* alert */
+			nil,		/* with */
+			nil,		/* , */
 			nil,		/* uint_lit */
 			nil,		/* sized_uint_lit */
 			nil,		/* ( */
@@ -222,11 +238,13 @@ var actionTab = actionTable{
 			nil,		/* service */
 			nil,		/* restart */
 			nil,		/* alert */
+			shift(13),		/* with */
+			nil,		/* , */
 			nil,		/* uint_lit */
 			nil,		/* sized_uint_lit */
 			nil,		/* ( */
 			nil,		/* ) */
-			shift(11),		/* if */
+			nil,		/* if */
 			nil,		/* operator */
 			nil,		/* then */
 			nil,		/* for */
@@ -247,6 +265,8 @@ var actionTab = actionTable{
 			nil,		/* service */
 			nil,		/* restart */
 			nil,		/* alert */
+			nil,		/* with */
+			nil,		/* , */
 			nil,		/* uint_lit */
 			nil,		/* sized_uint_lit */
 			nil,		/* ( */
@@ -264,7 +284,7 @@ var actionTab = actionTable{
 				canRecover: false,
 		actions: [numSymbols]action{
 			nil,		/* INVALID */
-			reduce(16),		/* $, reduce: RuleList */
+			reduce(19),		/* $, reduce: RuleList */
 			nil,		/* name */
 			nil,		/* host */
 			nil,		/* check */
@@ -272,11 +292,13 @@ var actionTab = actionTable{
 			nil,		/* service */
 			nil,		/* restart */
 			nil,		/* alert */
+			nil,		/* with */
+			nil,		/* , */
 			nil,		/* uint_lit */
 			nil,		/* sized_uint_lit */
 			nil,		/* ( */
 			nil,		/* ) */
-			reduce(16),		/* if, reduce: RuleList */
+			reduce(19),		/* if, reduce: RuleList */
 			nil,		/* operator */
 			nil,		/* then */
 			nil,		/* for */
@@ -290,13 +312,15 @@ var actionTab = actionTable{
 		actions: [numSymbols]action{
 			nil,		/* INVALID */
 			nil,		/* $ */
-			shift(14),		/* name */
+			shift(15),		/* name */
 			nil,		/* host */
 			nil,		/* check */
 			nil,		/* process */
 			nil,		/* service */
 			nil,		/* restart */
 			nil,		/* alert */
+			nil,		/* with */
+			nil,		/* , */
 			nil,		/* uint_lit */
 			nil,		/* sized_uint_lit */
 			nil,		/* ( */
@@ -314,7 +338,7 @@ var actionTab = actionTable{
 				canRecover: false,
 		actions: [numSymbols]action{
 			nil,		/* INVALID */
-			reduce(1),		/* $, reduce: Check */
+			nil,		/* $ */
 			nil,		/* name */
 			nil,		/* host */
 			nil,		/* check */
@@ -322,6 +346,8 @@ var actionTab = actionTable{
 			nil,		/* service */
 			nil,		/* restart */
 			nil,		/* alert */
+			nil,		/* with */
+			nil,		/* , */
 			nil,		/* uint_lit */
 			nil,		/* sized_uint_lit */
 			nil,		/* ( */
@@ -339,19 +365,21 @@ var actionTab = actionTable{
 				canRecover: false,
 		actions: [numSymbols]action{
 			nil,		/* INVALID */
-			reduce(17),		/* $, reduce: RuleList */
-			nil,		/* name */
+			nil,		/* $ */
+			shift(18),		/* name */
 			nil,		/* host */
 			nil,		/* check */
 			nil,		/* process */
 			nil,		/* service */
 			nil,		/* restart */
 			nil,		/* alert */
+			nil,		/* with */
+			nil,		/* , */
 			nil,		/* uint_lit */
 			nil,		/* sized_uint_lit */
 			nil,		/* ( */
 			nil,		/* ) */
-			reduce(17),		/* if, reduce: RuleList */
+			nil,		/* if */
 			nil,		/* operator */
 			nil,		/* then */
 			nil,		/* for */
@@ -364,7 +392,7 @@ var actionTab = actionTable{
 				canRecover: false,
 		actions: [numSymbols]action{
 			nil,		/* INVALID */
-			nil,		/* $ */
+			reduce(20),		/* $, reduce: RuleList */
 			nil,		/* name */
 			nil,		/* host */
 			nil,		/* check */
@@ -372,12 +400,14 @@ var actionTab = actionTable{
 			nil,		/* service */
 			nil,		/* restart */
 			nil,		/* alert */
+			nil,		/* with */
+			nil,		/* , */
 			nil,		/* uint_lit */
 			nil,		/* sized_uint_lit */
-			shift(16),		/* ( */
+			nil,		/* ( */
 			nil,		/* ) */
-			nil,		/* if */
-			reduce(11),		/* operator, reduce: Metric */
+			reduce(20),		/* if, reduce: RuleList */
+			nil,		/* operator */
 			nil,		/* then */
 			nil,		/* for */
 			nil,		/* cycles */
@@ -397,12 +427,14 @@ var actionTab = actionTable{
 			nil,		/* service */
 			nil,		/* restart */
 			nil,		/* alert */
+			nil,		/* with */
+			nil,		/* , */
 			nil,		/* uint_lit */
 			nil,		/* sized_uint_lit */
-			nil,		/* ( */
+			shift(20),		/* ( */
 			nil,		/* ) */
 			nil,		/* if */
-			shift(17),		/* operator */
+			reduce(14),		/* operator, reduce: Metric */
 			nil,		/* then */
 			nil,		/* for */
 			nil,		/* cycles */
@@ -415,19 +447,21 @@ var actionTab = actionTable{
 		actions: [numSymbols]action{
 			nil,		/* INVALID */
 			nil,		/* $ */
-			shift(18),		/* name */
+			nil,		/* name */
 			nil,		/* host */
 			nil,		/* check */
 			nil,		/* process */
 			nil,		/* service */
 			nil,		/* restart */
 			nil,		/* alert */
+			nil,		/* with */
+			nil,		/* , */
 			nil,		/* uint_lit */
-			shift(19),		/* sized_uint_lit */
+			nil,		/* sized_uint_lit */
 			nil,		/* ( */
 			nil,		/* ) */
 			nil,		/* if */
-			nil,		/* operator */
+			shift(21),		/* operator */
 			nil,		/* then */
 			nil,		/* for */
 			nil,		/* cycles */
@@ -439,7 +473,7 @@ var actionTab = actionTable{
 				canRecover: false,
 		actions: [numSymbols]action{
 			nil,		/* INVALID */
-			nil,		/* $ */
+			reduce(1),		/* $, reduce: Check */
 			nil,		/* name */
 			nil,		/* host */
 			nil,		/* check */
@@ -447,11 +481,13 @@ var actionTab = actionTable{
 			nil,		/* service */
 			nil,		/* restart */
 			nil,		/* alert */
-			shift(20),		/* uint_lit */
-			shift(22),		/* sized_uint_lit */
+			nil,		/* with */
+			nil,		/* , */
+			nil,		/* uint_lit */
+			nil,		/* sized_uint_lit */
 			nil,		/* ( */
 			nil,		/* ) */
-			nil,		/* if */
+			shift(11),		/* if */
 			nil,		/* operator */
 			nil,		/* then */
 			nil,		/* for */
@@ -465,17 +501,19 @@ var actionTab = actionTable{
 		actions: [numSymbols]action{
 			nil,		/* INVALID */
 			nil,		/* $ */
-			nil,		/* name */
+			shift(22),		/* name */
 			nil,		/* host */
 			nil,		/* check */
 			nil,		/* process */
 			nil,		/* service */
 			nil,		/* restart */
 			nil,		/* alert */
+			nil,		/* with */
+			nil,		/* , */
 			nil,		/* uint_lit */
 			nil,		/* sized_uint_lit */
 			nil,		/* ( */
-			shift(23),		/* ) */
+			nil,		/* ) */
 			nil,		/* if */
 			nil,		/* operator */
 			nil,		/* then */
@@ -497,11 +535,13 @@ var actionTab = actionTable{
 			nil,		/* service */
 			nil,		/* restart */
 			nil,		/* alert */
+			nil,		/* with */
+			nil,		/* , */
 			nil,		/* uint_lit */
 			nil,		/* sized_uint_lit */
 			nil,		/* ( */
-			shift(24),		/* ) */
-			nil,		/* if */
+			nil,		/* ) */
+			reduce(8),		/* if, reduce: ParameterList */
 			nil,		/* operator */
 			nil,		/* then */
 			nil,		/* for */
@@ -515,21 +555,23 @@ var actionTab = actionTable{
 		actions: [numSymbols]action{
 			nil,		/* INVALID */
 			nil,		/* $ */
-			nil,		/* name */
+			shift(23),		/* name */
 			nil,		/* host */
 			nil,		/* check */
 			nil,		/* process */
 			nil,		/* service */
 			nil,		/* restart */
 			nil,		/* alert */
+			nil,		/* with */
+			nil,		/* , */
 			nil,		/* uint_lit */
-			nil,		/* sized_uint_lit */
+			shift(24),		/* sized_uint_lit */
 			nil,		/* ( */
 			nil,		/* ) */
 			nil,		/* if */
 			nil,		/* operator */
-			reduce(10),		/* then, reduce: HumanAmount */
-			reduce(10),		/* for, reduce: HumanAmount */
+			nil,		/* then */
+			nil,		/* for */
 			nil,		/* cycles */
 			
 		},
@@ -547,14 +589,16 @@ var actionTab = actionTable{
 			nil,		/* service */
 			nil,		/* restart */
 			nil,		/* alert */
-			nil,		/* uint_lit */
-			nil,		/* sized_uint_lit */
+			nil,		/* with */
+			nil,		/* , */
+			shift(25),		/* uint_lit */
+			shift(27),		/* sized_uint_lit */
 			nil,		/* ( */
 			nil,		/* ) */
 			nil,		/* if */
 			nil,		/* operator */
-			shift(25),		/* then */
-			shift(26),		/* for */
+			nil,		/* then */
+			nil,		/* for */
 			nil,		/* cycles */
 			
 		},
@@ -572,14 +616,16 @@ var actionTab = actionTable{
 			nil,		/* service */
 			nil,		/* restart */
 			nil,		/* alert */
+			nil,		/* with */
+			shift(28),		/* , */
 			nil,		/* uint_lit */
 			nil,		/* sized_uint_lit */
 			nil,		/* ( */
 			nil,		/* ) */
-			nil,		/* if */
+			reduce(10),		/* if, reduce: Parameters */
 			nil,		/* operator */
-			reduce(9),		/* then, reduce: HumanAmount */
-			reduce(9),		/* for, reduce: HumanAmount */
+			nil,		/* then */
+			nil,		/* for */
 			nil,		/* cycles */
 			
 		},
@@ -597,12 +643,14 @@ var actionTab = actionTable{
 			nil,		/* service */
 			nil,		/* restart */
 			nil,		/* alert */
+			nil,		/* with */
+			nil,		/* , */
 			nil,		/* uint_lit */
 			nil,		/* sized_uint_lit */
 			nil,		/* ( */
-			nil,		/* ) */
+			shift(29),		/* ) */
 			nil,		/* if */
-			reduce(12),		/* operator, reduce: Metric */
+			nil,		/* operator */
 			nil,		/* then */
 			nil,		/* for */
 			nil,		/* cycles */
@@ -622,12 +670,14 @@ var actionTab = actionTable{
 			nil,		/* service */
 			nil,		/* restart */
 			nil,		/* alert */
+			nil,		/* with */
+			nil,		/* , */
 			nil,		/* uint_lit */
 			nil,		/* sized_uint_lit */
 			nil,		/* ( */
-			nil,		/* ) */
+			shift(30),		/* ) */
 			nil,		/* if */
-			reduce(13),		/* operator, reduce: Metric */
+			nil,		/* operator */
 			nil,		/* then */
 			nil,		/* for */
 			nil,		/* cycles */
@@ -645,16 +695,18 @@ var actionTab = actionTable{
 			nil,		/* check */
 			nil,		/* process */
 			nil,		/* service */
-			shift(28),		/* restart */
-			shift(29),		/* alert */
+			nil,		/* restart */
+			nil,		/* alert */
+			nil,		/* with */
+			nil,		/* , */
 			nil,		/* uint_lit */
 			nil,		/* sized_uint_lit */
 			nil,		/* ( */
 			nil,		/* ) */
 			nil,		/* if */
 			nil,		/* operator */
-			nil,		/* then */
-			nil,		/* for */
+			reduce(13),		/* then, reduce: HumanAmount */
+			reduce(13),		/* for, reduce: HumanAmount */
 			nil,		/* cycles */
 			
 		},
@@ -672,7 +724,63 @@ var actionTab = actionTable{
 			nil,		/* service */
 			nil,		/* restart */
 			nil,		/* alert */
-			shift(31),		/* uint_lit */
+			nil,		/* with */
+			nil,		/* , */
+			nil,		/* uint_lit */
+			nil,		/* sized_uint_lit */
+			nil,		/* ( */
+			nil,		/* ) */
+			nil,		/* if */
+			nil,		/* operator */
+			shift(31),		/* then */
+			shift(32),		/* for */
+			nil,		/* cycles */
+			
+		},
+
+	},
+	actionRow{ // S27
+				canRecover: false,
+		actions: [numSymbols]action{
+			nil,		/* INVALID */
+			nil,		/* $ */
+			nil,		/* name */
+			nil,		/* host */
+			nil,		/* check */
+			nil,		/* process */
+			nil,		/* service */
+			nil,		/* restart */
+			nil,		/* alert */
+			nil,		/* with */
+			nil,		/* , */
+			nil,		/* uint_lit */
+			nil,		/* sized_uint_lit */
+			nil,		/* ( */
+			nil,		/* ) */
+			nil,		/* if */
+			nil,		/* operator */
+			reduce(12),		/* then, reduce: HumanAmount */
+			reduce(12),		/* for, reduce: HumanAmount */
+			nil,		/* cycles */
+			
+		},
+
+	},
+	actionRow{ // S28
+				canRecover: false,
+		actions: [numSymbols]action{
+			nil,		/* INVALID */
+			nil,		/* $ */
+			shift(18),		/* name */
+			nil,		/* host */
+			nil,		/* check */
+			nil,		/* process */
+			nil,		/* service */
+			nil,		/* restart */
+			nil,		/* alert */
+			nil,		/* with */
+			nil,		/* , */
+			nil,		/* uint_lit */
 			nil,		/* sized_uint_lit */
 			nil,		/* ( */
 			nil,		/* ) */
@@ -685,61 +793,11 @@ var actionTab = actionTable{
 		},
 
 	},
-	actionRow{ // S27
-				canRecover: false,
-		actions: [numSymbols]action{
-			nil,		/* INVALID */
-			reduce(14),		/* $, reduce: Rule */
-			nil,		/* name */
-			nil,		/* host */
-			nil,		/* check */
-			nil,		/* process */
-			nil,		/* service */
-			nil,		/* restart */
-			nil,		/* alert */
-			nil,		/* uint_lit */
-			nil,		/* sized_uint_lit */
-			nil,		/* ( */
-			nil,		/* ) */
-			reduce(14),		/* if, reduce: Rule */
-			nil,		/* operator */
-			nil,		/* then */
-			nil,		/* for */
-			nil,		/* cycles */
-			
-		},
-
-	},
-	actionRow{ // S28
-				canRecover: false,
-		actions: [numSymbols]action{
-			nil,		/* INVALID */
-			reduce(6),		/* $, reduce: Action */
-			nil,		/* name */
-			nil,		/* host */
-			nil,		/* check */
-			nil,		/* process */
-			nil,		/* service */
-			nil,		/* restart */
-			nil,		/* alert */
-			nil,		/* uint_lit */
-			nil,		/* sized_uint_lit */
-			nil,		/* ( */
-			nil,		/* ) */
-			reduce(6),		/* if, reduce: Action */
-			nil,		/* operator */
-			nil,		/* then */
-			nil,		/* for */
-			nil,		/* cycles */
-			
-		},
-
-	},
 	actionRow{ // S29
 				canRecover: false,
 		actions: [numSymbols]action{
 			nil,		/* INVALID */
-			reduce(7),		/* $, reduce: Action */
+			nil,		/* $ */
 			nil,		/* name */
 			nil,		/* host */
 			nil,		/* check */
@@ -747,12 +805,14 @@ var actionTab = actionTable{
 			nil,		/* service */
 			nil,		/* restart */
 			nil,		/* alert */
+			nil,		/* with */
+			nil,		/* , */
 			nil,		/* uint_lit */
 			nil,		/* sized_uint_lit */
 			nil,		/* ( */
 			nil,		/* ) */
-			reduce(7),		/* if, reduce: Action */
-			nil,		/* operator */
+			nil,		/* if */
+			reduce(15),		/* operator, reduce: Metric */
 			nil,		/* then */
 			nil,		/* for */
 			nil,		/* cycles */
@@ -772,15 +832,17 @@ var actionTab = actionTable{
 			nil,		/* service */
 			nil,		/* restart */
 			nil,		/* alert */
+			nil,		/* with */
+			nil,		/* , */
 			nil,		/* uint_lit */
 			nil,		/* sized_uint_lit */
 			nil,		/* ( */
 			nil,		/* ) */
 			nil,		/* if */
-			nil,		/* operator */
+			reduce(16),		/* operator, reduce: Metric */
 			nil,		/* then */
 			nil,		/* for */
-			shift(32),		/* cycles */
+			nil,		/* cycles */
 			
 		},
 
@@ -795,8 +857,10 @@ var actionTab = actionTable{
 			nil,		/* check */
 			nil,		/* process */
 			nil,		/* service */
-			nil,		/* restart */
-			nil,		/* alert */
+			shift(35),		/* restart */
+			shift(36),		/* alert */
+			nil,		/* with */
+			nil,		/* , */
 			nil,		/* uint_lit */
 			nil,		/* sized_uint_lit */
 			nil,		/* ( */
@@ -805,7 +869,7 @@ var actionTab = actionTable{
 			nil,		/* operator */
 			nil,		/* then */
 			nil,		/* for */
-			reduce(8),		/* cycles, reduce: IntAmount */
+			nil,		/* cycles */
 			
 		},
 
@@ -822,13 +886,15 @@ var actionTab = actionTable{
 			nil,		/* service */
 			nil,		/* restart */
 			nil,		/* alert */
-			nil,		/* uint_lit */
+			nil,		/* with */
+			nil,		/* , */
+			shift(38),		/* uint_lit */
 			nil,		/* sized_uint_lit */
 			nil,		/* ( */
 			nil,		/* ) */
 			nil,		/* if */
 			nil,		/* operator */
-			shift(33),		/* then */
+			nil,		/* then */
 			nil,		/* for */
 			nil,		/* cycles */
 			
@@ -845,8 +911,199 @@ var actionTab = actionTable{
 			nil,		/* check */
 			nil,		/* process */
 			nil,		/* service */
-			shift(28),		/* restart */
-			shift(29),		/* alert */
+			nil,		/* restart */
+			nil,		/* alert */
+			nil,		/* with */
+			nil,		/* , */
+			nil,		/* uint_lit */
+			nil,		/* sized_uint_lit */
+			nil,		/* ( */
+			nil,		/* ) */
+			reduce(9),		/* if, reduce: Parameters */
+			nil,		/* operator */
+			nil,		/* then */
+			nil,		/* for */
+			nil,		/* cycles */
+			
+		},
+
+	},
+	actionRow{ // S34
+				canRecover: false,
+		actions: [numSymbols]action{
+			nil,		/* INVALID */
+			reduce(17),		/* $, reduce: Rule */
+			nil,		/* name */
+			nil,		/* host */
+			nil,		/* check */
+			nil,		/* process */
+			nil,		/* service */
+			nil,		/* restart */
+			nil,		/* alert */
+			nil,		/* with */
+			nil,		/* , */
+			nil,		/* uint_lit */
+			nil,		/* sized_uint_lit */
+			nil,		/* ( */
+			nil,		/* ) */
+			reduce(17),		/* if, reduce: Rule */
+			nil,		/* operator */
+			nil,		/* then */
+			nil,		/* for */
+			nil,		/* cycles */
+			
+		},
+
+	},
+	actionRow{ // S35
+				canRecover: false,
+		actions: [numSymbols]action{
+			nil,		/* INVALID */
+			reduce(6),		/* $, reduce: Action */
+			nil,		/* name */
+			nil,		/* host */
+			nil,		/* check */
+			nil,		/* process */
+			nil,		/* service */
+			nil,		/* restart */
+			nil,		/* alert */
+			nil,		/* with */
+			nil,		/* , */
+			nil,		/* uint_lit */
+			nil,		/* sized_uint_lit */
+			nil,		/* ( */
+			nil,		/* ) */
+			reduce(6),		/* if, reduce: Action */
+			nil,		/* operator */
+			nil,		/* then */
+			nil,		/* for */
+			nil,		/* cycles */
+			
+		},
+
+	},
+	actionRow{ // S36
+				canRecover: false,
+		actions: [numSymbols]action{
+			nil,		/* INVALID */
+			reduce(7),		/* $, reduce: Action */
+			nil,		/* name */
+			nil,		/* host */
+			nil,		/* check */
+			nil,		/* process */
+			nil,		/* service */
+			nil,		/* restart */
+			nil,		/* alert */
+			nil,		/* with */
+			nil,		/* , */
+			nil,		/* uint_lit */
+			nil,		/* sized_uint_lit */
+			nil,		/* ( */
+			nil,		/* ) */
+			reduce(7),		/* if, reduce: Action */
+			nil,		/* operator */
+			nil,		/* then */
+			nil,		/* for */
+			nil,		/* cycles */
+			
+		},
+
+	},
+	actionRow{ // S37
+				canRecover: false,
+		actions: [numSymbols]action{
+			nil,		/* INVALID */
+			nil,		/* $ */
+			nil,		/* name */
+			nil,		/* host */
+			nil,		/* check */
+			nil,		/* process */
+			nil,		/* service */
+			nil,		/* restart */
+			nil,		/* alert */
+			nil,		/* with */
+			nil,		/* , */
+			nil,		/* uint_lit */
+			nil,		/* sized_uint_lit */
+			nil,		/* ( */
+			nil,		/* ) */
+			nil,		/* if */
+			nil,		/* operator */
+			nil,		/* then */
+			nil,		/* for */
+			shift(39),		/* cycles */
+			
+		},
+
+	},
+	actionRow{ // S38
+				canRecover: false,
+		actions: [numSymbols]action{
+			nil,		/* INVALID */
+			nil,		/* $ */
+			nil,		/* name */
+			nil,		/* host */
+			nil,		/* check */
+			nil,		/* process */
+			nil,		/* service */
+			nil,		/* restart */
+			nil,		/* alert */
+			nil,		/* with */
+			nil,		/* , */
+			nil,		/* uint_lit */
+			nil,		/* sized_uint_lit */
+			nil,		/* ( */
+			nil,		/* ) */
+			nil,		/* if */
+			nil,		/* operator */
+			nil,		/* then */
+			nil,		/* for */
+			reduce(11),		/* cycles, reduce: IntAmount */
+			
+		},
+
+	},
+	actionRow{ // S39
+				canRecover: false,
+		actions: [numSymbols]action{
+			nil,		/* INVALID */
+			nil,		/* $ */
+			nil,		/* name */
+			nil,		/* host */
+			nil,		/* check */
+			nil,		/* process */
+			nil,		/* service */
+			nil,		/* restart */
+			nil,		/* alert */
+			nil,		/* with */
+			nil,		/* , */
+			nil,		/* uint_lit */
+			nil,		/* sized_uint_lit */
+			nil,		/* ( */
+			nil,		/* ) */
+			nil,		/* if */
+			nil,		/* operator */
+			shift(40),		/* then */
+			nil,		/* for */
+			nil,		/* cycles */
+			
+		},
+
+	},
+	actionRow{ // S40
+				canRecover: false,
+		actions: [numSymbols]action{
+			nil,		/* INVALID */
+			nil,		/* $ */
+			nil,		/* name */
+			nil,		/* host */
+			nil,		/* check */
+			nil,		/* process */
+			nil,		/* service */
+			shift(35),		/* restart */
+			shift(36),		/* alert */
+			nil,		/* with */
+			nil,		/* , */
 			nil,		/* uint_lit */
 			nil,		/* sized_uint_lit */
 			nil,		/* ( */
@@ -860,11 +1117,11 @@ var actionTab = actionTable{
 		},
 
 	},
-	actionRow{ // S34
+	actionRow{ // S41
 				canRecover: false,
 		actions: [numSymbols]action{
 			nil,		/* INVALID */
-			reduce(15),		/* $, reduce: Rule */
+			reduce(18),		/* $, reduce: Rule */
 			nil,		/* name */
 			nil,		/* host */
 			nil,		/* check */
@@ -872,11 +1129,13 @@ var actionTab = actionTable{
 			nil,		/* service */
 			nil,		/* restart */
 			nil,		/* alert */
+			nil,		/* with */
+			nil,		/* , */
 			nil,		/* uint_lit */
 			nil,		/* sized_uint_lit */
 			nil,		/* ( */
 			nil,		/* ) */
-			reduce(15),		/* if, reduce: Rule */
+			reduce(18),		/* if, reduce: Rule */
 			nil,		/* operator */
 			nil,		/* then */
 			nil,		/* for */

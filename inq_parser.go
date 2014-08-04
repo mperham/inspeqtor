@@ -110,6 +110,6 @@ func convertService(inqsvc *ast.ProcessCheck) (*Service, error) {
 		util.DebugDebug("Rule: %+v", *rule)
 		rules[i] = rule
 	}
-	svc := &Service{inqsvc.Name, 0, 0, rules, metrics.NewProcessStore(), nil}
+	svc := &Service{inqsvc.Name, 0, 0, rules, inqsvc.Parameters, metrics.NewProcessStore(), nil}
 	return svc, nil
 }

@@ -9,7 +9,7 @@ _letter : 'a'-'z' | 'A'-'Z' ;
 
 _digit : '0'-'9' ;
 
-_idchar : _letter | _digit | '_' | '-' | '.';
+_idchar : _letter | _digit | '_' | '-' | '.' | '/';
 
 _sizecode : 'k' | 'm' | 'g' | 't' | 'p' | '%';
 
@@ -40,7 +40,7 @@ check host
 */
 
 Check
-  : Preamble Checktype name RuleList                  << ast.NewProcessCheck($1, $2, $3), nil >>
+  : Preamble Checktype name ParameterList RuleList     << ast.NewProcessCheck($1, $2, $4, $3), nil >>
   | Preamble "host" RuleList                        << ast.NewHostCheck($2), nil >>;
 
 Preamble
@@ -53,6 +53,13 @@ Checktype
 Action
   : "restart"       << $0, nil >>
   | "alert"         << $0, nil >>;
+
+ParameterList
+  : "with" Parameters   << $1, nil >>;
+
+Parameters
+  : name name "," Parameters      << ast.AddParam($0, $1, $3) >>
+  | name name                     << ast.AddParam($0, $1, nil) >>;
 
 IntAmount
   : uint_lit            << ast.ToInt64($0) >>;

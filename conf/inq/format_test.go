@@ -1,7 +1,7 @@
 package inq
 
 import (
-	"fmt"
+	"github.com/stretchr/testify/assert"
 	"inspeqtor/conf/inq/ast"
 	"inspeqtor/conf/inq/lexer"
 	"inspeqtor/conf/inq/parser"
@@ -23,7 +23,8 @@ func TestBasicServiceParsing(t *testing.T) {
 	}
 
 	check := obj.(*ast.ProcessCheck)
-	fmt.Printf("output: %s\n", check)
+	assert.Equal(t, check.Parameters["key"], "value")
+	assert.Equal(t, check.Parameters["foo"], "bar")
 }
 
 func TestBasicHostParsing(t *testing.T) {
@@ -40,5 +41,5 @@ func TestBasicHostParsing(t *testing.T) {
 	}
 
 	check := obj.(*ast.HostCheck)
-	fmt.Printf("output: %s\n", check)
+	assert.Equal(t, len(check.Rules), 2)
 }

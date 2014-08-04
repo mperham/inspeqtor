@@ -15,11 +15,12 @@ import (
   PID 0 means the process did not exist during that cycle.
 */
 type Service struct {
-	Name    string
-	PID     services.ProcessId
-	Status  services.Status
-	Rules   []*Rule
-	Metrics metrics.Storage
+	Name       string
+	PID        services.ProcessId
+	Status     services.Status
+	Rules      []*Rule
+	Parameters map[string]string
+	Metrics    metrics.Storage
 
 	// Upon bootup, we scan each init system looking for the service
 	// and cache which init system manages it for our lifetime.

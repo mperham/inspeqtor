@@ -30,13 +30,13 @@ var productionsTable = ProdTab {
 		},
 	},
 	ProdTabEntry{
-		String: `Check : Preamble Checktype name RuleList	<< ast.NewProcessCheck(X[1], X[2], X[3]), nil >>`,
+		String: `Check : Preamble Checktype name ParameterList RuleList	<< ast.NewProcessCheck(X[1], X[2], X[4], X[3]), nil >>`,
 		Id: "Check",
 		NTType: 1,
 		Index: 1,
-		NumSymbols: 4,
+		NumSymbols: 5,
 		ReduceFunc: func(X []Attrib) (Attrib, error) {
-			return ast.NewProcessCheck(X[1], X[2], X[3]), nil
+			return ast.NewProcessCheck(X[1], X[2], X[4], X[3]), nil
 		},
 	},
 	ProdTabEntry{
@@ -100,10 +100,40 @@ var productionsTable = ProdTab {
 		},
 	},
 	ProdTabEntry{
-		String: `IntAmount : uint_lit	<< ast.ToInt64(X[0]) >>`,
-		Id: "IntAmount",
+		String: `ParameterList : "with" Parameters	<< X[1], nil >>`,
+		Id: "ParameterList",
 		NTType: 5,
 		Index: 8,
+		NumSymbols: 2,
+		ReduceFunc: func(X []Attrib) (Attrib, error) {
+			return X[1], nil
+		},
+	},
+	ProdTabEntry{
+		String: `Parameters : name name "," Parameters	<< ast.AddParam(X[0], X[1], X[3]) >>`,
+		Id: "Parameters",
+		NTType: 6,
+		Index: 9,
+		NumSymbols: 4,
+		ReduceFunc: func(X []Attrib) (Attrib, error) {
+			return ast.AddParam(X[0], X[1], X[3])
+		},
+	},
+	ProdTabEntry{
+		String: `Parameters : name name	<< ast.AddParam(X[0], X[1], nil) >>`,
+		Id: "Parameters",
+		NTType: 6,
+		Index: 10,
+		NumSymbols: 2,
+		ReduceFunc: func(X []Attrib) (Attrib, error) {
+			return ast.AddParam(X[0], X[1], nil)
+		},
+	},
+	ProdTabEntry{
+		String: `IntAmount : uint_lit	<< ast.ToInt64(X[0]) >>`,
+		Id: "IntAmount",
+		NTType: 7,
+		Index: 11,
 		NumSymbols: 1,
 		ReduceFunc: func(X []Attrib) (Attrib, error) {
 			return ast.ToInt64(X[0])
@@ -112,8 +142,8 @@ var productionsTable = ProdTab {
 	ProdTabEntry{
 		String: `HumanAmount : sized_uint_lit	<< ast.HumanAmount(X[0]) >>`,
 		Id: "HumanAmount",
-		NTType: 6,
-		Index: 9,
+		NTType: 8,
+		Index: 12,
 		NumSymbols: 1,
 		ReduceFunc: func(X []Attrib) (Attrib, error) {
 			return ast.HumanAmount(X[0])
@@ -122,8 +152,8 @@ var productionsTable = ProdTab {
 	ProdTabEntry{
 		String: `HumanAmount : uint_lit	<< ast.ToInt64(X[0]) >>`,
 		Id: "HumanAmount",
-		NTType: 6,
-		Index: 10,
+		NTType: 8,
+		Index: 13,
 		NumSymbols: 1,
 		ReduceFunc: func(X []Attrib) (Attrib, error) {
 			return ast.ToInt64(X[0])
@@ -132,8 +162,8 @@ var productionsTable = ProdTab {
 	ProdTabEntry{
 		String: `Metric : name	<< ast.Metric(X[0], nil) >>`,
 		Id: "Metric",
-		NTType: 7,
-		Index: 11,
+		NTType: 9,
+		Index: 14,
 		NumSymbols: 1,
 		ReduceFunc: func(X []Attrib) (Attrib, error) {
 			return ast.Metric(X[0], nil)
@@ -142,8 +172,8 @@ var productionsTable = ProdTab {
 	ProdTabEntry{
 		String: `Metric : name "(" name ")"	<< ast.Metric(X[0], X[2]) >>`,
 		Id: "Metric",
-		NTType: 7,
-		Index: 12,
+		NTType: 9,
+		Index: 15,
 		NumSymbols: 4,
 		ReduceFunc: func(X []Attrib) (Attrib, error) {
 			return ast.Metric(X[0], X[2])
@@ -152,8 +182,8 @@ var productionsTable = ProdTab {
 	ProdTabEntry{
 		String: `Metric : name "(" sized_uint_lit ")"	<< ast.Metric(X[0], X[2]) >>`,
 		Id: "Metric",
-		NTType: 7,
-		Index: 13,
+		NTType: 9,
+		Index: 16,
 		NumSymbols: 4,
 		ReduceFunc: func(X []Attrib) (Attrib, error) {
 			return ast.Metric(X[0], X[2])
@@ -162,8 +192,8 @@ var productionsTable = ProdTab {
 	ProdTabEntry{
 		String: `Rule : "if" Metric operator HumanAmount "then" Action	<< ast.NewRule(X[1], X[2], X[3], X[5], int64(1)), nil >>`,
 		Id: "Rule",
-		NTType: 8,
-		Index: 14,
+		NTType: 10,
+		Index: 17,
 		NumSymbols: 6,
 		ReduceFunc: func(X []Attrib) (Attrib, error) {
 			return ast.NewRule(X[1], X[2], X[3], X[5], int64(1)), nil
@@ -172,8 +202,8 @@ var productionsTable = ProdTab {
 	ProdTabEntry{
 		String: `Rule : "if" Metric operator HumanAmount "for" IntAmount "cycles" "then" Action	<< ast.NewRule(X[1], X[2], X[3], X[8], X[5]), nil >>`,
 		Id: "Rule",
-		NTType: 8,
-		Index: 15,
+		NTType: 10,
+		Index: 18,
 		NumSymbols: 9,
 		ReduceFunc: func(X []Attrib) (Attrib, error) {
 			return ast.NewRule(X[1], X[2], X[3], X[8], X[5]), nil
@@ -182,8 +212,8 @@ var productionsTable = ProdTab {
 	ProdTabEntry{
 		String: `RuleList : Rule	<< ast.NewRuleList(X[0]), nil >>`,
 		Id: "RuleList",
-		NTType: 9,
-		Index: 16,
+		NTType: 11,
+		Index: 19,
 		NumSymbols: 1,
 		ReduceFunc: func(X []Attrib) (Attrib, error) {
 			return ast.NewRuleList(X[0]), nil
@@ -192,8 +222,8 @@ var productionsTable = ProdTab {
 	ProdTabEntry{
 		String: `RuleList : RuleList Rule	<< ast.AppendRule(X[0], X[1]), nil >>`,
 		Id: "RuleList",
-		NTType: 9,
-		Index: 17,
+		NTType: 11,
+		Index: 20,
 		NumSymbols: 2,
 		ReduceFunc: func(X []Attrib) (Attrib, error) {
 			return ast.AppendRule(X[0], X[1]), nil
