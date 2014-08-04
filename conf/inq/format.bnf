@@ -11,10 +11,13 @@ _digit : '0'-'9' ;
 
 _idchar : _letter | _digit | '_' | '-' | '.';
 
-sizecode : 'k' | 'm' | 'g' | 't' | 'p' | '%';
-uint_lit : _digit {_digit};
+_sizecode : 'k' | 'm' | 'g' | 't' | 'p' | '%';
 
-id : (_letter) {_idchar} ;
+_uint : _digit {_digit};
+uint_lit : _uint;
+sized_uint_lit : _uint _sizecode;
+
+name : _idchar {_idchar} ;
 operator : '>' | '<';
 
 << import "inspeqtor/conf/inq/ast" >>
@@ -32,19 +35,18 @@ check service redis
 
 check host
   if cpu(user) > 400% for 2 cycles then alert
-  if swap(usage) > 20% for 2 cycles then alert
+  if swap > 20% for 2 cycles then alert
 
 */
 
 Check
-  : Preamble Checktype id RuleList                  << ast.NewProcessCheck($1, $2, $3), nil >>
+  : Preamble Checktype name RuleList                  << ast.NewProcessCheck($1, $2, $3), nil >>
   | Preamble "host" RuleList                        << ast.NewHostCheck($2), nil >>;
 
-Preamble :
- : "check"          << $0, nil >> // Monit compatibility
- | "inspect"        << $0, nil >>;
+Preamble
+ : "check"          << $0, nil >>;
 
-Checktype :
+Checktype
  : "process"        << $0, nil >>
  | "service"        << $0, nil >>;
 
@@ -56,12 +58,22 @@ IntAmount
   : uint_lit            << ast.ToInt64($0) >>;
 
 HumanAmount
-  : uint_lit            << ast.HumanAmount($0, nil) >>
-  | uint_lit sizecode   << ast.HumanAmount($0, $1) >>;
+  : sized_uint_lit      << ast.HumanAmount($0) >>
+  | uint_lit            << ast.ToInt64($0) >>;
 
+// Metrics are named like "family(name)", e.g. memory(rss), cpu(user)
+// or mysql(questions).
+//
+// Name is optional to allow English-like naming for special metrics
+// like "swap" that are just a single number, otherwise we'd have to
+// force awkward naming like "swap(usage)".
+//
+// Allow metric names to begin with numbers so we can support
+// metrics like "load(1m)".
 Metric
-  : id                  << ast.Metric($0, nil) >>
-  | id "(" id ")"       << ast.Metric($0, $2) >>;
+  : name                    << ast.Metric($0, nil) >>
+  | name "(" name ")"       << ast.Metric($0, $2) >>
+  | name "(" sized_uint_lit ")"       << ast.Metric($0, $2) >>;
 
 Rule
   : "if" Metric operator HumanAmount "then" Action  << ast.NewRule($1, $2, $3, $5, int64(1)), nil >>

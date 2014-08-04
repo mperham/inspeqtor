@@ -30,7 +30,7 @@ var productionsTable = ProdTab {
 		},
 	},
 	ProdTabEntry{
-		String: `Check : Preamble Checktype id RuleList	<< ast.NewProcessCheck(X[1], X[2], X[3]), nil >>`,
+		String: `Check : Preamble Checktype name RuleList	<< ast.NewProcessCheck(X[1], X[2], X[3]), nil >>`,
 		Id: "Check",
 		NTType: 1,
 		Index: 1,
@@ -60,20 +60,10 @@ var productionsTable = ProdTab {
 		},
 	},
 	ProdTabEntry{
-		String: `Preamble : "inspect"	<< X[0], nil >>`,
-		Id: "Preamble",
-		NTType: 2,
-		Index: 4,
-		NumSymbols: 1,
-		ReduceFunc: func(X []Attrib) (Attrib, error) {
-			return X[0], nil
-		},
-	},
-	ProdTabEntry{
 		String: `Checktype : "process"	<< X[0], nil >>`,
 		Id: "Checktype",
 		NTType: 3,
-		Index: 5,
+		Index: 4,
 		NumSymbols: 1,
 		ReduceFunc: func(X []Attrib) (Attrib, error) {
 			return X[0], nil
@@ -83,7 +73,7 @@ var productionsTable = ProdTab {
 		String: `Checktype : "service"	<< X[0], nil >>`,
 		Id: "Checktype",
 		NTType: 3,
-		Index: 6,
+		Index: 5,
 		NumSymbols: 1,
 		ReduceFunc: func(X []Attrib) (Attrib, error) {
 			return X[0], nil
@@ -93,7 +83,7 @@ var productionsTable = ProdTab {
 		String: `Action : "restart"	<< X[0], nil >>`,
 		Id: "Action",
 		NTType: 4,
-		Index: 7,
+		Index: 6,
 		NumSymbols: 1,
 		ReduceFunc: func(X []Attrib) (Attrib, error) {
 			return X[0], nil
@@ -103,7 +93,7 @@ var productionsTable = ProdTab {
 		String: `Action : "alert"	<< X[0], nil >>`,
 		Id: "Action",
 		NTType: 4,
-		Index: 8,
+		Index: 7,
 		NumSymbols: 1,
 		ReduceFunc: func(X []Attrib) (Attrib, error) {
 			return X[0], nil
@@ -113,44 +103,54 @@ var productionsTable = ProdTab {
 		String: `IntAmount : uint_lit	<< ast.ToInt64(X[0]) >>`,
 		Id: "IntAmount",
 		NTType: 5,
-		Index: 9,
+		Index: 8,
 		NumSymbols: 1,
 		ReduceFunc: func(X []Attrib) (Attrib, error) {
 			return ast.ToInt64(X[0])
 		},
 	},
 	ProdTabEntry{
-		String: `HumanAmount : uint_lit	<< ast.HumanAmount(X[0], nil) >>`,
+		String: `HumanAmount : sized_uint_lit	<< ast.HumanAmount(X[0]) >>`,
+		Id: "HumanAmount",
+		NTType: 6,
+		Index: 9,
+		NumSymbols: 1,
+		ReduceFunc: func(X []Attrib) (Attrib, error) {
+			return ast.HumanAmount(X[0])
+		},
+	},
+	ProdTabEntry{
+		String: `HumanAmount : uint_lit	<< ast.ToInt64(X[0]) >>`,
 		Id: "HumanAmount",
 		NTType: 6,
 		Index: 10,
 		NumSymbols: 1,
 		ReduceFunc: func(X []Attrib) (Attrib, error) {
-			return ast.HumanAmount(X[0], nil)
+			return ast.ToInt64(X[0])
 		},
 	},
 	ProdTabEntry{
-		String: `HumanAmount : uint_lit sizecode	<< ast.HumanAmount(X[0], X[1]) >>`,
-		Id: "HumanAmount",
-		NTType: 6,
-		Index: 11,
-		NumSymbols: 2,
-		ReduceFunc: func(X []Attrib) (Attrib, error) {
-			return ast.HumanAmount(X[0], X[1])
-		},
-	},
-	ProdTabEntry{
-		String: `Metric : id	<< ast.Metric(X[0], nil) >>`,
+		String: `Metric : name	<< ast.Metric(X[0], nil) >>`,
 		Id: "Metric",
 		NTType: 7,
-		Index: 12,
+		Index: 11,
 		NumSymbols: 1,
 		ReduceFunc: func(X []Attrib) (Attrib, error) {
 			return ast.Metric(X[0], nil)
 		},
 	},
 	ProdTabEntry{
-		String: `Metric : id "(" id ")"	<< ast.Metric(X[0], X[2]) >>`,
+		String: `Metric : name "(" name ")"	<< ast.Metric(X[0], X[2]) >>`,
+		Id: "Metric",
+		NTType: 7,
+		Index: 12,
+		NumSymbols: 4,
+		ReduceFunc: func(X []Attrib) (Attrib, error) {
+			return ast.Metric(X[0], X[2])
+		},
+	},
+	ProdTabEntry{
+		String: `Metric : name "(" sized_uint_lit ")"	<< ast.Metric(X[0], X[2]) >>`,
 		Id: "Metric",
 		NTType: 7,
 		Index: 13,

@@ -2,4 +2,3 @@ check service memcached
 #  if not exists then start
   if memory(rss) > 250m then restart
   if cpu(user) > 4 then alert
-  if swap(usage) > 20% then alert

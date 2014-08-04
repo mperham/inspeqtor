@@ -68,27 +68,28 @@ func Metric(family interface{}, name interface{}) (*RuleMetric, error) {
 	return m, nil
 }
 
-func HumanAmount(digits interface{}, code interface{}) (int64, error) {
-	amt, err := strconv.ParseInt(string(digits.(*token.Token).Lit), 10, 64)
+func HumanAmount(digits interface{}) (int64, error) {
+	str := string(digits.(*token.Token).Lit)
+	sizecode := str[len(str)-1:]
+	str = str[0 : len(str)-1]
+	amt, err := strconv.ParseInt(str, 10, 64)
 	if err != nil {
 		return 0, err
 	}
 
-	if code != nil {
-		sizecode := strings.ToLower(string(code.(*token.Token).Lit))
-		if sizecode == "k" {
-			amt *= 1024
-		} else if sizecode == "m" {
-			amt *= 1024 * 1024
-		} else if sizecode == "g" {
-			amt *= 1024 * 1024 * 1024
-		} else if sizecode == "t" {
-			amt *= 1024 * 1024 * 1024 * 1024
-		} else if sizecode == "p" {
-			amt *= 1024 * 1024 * 1024 * 1024 * 1024
-		} else if sizecode == "%" {
-			// nothing to do
-		}
+	sizecode = strings.ToLower(sizecode)
+	if sizecode == "k" {
+		amt *= 1024
+	} else if sizecode == "m" {
+		amt *= 1024 * 1024
+	} else if sizecode == "g" {
+		amt *= 1024 * 1024 * 1024
+	} else if sizecode == "t" {
+		amt *= 1024 * 1024 * 1024 * 1024
+	} else if sizecode == "p" {
+		amt *= 1024 * 1024 * 1024 * 1024 * 1024
+	} else if sizecode == "%" {
+		// nothing to do
 	}
 	return amt, nil
 }
