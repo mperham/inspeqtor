@@ -14,18 +14,22 @@ func NewHostStore() Storage {
 		map[string]*family{},
 	}
 
-	store.declareGauge("swap", "")
-	store.declareGauge("load", "1")
-	store.declareGauge("load", "5")
-	store.declareGauge("load", "15")
+	store.declareGauge("swap", "", nil)
+	store.declareGauge("load", "1", multiplyBy100)
+	store.declareGauge("load", "5", multiplyBy100)
+	store.declareGauge("load", "15", multiplyBy100)
 	store.declareCounter("cpu", "", PERCENTAGE)
 	store.declareCounter("cpu", "user", PERCENTAGE)
 	store.declareCounter("cpu", "system", PERCENTAGE)
 	store.declareCounter("cpu", "iowait", PERCENTAGE)
 	store.declareCounter("cpu", "steal", PERCENTAGE)
 	store.declareDynamicFamily("disk")
-	store.declareGauge("disk", "/")
+	store.declareGauge("disk", "/", nil)
 	return store
+}
+
+func multiplyBy100(val int64) int64 {
+	return val * 100
 }
 
 const (

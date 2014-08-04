@@ -14,8 +14,8 @@ func NewProcessStore(values ...interface{}) Storage {
 		map[string]*family{},
 	}
 
-	store.declareGauge("memory", "rss")
-	store.declareGauge("memory", "vsz")
+	store.declareGauge("memory", "rss", nil)
+	store.declareGauge("memory", "vsz", nil)
 	store.declareCounter("cpu", "user", PERCENTAGE)
 	store.declareCounter("cpu", "system", PERCENTAGE)
 	store.declareCounter("cpu", "total_user", PERCENTAGE)
