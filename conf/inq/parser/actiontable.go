@@ -591,8 +591,8 @@ var actionTab = actionTable{
 			nil,		/* alert */
 			nil,		/* with */
 			nil,		/* , */
-			nil,		/* uint_lit */
-			shift(25),		/* sized_uint_lit */
+			shift(25),		/* uint_lit */
+			nil,		/* sized_uint_lit */
 			nil,		/* ( */
 			nil,		/* ) */
 			nil,		/* if */

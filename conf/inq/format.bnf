@@ -77,11 +77,11 @@ HumanAmount
 // force awkward naming like "swap(usage)".
 //
 // Allow metric names to begin with numbers so we can support
-// metrics like "load(1m)".
+// metrics like "load(1)".
 Metric
   : name                    << ast.Metric($0, nil) >>
   | name "(" name ")"       << ast.Metric($0, $2) >>
-  | name "(" sized_uint_lit ")"       << ast.Metric($0, $2) >>;
+  | name "(" uint_lit ")"       << ast.Metric($0, $2) >>;
 
 Rule
   : "if" Metric operator HumanAmount "then" Action  << ast.NewRule($1, $2, $3, $5, int64(1)), nil >>

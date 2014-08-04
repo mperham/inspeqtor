@@ -63,5 +63,5 @@ func TestBasicHostParsing(t *testing.T) {
 	}
 
 	check := obj.(*ast.HostCheck)
-	assert.Equal(t, len(check.Rules), 2)
+	assert.Equal(t, len(check.Rules), 3)
 }

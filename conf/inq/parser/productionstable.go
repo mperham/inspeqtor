@@ -190,7 +190,7 @@ var productionsTable = ProdTab {
 		},
 	},
 	ProdTabEntry{
-		String: `Metric : name "(" sized_uint_lit ")"	<< ast.Metric(X[0], X[2]) >>`,
+		String: `Metric : name "(" uint_lit ")"	<< ast.Metric(X[0], X[2]) >>`,
 		Id: "Metric",
 		NTType: 9,
 		Index: 17,
