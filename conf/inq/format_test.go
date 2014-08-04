@@ -10,7 +10,7 @@ import (
 )
 
 func TestBasicServiceParsing(t *testing.T) {
-	data, err := ioutil.ReadFile("conf.d/memcache.inq")
+	data, err := ioutil.ReadFile("conf.d/memcached.inq")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -24,7 +24,9 @@ func TestBasicServiceParsing(t *testing.T) {
 
 	check := obj.(*ast.ProcessCheck)
 	assert.Equal(t, check.Parameters["key"], "value")
-	assert.Equal(t, check.Parameters["foo"], "bar")
+	assert.Equal(t, check.Parameters["key"], "value")
+	assert.Equal(t, check.Name, "memcached")
+	assert.Equal(t, len(check.Rules), 2)
 }
 
 func TestBasicHostParsing(t *testing.T) {
