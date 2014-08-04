@@ -1,6 +1,7 @@
 package metrics
 
 import (
+	"fmt"
 	"inspeqtor/util"
 )
 
@@ -28,6 +29,9 @@ type Storage struct {
 
 func (store Storage) Get(family string, name string) int64 {
 	metric := store.data[family][name]
+	if metric == nil {
+		panic(fmt.Sprintf("No such metric: %s(%s)", family, name))
+	}
 	return metric.get()
 }
 

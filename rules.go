@@ -66,7 +66,7 @@ func (rule *Rule) Check(svcName string, svcData metrics.Storage) RuleStatus {
 	}
 
 	if tripped {
-		util.Debug("%s[%s] tripped.  Current value = %d", svcName, rule.MetricName(), curval)
+		util.Debug("%s[%s] tripped.  %d %d", svcName, rule.MetricName(), curval, rule.threshold)
 		rule.trippedCount++
 	}
 

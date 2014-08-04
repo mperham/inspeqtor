@@ -15,9 +15,9 @@ func NewHostStore() Storage {
 	}
 
 	store.declareGauge("swap", "")
-	store.declareGauge("load", "1")
-	store.declareGauge("load", "5")
-	store.declareGauge("load", "15")
+	store.declareGauge("load", "1m")
+	store.declareGauge("load", "5m")
+	store.declareGauge("load", "15m")
 	store.declareCounter("cpu", "", PERCENTAGE)
 	store.declareCounter("cpu", "user", PERCENTAGE)
 	store.declareCounter("cpu", "system", PERCENTAGE)
@@ -205,9 +205,9 @@ func collectLoadAverage(path string, store Storage) error {
 		return err
 	}
 
-	store.save("load", "1", int64(load1*100))
-	store.save("load", "5", int64(load5*100))
-	store.save("load", "15", int64(load15*100))
+	store.save("load", "1m", int64(load1*100))
+	store.save("load", "5m", int64(load5*100))
+	store.save("load", "15m", int64(load15*100))
 	return nil
 }
 

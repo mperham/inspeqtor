@@ -125,6 +125,9 @@ func (i *Inspeqtor) scanSystem(firstTime bool) {
 	barrier.Wait()
 	util.Debug("Collection complete in " + time.Now().Sub(start).String())
 
+	for _, rule := range i.Host.Rules {
+		rule.Check(i.Host.Name, i.Host.Metrics)
+	}
 	for _, svc := range i.Services {
 		for _, rule := range svc.Rules {
 			rule.Check(svc.Name, svc.Metrics)
