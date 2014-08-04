@@ -18,11 +18,11 @@ const (
 type Rule struct {
 	metricFamily string
 	metricName   string
-	Op           Operator
-	Threshold    int64
-	CycleCount   int
-	TrippedCount int
-	Actions      []*Action
+	op           Operator
+	threshold    int64
+	cycleCount   int
+	trippedCount int
+	actions      []*Action
 }
 
 func (r Rule) MetricName() string {
@@ -31,6 +31,14 @@ func (r Rule) MetricName() string {
 		s += "(" + r.metricName + ")"
 	}
 	return s
+}
+
+func (r Rule) Threshold() int64 {
+	return r.threshold
+}
+
+func (r Rule) Op() Operator {
+	return r.op
 }
 
 /*
@@ -48,26 +56,27 @@ func (rule *Rule) Check(svcName string, svcData metrics.Storage) RuleStatus {
 
 	tripped := false
 
-	switch rule.Op {
+	switch rule.op {
 	case LT:
-		tripped = curval < rule.Threshold
+		tripped = curval < rule.threshold
 	case GT:
-		tripped = curval > rule.Threshold
+		tripped = curval > rule.threshold
 	default:
-		util.Warn("Unknown operator: %d", rule.Op)
+		util.Warn("Unknown operator: %d", rule.op)
 	}
 
 	if tripped {
-		rule.TrippedCount++
+		util.Debug("%s[%s] tripped.  Current value = %d", svcName, rule.MetricName(), curval)
+		rule.trippedCount++
 	}
 
-	if rule.TrippedCount == rule.CycleCount && tripped {
+	if rule.trippedCount == rule.cycleCount && tripped {
 		util.Warn("%s[%s] triggered.  Current value = %d", svcName, rule.MetricName(), curval)
 		return Triggered
 	}
-	if rule.TrippedCount != 0 && !tripped {
+	if rule.trippedCount != 0 && !tripped {
 		util.Info("%s[%s] recovered.", svcName, rule.MetricName())
-		rule.TrippedCount = 0
+		rule.trippedCount = 0
 		return Recovered
 	}
 
