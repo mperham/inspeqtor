@@ -40,7 +40,8 @@ check host
 */
 
 Check
-  : Preamble Checktype name ParameterList RuleList     << ast.NewProcessCheck($1, $2, $4, $3), nil >>
+  : Preamble Checktype name ParameterList RuleList  << ast.NewProcessCheck($1, $2, $4, $3), nil >>
+  | Preamble Checktype name RuleList                << ast.NewProcessCheck($1, $2, $3, map[string]string{}), nil >>
   | Preamble "host" RuleList                        << ast.NewHostCheck($2), nil >>;
 
 Preamble

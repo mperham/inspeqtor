@@ -1,0 +1,4 @@
+check service mysql
+#  if not exists then start
+  if memory(rss) > 2g then restart
+  if cpu(user) > 50 then alert
