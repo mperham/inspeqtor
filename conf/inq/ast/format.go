@@ -27,8 +27,30 @@ type Rule struct {
 	Metric     RuleMetric
 	Operator   string
 	Value      int64
-	Action     string
+	Actions    []Action
 	CycleCount int
+}
+
+type Action struct {
+	Name string
+	Team string
+}
+
+func AppendAction(action interface{}, list interface{}) ([]Action, error) {
+	lst := list.([]Action)
+	lst = append(lst, action.(Action))
+	return lst, nil
+}
+
+func AddAction(name interface{}, t interface{}) (Action, error) {
+	team := ""
+	if t != nil {
+		team = string(t.(*token.Token).Lit)
+	}
+	return Action{
+		string(name.(*token.Token).Lit),
+		team,
+	}, nil
 }
 
 func AddParam(key interface{}, val interface{}, hash interface{}) (map[string]string, error) {
@@ -67,12 +89,12 @@ func AppendRule(list interface{}, rule interface{}) RuleList {
 	return append(list.(RuleList), rule.(*Rule))
 }
 
-func NewRule(metric interface{}, operator interface{}, value interface{}, action interface{}, cycleCount interface{}) *Rule {
+func NewRule(metric interface{}, operator interface{}, value interface{}, actions interface{}, cycleCount interface{}) *Rule {
 	return &Rule{
 		*metric.(*RuleMetric),
 		string(operator.(*token.Token).Lit),
 		value.(int64),
-		string(action.(*token.Token).Lit),
+		actions.([]Action),
 		int(cycleCount.(int64)),
 	}
 }

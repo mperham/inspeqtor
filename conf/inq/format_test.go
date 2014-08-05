@@ -6,6 +6,7 @@ import (
 	"inspeqtor/conf/inq/lexer"
 	"inspeqtor/conf/inq/parser"
 	"io/ioutil"
+	"log"
 	"testing"
 )
 
@@ -47,6 +48,9 @@ func TestBasicServiceParsing(t *testing.T) {
 	assert.Equal(t, len(check.Parameters), 2)
 	assert.Equal(t, check.Parameters["key"], "value")
 	assert.Equal(t, check.Parameters["foo"], "bar")
+	for _, x := range check.Rules {
+		log.Printf("%+v", *x)
+	}
 }
 
 func TestBasicHostParsing(t *testing.T) {

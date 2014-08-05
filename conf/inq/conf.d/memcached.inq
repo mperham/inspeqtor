@@ -1,4 +1,4 @@
 check service memcached with key value, foo bar
 #  if not exists then start
-  if memory(rss) > 250m then restart
+  if memory(rss) > 250m then alert ops, restart
   if cpu(user) > 4 then alert

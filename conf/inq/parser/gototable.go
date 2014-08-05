@@ -3,7 +3,7 @@
 */
 package parser
 
-const numNTSymbols = 12
+const numNTSymbols = 13
 type(
 	gotoTable [numStates]gotoRow
 	gotoRow	[numNTSymbols] int
@@ -16,6 +16,7 @@ var gotoTab = gotoTable{
 		1, // Check
 		2, // Preamble
 		-1, // Checktype
+		-1, // ActionList
 		-1, // Action
 		-1, // ParameterList
 		-1, // Parameters
@@ -33,6 +34,7 @@ var gotoTab = gotoTable{
 		-1, // Check
 		-1, // Preamble
 		-1, // Checktype
+		-1, // ActionList
 		-1, // Action
 		-1, // ParameterList
 		-1, // Parameters
@@ -50,6 +52,7 @@ var gotoTab = gotoTable{
 		-1, // Check
 		-1, // Preamble
 		4, // Checktype
+		-1, // ActionList
 		-1, // Action
 		-1, // ParameterList
 		-1, // Parameters
@@ -67,6 +70,7 @@ var gotoTab = gotoTable{
 		-1, // Check
 		-1, // Preamble
 		-1, // Checktype
+		-1, // ActionList
 		-1, // Action
 		-1, // ParameterList
 		-1, // Parameters
@@ -84,6 +88,7 @@ var gotoTab = gotoTable{
 		-1, // Check
 		-1, // Preamble
 		-1, // Checktype
+		-1, // ActionList
 		-1, // Action
 		-1, // ParameterList
 		-1, // Parameters
@@ -101,6 +106,7 @@ var gotoTab = gotoTable{
 		-1, // Check
 		-1, // Preamble
 		-1, // Checktype
+		-1, // ActionList
 		-1, // Action
 		-1, // ParameterList
 		-1, // Parameters
@@ -118,6 +124,7 @@ var gotoTab = gotoTable{
 		-1, // Check
 		-1, // Preamble
 		-1, // Checktype
+		-1, // ActionList
 		-1, // Action
 		-1, // ParameterList
 		-1, // Parameters
@@ -135,6 +142,7 @@ var gotoTab = gotoTable{
 		-1, // Check
 		-1, // Preamble
 		-1, // Checktype
+		-1, // ActionList
 		-1, // Action
 		-1, // ParameterList
 		-1, // Parameters
@@ -152,6 +160,7 @@ var gotoTab = gotoTable{
 		-1, // Check
 		-1, // Preamble
 		-1, // Checktype
+		-1, // ActionList
 		-1, // Action
 		12, // ParameterList
 		-1, // Parameters
@@ -169,6 +178,7 @@ var gotoTab = gotoTable{
 		-1, // Check
 		-1, // Preamble
 		-1, // Checktype
+		-1, // ActionList
 		-1, // Action
 		-1, // ParameterList
 		-1, // Parameters
@@ -186,6 +196,7 @@ var gotoTab = gotoTable{
 		-1, // Check
 		-1, // Preamble
 		-1, // Checktype
+		-1, // ActionList
 		-1, // Action
 		-1, // ParameterList
 		-1, // Parameters
@@ -203,6 +214,7 @@ var gotoTab = gotoTable{
 		-1, // Check
 		-1, // Preamble
 		-1, // Checktype
+		-1, // ActionList
 		-1, // Action
 		-1, // ParameterList
 		-1, // Parameters
@@ -220,6 +232,7 @@ var gotoTab = gotoTable{
 		-1, // Check
 		-1, // Preamble
 		-1, // Checktype
+		-1, // ActionList
 		-1, // Action
 		-1, // ParameterList
 		-1, // Parameters
@@ -237,6 +250,7 @@ var gotoTab = gotoTable{
 		-1, // Check
 		-1, // Preamble
 		-1, // Checktype
+		-1, // ActionList
 		-1, // Action
 		-1, // ParameterList
 		-1, // Parameters
@@ -254,6 +268,7 @@ var gotoTab = gotoTable{
 		-1, // Check
 		-1, // Preamble
 		-1, // Checktype
+		-1, // ActionList
 		-1, // Action
 		-1, // ParameterList
 		20, // Parameters
@@ -271,6 +286,7 @@ var gotoTab = gotoTable{
 		-1, // Check
 		-1, // Preamble
 		-1, // Checktype
+		-1, // ActionList
 		-1, // Action
 		-1, // ParameterList
 		-1, // Parameters
@@ -288,6 +304,7 @@ var gotoTab = gotoTable{
 		-1, // Check
 		-1, // Preamble
 		-1, // Checktype
+		-1, // ActionList
 		-1, // Action
 		-1, // ParameterList
 		-1, // Parameters
@@ -305,6 +322,7 @@ var gotoTab = gotoTable{
 		-1, // Check
 		-1, // Preamble
 		-1, // Checktype
+		-1, // ActionList
 		-1, // Action
 		-1, // ParameterList
 		-1, // Parameters
@@ -322,6 +340,7 @@ var gotoTab = gotoTable{
 		-1, // Check
 		-1, // Preamble
 		-1, // Checktype
+		-1, // ActionList
 		-1, // Action
 		-1, // ParameterList
 		-1, // Parameters
@@ -339,6 +358,7 @@ var gotoTab = gotoTable{
 		-1, // Check
 		-1, // Preamble
 		-1, // Checktype
+		-1, // ActionList
 		-1, // Action
 		-1, // ParameterList
 		-1, // Parameters
@@ -356,6 +376,7 @@ var gotoTab = gotoTable{
 		-1, // Check
 		-1, // Preamble
 		-1, // Checktype
+		-1, // ActionList
 		-1, // Action
 		-1, // ParameterList
 		-1, // Parameters
@@ -373,6 +394,7 @@ var gotoTab = gotoTable{
 		-1, // Check
 		-1, // Preamble
 		-1, // Checktype
+		-1, // ActionList
 		-1, // Action
 		-1, // ParameterList
 		-1, // Parameters
@@ -390,6 +412,7 @@ var gotoTab = gotoTable{
 		-1, // Check
 		-1, // Preamble
 		-1, // Checktype
+		-1, // ActionList
 		-1, // Action
 		-1, // ParameterList
 		-1, // Parameters
@@ -407,6 +430,7 @@ var gotoTab = gotoTable{
 		-1, // Check
 		-1, // Preamble
 		-1, // Checktype
+		-1, // ActionList
 		-1, // Action
 		-1, // ParameterList
 		-1, // Parameters
@@ -424,6 +448,7 @@ var gotoTab = gotoTable{
 		-1, // Check
 		-1, // Preamble
 		-1, // Checktype
+		-1, // ActionList
 		-1, // Action
 		-1, // ParameterList
 		-1, // Parameters
@@ -441,6 +466,7 @@ var gotoTab = gotoTable{
 		-1, // Check
 		-1, // Preamble
 		-1, // Checktype
+		-1, // ActionList
 		-1, // Action
 		-1, // ParameterList
 		-1, // Parameters
@@ -458,6 +484,7 @@ var gotoTab = gotoTable{
 		-1, // Check
 		-1, // Preamble
 		-1, // Checktype
+		-1, // ActionList
 		-1, // Action
 		-1, // ParameterList
 		-1, // Parameters
@@ -475,6 +502,7 @@ var gotoTab = gotoTable{
 		-1, // Check
 		-1, // Preamble
 		-1, // Checktype
+		-1, // ActionList
 		-1, // Action
 		-1, // ParameterList
 		-1, // Parameters
@@ -492,6 +520,7 @@ var gotoTab = gotoTable{
 		-1, // Check
 		-1, // Preamble
 		-1, // Checktype
+		-1, // ActionList
 		-1, // Action
 		-1, // ParameterList
 		-1, // Parameters
@@ -509,6 +538,7 @@ var gotoTab = gotoTable{
 		-1, // Check
 		-1, // Preamble
 		-1, // Checktype
+		-1, // ActionList
 		-1, // Action
 		-1, // ParameterList
 		34, // Parameters
@@ -526,6 +556,7 @@ var gotoTab = gotoTable{
 		-1, // Check
 		-1, // Preamble
 		-1, // Checktype
+		-1, // ActionList
 		-1, // Action
 		-1, // ParameterList
 		-1, // Parameters
@@ -543,6 +574,7 @@ var gotoTab = gotoTable{
 		-1, // Check
 		-1, // Preamble
 		-1, // Checktype
+		-1, // ActionList
 		-1, // Action
 		-1, // ParameterList
 		-1, // Parameters
@@ -560,7 +592,8 @@ var gotoTab = gotoTable{
 		-1, // Check
 		-1, // Preamble
 		-1, // Checktype
-		35, // Action
+		35, // ActionList
+		36, // Action
 		-1, // ParameterList
 		-1, // Parameters
 		-1, // IntAmount
@@ -577,10 +610,11 @@ var gotoTab = gotoTable{
 		-1, // Check
 		-1, // Preamble
 		-1, // Checktype
+		-1, // ActionList
 		-1, // Action
 		-1, // ParameterList
 		-1, // Parameters
-		38, // IntAmount
+		39, // IntAmount
 		-1, // HumanAmount
 		-1, // Metric
 		-1, // Rule
@@ -594,6 +628,7 @@ var gotoTab = gotoTable{
 		-1, // Check
 		-1, // Preamble
 		-1, // Checktype
+		-1, // ActionList
 		-1, // Action
 		-1, // ParameterList
 		-1, // Parameters
@@ -611,6 +646,7 @@ var gotoTab = gotoTable{
 		-1, // Check
 		-1, // Preamble
 		-1, // Checktype
+		-1, // ActionList
 		-1, // Action
 		-1, // ParameterList
 		-1, // Parameters
@@ -628,6 +664,7 @@ var gotoTab = gotoTable{
 		-1, // Check
 		-1, // Preamble
 		-1, // Checktype
+		-1, // ActionList
 		-1, // Action
 		-1, // ParameterList
 		-1, // Parameters
@@ -645,6 +682,7 @@ var gotoTab = gotoTable{
 		-1, // Check
 		-1, // Preamble
 		-1, // Checktype
+		-1, // ActionList
 		-1, // Action
 		-1, // ParameterList
 		-1, // Parameters
@@ -662,6 +700,7 @@ var gotoTab = gotoTable{
 		-1, // Check
 		-1, // Preamble
 		-1, // Checktype
+		-1, // ActionList
 		-1, // Action
 		-1, // ParameterList
 		-1, // Parameters
@@ -679,6 +718,7 @@ var gotoTab = gotoTable{
 		-1, // Check
 		-1, // Preamble
 		-1, // Checktype
+		-1, // ActionList
 		-1, // Action
 		-1, // ParameterList
 		-1, // Parameters
@@ -696,6 +736,7 @@ var gotoTab = gotoTable{
 		-1, // Check
 		-1, // Preamble
 		-1, // Checktype
+		-1, // ActionList
 		-1, // Action
 		-1, // ParameterList
 		-1, // Parameters
@@ -713,7 +754,8 @@ var gotoTab = gotoTable{
 		-1, // Check
 		-1, // Preamble
 		-1, // Checktype
-		42, // Action
+		44, // ActionList
+		36, // Action
 		-1, // ParameterList
 		-1, // Parameters
 		-1, // IntAmount
@@ -730,6 +772,79 @@ var gotoTab = gotoTable{
 		-1, // Check
 		-1, // Preamble
 		-1, // Checktype
+		-1, // ActionList
+		-1, // Action
+		-1, // ParameterList
+		-1, // Parameters
+		-1, // IntAmount
+		-1, // HumanAmount
+		-1, // Metric
+		-1, // Rule
+		-1, // RuleList
+		
+
+	},
+	gotoRow{ // S43
+		
+		-1, // S'
+		-1, // Check
+		-1, // Preamble
+		-1, // Checktype
+		-1, // ActionList
+		-1, // Action
+		-1, // ParameterList
+		-1, // Parameters
+		-1, // IntAmount
+		-1, // HumanAmount
+		-1, // Metric
+		-1, // Rule
+		-1, // RuleList
+		
+
+	},
+	gotoRow{ // S44
+		
+		-1, // S'
+		-1, // Check
+		-1, // Preamble
+		-1, // Checktype
+		-1, // ActionList
+		-1, // Action
+		-1, // ParameterList
+		-1, // Parameters
+		-1, // IntAmount
+		-1, // HumanAmount
+		-1, // Metric
+		-1, // Rule
+		-1, // RuleList
+		
+
+	},
+	gotoRow{ // S45
+		
+		-1, // S'
+		-1, // Check
+		-1, // Preamble
+		-1, // Checktype
+		46, // ActionList
+		36, // Action
+		-1, // ParameterList
+		-1, // Parameters
+		-1, // IntAmount
+		-1, // HumanAmount
+		-1, // Metric
+		-1, // Rule
+		-1, // RuleList
+		
+
+	},
+	gotoRow{ // S46
+		
+		-1, // S'
+		-1, // Check
+		-1, // Preamble
+		-1, // Checktype
+		-1, // ActionList
 		-1, // Action
 		-1, // ParameterList
 		-1, // Parameters

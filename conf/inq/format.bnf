@@ -45,15 +45,24 @@ Check
   | Preamble "host" RuleList                        << ast.NewHostCheck($2), nil >>;
 
 Preamble
- : "check"          << $0, nil >>;
+ : "check"          << $0, nil >>
+;
 
 Checktype
  : "process"        << $0, nil >>
- | "service"        << $0, nil >>;
+ | "service"        << $0, nil >>
+;
+
+ActionList
+  : Action                   << []ast.Action{$0.(ast.Action)}, nil >>
+  | Action "," ActionList    << ast.AppendAction($0, $2) >>
+;
 
 Action
-  : "restart"       << $0, nil >>
-  | "alert"         << $0, nil >>;
+  : "restart"       << ast.AddAction($0, nil) >>
+  | "alert"         << ast.AddAction($0, nil) >>
+  | "alert" name    << ast.AddAction($0, $1) >>
+;
 
 ParameterList
   : "with" Parameters   << $1, nil >>;
@@ -84,8 +93,8 @@ Metric
   | name "(" uint_lit ")"       << ast.Metric($0, $2) >>;
 
 Rule
-  : "if" Metric operator HumanAmount "then" Action  << ast.NewRule($1, $2, $3, $5, int64(1)), nil >>
-  | "if" Metric operator HumanAmount "for" IntAmount "cycles" "then" Action  << ast.NewRule($1, $2, $3, $8, $5), nil >>;
+  : "if" Metric operator HumanAmount "then" ActionList  << ast.NewRule($1, $2, $3, $5, int64(1)), nil >>
+  | "if" Metric operator HumanAmount "for" IntAmount "cycles" "then" ActionList  << ast.NewRule($1, $2, $3, $8, $5), nil >>;
 
 RuleList
   : Rule                              << ast.NewRuleList($0), nil >>
