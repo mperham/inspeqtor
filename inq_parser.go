@@ -73,20 +73,23 @@ func convertHost(inqhost *ast.HostCheck) (*Host, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	storage := metrics.NewHostStore()
+	h := Host{hostname, nil, storage}
 	rules := make([]*Rule, len(inqhost.Rules))
 	for i, rule := range inqhost.Rules {
-		rule, err := convertRule(storage, rule, nil)
+		rule, err := convertRule(h, rule, nil)
 		util.DebugDebug("Rule: %+v", *rule)
 		if err != nil {
 			return nil, err
 		}
 		rules[i] = rule
 	}
-	return &Host{hostname, rules, storage}, nil
+	h.Rules = rules
+	return &h, nil
 }
 
-func convertRule(storage metrics.Storage, inqrule *ast.Rule, actionList []*Action) (*Rule, error) {
+func convertRule(check Checkable, inqrule *ast.Rule, actionList []*Action) (*Rule, error) {
 	op := GT
 	switch inqrule.Operator {
 	case ">":
@@ -97,33 +100,28 @@ func convertRule(storage metrics.Storage, inqrule *ast.Rule, actionList []*Actio
 		return nil, errors.New("Unknown operator: " + inqrule.Operator)
 	}
 
-	threshold, err := storage.PrepareRule(inqrule.Metric.Family, inqrule.Metric.Name, inqrule.Value)
+	threshold, err := check.MetricData().PrepareRule(inqrule.Metric.Family, inqrule.Metric.Name, inqrule.Value)
 	if err != nil {
 		return nil, err
 	}
 
-	return &Rule{inqrule.Metric.Family,
-			inqrule.Metric.Name,
-			op,
-			threshold,
-			inqrule.CycleCount,
-			0,
-			nil},
-		nil
+	return &Rule{check, inqrule.Metric.Family, inqrule.Metric.Name,
+		op, threshold, 0, inqrule.CycleCount, 0, Undetermined, nil}, nil
 }
 
 func convertService(inqsvc *ast.ProcessCheck) (*Service, error) {
 	rules := make([]*Rule, len(inqsvc.Rules))
 	storage := metrics.NewProcessStore()
+	svc := Service{inqsvc.Name, 0, 0, nil, inqsvc.Parameters, storage, nil}
 
 	for i, rule := range inqsvc.Rules {
-		rule, err := convertRule(storage, rule, nil)
+		rule, err := convertRule(svc, rule, nil)
 		if err != nil {
 			return nil, err
 		}
 		util.DebugDebug("Rule: %+v", *rule)
 		rules[i] = rule
 	}
-	svc := &Service{inqsvc.Name, 0, 0, rules, inqsvc.Parameters, storage, nil}
-	return svc, nil
+	svc.Rules = rules
+	return &svc, nil
 }

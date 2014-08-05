@@ -1,6 +1,8 @@
 package inspeqtor
 
 import (
+	"errors"
+	"fmt"
 	"inspeqtor/conf/global/ast"
 	"inspeqtor/conf/global/lexer"
 	"inspeqtor/conf/global/parser"
@@ -26,7 +28,7 @@ type AlertRoute struct {
 
 type ConfigFile struct {
 	Top         GlobalConfig
-	AlertRoutes []AlertRoute
+	AlertRoutes map[string]AlertRoute
 }
 
 func ParseGlobal(rootDir string) (*ConfigFile, error) {
@@ -61,9 +63,16 @@ func ParseGlobal(rootDir string) (*ConfigFile, error) {
 			}
 			config.Top.CycleTime = uint16(time)
 		}
-		config.AlertRoutes = []AlertRoute{}
+		config.AlertRoutes = map[string]AlertRoute{}
 		for _, v := range ast.Routes {
-			config.AlertRoutes = append(config.AlertRoutes, AlertRoute{v.Name, v.Channel, v.Config})
+			ar, err := ValidateChannel(v.Name, v.Channel, v.Config)
+			if err != nil {
+				return nil, err
+			}
+			if _, ok := config.AlertRoutes[v.Name]; ok {
+				return nil, errors.New(fmt.Sprintf("Duplicate alert config for '%s'", v.Name))
+			}
+			config.AlertRoutes[v.Name] = ar
 		}
 		return &config, nil
 	} else {

@@ -11,9 +11,9 @@ const (
 	emailTemplate = `
 From: {{.Config.From}}
 To: {{.Config.To}}
-Subject: [{{.Alert.Service.Name}}] {{.Alert.Rule.MetricName}} is {{.Alert.Rule.Op}} than {{.Alert.Rule.Threshold}}
+Subject: [{{.Alert.Rule.EntityName}}] {{.Alert.Rule.MetricName}} is {{.Alert.Rule.Op}} than {{.Alert.Rule.Threshold}}
 
-[{{.Alert.Service.Name}}] {{.Alert.Rule.MetricName}} is {{.Alert.Rule.Op}} than {{.Alert.Rule.Threshold}}
+[{{.Alert.Rule.EntityName}}] {{.Alert.Rule.MetricName}} is {{.Alert.Rule.Op}} than {{.Alert.Rule.Threshold}}
 `
 )
 
@@ -34,6 +34,10 @@ type EmailConfig struct {
 type EmailAlert struct {
 	Alert  *Alert
 	Config *EmailConfig
+}
+
+func ValidateChannel(name string, channel string, config map[string]string) (AlertRoute, error) {
+	return AlertRoute{name, channel, config}, nil
 }
 
 func SetupNotification(name string, vars map[string]string) (Action, error) {
@@ -96,11 +100,11 @@ func (e *EmailConfig) Setup(hash map[string]string) error {
 	}
 	host, ok := hash["hostname"]
 	if !ok {
-		return errors.New("You must have a hostname configured to send email")
+		return errors.New("You must have a 'hostname' parameter pointing to your SMTP server")
 	}
-	to, ok := hash["to"]
+	to, ok := hash["email"]
 	if !ok {
-		return errors.New("You must have a to address configured to send email")
+		return errors.New("You are missing the 'email' parameter, needed to specify a To address for your alert emails")
 	}
 	from, ok := hash["from"]
 	if !ok {

@@ -13,7 +13,7 @@ func TestGmailNotifier(t *testing.T) {
 	i, err := SetupNotification("gmail", map[string]string{
 		"username": "mike",
 		"password": "fuzzbucket",
-		"to":       "mike@example.org",
+		"email":    "mike@example.org",
 	})
 	assert.Nil(t, err)
 	assert.NotNil(t, i)
@@ -24,7 +24,7 @@ func TestEmailNotifier(t *testing.T) {
 		"username": "mike",
 		"password": "fuzzbucket",
 		"hostname": "smtp.example.com",
-		"to":       "mike@example.org",
+		"email":    "mike@example.org",
 	})
 	assert.Nil(t, err)
 	assert.NotNil(t, i)
@@ -34,16 +34,16 @@ func TestMissingEmailNotifier(t *testing.T) {
 	i, err := SetupNotification("email", map[string]string{
 		"username": "mike",
 		"password": "fuzzbucket",
-		"to":       "mike@example.org",
+		"email":    "mike@example.org",
 	})
 	assert.NotNil(t, err)
 	assert.Nil(t, i)
 }
 
 func TestEmailTrigger(t *testing.T) {
+	svc := Service{"mysql", 0, services.Down, nil, nil, metrics.NewProcessStore(), nil}
 	alert := &Alert{
-		&Service{"mysql", 0, services.Down, nil, nil, metrics.NewProcessStore(), nil},
-		&Rule{"memory", "rss", GT, 64 * 1024 * 1024, 1, 0, nil},
+		&Rule{svc, "memory", "rss", GT, 64 * 1024 * 1024, 0, 1, 0, Undetermined, nil},
 	}
 
 	err := validEmailSetup().TriggerEmail(alert, func(e *EmailConfig, doc bytes.Buffer) error {

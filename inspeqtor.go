@@ -126,18 +126,18 @@ func (i *Inspeqtor) scanSystem(firstTime bool) {
 	barrier.Wait()
 	util.Debug("Collection complete in " + time.Now().Sub(start).String())
 
-	rulesToAlert := []*Rule{}
+	rulesToAlert := []Alert{}
 	for _, rule := range i.Host.Rules {
-		status := rule.Check(i.Host.Name, i.Host.Metrics)
-		if status == Triggered {
-			rulesToAlert = append(rulesToAlert, rule)
+		rule := rule.Check()
+		if rule != nil {
+			rulesToAlert = append(rulesToAlert, Alert{rule})
 		}
 	}
 	for _, svc := range i.Services {
 		for _, rule := range svc.Rules {
-			status := rule.Check(svc.Name, svc.Metrics)
-			if status == Triggered {
-				rulesToAlert = append(rulesToAlert, rule)
+			rule := rule.Check()
+			if rule != nil {
+				rulesToAlert = append(rulesToAlert, Alert{rule})
 			}
 		}
 	}
@@ -149,7 +149,7 @@ func (i *Inspeqtor) scanSystem(firstTime bool) {
 	i.fireAlerts(rulesToAlert)
 }
 
-func (i *Inspeqtor) fireAlerts(rules []*Rule) error {
+func (i *Inspeqtor) fireAlerts(alerts []Alert) error {
 	return nil
 }
 
@@ -167,16 +167,16 @@ Resolve each defined service to its managing init system.
 func (i *Inspeqtor) resolveServices() {
 	for _, svc := range i.Services {
 		for _, sm := range i.ServiceManagers {
-			pid, status, err := sm.LookupService(svc.Name)
+			pid, status, err := sm.LookupService(svc.Name())
 			if err != nil {
 				util.Warn(err.Error())
 				return
 			}
 			if pid == -1 {
-				util.Debug(sm.Name() + " doesn't have " + svc.Name)
+				util.Debug(sm.Name() + " doesn't have " + svc.Name())
 				return
 			}
-			util.Info("Found " + sm.Name() + "/" + svc.Name + " with PID " + strconv.Itoa(int(pid)))
+			util.Info("Found " + sm.Name() + "/" + svc.Name() + " with PID " + strconv.Itoa(int(pid)))
 			svc.PID = pid
 			svc.Status = status
 			svc.Manager = sm
@@ -205,7 +205,7 @@ func (i *Inspeqtor) collectService(svc *Service, completeCallback func(*Service)
 		return
 	}
 	if svc.Status == services.Starting {
-		pid, status, err := svc.Manager.LookupService(svc.Name)
+		pid, status, err := svc.Manager.LookupService(svc.Name())
 		if err != nil {
 			util.Warn(err.Error())
 		}
