@@ -15,10 +15,14 @@ var actionTab = actionTable{
 		actions: [numSymbols]action{
 			nil,		/* INVALID */
 			nil,		/* $ */
-			nil,		/* [ */
-			shift(3),		/* value */
-			nil,		/* ] */
-			nil,		/* : */
+			shift(4),		/* send */
+			nil,		/* alerts */
+			nil,		/* via */
+			nil,		/* value */
+			nil,		/* with */
+			nil,		/* to */
+			nil,		/* , */
+			shift(5),		/* set */
 			
 		},
 
@@ -28,10 +32,14 @@ var actionTab = actionTable{
 		actions: [numSymbols]action{
 			nil,		/* INVALID */
 			accept(true),		/* $ */
-			nil,		/* [ */
+			nil,		/* send */
+			nil,		/* alerts */
+			nil,		/* via */
 			nil,		/* value */
-			nil,		/* ] */
-			nil,		/* : */
+			nil,		/* with */
+			nil,		/* to */
+			nil,		/* , */
+			nil,		/* set */
 			
 		},
 
@@ -41,10 +49,14 @@ var actionTab = actionTable{
 		actions: [numSymbols]action{
 			nil,		/* INVALID */
 			reduce(1),		/* $, reduce: Config */
-			shift(7),		/* [ */
-			shift(3),		/* value */
-			nil,		/* ] */
-			nil,		/* : */
+			shift(4),		/* send */
+			nil,		/* alerts */
+			nil,		/* via */
+			nil,		/* value */
+			nil,		/* with */
+			nil,		/* to */
+			nil,		/* , */
+			shift(5),		/* set */
 			
 		},
 
@@ -53,11 +65,15 @@ var actionTab = actionTable{
 				canRecover: false,
 		actions: [numSymbols]action{
 			nil,		/* INVALID */
-			nil,		/* $ */
-			nil,		/* [ */
+			reduce(2),		/* $, reduce: Config */
+			shift(4),		/* send */
+			nil,		/* alerts */
+			nil,		/* via */
 			nil,		/* value */
-			nil,		/* ] */
-			reduce(8),		/* :, reduce: Key */
+			nil,		/* with */
+			nil,		/* to */
+			nil,		/* , */
+			shift(5),		/* set */
 			
 		},
 
@@ -66,11 +82,15 @@ var actionTab = actionTable{
 				canRecover: false,
 		actions: [numSymbols]action{
 			nil,		/* INVALID */
-			reduce(5),		/* $, reduce: ConfigList */
-			reduce(5),		/* [, reduce: ConfigList */
-			reduce(5),		/* value, reduce: ConfigList */
-			nil,		/* ] */
-			nil,		/* : */
+			nil,		/* $ */
+			nil,		/* send */
+			shift(8),		/* alerts */
+			nil,		/* via */
+			nil,		/* value */
+			nil,		/* with */
+			nil,		/* to */
+			nil,		/* , */
+			nil,		/* set */
 			
 		},
 
@@ -80,10 +100,14 @@ var actionTab = actionTable{
 		actions: [numSymbols]action{
 			nil,		/* INVALID */
 			nil,		/* $ */
-			nil,		/* [ */
-			nil,		/* value */
-			nil,		/* ] */
-			shift(9),		/* : */
+			nil,		/* send */
+			nil,		/* alerts */
+			nil,		/* via */
+			shift(9),		/* value */
+			nil,		/* with */
+			nil,		/* to */
+			nil,		/* , */
+			nil,		/* set */
 			
 		},
 
@@ -92,11 +116,15 @@ var actionTab = actionTable{
 				canRecover: false,
 		actions: [numSymbols]action{
 			nil,		/* INVALID */
-			reduce(2),		/* $, reduce: Config */
-			shift(10),		/* [ */
+			reduce(3),		/* $, reduce: Config */
+			nil,		/* send */
+			nil,		/* alerts */
+			nil,		/* via */
 			nil,		/* value */
-			nil,		/* ] */
-			nil,		/* : */
+			nil,		/* with */
+			nil,		/* to */
+			nil,		/* , */
+			nil,		/* set */
 			
 		},
 
@@ -105,11 +133,15 @@ var actionTab = actionTable{
 				canRecover: false,
 		actions: [numSymbols]action{
 			nil,		/* INVALID */
-			nil,		/* $ */
-			nil,		/* [ */
-			shift(11),		/* value */
-			nil,		/* ] */
-			nil,		/* : */
+			reduce(4),		/* $, reduce: Config */
+			nil,		/* send */
+			nil,		/* alerts */
+			nil,		/* via */
+			nil,		/* value */
+			nil,		/* with */
+			nil,		/* to */
+			nil,		/* , */
+			nil,		/* set */
 			
 		},
 
@@ -118,11 +150,15 @@ var actionTab = actionTable{
 				canRecover: false,
 		actions: [numSymbols]action{
 			nil,		/* INVALID */
-			reduce(6),		/* $, reduce: ConfigList */
-			reduce(6),		/* [, reduce: ConfigList */
-			reduce(6),		/* value, reduce: ConfigList */
-			nil,		/* ] */
-			nil,		/* : */
+			nil,		/* $ */
+			nil,		/* send */
+			nil,		/* alerts */
+			shift(10),		/* via */
+			nil,		/* value */
+			nil,		/* with */
+			shift(11),		/* to */
+			nil,		/* , */
+			nil,		/* set */
 			
 		},
 
@@ -132,10 +168,14 @@ var actionTab = actionTable{
 		actions: [numSymbols]action{
 			nil,		/* INVALID */
 			nil,		/* $ */
-			nil,		/* [ */
+			nil,		/* send */
+			nil,		/* alerts */
+			nil,		/* via */
 			shift(12),		/* value */
-			nil,		/* ] */
-			nil,		/* : */
+			nil,		/* with */
+			nil,		/* to */
+			nil,		/* , */
+			nil,		/* set */
 			
 		},
 
@@ -145,10 +185,14 @@ var actionTab = actionTable{
 		actions: [numSymbols]action{
 			nil,		/* INVALID */
 			nil,		/* $ */
-			nil,		/* [ */
-			shift(14),		/* value */
-			nil,		/* ] */
-			nil,		/* : */
+			nil,		/* send */
+			nil,		/* alerts */
+			nil,		/* via */
+			shift(13),		/* value */
+			nil,		/* with */
+			nil,		/* to */
+			nil,		/* , */
+			nil,		/* set */
 			
 		},
 
@@ -158,10 +202,14 @@ var actionTab = actionTable{
 		actions: [numSymbols]action{
 			nil,		/* INVALID */
 			nil,		/* $ */
-			nil,		/* [ */
-			nil,		/* value */
-			shift(15),		/* ] */
-			nil,		/* : */
+			nil,		/* send */
+			nil,		/* alerts */
+			nil,		/* via */
+			shift(14),		/* value */
+			nil,		/* with */
+			nil,		/* to */
+			nil,		/* , */
+			nil,		/* set */
 			
 		},
 
@@ -170,11 +218,15 @@ var actionTab = actionTable{
 				canRecover: false,
 		actions: [numSymbols]action{
 			nil,		/* INVALID */
-			reduce(9),		/* $, reduce: Value */
-			reduce(9),		/* [, reduce: Value */
-			reduce(9),		/* value, reduce: Value */
-			nil,		/* ] */
-			nil,		/* : */
+			reduce(9),		/* $, reduce: SetStatement */
+			reduce(9),		/* send, reduce: SetStatement */
+			nil,		/* alerts */
+			nil,		/* via */
+			nil,		/* value */
+			nil,		/* with */
+			nil,		/* to */
+			nil,		/* , */
+			reduce(9),		/* set, reduce: SetStatement */
 			
 		},
 
@@ -183,11 +235,15 @@ var actionTab = actionTable{
 				canRecover: false,
 		actions: [numSymbols]action{
 			nil,		/* INVALID */
-			reduce(7),		/* $, reduce: KVPair */
-			reduce(7),		/* [, reduce: KVPair */
-			reduce(7),		/* value, reduce: KVPair */
-			nil,		/* ] */
-			nil,		/* : */
+			nil,		/* $ */
+			nil,		/* send */
+			nil,		/* alerts */
+			nil,		/* via */
+			nil,		/* value */
+			shift(15),		/* with */
+			nil,		/* to */
+			nil,		/* , */
+			nil,		/* set */
 			
 		},
 
@@ -197,10 +253,14 @@ var actionTab = actionTable{
 		actions: [numSymbols]action{
 			nil,		/* INVALID */
 			nil,		/* $ */
-			nil,		/* [ */
+			nil,		/* send */
+			nil,		/* alerts */
+			shift(16),		/* via */
 			nil,		/* value */
-			shift(16),		/* ] */
-			nil,		/* : */
+			nil,		/* with */
+			nil,		/* to */
+			nil,		/* , */
+			nil,		/* set */
 			
 		},
 
@@ -210,10 +270,14 @@ var actionTab = actionTable{
 		actions: [numSymbols]action{
 			nil,		/* INVALID */
 			nil,		/* $ */
-			nil,		/* [ */
-			shift(3),		/* value */
-			nil,		/* ] */
-			nil,		/* : */
+			nil,		/* send */
+			nil,		/* alerts */
+			nil,		/* via */
+			shift(17),		/* value */
+			nil,		/* with */
+			nil,		/* to */
+			nil,		/* , */
+			nil,		/* set */
 			
 		},
 
@@ -223,10 +287,14 @@ var actionTab = actionTable{
 		actions: [numSymbols]action{
 			nil,		/* INVALID */
 			nil,		/* $ */
-			nil,		/* [ */
-			shift(3),		/* value */
-			nil,		/* ] */
-			nil,		/* : */
+			nil,		/* send */
+			nil,		/* alerts */
+			nil,		/* via */
+			shift(19),		/* value */
+			nil,		/* with */
+			nil,		/* to */
+			nil,		/* , */
+			nil,		/* set */
 			
 		},
 
@@ -235,11 +303,15 @@ var actionTab = actionTable{
 				canRecover: false,
 		actions: [numSymbols]action{
 			nil,		/* INVALID */
-			reduce(3),		/* $, reduce: ContextList */
-			reduce(3),		/* [, reduce: ContextList */
-			shift(3),		/* value */
-			nil,		/* ] */
-			nil,		/* : */
+			nil,		/* $ */
+			nil,		/* send */
+			nil,		/* alerts */
+			nil,		/* via */
+			shift(20),		/* value */
+			nil,		/* with */
+			nil,		/* to */
+			nil,		/* , */
+			nil,		/* set */
 			
 		},
 
@@ -248,11 +320,117 @@ var actionTab = actionTable{
 				canRecover: false,
 		actions: [numSymbols]action{
 			nil,		/* INVALID */
-			reduce(4),		/* $, reduce: ContextList */
-			reduce(4),		/* [, reduce: ContextList */
-			shift(3),		/* value */
-			nil,		/* ] */
-			nil,		/* : */
+			reduce(5),		/* $, reduce: RouteStatement */
+			reduce(5),		/* send, reduce: RouteStatement */
+			nil,		/* alerts */
+			nil,		/* via */
+			nil,		/* value */
+			nil,		/* with */
+			nil,		/* to */
+			nil,		/* , */
+			reduce(5),		/* set, reduce: RouteStatement */
+			
+		},
+
+	},
+	actionRow{ // S19
+				canRecover: false,
+		actions: [numSymbols]action{
+			nil,		/* INVALID */
+			nil,		/* $ */
+			nil,		/* send */
+			nil,		/* alerts */
+			nil,		/* via */
+			nil,		/* value */
+			shift(21),		/* with */
+			nil,		/* to */
+			nil,		/* , */
+			nil,		/* set */
+			
+		},
+
+	},
+	actionRow{ // S20
+				canRecover: false,
+		actions: [numSymbols]action{
+			nil,		/* INVALID */
+			reduce(7),		/* $, reduce: ChannelParameters */
+			reduce(7),		/* send, reduce: ChannelParameters */
+			nil,		/* alerts */
+			nil,		/* via */
+			nil,		/* value */
+			nil,		/* with */
+			nil,		/* to */
+			shift(22),		/* , */
+			reduce(7),		/* set, reduce: ChannelParameters */
+			
+		},
+
+	},
+	actionRow{ // S21
+				canRecover: false,
+		actions: [numSymbols]action{
+			nil,		/* INVALID */
+			nil,		/* $ */
+			nil,		/* send */
+			nil,		/* alerts */
+			nil,		/* via */
+			shift(17),		/* value */
+			nil,		/* with */
+			nil,		/* to */
+			nil,		/* , */
+			nil,		/* set */
+			
+		},
+
+	},
+	actionRow{ // S22
+				canRecover: false,
+		actions: [numSymbols]action{
+			nil,		/* INVALID */
+			nil,		/* $ */
+			nil,		/* send */
+			nil,		/* alerts */
+			nil,		/* via */
+			shift(17),		/* value */
+			nil,		/* with */
+			nil,		/* to */
+			nil,		/* , */
+			nil,		/* set */
+			
+		},
+
+	},
+	actionRow{ // S23
+				canRecover: false,
+		actions: [numSymbols]action{
+			nil,		/* INVALID */
+			reduce(6),		/* $, reduce: RouteStatement */
+			reduce(6),		/* send, reduce: RouteStatement */
+			nil,		/* alerts */
+			nil,		/* via */
+			nil,		/* value */
+			nil,		/* with */
+			nil,		/* to */
+			nil,		/* , */
+			reduce(6),		/* set, reduce: RouteStatement */
+			
+		},
+
+	},
+	actionRow{ // S24
+				canRecover: false,
+		actions: [numSymbols]action{
+			nil,		/* INVALID */
+			reduce(8),		/* $, reduce: ChannelParameters */
+			reduce(8),		/* send, reduce: ChannelParameters */
+			nil,		/* alerts */
+			nil,		/* via */
+			nil,		/* value */
+			nil,		/* with */
+			nil,		/* to */
+			nil,		/* , */
+			reduce(8),		/* set, reduce: ChannelParameters */
 			
 		},
 

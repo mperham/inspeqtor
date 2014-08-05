@@ -2,64 +2,48 @@ package ast
 
 import (
 	"inspeqtor/conf/global/token"
-	"strings"
 )
 
-type KVPair struct {
-	Key   string
-	Value string
-}
-
-func NewKVPair(k interface{}, v interface{}) KVPair {
+func AppendPair(k interface{}, v interface{}, hash interface{}) map[string]string {
 	key := string(k.(*token.Token).Lit)
-	value := strings.Trim(string(v.(*token.Token).Lit), "\"")
-	return KVPair{
-		key, value,
-	}
-}
+	value := string(v.(*token.Token).Lit)
 
-func NewPair(pair interface{}) map[string]string {
-	hash := make(map[string]string, 1)
-	hash[pair.(KVPair).Key] = pair.(KVPair).Value
-	return hash
-}
-
-func AppendPair(hash interface{}, pair interface{}) map[string]string {
 	h := hash.(map[string]string)
-	h[pair.(KVPair).Key] = pair.(KVPair).Value
+	h[key] = value
 	return h
 }
 
-type Context struct {
-	Name   string
-	Config map[string]string
+type Route struct {
+	Name    string
+	Channel string
+	Config  map[string]string
 }
 
-func NewContext(name interface{}, config interface{}) []Context {
-	return []Context{
-		Context{string(name.(*token.Token).Lit), config.(map[string]string)},
+type Config struct {
+	Variables map[string]string
+	Routes    []Route
+}
+
+func NewRoute(name interface{}, channel interface{}, config interface{}) (Route, error) {
+	nm := ""
+	if name != nil {
+		nm = string(name.(*token.Token).Lit)
 	}
+	return Route{nm, string(channel.(*token.Token).Lit), config.(map[string]string)}, nil
 }
 
-func AppendContext(contexts interface{}, name interface{}, config interface{}) []Context {
-	c := Context{string(name.(*token.Token).Lit), config.(map[string]string)}
-	return append(contexts.([]Context), c)
+func AddRoute(route interface{}, config interface{}) (Config, error) {
+	c := config.(Config)
+	r := route.(Route)
+	c.Routes = append(c.Routes, r)
+	return c, nil
 }
 
-type ConfigFile struct {
-	TopConfig  map[string]string
-	Contextual map[string]map[string]string
-}
-
-func GlobalConfig(config interface{}, contexts interface{}) ConfigFile {
-	g := ConfigFile{
-		TopConfig: config.(map[string]string),
+func AddSet(set interface{}, config interface{}) (Config, error) {
+	c := config.(Config)
+	vars := set.(map[string]string)
+	for k, v := range vars {
+		c.Variables[k] = v
 	}
-
-	c := contexts.([]Context)
-	g.Contextual = make(map[string]map[string]string, len(c))
-	for _, ctx := range c {
-		g.Contextual[ctx.Name] = ctx.Config
-	}
-	return g
+	return c, nil
 }

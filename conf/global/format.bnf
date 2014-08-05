@@ -27,26 +27,29 @@ _letter : 'a'-'z' | 'A'-'Z' ;
 _digit : '0'-'9' ;
 _keychar : _letter | _digit | '_';
 
-_valuechar : _keychar | '!' | '@' | '#' | '$' | '%' | '&' | '\'' | '*' | '+' | '-' | '/' | ';' | '=' | '?' | '^' | '‘' | '{' | '|' | '}' | '~' | '"' | '\u0100'-'\U0010FFFF' ;
+_valuechar : _keychar | '!' | '@' | '.' | '#' | '$' | '%' | '&' | '\'' | '*' | '+' | '-' | '/' | ';' | ':' | '=' | '?' | '^' | '‘' | '{' | '|' | '}' | '~' | '"' | '\u0100'-'\U0010FFFF' ;
 
-value : (_valuechar) {_valuechar} ;
+value : (_keychar) {_valuechar} ;
 
 << import "inspeqtor/conf/global/ast" >>
 
 Config
-  : ConfigList                            << ast.GlobalConfig($0, nil), nil >>
-  | ConfigList ContextList                << ast.GlobalConfig($0, $1), nil >>;
+  : SetStatement                  << ast.Config{$0.(map[string]string), []ast.Route{}}, nil >>
+  | RouteStatement                << ast.Config{map[string]string{}, []ast.Route{$0.(ast.Route)}}, nil >>
+  | SetStatement Config           << ast.AddSet($0, $1) >>
+  | RouteStatement Config         << ast.AddRoute($0, $1) >>
+;
 
-ContextList
-  : "[" value "]" ConfigList                << ast.NewContext($1, $3), nil >>
-  | ContextList "[" value "]" ConfigList    << ast.AppendContext($0, $2, $4), nil >>;
+RouteStatement
+  : "send" "alerts" "via" value "with" ChannelParameters            << ast.NewRoute(nil, $3, $5) >>
+  | "send" "alerts" "to" value "via" value "with" ChannelParameters << ast.NewRoute($3, $5, $7) >>
+;
 
-ConfigList
-  : KVPair                                << ast.NewPair($0), nil >>
-  | ConfigList KVPair                     << ast.AppendPair($0, $1), nil >>;
+ChannelParameters
+  : value value                          << ast.AppendPair($0, $1, map[string]string{}), nil >>
+  | value value "," ChannelParameters    << ast.AppendPair($0, $1, $3), nil >>
+;
 
-KVPair
-  : Key ":" Value            << ast.NewKVPair($0, $2), nil >>;
-
-Key: value << $0, nil >>;
-Value: value << $0, nil >>;
+SetStatement
+  : "set" value value            << ast.AppendPair($1, $2, map[string]string{}), nil >>
+;

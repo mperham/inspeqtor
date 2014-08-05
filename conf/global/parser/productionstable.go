@@ -30,93 +30,93 @@ var productionsTable = ProdTab {
 		},
 	},
 	ProdTabEntry{
-		String: `Config : ConfigList	<< ast.GlobalConfig(X[0], nil), nil >>`,
+		String: `Config : SetStatement	<< ast.Config{X[0].(map[string]string), []ast.Route{}}, nil >>`,
 		Id: "Config",
 		NTType: 1,
 		Index: 1,
 		NumSymbols: 1,
 		ReduceFunc: func(X []Attrib) (Attrib, error) {
-			return ast.GlobalConfig(X[0], nil), nil
+			return ast.Config{X[0].(map[string]string), []ast.Route{}}, nil
 		},
 	},
 	ProdTabEntry{
-		String: `Config : ConfigList ContextList	<< ast.GlobalConfig(X[0], X[1]), nil >>`,
+		String: `Config : RouteStatement	<< ast.Config{map[string]string{}, []ast.Route{X[0].(ast.Route)}}, nil >>`,
 		Id: "Config",
 		NTType: 1,
 		Index: 2,
-		NumSymbols: 2,
+		NumSymbols: 1,
 		ReduceFunc: func(X []Attrib) (Attrib, error) {
-			return ast.GlobalConfig(X[0], X[1]), nil
+			return ast.Config{map[string]string{}, []ast.Route{X[0].(ast.Route)}}, nil
 		},
 	},
 	ProdTabEntry{
-		String: `ContextList : "[" value "]" ConfigList	<< ast.NewContext(X[1], X[3]), nil >>`,
-		Id: "ContextList",
-		NTType: 2,
+		String: `Config : SetStatement Config	<< ast.AddSet(X[0], X[1]) >>`,
+		Id: "Config",
+		NTType: 1,
 		Index: 3,
+		NumSymbols: 2,
+		ReduceFunc: func(X []Attrib) (Attrib, error) {
+			return ast.AddSet(X[0], X[1])
+		},
+	},
+	ProdTabEntry{
+		String: `Config : RouteStatement Config	<< ast.AddRoute(X[0], X[1]) >>`,
+		Id: "Config",
+		NTType: 1,
+		Index: 4,
+		NumSymbols: 2,
+		ReduceFunc: func(X []Attrib) (Attrib, error) {
+			return ast.AddRoute(X[0], X[1])
+		},
+	},
+	ProdTabEntry{
+		String: `RouteStatement : "send" "alerts" "via" value "with" ChannelParameters	<< ast.NewRoute(nil, X[3], X[5]) >>`,
+		Id: "RouteStatement",
+		NTType: 2,
+		Index: 5,
+		NumSymbols: 6,
+		ReduceFunc: func(X []Attrib) (Attrib, error) {
+			return ast.NewRoute(nil, X[3], X[5])
+		},
+	},
+	ProdTabEntry{
+		String: `RouteStatement : "send" "alerts" "to" value "via" value "with" ChannelParameters	<< ast.NewRoute(X[3], X[5], X[7]) >>`,
+		Id: "RouteStatement",
+		NTType: 2,
+		Index: 6,
+		NumSymbols: 8,
+		ReduceFunc: func(X []Attrib) (Attrib, error) {
+			return ast.NewRoute(X[3], X[5], X[7])
+		},
+	},
+	ProdTabEntry{
+		String: `ChannelParameters : value value	<< ast.AppendPair(X[0], X[1], map[string]string{}), nil >>`,
+		Id: "ChannelParameters",
+		NTType: 3,
+		Index: 7,
+		NumSymbols: 2,
+		ReduceFunc: func(X []Attrib) (Attrib, error) {
+			return ast.AppendPair(X[0], X[1], map[string]string{}), nil
+		},
+	},
+	ProdTabEntry{
+		String: `ChannelParameters : value value "," ChannelParameters	<< ast.AppendPair(X[0], X[1], X[3]), nil >>`,
+		Id: "ChannelParameters",
+		NTType: 3,
+		Index: 8,
 		NumSymbols: 4,
 		ReduceFunc: func(X []Attrib) (Attrib, error) {
-			return ast.NewContext(X[1], X[3]), nil
+			return ast.AppendPair(X[0], X[1], X[3]), nil
 		},
 	},
 	ProdTabEntry{
-		String: `ContextList : ContextList "[" value "]" ConfigList	<< ast.AppendContext(X[0], X[2], X[4]), nil >>`,
-		Id: "ContextList",
-		NTType: 2,
-		Index: 4,
-		NumSymbols: 5,
-		ReduceFunc: func(X []Attrib) (Attrib, error) {
-			return ast.AppendContext(X[0], X[2], X[4]), nil
-		},
-	},
-	ProdTabEntry{
-		String: `ConfigList : KVPair	<< ast.NewPair(X[0]), nil >>`,
-		Id: "ConfigList",
-		NTType: 3,
-		Index: 5,
-		NumSymbols: 1,
-		ReduceFunc: func(X []Attrib) (Attrib, error) {
-			return ast.NewPair(X[0]), nil
-		},
-	},
-	ProdTabEntry{
-		String: `ConfigList : ConfigList KVPair	<< ast.AppendPair(X[0], X[1]), nil >>`,
-		Id: "ConfigList",
-		NTType: 3,
-		Index: 6,
-		NumSymbols: 2,
-		ReduceFunc: func(X []Attrib) (Attrib, error) {
-			return ast.AppendPair(X[0], X[1]), nil
-		},
-	},
-	ProdTabEntry{
-		String: `KVPair : Key ":" Value	<< ast.NewKVPair(X[0], X[2]), nil >>`,
-		Id: "KVPair",
+		String: `SetStatement : "set" value value	<< ast.AppendPair(X[1], X[2], map[string]string{}), nil >>`,
+		Id: "SetStatement",
 		NTType: 4,
-		Index: 7,
+		Index: 9,
 		NumSymbols: 3,
 		ReduceFunc: func(X []Attrib) (Attrib, error) {
-			return ast.NewKVPair(X[0], X[2]), nil
-		},
-	},
-	ProdTabEntry{
-		String: `Key : value	<< X[0], nil >>`,
-		Id: "Key",
-		NTType: 5,
-		Index: 8,
-		NumSymbols: 1,
-		ReduceFunc: func(X []Attrib) (Attrib, error) {
-			return X[0], nil
-		},
-	},
-	ProdTabEntry{
-		String: `Value : value	<< X[0], nil >>`,
-		Id: "Value",
-		NTType: 6,
-		Index: 9,
-		NumSymbols: 1,
-		ReduceFunc: func(X []Attrib) (Attrib, error) {
-			return X[0], nil
+			return ast.AppendPair(X[1], X[2], map[string]string{}), nil
 		},
 	},
 	

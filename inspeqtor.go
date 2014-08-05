@@ -55,6 +55,7 @@ func (i *Inspeqtor) Parse() error {
 	if err != nil {
 		return err
 	}
+	util.DebugDebug("Global config: %+v", config)
 	i.GlobalConfig = config
 
 	host, services, err := ParseInq(i.RootDir + "/conf.d")
@@ -125,14 +126,31 @@ func (i *Inspeqtor) scanSystem(firstTime bool) {
 	barrier.Wait()
 	util.Debug("Collection complete in " + time.Now().Sub(start).String())
 
+	rulesToAlert := []*Rule{}
 	for _, rule := range i.Host.Rules {
-		rule.Check(i.Host.Name, i.Host.Metrics)
+		status := rule.Check(i.Host.Name, i.Host.Metrics)
+		if status == Triggered {
+			rulesToAlert = append(rulesToAlert, rule)
+		}
 	}
 	for _, svc := range i.Services {
 		for _, rule := range svc.Rules {
-			rule.Check(svc.Name, svc.Metrics)
+			status := rule.Check(svc.Name, svc.Metrics)
+			if status == Triggered {
+				rulesToAlert = append(rulesToAlert, rule)
+			}
 		}
 	}
+
+	/*
+	   We now have a set of rules which have triggered.  We need to run
+	   the alerts for each.
+	*/
+	i.fireAlerts(rulesToAlert)
+}
+
+func (i *Inspeqtor) fireAlerts(rules []*Rule) error {
+	return nil
 }
 
 func (i *Inspeqtor) collectHost(completeCallback func()) {

@@ -3,7 +3,7 @@
 */
 package parser
 
-const numNTSymbols = 7
+const numNTSymbols = 5
 type(
 	gotoTable [numStates]gotoRow
 	gotoRow	[numNTSymbols] int
@@ -14,11 +14,9 @@ var gotoTab = gotoTable{
 		
 		-1, // S'
 		1, // Config
-		-1, // ContextList
-		2, // ConfigList
-		4, // KVPair
-		5, // Key
-		-1, // Value
+		3, // RouteStatement
+		-1, // ChannelParameters
+		2, // SetStatement
 		
 
 	},
@@ -26,35 +24,29 @@ var gotoTab = gotoTable{
 		
 		-1, // S'
 		-1, // Config
-		-1, // ContextList
-		-1, // ConfigList
-		-1, // KVPair
-		-1, // Key
-		-1, // Value
+		-1, // RouteStatement
+		-1, // ChannelParameters
+		-1, // SetStatement
 		
 
 	},
 	gotoRow{ // S2
 		
 		-1, // S'
-		-1, // Config
-		6, // ContextList
-		-1, // ConfigList
-		8, // KVPair
-		5, // Key
-		-1, // Value
+		6, // Config
+		3, // RouteStatement
+		-1, // ChannelParameters
+		2, // SetStatement
 		
 
 	},
 	gotoRow{ // S3
 		
 		-1, // S'
-		-1, // Config
-		-1, // ContextList
-		-1, // ConfigList
-		-1, // KVPair
-		-1, // Key
-		-1, // Value
+		7, // Config
+		3, // RouteStatement
+		-1, // ChannelParameters
+		2, // SetStatement
 		
 
 	},
@@ -62,11 +54,9 @@ var gotoTab = gotoTable{
 		
 		-1, // S'
 		-1, // Config
-		-1, // ContextList
-		-1, // ConfigList
-		-1, // KVPair
-		-1, // Key
-		-1, // Value
+		-1, // RouteStatement
+		-1, // ChannelParameters
+		-1, // SetStatement
 		
 
 	},
@@ -74,11 +64,9 @@ var gotoTab = gotoTable{
 		
 		-1, // S'
 		-1, // Config
-		-1, // ContextList
-		-1, // ConfigList
-		-1, // KVPair
-		-1, // Key
-		-1, // Value
+		-1, // RouteStatement
+		-1, // ChannelParameters
+		-1, // SetStatement
 		
 
 	},
@@ -86,11 +74,9 @@ var gotoTab = gotoTable{
 		
 		-1, // S'
 		-1, // Config
-		-1, // ContextList
-		-1, // ConfigList
-		-1, // KVPair
-		-1, // Key
-		-1, // Value
+		-1, // RouteStatement
+		-1, // ChannelParameters
+		-1, // SetStatement
 		
 
 	},
@@ -98,11 +84,9 @@ var gotoTab = gotoTable{
 		
 		-1, // S'
 		-1, // Config
-		-1, // ContextList
-		-1, // ConfigList
-		-1, // KVPair
-		-1, // Key
-		-1, // Value
+		-1, // RouteStatement
+		-1, // ChannelParameters
+		-1, // SetStatement
 		
 
 	},
@@ -110,11 +94,9 @@ var gotoTab = gotoTable{
 		
 		-1, // S'
 		-1, // Config
-		-1, // ContextList
-		-1, // ConfigList
-		-1, // KVPair
-		-1, // Key
-		-1, // Value
+		-1, // RouteStatement
+		-1, // ChannelParameters
+		-1, // SetStatement
 		
 
 	},
@@ -122,11 +104,9 @@ var gotoTab = gotoTable{
 		
 		-1, // S'
 		-1, // Config
-		-1, // ContextList
-		-1, // ConfigList
-		-1, // KVPair
-		-1, // Key
-		13, // Value
+		-1, // RouteStatement
+		-1, // ChannelParameters
+		-1, // SetStatement
 		
 
 	},
@@ -134,11 +114,9 @@ var gotoTab = gotoTable{
 		
 		-1, // S'
 		-1, // Config
-		-1, // ContextList
-		-1, // ConfigList
-		-1, // KVPair
-		-1, // Key
-		-1, // Value
+		-1, // RouteStatement
+		-1, // ChannelParameters
+		-1, // SetStatement
 		
 
 	},
@@ -146,11 +124,9 @@ var gotoTab = gotoTable{
 		
 		-1, // S'
 		-1, // Config
-		-1, // ContextList
-		-1, // ConfigList
-		-1, // KVPair
-		-1, // Key
-		-1, // Value
+		-1, // RouteStatement
+		-1, // ChannelParameters
+		-1, // SetStatement
 		
 
 	},
@@ -158,11 +134,9 @@ var gotoTab = gotoTable{
 		
 		-1, // S'
 		-1, // Config
-		-1, // ContextList
-		-1, // ConfigList
-		-1, // KVPair
-		-1, // Key
-		-1, // Value
+		-1, // RouteStatement
+		-1, // ChannelParameters
+		-1, // SetStatement
 		
 
 	},
@@ -170,11 +144,9 @@ var gotoTab = gotoTable{
 		
 		-1, // S'
 		-1, // Config
-		-1, // ContextList
-		-1, // ConfigList
-		-1, // KVPair
-		-1, // Key
-		-1, // Value
+		-1, // RouteStatement
+		-1, // ChannelParameters
+		-1, // SetStatement
 		
 
 	},
@@ -182,11 +154,9 @@ var gotoTab = gotoTable{
 		
 		-1, // S'
 		-1, // Config
-		-1, // ContextList
-		-1, // ConfigList
-		-1, // KVPair
-		-1, // Key
-		-1, // Value
+		-1, // RouteStatement
+		-1, // ChannelParameters
+		-1, // SetStatement
 		
 
 	},
@@ -194,11 +164,9 @@ var gotoTab = gotoTable{
 		
 		-1, // S'
 		-1, // Config
-		-1, // ContextList
-		17, // ConfigList
-		4, // KVPair
-		5, // Key
-		-1, // Value
+		-1, // RouteStatement
+		18, // ChannelParameters
+		-1, // SetStatement
 		
 
 	},
@@ -206,11 +174,9 @@ var gotoTab = gotoTable{
 		
 		-1, // S'
 		-1, // Config
-		-1, // ContextList
-		18, // ConfigList
-		4, // KVPair
-		5, // Key
-		-1, // Value
+		-1, // RouteStatement
+		-1, // ChannelParameters
+		-1, // SetStatement
 		
 
 	},
@@ -218,11 +184,9 @@ var gotoTab = gotoTable{
 		
 		-1, // S'
 		-1, // Config
-		-1, // ContextList
-		-1, // ConfigList
-		8, // KVPair
-		5, // Key
-		-1, // Value
+		-1, // RouteStatement
+		-1, // ChannelParameters
+		-1, // SetStatement
 		
 
 	},
@@ -230,11 +194,69 @@ var gotoTab = gotoTable{
 		
 		-1, // S'
 		-1, // Config
-		-1, // ContextList
-		-1, // ConfigList
-		8, // KVPair
-		5, // Key
-		-1, // Value
+		-1, // RouteStatement
+		-1, // ChannelParameters
+		-1, // SetStatement
+		
+
+	},
+	gotoRow{ // S19
+		
+		-1, // S'
+		-1, // Config
+		-1, // RouteStatement
+		-1, // ChannelParameters
+		-1, // SetStatement
+		
+
+	},
+	gotoRow{ // S20
+		
+		-1, // S'
+		-1, // Config
+		-1, // RouteStatement
+		-1, // ChannelParameters
+		-1, // SetStatement
+		
+
+	},
+	gotoRow{ // S21
+		
+		-1, // S'
+		-1, // Config
+		-1, // RouteStatement
+		23, // ChannelParameters
+		-1, // SetStatement
+		
+
+	},
+	gotoRow{ // S22
+		
+		-1, // S'
+		-1, // Config
+		-1, // RouteStatement
+		24, // ChannelParameters
+		-1, // SetStatement
+		
+
+	},
+	gotoRow{ // S23
+		
+		-1, // S'
+		-1, // Config
+		-1, // RouteStatement
+		-1, // ChannelParameters
+		-1, // SetStatement
+		
+
+	},
+	gotoRow{ // S24
+		
+		-1, // S'
+		-1, // Config
+		-1, // RouteStatement
+		-1, // ChannelParameters
+		-1, // SetStatement
 		
 
 	},

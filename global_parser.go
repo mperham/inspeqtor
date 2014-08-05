@@ -18,10 +18,15 @@ type GlobalConfig struct {
 
 var Defaults = GlobalConfig{15}
 
-type Config map[string]string
+type AlertRoute struct {
+	Name    string
+	Channel string
+	Config  map[string]string
+}
+
 type ConfigFile struct {
-	Top              GlobalConfig
-	ContextualConfig map[string]Config
+	Top         GlobalConfig
+	AlertRoutes []AlertRoute
 }
 
 func ParseGlobal(rootDir string) (*ConfigFile, error) {
@@ -41,21 +46,24 @@ func ParseGlobal(rootDir string) (*ConfigFile, error) {
 		s := lexer.NewLexer([]byte(data))
 		p := parser.NewParser()
 		obj, err := p.Parse(s)
-		ast := obj.(ast.ConfigFile)
+		if err != nil {
+			return nil, err
+		}
+		ast := obj.(ast.Config)
 
 		var config ConfigFile
 		config.Top = Defaults
-		if val, has := ast.TopConfig["cycle_time"]; has {
+		if val, has := ast.Variables["cycle_time"]; has {
 			time, err := strconv.Atoi(val)
 			if err != nil {
 				util.Warn("Invalid cycle time: " + val)
-				time = 30
+				time = 15
 			}
 			config.Top.CycleTime = uint16(time)
 		}
-		config.ContextualConfig = map[string]Config{}
-		for k, v := range ast.Contextual {
-			config.ContextualConfig[k] = v
+		config.AlertRoutes = []AlertRoute{}
+		for _, v := range ast.Routes {
+			config.AlertRoutes = append(config.AlertRoutes, AlertRoute{v.Name, v.Channel, v.Config})
 		}
 		return &config, nil
 	} else {
