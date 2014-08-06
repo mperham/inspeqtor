@@ -1,4 +1,4 @@
-check host
+check host with owner ops
   if memory(free) < 1g for 2 cycles then alert
   if cpu(user) > 95 for 2 cycles then alert
   if load(1) > 10 for 2 cycles then alert

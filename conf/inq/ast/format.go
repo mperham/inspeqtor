@@ -7,7 +7,8 @@ import (
 )
 
 type HostCheck struct {
-	Rules []*Rule
+	Rules      []Rule
+	Parameters map[string]string
 }
 
 type ProcessCheck struct {
@@ -16,7 +17,7 @@ type ProcessCheck struct {
 	Parameters map[string]string
 }
 
-type RuleList []*Rule
+type RuleList []Rule
 
 type RuleMetric struct {
 	Family string
@@ -75,22 +76,23 @@ func NewProcessCheck(checkType interface{}, name interface{}, rules interface{},
 		params.(map[string]string),
 	}
 }
-func NewHostCheck(rules interface{}) *HostCheck {
+func NewHostCheck(rules interface{}, params interface{}) *HostCheck {
 	return &HostCheck{
 		rules.(RuleList),
+		params.(map[string]string),
 	}
 }
 
 func NewRuleList(rule interface{}) RuleList {
-	return RuleList{rule.(*Rule)}
+	return RuleList{rule.(Rule)}
 }
 
 func AppendRule(list interface{}, rule interface{}) RuleList {
-	return append(list.(RuleList), rule.(*Rule))
+	return append(list.(RuleList), rule.(Rule))
 }
 
-func NewRule(metric interface{}, operator interface{}, value interface{}, actions interface{}, cycleCount interface{}) *Rule {
-	return &Rule{
+func NewRule(metric interface{}, operator interface{}, value interface{}, actions interface{}, cycleCount interface{}) Rule {
+	return Rule{
 		*metric.(*RuleMetric),
 		string(operator.(*token.Token).Lit),
 		value.(int64),

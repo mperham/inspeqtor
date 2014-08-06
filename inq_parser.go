@@ -75,21 +75,21 @@ func convertHost(inqhost *ast.HostCheck) (*Host, error) {
 	}
 
 	storage := metrics.NewHostStore()
-	h := Host{hostname, nil, storage}
-	rules := make([]*Rule, len(inqhost.Rules))
+	h := &Host{hostname, nil, storage, inqhost.Parameters}
+	rules := make([]Rule, len(inqhost.Rules))
 	for i, rule := range inqhost.Rules {
-		rule, err := convertRule(h, rule, nil)
-		util.DebugDebug("Rule: %+v", *rule)
+		rule, err := convertRule(h, rule)
+		util.DebugDebug("Rule: %+v", rule)
 		if err != nil {
 			return nil, err
 		}
-		rules[i] = rule
+		rules[i] = *rule
 	}
 	h.Rules = rules
-	return &h, nil
+	return h, nil
 }
 
-func convertRule(check Checkable, inqrule *ast.Rule, actionList []*Action) (*Rule, error) {
+func convertRule(check Checkable, inqrule ast.Rule) (*Rule, error) {
 	op := GT
 	switch inqrule.Operator {
 	case ">":
@@ -105,23 +105,36 @@ func convertRule(check Checkable, inqrule *ast.Rule, actionList []*Action) (*Rul
 		return nil, err
 	}
 
+	actions := make([]Action, len(inqrule.Actions))
+	for _, action := range inqrule.Actions {
+		act, err := convertAction(check, action.Name, action.Team)
+		if err != nil {
+			return nil, err
+		}
+		actions = append(actions, act)
+	}
+
 	return &Rule{check, inqrule.Metric.Family, inqrule.Metric.Name,
-		op, threshold, 0, inqrule.CycleCount, 0, Ok, nil}, nil
+		op, threshold, 0, inqrule.CycleCount, 0, Ok, actions}, nil
+}
+
+func convertAction(check Checkable, name string, team string) (Action, error) {
+	return nil, nil
 }
 
 func convertService(inqsvc *ast.ProcessCheck) (*Service, error) {
-	rules := make([]*Rule, len(inqsvc.Rules))
+	rules := make([]Rule, len(inqsvc.Rules))
 	storage := metrics.NewProcessStore()
-	svc := Service{inqsvc.Name, 0, 0, nil, inqsvc.Parameters, storage, nil}
+	svc := &Service{inqsvc.Name, 0, 0, nil, inqsvc.Parameters, storage, nil}
 
 	for i, rule := range inqsvc.Rules {
-		rule, err := convertRule(svc, rule, nil)
+		rule, err := convertRule(svc, rule)
 		if err != nil {
 			return nil, err
 		}
 		util.DebugDebug("Rule: %+v", *rule)
-		rules[i] = rule
+		rules[i] = *rule
 	}
 	svc.Rules = rules
-	return &svc, nil
+	return svc, nil
 }

@@ -4,27 +4,6 @@ import (
 	"inspeqtor/util"
 )
 
-type RuleState uint8
-
-const (
-	Ok RuleState = iota
-	Triggered
-	Recovered
-)
-
-type Rule struct {
-	entity       Checkable
-	metricFamily string
-	metricName   string
-	op           Operator
-	threshold    int64
-	currentValue int64
-	cycleCount   int
-	trippedCount int
-	state        RuleState
-	actions      []*Action
-}
-
 func (r Rule) MetricName() string {
 	s := r.metricFamily
 	if r.metricName != "" {

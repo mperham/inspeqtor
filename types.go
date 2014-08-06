@@ -18,44 +18,47 @@ type Service struct {
 	ServiceName string
 	PID         services.ProcessId
 	Status      services.Status
-	Rules       []*Rule
+	Rules       []Rule
 	Parameters  map[string]string
-	Metrics     metrics.Storage
-
-	// Upon bootup, we scan each init system looking for the service
-	// and cache which init system manages it for our lifetime.
-	Manager services.InitSystem
-}
-
-func (s Service) Owner() string {
-	return s.Parameters["owner"]
+	Metrics     *metrics.Storage
+	Manager     services.InitSystem
 }
 
 type Host struct {
-	Hostname string
-	Rules    []*Rule
-	Metrics  metrics.Storage
+	Hostname   string
+	Rules      []Rule
+	Metrics    *metrics.Storage
+	Parameters map[string]string
 }
 
-func (h Service) MetricData() metrics.Storage {
+func (h *Service) MetricData() *metrics.Storage {
 	return h.Metrics
 }
 
-func (h Host) MetricData() metrics.Storage {
+func (h *Host) MetricData() *metrics.Storage {
 	return h.Metrics
 }
 
-func (h Service) Name() string {
+func (h *Service) Name() string {
 	return h.ServiceName
 }
 
-func (h Host) Name() string {
+func (h *Host) Name() string {
 	return h.Hostname
+}
+
+func (h *Service) Owner() string {
+	return h.Parameters["owner"]
+}
+
+func (h *Host) Owner() string {
+	return h.Parameters["owner"]
 }
 
 type Checkable interface {
 	Name() string
-	MetricData() metrics.Storage
+	Owner() string
+	MetricData() *metrics.Storage
 }
 
 type Operator uint8
@@ -64,6 +67,27 @@ const (
 	LT Operator = iota
 	GT
 )
+
+type RuleState uint8
+
+const (
+	Ok RuleState = iota
+	Triggered
+	Recovered
+)
+
+type Rule struct {
+	entity       Checkable
+	metricFamily string
+	metricName   string
+	op           Operator
+	threshold    int64
+	currentValue int64
+	cycleCount   int
+	trippedCount int
+	state        RuleState
+	actions      []Action
+}
 
 type Alert struct {
 	Rule *Rule

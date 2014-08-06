@@ -9,8 +9,8 @@ import (
 	"strings"
 )
 
-func NewHostStore() Storage {
-	store := Storage{
+func NewHostStore() *Storage {
+	store := &Storage{
 		map[string]*family{},
 	}
 
@@ -43,7 +43,7 @@ var (
 	}
 )
 
-func CollectHostMetrics(store Storage, path string) error {
+func CollectHostMetrics(store *Storage, path string) error {
 	var err error
 
 	err = collectLoadAverage(path, store)
@@ -67,7 +67,7 @@ func CollectHostMetrics(store Storage, path string) error {
 	return nil
 }
 
-func collectMemory(path string, store Storage) error {
+func collectMemory(path string, store *Storage) error {
 	ok, err := util.FileExists(path + "/meminfo")
 	if err != nil {
 		return err
@@ -164,7 +164,7 @@ func normalizeSwap(val float64, size rune) float64 {
 	}
 }
 
-func collectLoadAverage(path string, store Storage) error {
+func collectLoadAverage(path string, store *Storage) error {
 	// TODO make this a one-time check so we don't incur the overhead
 	// on every cycle.
 	ok, err := util.FileExists(path + "/loadavg")
@@ -212,7 +212,7 @@ func collectLoadAverage(path string, store Storage) error {
 	return nil
 }
 
-func collectCpu(path string, store Storage) error {
+func collectCpu(path string, store *Storage) error {
 	ok, err := util.FileExists(path + "/stat")
 	if err != nil {
 		return err
@@ -248,7 +248,7 @@ func collectCpu(path string, store Storage) error {
 	return nil
 }
 
-func collectDisk(path string, store Storage) error {
+func collectDisk(path string, store *Storage) error {
 	var lines []string
 
 	if path == "" {

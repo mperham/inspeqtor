@@ -126,18 +126,18 @@ func (i *Inspeqtor) scanSystem(firstTime bool) {
 	barrier.Wait()
 	util.Debug("Collection complete in " + time.Now().Sub(start).String())
 
-	rulesToAlert := []Alert{}
+	rulesToAlert := []*Alert{}
 	for _, rule := range i.Host.Rules {
 		rule := rule.Check()
 		if rule != nil {
-			rulesToAlert = append(rulesToAlert, Alert{rule})
+			rulesToAlert = append(rulesToAlert, &Alert{rule})
 		}
 	}
 	for _, svc := range i.Services {
 		for _, rule := range svc.Rules {
 			rule := rule.Check()
 			if rule != nil {
-				rulesToAlert = append(rulesToAlert, Alert{rule})
+				rulesToAlert = append(rulesToAlert, &Alert{rule})
 			}
 		}
 	}
@@ -149,7 +149,12 @@ func (i *Inspeqtor) scanSystem(firstTime bool) {
 	i.fireAlerts(rulesToAlert)
 }
 
-func (i *Inspeqtor) fireAlerts(alerts []Alert) error {
+func (i *Inspeqtor) fireAlerts(alerts []*Alert) error {
+	//for _, alert := range alerts {
+	//for _, action := range alert.Rule.actions {
+	//action.Trigger(alert)
+	//}
+	//}
 	return nil
 }
 

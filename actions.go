@@ -21,9 +21,9 @@ var (
 	email = template.Must(template.New("emailTemplate").Parse(emailTemplate))
 )
 
-type EmailSender func(e *EmailConfig, doc bytes.Buffer) error
+type EmailSender func(e *EmailNotifier, doc bytes.Buffer) error
 
-type EmailConfig struct {
+type EmailNotifier struct {
 	Username string
 	Password string
 	Host     string
@@ -32,8 +32,8 @@ type EmailConfig struct {
 }
 
 type EmailAlert struct {
-	Alert  *Alert
-	Config *EmailConfig
+	*Alert
+	Config *EmailNotifier
 }
 
 func ValidateChannel(name string, channel string, config map[string]string) (AlertRoute, error) {
@@ -43,7 +43,7 @@ func ValidateChannel(name string, channel string, config map[string]string) (Ale
 func SetupNotification(name string, vars map[string]string) (Action, error) {
 	switch name {
 	case "email":
-		en := &EmailConfig{}
+		en := &EmailNotifier{}
 		err := en.Setup(vars)
 		if err != nil {
 			return nil, err
@@ -51,7 +51,7 @@ func SetupNotification(name string, vars map[string]string) (Action, error) {
 		return en, nil
 	case "gmail":
 		vars["hostname"] = "smtp.gmail.com"
-		en := &EmailConfig{}
+		en := &EmailNotifier{}
 		err := en.Setup(vars)
 		if err != nil {
 			return nil, err
@@ -62,15 +62,15 @@ func SetupNotification(name string, vars map[string]string) (Action, error) {
 	}
 }
 
-func (e *EmailConfig) Name() string {
+func (e EmailNotifier) Name() string {
 	return "email"
 }
 
-func (e *EmailConfig) Trigger(alert *Alert) error {
+func (e EmailNotifier) Trigger(alert *Alert) error {
 	return e.TriggerEmail(alert, sendEmail)
 }
 
-func (e *EmailConfig) TriggerEmail(alert *Alert, sender EmailSender) error {
+func (e *EmailNotifier) TriggerEmail(alert *Alert, sender EmailSender) error {
 	var doc bytes.Buffer
 	err := email.Execute(&doc, &EmailAlert{alert, e})
 	if err != nil {
@@ -79,7 +79,7 @@ func (e *EmailConfig) TriggerEmail(alert *Alert, sender EmailSender) error {
 	return sender(e, doc)
 }
 
-func sendEmail(e *EmailConfig, doc bytes.Buffer) error {
+func sendEmail(e *EmailNotifier, doc bytes.Buffer) error {
 	auth := smtp.PlainAuth("", e.Username, "", e.Host)
 	err := smtp.SendMail(e.Host+":587", auth, e.From,
 		[]string{e.To}, doc.Bytes())
@@ -89,7 +89,7 @@ func sendEmail(e *EmailConfig, doc bytes.Buffer) error {
 	return nil
 }
 
-func (e *EmailConfig) Setup(hash map[string]string) error {
+func (e *EmailNotifier) Setup(hash map[string]string) error {
 	usr, ok := hash["username"]
 	if !ok {
 		return errors.New("You must have a username configured to send email")

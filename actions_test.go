@@ -43,10 +43,10 @@ func TestMissingEmailNotifier(t *testing.T) {
 func TestEmailTrigger(t *testing.T) {
 	svc := Service{"mysql", 0, services.Down, nil, nil, metrics.NewProcessStore(), nil}
 	alert := &Alert{
-		&Rule{svc, "memory", "rss", GT, 64 * 1024 * 1024, 0, 1, 0, Ok, nil},
+		&Rule{&svc, "memory", "rss", GT, 64 * 1024 * 1024, 0, 1, 0, Ok, nil},
 	}
 
-	err := validEmailSetup().TriggerEmail(alert, func(e *EmailConfig, doc bytes.Buffer) error {
+	err := validEmailSetup().TriggerEmail(alert, func(e *EmailNotifier, doc bytes.Buffer) error {
 		content := string(doc.Bytes())
 		assert.True(t, strings.Index(content, "[mysql]") > 0, "email does not contain expected content")
 		assert.True(t, strings.Index(content, "memory(rss)") > 0, "email does not contain expected content")
@@ -55,7 +55,7 @@ func TestEmailTrigger(t *testing.T) {
 	assert.Nil(t, err)
 }
 
-func validEmailSetup() *EmailConfig {
-	return &EmailConfig{
+func validEmailSetup() *EmailNotifier {
+	return &EmailNotifier{
 		"mike", "fuzzbucket", "smtp.gmail.com", "mike@example.org", "mperham@gmail.com"}
 }
