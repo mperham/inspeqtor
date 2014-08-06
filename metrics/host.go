@@ -18,29 +18,29 @@ func NewHostStore() Storage {
 	store.declareGauge("load", "1", multiplyBy100)
 	store.declareGauge("load", "5", multiplyBy100)
 	store.declareGauge("load", "15", multiplyBy100)
-	store.declareCounter("cpu", "", PERCENTAGE)
-	store.declareCounter("cpu", "user", PERCENTAGE)
-	store.declareCounter("cpu", "system", PERCENTAGE)
-	store.declareCounter("cpu", "iowait", PERCENTAGE)
-	store.declareCounter("cpu", "steal", PERCENTAGE)
+	store.declareCounter("cpu", "", percentage)
+	store.declareCounter("cpu", "user", percentage)
+	store.declareCounter("cpu", "system", percentage)
+	store.declareCounter("cpu", "iowait", percentage)
+	store.declareCounter("cpu", "steal", percentage)
 	store.declareDynamicFamily("disk")
 	store.declareGauge("disk", "/", nil)
 	return store
 }
 
-func multiplyBy100(val int64) int64 {
-	return val * 100
-}
-
 const (
-	CYCLE_TICKS float64 = CLK_TCK * 15
+	cycle_ticks float64 = CLK_TCK * 15
 )
 
 var (
-	PERCENTAGE = func(cur, prev int64) int64 {
-		return int64((float64(cur-prev) / CYCLE_TICKS) * 100)
+	meminfoParser = regexp.MustCompile("([^:]+):\\s+(\\d+)")
+	swapRegexp    = regexp.MustCompile("= (\\d+\\.\\d{2}[A-Z])(.*)")
+	percentage    = func(cur, prev int64) int64 {
+		return int64((float64(cur-prev) / cycle_ticks) * 100)
 	}
-	meminfoParser *regexp.Regexp = regexp.MustCompile("([^:]+):\\s+(\\d+)")
+	multiplyBy100 = func(val int64) int64 {
+		return val * 100
+	}
 )
 
 func CollectHostMetrics(store Storage, path string) error {
@@ -163,10 +163,6 @@ func normalizeSwap(val float64, size rune) float64 {
 		return val
 	}
 }
-
-var (
-	swapRegexp = regexp.MustCompile("= (\\d+\\.\\d{2}[A-Z])(.*)")
-)
 
 func collectLoadAverage(path string, store Storage) error {
 	// TODO make this a one-time check so we don't incur the overhead

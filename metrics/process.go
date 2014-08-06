@@ -16,10 +16,10 @@ func NewProcessStore(values ...interface{}) Storage {
 
 	store.declareGauge("memory", "rss", nil)
 	store.declareGauge("memory", "vsz", nil)
-	store.declareCounter("cpu", "user", PERCENTAGE)
-	store.declareCounter("cpu", "system", PERCENTAGE)
-	store.declareCounter("cpu", "total_user", PERCENTAGE)
-	store.declareCounter("cpu", "total_system", PERCENTAGE)
+	store.declareCounter("cpu", "user", percentage)
+	store.declareCounter("cpu", "system", percentage)
+	store.declareCounter("cpu", "total_user", percentage)
+	store.declareCounter("cpu", "total_system", percentage)
 	if len(values) > 0 {
 		store.fill(values...)
 	}
