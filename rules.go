@@ -4,11 +4,10 @@ import (
 	"inspeqtor/util"
 )
 
-type RuleStatus uint8
+type RuleState uint8
 
 const (
-	Undetermined RuleStatus = iota
-	Ok
+	Ok RuleState = iota
 	Triggered
 	Recovered
 )
@@ -22,7 +21,7 @@ type Rule struct {
 	currentValue int64
 	cycleCount   int
 	trippedCount int
-	status       RuleStatus
+	state        RuleState
 	actions      []*Action
 }
 
@@ -79,13 +78,13 @@ func (rule *Rule) Check() *Rule {
 		rule.trippedCount = 0
 	}
 
-	return stateMachine[rule.status](rule, tripped)
+	return stateMachine[rule.state](rule, tripped)
 }
 
 type stateHandler func(*Rule, bool) *Rule
 
 var (
-	stateMachine = map[RuleStatus]stateHandler{
+	stateMachine = map[RuleState]stateHandler{
 		Ok:        okHandler,
 		Recovered: recoveredHandler,
 		Triggered: triggeredHandler,
@@ -95,7 +94,7 @@ var (
 func okHandler(rule *Rule, tripped bool) *Rule {
 	if tripped && rule.trippedCount == rule.cycleCount {
 		util.Warn("%s[%s] triggered.  Current value = %d", rule.entity.Name(), rule.MetricName(), rule.currentValue)
-		rule.status = Triggered
+		rule.state = Triggered
 		return rule
 	} else if tripped {
 		util.Debug("%s[%s] tripped. Current: %d, Threshold: %d", rule.entity.Name(), rule.MetricName(), rule.currentValue, rule.threshold)
@@ -106,10 +105,10 @@ func okHandler(rule *Rule, tripped bool) *Rule {
 func recoveredHandler(rule *Rule, tripped bool) *Rule {
 	if tripped && rule.trippedCount == rule.cycleCount {
 		util.Warn("%s[%s] triggered.  Current value = %d", rule.entity.Name(), rule.MetricName(), rule.currentValue)
-		rule.status = Triggered
+		rule.state = Triggered
 		return rule
 	} else {
-		rule.status = Ok
+		rule.state = Ok
 	}
 	return nil
 }
@@ -117,7 +116,7 @@ func recoveredHandler(rule *Rule, tripped bool) *Rule {
 func triggeredHandler(rule *Rule, tripped bool) *Rule {
 	if !tripped {
 		util.Info("%s[%s] recovered.", rule.entity.Name(), rule.MetricName())
-		rule.status = Recovered
+		rule.state = Recovered
 		return rule
 	} else {
 		util.Debug("%s[%s] tripped. Current: %d, Threshold: %d", rule.entity.Name(), rule.MetricName(), rule.currentValue, rule.threshold)

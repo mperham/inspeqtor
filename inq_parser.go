@@ -106,7 +106,7 @@ func convertRule(check Checkable, inqrule *ast.Rule, actionList []*Action) (*Rul
 	}
 
 	return &Rule{check, inqrule.Metric.Family, inqrule.Metric.Name,
-		op, threshold, 0, inqrule.CycleCount, 0, Undetermined, nil}, nil
+		op, threshold, 0, inqrule.CycleCount, 0, Ok, nil}, nil
 }
 
 func convertService(inqsvc *ast.ProcessCheck) (*Service, error) {
