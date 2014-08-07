@@ -25,6 +25,6 @@ upload: clean package
 	curl \
 		-T output/$(NAME)_$(VERSION)_$(ARCH).deb \
 		-umperham:${BINTRAY_API_KEY} \
-		"https://api.bintray.com/content/contribsys/releases/inspeqtor/${VERSION}/$(NAME)_$(VERSION)_$(ARCH).deb"
+		"https://api.bintray.com/content/contribsys/releases/$(NAME)/${VERSION}/$(NAME)_$(VERSION)_$(ARCH).deb;publish=1"
 
 .PHONY: all clean test build package upload
