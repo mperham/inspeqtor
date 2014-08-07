@@ -22,3 +22,6 @@ _testmain.go
 *.exe
 *.test
 .vagrant/
+output/
+.goxc.local.json
+tags
