@@ -23,5 +23,5 @@ _testmain.go
 *.test
 .vagrant/
 output/
-.goxc.local.json
 tags
+.local.sh
