@@ -1,0 +1,23 @@
+#
+# Inspeqtor is designed to monitor services.
+# Services must be controlled by your OS's init system: upstart,
+# systemd, launchd or runit.
+#
+
+#
+# Here we define the service to monitor. The name of the service
+# ('mysql') must match the name that your init system uses.
+#
+check service mysql
+  #
+  # Services can have an owner.  Any alerts for that service
+  # will route to that owner, see inspeqtor.conf for setting up owners.
+  # This line is totally optional.
+  #
+  with owner ops
+
+  #
+  # Add any specific metrics you want to verify.
+  #
+  if cpu(user) > 90% for 2 cycles then alert
+  if memory(rss) > 2g then alert

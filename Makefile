@@ -27,8 +27,12 @@ build_rpm: build
 	# gem install fpm
 	# brew install rpm
 	fpm -f -s dir -t rpm -n $(NAME) -v $(VERSION) -p output \
-		--config-file /etc/inspeqtor/inspeqtor.conf \
-		--rpm-compression bzip2 --rpm-os linux -a x86_64 $(NAME)
+		--config-files /etc/inspeqtor \
+		--rpm-compression bzip2 --rpm-os linux -a x86_64 \
+	 	$(NAME)=/usr/bin/$(NAME) \
+		packaging/$(NAME).conf.default=/etc/$(NAME)/$(NAME).conf \
+		packaging/system.inq.default=/etc/$(NAME)/conf.d/system.inq \
+		packaging/service.inq.template=/etc/$(NAME)/conf.d/service.inq.template \
 
 build_deb: build
 	# gem install fpm
@@ -42,6 +46,7 @@ build_deb: build
 	 	$(NAME)=/usr/bin/$(NAME) \
 		packaging/$(NAME).conf.default=/etc/$(NAME)/$(NAME).conf \
 		packaging/system.inq.default=/etc/$(NAME)/conf.d/system.inq \
+		packaging/service.inq.template=/etc/$(NAME)/conf.d/service.inq.template \
 
 upload: clean package
 	curl \
