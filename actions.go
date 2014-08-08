@@ -11,11 +11,34 @@ const (
 	emailTemplate = `
 From: {{.Config.From}}
 To: {{.Config.To}}
-Subject: [{{.Alert.Rule.EntityName}}] {{.Alert.Rule.MetricName}} is {{.Alert.Rule.Op}} than {{.Alert.Rule.Threshold}}
+Subject: [{{.Rule.EntityName}}] {{.Rule.MetricName}} is {{.Rule.Op}} than {{.Rule.Threshold}}
 
-[{{.Alert.Rule.EntityName}}] {{.Alert.Rule.MetricName}} is {{.Alert.Rule.Op}} than {{.Alert.Rule.Threshold}}
+[{{.Rule.EntityName}}] {{.Rule.MetricName}} is {{.Rule.Op}} than {{.Rule.Threshold}}
 `
 )
+
+type ActionBuilder func(map[string]string) (Action, error)
+
+var (
+	Actions = map[string]ActionBuilder{
+		"email": buildEmailAction,
+		"gmail": buildGmailAction,
+	}
+)
+
+func buildEmailAction(params map[string]string) (Action, error) {
+	en := &EmailNotifier{}
+	err := en.Setup(params)
+	if err != nil {
+		return nil, err
+	}
+	return en, nil
+}
+
+func buildGmailAction(params map[string]string) (Action, error) {
+	params["hostname"] = "smtp.gmail.com"
+	return buildEmailAction(params)
+}
 
 var (
 	email = template.Must(template.New("emailTemplate").Parse(emailTemplate))
@@ -38,28 +61,6 @@ type EmailAlert struct {
 
 func ValidateChannel(name string, channel string, config map[string]string) (AlertRoute, error) {
 	return AlertRoute{name, channel, config}, nil
-}
-
-func SetupNotification(name string, vars map[string]string) (Action, error) {
-	switch name {
-	case "email":
-		en := &EmailNotifier{}
-		err := en.Setup(vars)
-		if err != nil {
-			return nil, err
-		}
-		return en, nil
-	case "gmail":
-		vars["hostname"] = "smtp.gmail.com"
-		en := &EmailNotifier{}
-		err := en.Setup(vars)
-		if err != nil {
-			return nil, err
-		}
-		return en, nil
-	default:
-		return nil, nil
-	}
 }
 
 func (e EmailNotifier) Name() string {

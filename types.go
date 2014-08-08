@@ -90,7 +90,7 @@ type Rule struct {
 }
 
 type Alert struct {
-	Rule *Rule
+	*Rule
 }
 
 type Action interface {

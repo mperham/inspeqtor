@@ -10,7 +10,7 @@ import (
 )
 
 func TestGmailNotifier(t *testing.T) {
-	i, err := SetupNotification("gmail", map[string]string{
+	i, err := Actions["gmail"](map[string]string{
 		"username": "mike",
 		"password": "fuzzbucket",
 		"email":    "mike@example.org",
@@ -20,7 +20,7 @@ func TestGmailNotifier(t *testing.T) {
 }
 
 func TestEmailNotifier(t *testing.T) {
-	i, err := SetupNotification("email", map[string]string{
+	i, err := Actions["email"](map[string]string{
 		"username": "mike",
 		"password": "fuzzbucket",
 		"hostname": "smtp.example.com",
@@ -31,7 +31,7 @@ func TestEmailNotifier(t *testing.T) {
 }
 
 func TestMissingEmailNotifier(t *testing.T) {
-	i, err := SetupNotification("email", map[string]string{
+	i, err := Actions["email"](map[string]string{
 		"username": "mike",
 		"password": "fuzzbucket",
 		"email":    "mike@example.org",
