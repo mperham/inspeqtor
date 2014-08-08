@@ -1,0 +1,33 @@
+#
+# Inspeqtor's default system check.
+#
+# .inq files represent a thing to monitor and verify.
+# Inspeqtor MUST, at minimum, have a "check host" recipe.
+# system.inq is the naming convention for checking the
+# host itself.
+#
+
+check host
+
+  #
+  # Typically you want to use all your RAM but not go into swap.
+  # We'll trigger an alert if the system goes beyond 20% swap
+  # usage for more than a minute.
+  #
+  if swap > 20% for 4 cycles then alert
+
+  #
+  # You want to know if anything is using an excessive
+  # amount of CPU time.  100% is one core so this will alert if any process
+  # is pegging a core.  You'll need to increase this if you have a
+  # multi-threaded process which is designed to use many cores, e.g.
+  # many Java applications.
+  #
+  if cpu(user) > 95% for 4 cycles then alert
+
+  #
+  # Running out of disk space will make you look like a fool to the boss.
+  # Tell us if the root partition is running out of space.
+  # You can add any mount point, e.g.
+  #    if disk(/backups) > 90% then alert
+  if disk(/) > 90% then alert

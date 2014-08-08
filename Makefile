@@ -27,17 +27,21 @@ build_rpm: build
 	# gem install fpm
 	# brew install rpm
 	fpm -f -s dir -t rpm -n $(NAME) -v $(VERSION) -p output \
+		--config-file /etc/inspeqtor/inspeqtor.conf \
 		--rpm-compression bzip2 --rpm-os linux -a x86_64 $(NAME)
 
 build_deb: build
 	# gem install fpm
 	fpm -f -s dir -t deb -n $(NAME) -v $(VERSION) -p output \
-		--deb-priority optional --category admin \
+		--deb-priority optional --category admin --config-files /etc/$(NAME) \
 		--deb-compression bzip2 --after-install packaging/postinst.sh \
 	 	--before-remove packaging/prerm.sh --after-remove packaging/postrm.sh \
-		--url http://contribsys.com/inspeqtor --description "Modern service monitoring" \
+		--url http://contribsys.com/$(NAME) --description "Modern service monitoring" \
 		-m "Mike Perham <oss@contribsys.com>" --iteration $(ITERATION) --license "GPL 3.0" \
-		--vendor "Contributed Systems" -d "runit" -a amd64 $(NAME)
+		--vendor "Contributed Systems" -d "runit" -a amd64 \
+	 	$(NAME)=/usr/bin/$(NAME) \
+		packaging/$(NAME).conf.default=/etc/$(NAME)/$(NAME).conf \
+		packaging/system.inq.default=/etc/$(NAME)/conf.d/system.inq \
 
 upload: clean package
 	curl \
