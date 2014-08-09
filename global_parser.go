@@ -20,6 +20,24 @@ type GlobalConfig struct {
 
 var Defaults = GlobalConfig{15}
 
+/*
+  An alert route is a customized way to send an alert to a recipient.
+
+  Name is the logical entity to be alerted, the default notification
+    scheme uses "" for the Name but this might be "ops" or "analytics"
+  Channel is the notification mechanism: email, campfire, etc.
+  Config is an undefined set of kv pairs for configuring the channel.
+
+  The configuration looks like this:
+
+    send alerts to NAME
+      via CHANNEL with K V, K V, K V
+
+  You'd then write a rule like:
+
+    if foo > 10 then alert NAME
+
+*/
 type AlertRoute struct {
 	Name    string
 	Channel string
