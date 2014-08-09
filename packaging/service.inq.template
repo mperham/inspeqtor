@@ -1,12 +1,33 @@
+# NOTE this file should be renamed to <name>.inq where name is explained below.
 #
-# Inspeqtor is designed to monitor services.
-# Services must be controlled by your OS's init system: upstart,
-# systemd, launchd or runit.
+# Inspeqtor is designed to monitor a host and the services running
+# on that host. Services must be controlled by your OS's init system:
+# upstart, systemd, launchd or runit.
+#
+# Inspeqtor knows how to monitor services for each major init system,
+# as long as you give the exact name of that service.
+#
+# In upstart:
+#   /etc/init/<name>.conf
+# In runit:
+#   /etc/service/<name>/run
+# In launchd:
+#   ~/Library/LaunchAgents/<name>.plist
+#
+# Note that Inspeqtor explicitly does not support /etc/init.d; this
+# is a conscious decision: init.d is terrible.  You shouldn't need
+# a 50-100 bash script just to start/stop your daemon.  Learn to use
+# the modern init systems above and you'll never go back.  I strongly
+# recommend runit - it has a wonderfully simple, Unix design - and
+# it's what Inspeqtor depends on to manage itself.
+#
+# http://www.mikeperham.com/2014/07/07/use-runit/
 #
 
 #
 # Here we define the service to monitor. The name of the service
 # ('mysql') must match the name that your init system uses.
+# You'll want to rename this file to mysql.inq to match.
 #
 check service mysql
   #
@@ -18,6 +39,13 @@ check service mysql
 
   #
   # Add any specific metrics you want to verify.
+  # Any alerts will go to ops since they are the owner.
   #
-  if cpu(user) > 90% for 2 cycles then alert
   if memory(rss) > 2g then alert
+
+  #
+  # The Ops team may own the database but we'll assume excessive CPU use
+  # is due to the Analytics team running inefficient SQL queries on the
+  # machine so notify them directly.
+  #
+  if cpu(user) > 90% for 2 cycles then alert analytics

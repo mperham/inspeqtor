@@ -11,12 +11,12 @@ set cycle_time 15
 #
 # This is the default alert statement.  All alerts will be routed
 # here unless you:
-# 1. mark the host or service as owned by a specific team
+#
+# 1. mark the host or service as owned by a specific team; OR
 # 2. you explicitly name a team to alert in a rule
 #
-# Basic email alerts via gmail sent to "dev@example.com"
+# Here we'll configure the default to send email alerts via gmail to "dev@example.com"
 #
-
 send alerts
   via gmail with username mike, password fuzzbucket, email dev@example.com
 
@@ -24,7 +24,6 @@ send alerts
 # You may elect to create different teams to receive different alerts
 # Use "to <team>" to create a team that you can use when writing rules.
 #
-
 send alerts to ops
   via gmail with username julia, password wurst-password, email ops@example.com
 
@@ -32,6 +31,5 @@ send alerts to ops
 # Here's a generic SMTP email example, not requiring Google Mail.
 # Your email host must accept SMTP/TLS.
 #
-
 send alerts to analytics
   via email with username bob, password blargh_fazz, server smtp.example.com:587, email analytics@example.com

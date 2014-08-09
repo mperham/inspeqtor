@@ -6,7 +6,6 @@
 # system.inq is the naming convention for checking the
 # host itself.
 #
-
 check host
 
   #
@@ -26,8 +25,10 @@ check host
   if cpu(user) > 95% for 4 cycles then alert
 
   #
-  # Running out of disk space will make you look like a fool to the boss.
-  # Tell us if the root partition is running out of space.
+  # Running out of disk space will not make you look good to the boss.
+  # Alert if the root partition is running out of space.
+  #
   # You can add any mount point, e.g.
   #    if disk(/backups) > 90% then alert
+  #
   if disk(/) > 90% then alert
