@@ -6,6 +6,7 @@ import (
 )
 
 func TestInspeqtorParse(t *testing.T) {
+	t.Parallel()
 	i, err := New("test")
 	assert.Nil(t, err)
 	err = i.Parse()

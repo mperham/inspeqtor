@@ -6,6 +6,7 @@ import (
 )
 
 func TestCollectHostMetrics(t *testing.T) {
+	t.Parallel()
 	store := NewHostStore()
 	err := CollectHostMetrics(store, "proc")
 	if err != nil {
@@ -38,6 +39,7 @@ func TestCollectHostMetrics(t *testing.T) {
 }
 
 func TestCollectRealHostMetrics(t *testing.T) {
+	t.Parallel()
 	store := NewHostStore()
 	err := CollectHostMetrics(store, "/proc")
 	if err != nil {
@@ -51,6 +53,7 @@ func TestCollectRealHostMetrics(t *testing.T) {
 }
 
 func TestCollectDiskMetrics(t *testing.T) {
+	t.Parallel()
 	store := NewHostStore()
 	err := collectDisk("fixtures/df.linux.txt", store)
 	if err != nil {

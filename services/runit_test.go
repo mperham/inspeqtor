@@ -5,6 +5,7 @@ import (
 )
 
 func TestDetectRunit(t *testing.T) {
+	t.Parallel()
 	runit, err := detectRunit("./")
 	if err != nil {
 		t.Fatal(err)

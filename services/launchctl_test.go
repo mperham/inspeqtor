@@ -5,6 +5,7 @@ import (
 )
 
 func TestLaunchctl(t *testing.T) {
+	t.Parallel()
 	l, err := detectLaunchctl("darwin/")
 	if err != nil {
 		t.Fatal(err)

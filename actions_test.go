@@ -18,6 +18,7 @@ func mockService(name string) *Service {
 }
 
 func TestRestartAlert(t *testing.T) {
+	t.Parallel()
 	s := mockService("foobar")
 	res, err := Actions["restart"](s, nil)
 	assert.Nil(t, err)
@@ -25,6 +26,7 @@ func TestRestartAlert(t *testing.T) {
 }
 
 func TestRestart(t *testing.T) {
+	t.Parallel()
 	s := mockService("foobar")
 	res, err := Actions["restart"](s, nil)
 	assert.Nil(t, err)
@@ -38,6 +40,7 @@ func TestRestart(t *testing.T) {
 }
 
 func TestGmailNotifier(t *testing.T) {
+	t.Parallel()
 	action, err := makeAction("alert", "gmail", map[string]string{
 		"username": "mike",
 		"password": "fuzzbucket",
@@ -48,6 +51,7 @@ func TestGmailNotifier(t *testing.T) {
 }
 
 func TestEmailNotifier(t *testing.T) {
+	t.Parallel()
 	action, err := makeAction("alert", "email", map[string]string{
 		"username": "mike",
 		"password": "fuzzbucket",
@@ -59,12 +63,14 @@ func TestEmailNotifier(t *testing.T) {
 }
 
 func TestInvalidNotifier(t *testing.T) {
+	t.Parallel()
 	action, err := makeAction("alert", "emaul", map[string]string{})
 	assert.NotNil(t, err)
 	assert.Nil(t, action)
 }
 
 func TestMissingEmailNotifier(t *testing.T) {
+	t.Parallel()
 	action, err := makeAction("alert", "email", map[string]string{
 		"username": "mike",
 		"password": "fuzzbucket",
@@ -75,6 +81,7 @@ func TestMissingEmailNotifier(t *testing.T) {
 }
 
 func TestEmailTrigger(t *testing.T) {
+	t.Parallel()
 	svc := Service{"mysql", 0, services.Down, nil, nil, metrics.NewProcessStore(), nil}
 	alert := &Alert{
 		&Rule{&svc, "memory", "rss", GT, 64 * 1024 * 1024, 0, 1, 0, Ok, nil},

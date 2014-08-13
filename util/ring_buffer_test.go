@@ -6,6 +6,7 @@ import (
 )
 
 func TestRingBuffer(t *testing.T) {
+	t.Parallel()
 	rb := NewRingBuffer(5)
 
 	assert.Panics(t, func() {

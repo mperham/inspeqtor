@@ -8,10 +8,10 @@ BASENAME=$(NAME)_$(VERSION)-$(ITERATION)
 # Include the secret API key which is needed to upload releases to bintray
 -include .local.sh
 
-all: clean package
+all: test
 
 test:
-	go test ./...
+	go test -parallel 4 ./... | grep -v "no test files"
 
 build: test
 	GOOS=linux GOARCH=amd64 go build -o $(NAME) cmd/main.go

@@ -12,6 +12,7 @@ const (
 )
 
 func TestRulesCheck(t *testing.T) {
+	t.Parallel()
 	svc := Service{"mysql", 0, services.Down, nil, nil, metrics.NewProcessStore(), nil}
 	rule := &Rule{&svc, "memory", "rss", LT, 64 * MB, 0, 2, 0, Ok, nil}
 

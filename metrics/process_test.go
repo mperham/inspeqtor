@@ -7,6 +7,7 @@ import (
 )
 
 func TestNonexistentProcessCapture(t *testing.T) {
+	t.Parallel()
 	store := NewProcessStore()
 	err := CaptureProcess(store, "proc", 100)
 	if err == nil {
@@ -16,6 +17,7 @@ func TestNonexistentProcessCapture(t *testing.T) {
 
 // doesn't have real CPU numbers
 func TestBasicProcess(t *testing.T) {
+	t.Parallel()
 	store := NewProcessStore()
 	err := CaptureProcess(store, "proc", 9051)
 	if err != nil {
@@ -43,6 +45,7 @@ func TestBasicProcess(t *testing.T) {
 
 // has real stats, no children
 func TestMysqlProcess(t *testing.T) {
+	t.Parallel()
 	store := NewProcessStore()
 	err := CaptureProcess(store, "proc", 14190)
 	if err != nil {
@@ -69,6 +72,7 @@ func TestMysqlProcess(t *testing.T) {
 
 // has real stats, child processes
 func TestApacheProcess(t *testing.T) {
+	t.Parallel()
 	store := NewProcessStore()
 	err := CaptureProcess(store, "proc", 3589)
 	if err != nil {
@@ -95,6 +99,7 @@ func TestApacheProcess(t *testing.T) {
 
 // verify our own process stats
 func TestRealProcess(t *testing.T) {
+	t.Parallel()
 	store := NewProcessStore()
 	err := CaptureProcess(store, "/etc/proc", os.Getpid())
 	if err != nil {
@@ -112,6 +117,7 @@ func TestRealProcess(t *testing.T) {
 
 // verify we can't capture a non-existent process for real
 func TestNonexistentProcess(t *testing.T) {
+	t.Parallel()
 	store := NewProcessStore()
 	err := CaptureProcess(store, "/etc/proc", -1)
 	assert.Error(t, err)
