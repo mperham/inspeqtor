@@ -20,8 +20,15 @@ func (r Rule) Threshold() int64 {
 	return r.threshold
 }
 
-func (r Rule) Op() Operator {
-	return r.op
+func (r Rule) Op() string {
+	switch r.op {
+	case GT:
+		return ">"
+	case LT:
+		return "<"
+	default:
+		return "?"
+	}
 }
 
 /*

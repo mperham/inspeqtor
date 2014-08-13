@@ -105,7 +105,7 @@ func convertRule(global *ConfigFile, check Checkable, inqrule ast.Rule) (*Rule, 
 		return nil, err
 	}
 
-	actions := make([]Action, len(inqrule.Actions))
+	actions := make([]Action, 0)
 	for _, action := range inqrule.Actions {
 		act, err := convertAction(global, check, action.Name, action.Team)
 		if err != nil {

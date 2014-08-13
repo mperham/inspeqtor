@@ -4,7 +4,9 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"inspeqtor/util"
 	"net/smtp"
+	"strings"
 	"text/template"
 )
 
@@ -119,11 +121,16 @@ func (e *EmailNotifier) TriggerEmail(alert *Alert, sender EmailSender) error {
 }
 
 func sendEmail(e *EmailNotifier, doc bytes.Buffer) error {
-	auth := smtp.PlainAuth("", e.Username, "", e.Host)
-	err := smtp.SendMail(e.Host+":587", auth, e.From,
-		[]string{e.To}, doc.Bytes())
-	if err != nil {
-		return err
+	if strings.Index(e.To, "@example.com") > 0 {
+		util.Warn(string(doc.Bytes()))
+	} else {
+		util.Debug("Sending email to %s", e.To)
+		auth := smtp.PlainAuth("", e.Username, "", e.Host)
+		err := smtp.SendMail(e.Host+":587", auth, e.From,
+			[]string{e.To}, doc.Bytes())
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }

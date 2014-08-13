@@ -95,21 +95,19 @@ func exit() {
 }
 
 func (i *Inspeqtor) runLoop() {
-	i.scanSystem(true)
+	util.DebugDebug("Resolving services")
+	i.resolveServices()
+
+	i.scanSystem()
 	for {
 		select {
 		case <-time.After(time.Duration(i.GlobalConfig.Top.CycleTime) * time.Second):
-			i.scanSystem(false)
+			i.scanSystem()
 		}
 	}
 }
 
-func (i *Inspeqtor) scanSystem(firstTime bool) {
-	if firstTime {
-		util.DebugDebug("Resolving services")
-		i.resolveServices()
-	}
-
+func (i *Inspeqtor) scanSystem() {
 	start := time.Now()
 	var barrier sync.WaitGroup
 	barrier.Add(1)
@@ -150,11 +148,11 @@ func (i *Inspeqtor) scanSystem(firstTime bool) {
 }
 
 func (i *Inspeqtor) fireAlerts(alerts []*Alert) error {
-	//for _, alert := range alerts {
-	//for _, action := range alert.Rule.actions {
-	//action.Trigger(alert)
-	//}
-	//}
+	for _, alert := range alerts {
+		for _, action := range alert.Rule.actions {
+			action.Trigger(alert)
+		}
+	}
 	return nil
 }
 
@@ -172,7 +170,8 @@ Resolve each defined service to its managing init system.
 func (i *Inspeqtor) resolveServices() {
 	for _, svc := range i.Services {
 		for _, sm := range i.ServiceManagers {
-			pid, status, err := sm.LookupService(svc.Name())
+			nm := svc.Name()
+			pid, status, err := sm.LookupService(nm)
 			if err != nil {
 				util.Warn(err.Error())
 				return
