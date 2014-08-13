@@ -11,10 +11,10 @@ BASENAME=$(NAME)_$(VERSION)-$(ITERATION)
 all: test
 
 test:
-	go test -parallel 4 ./... | grep -v "no test files"
+	@go test -parallel 4 ./... | grep -v "no test files"
 
 build: test
-	GOOS=linux GOARCH=amd64 go build -o $(NAME) cmd/main.go
+	@GOOS=linux GOARCH=amd64 go build -o $(NAME) cmd/main.go
 
 clean:
 	rm -f main $(NAME)

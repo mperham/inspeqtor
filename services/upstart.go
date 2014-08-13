@@ -37,22 +37,28 @@ func detectUpstart(path string) (InitSystem, error) {
 
 	if len(matches) > 0 {
 		util.Info("Detected upstart in " + path)
-		return Upstart{path, ""}, nil
+		return &Upstart{path, ""}, nil
 	}
 
 	util.Debug("upstart not detected, empty " + path)
 	return nil, nil
 }
 
-func (u Upstart) Name() string {
+func (u *Upstart) Name() string {
 	return "upstart"
 }
 
-func (u Upstart) Restart(serviceName string) error {
-	cmd := exec.Command("restart", serviceName)
-	sout, err := cmd.CombinedOutput()
-	if err != nil {
-		return err
+func (u *Upstart) Restart(serviceName string) error {
+	var err error
+	var sout []byte
+	if len(u.dummyOutput) != 0 {
+		sout = []byte(u.dummyOutput)
+	} else {
+		cmd := exec.Command("restart", serviceName)
+		sout, err = cmd.CombinedOutput()
+		if err != nil {
+			return err
+		}
 	}
 
 	lines, err := util.ReadLines(sout)
@@ -62,7 +68,7 @@ func (u Upstart) Restart(serviceName string) error {
 	return nil
 }
 
-func (u Upstart) LookupService(serviceName string) (ProcessId, Status, error) {
+func (u *Upstart) LookupService(serviceName string) (ProcessId, Status, error) {
 	matches, err := filepath.Glob(u.path + "/" + serviceName + ".conf")
 	if err != nil {
 		return 0, Unknown, err

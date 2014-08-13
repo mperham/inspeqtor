@@ -21,7 +21,8 @@ import (
 )
 
 type Runit struct {
-	path string
+	path        string
+	dummyOutput string
 }
 
 func detectRunit(root string) (InitSystem, error) {
@@ -51,31 +52,42 @@ func detectRunit(root string) (InitSystem, error) {
 
 	if len(matches) > 0 {
 		util.Info("Detected runit in " + path)
-		return Runit{path}, nil
+		return &Runit{path, ""}, nil
 	}
 
 	return nil, nil
 }
 
-func (r Runit) Name() string {
+func (r *Runit) Name() string {
 	return "runit"
 }
 
-func (r Runit) Restart(serviceName string) error {
-	cmd := exec.Command("sv", "restart", serviceName)
-	sout, err := cmd.CombinedOutput()
+func (r *Runit) Restart(serviceName string) error {
+	out := []byte{}
+
+	if r.dummyOutput == "" {
+		cmd := exec.Command("sv", "restart", serviceName)
+		sout, err := cmd.CombinedOutput()
+		if err != nil {
+			return err
+		}
+		out = sout
+	} else {
+		out = []byte(r.dummyOutput)
+		r.dummyOutput = ""
+	}
+
+	lines, err := util.ReadLines(out)
 	if err != nil {
 		return err
 	}
-
-	lines, err := util.ReadLines(sout)
 	if len(lines) != 1 {
 		return errors.New("Unexpected output: " + strings.Join(lines, "\n"))
 	}
 	return nil
 }
 
-func (r Runit) LookupService(serviceName string) (ProcessId, Status, error) {
+func (r *Runit) LookupService(serviceName string) (ProcessId, Status, error) {
 	matches, err := filepath.Glob(r.path + "/" + serviceName + "/run")
 	if err != nil {
 		return 0, Unknown, err

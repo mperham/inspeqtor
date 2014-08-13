@@ -11,7 +11,7 @@ func TestDetectUpstart(t *testing.T) {
 	init, err := detectUpstart("etc/init")
 	assert.Nil(t, err)
 
-	upstart := init.(Upstart)
+	upstart := init.(*Upstart)
 	upstart.dummyOutput = "mysql start/running, process 14190"
 	pid, st, err := upstart.LookupService("mysql")
 	assert.Nil(t, err)
@@ -47,4 +47,8 @@ func TestDetectUpstart(t *testing.T) {
 	if !strings.Contains(err.Error(), "Unknown upstart output") {
 		t.Error("Unexpected error: " + err.Error())
 	}
+
+	upstart.dummyOutput = "rsyslog start/running, process 28192"
+	err = upstart.Restart("rsyslog")
+	assert.Nil(t, err)
 }

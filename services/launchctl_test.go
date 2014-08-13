@@ -23,6 +23,9 @@ func TestLaunchctl(t *testing.T) {
 	assert.Equal(t, Unknown, status)
 	assert.Equal(t, -1, pid)
 
+	err = l.Restart("some.jacked.up.name")
+	assert.NotNil(t, err)
+
 	pid1, status, err := l.LookupService("homebrew.mxcl.memcached")
 	if pid > 0 && status == Up {
 		err = l.Restart("homebrew.mxcl.memcached")

@@ -85,7 +85,7 @@ func (l *Launchctl) Restart(serviceName string) error {
 	return nil
 }
 
-func (l Launchctl) LookupService(serviceName string) (ProcessId, Status, error) {
+func (l *Launchctl) LookupService(serviceName string) (ProcessId, Status, error) {
 	cmd := exec.Command("launchctl", "list")
 	sout, err := cmd.CombinedOutput()
 	if err != nil {
