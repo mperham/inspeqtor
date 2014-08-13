@@ -1,39 +1,24 @@
 package services
 
 import (
+	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
 func TestDetectRunit(t *testing.T) {
 	t.Parallel()
 	runit, err := detectRunit("./")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if runit == nil {
-		t.Fatal("Runit not detected")
-	}
+	assert.Nil(t, err)
+	assert.NotNil(t, runit)
 
 	pid, status, err := runit.LookupService("memcached")
-	if err != nil {
-		t.Error(err)
-	}
-	if pid != 1234 {
-		t.Errorf("Expected positive PID, got %d\n", pid)
-	}
-	if status != Up {
-		t.Errorf("Service should be unknown, got %v\n", status)
-	}
+	assert.Nil(t, err)
+	assert.Equal(t, 1234, pid)
+	assert.Equal(t, Up, status)
 
 	// bad service name
 	pid, status, err = runit.LookupService("nonexistent")
-	if err != nil {
-		t.Error(err)
-	}
-	if pid != -1 {
-		t.Errorf("Expected not found PID, got %d\n", pid)
-	}
-	if status != Unknown {
-		t.Errorf("Service should be unknown, got %v\n", status)
-	}
+	assert.Nil(t, err)
+	assert.Equal(t, Unknown, status)
+	assert.Equal(t, -1, pid)
 }

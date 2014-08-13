@@ -1,6 +1,7 @@
 package services
 
 import (
+	"github.com/stretchr/testify/assert"
 	"strings"
 	"testing"
 )
@@ -8,74 +9,42 @@ import (
 func TestDetectUpstart(t *testing.T) {
 	t.Parallel()
 	init, err := detectUpstart("etc/init")
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.Nil(t, err)
 
 	upstart := init.(Upstart)
 	upstart.dummyOutput = "mysql start/running, process 14190"
 	pid, st, err := upstart.LookupService("mysql")
-	if err != nil {
-		t.Error(err)
-	}
-	if pid <= 0 {
-		t.Errorf("Expected positive PID, got %d\n", pid)
-	}
-	if st != Up {
-		t.Errorf("Expected Up status, got %v\n", st)
-	}
+	assert.Nil(t, err)
+	assert.Equal(t, 14190, pid)
+	assert.Equal(t, Up, st)
 
 	// conf exists, but job is invalid
 	upstart.dummyOutput = "initctl: Unknown job: foo"
 	pid, st, err = upstart.LookupService("foo")
-	if err != nil {
-		t.Error(err)
-	}
-	if pid != -1 {
-		t.Errorf("Expected not found PID, got %d\n", pid)
-	}
-	if st != Unknown {
-		t.Errorf("Expected Unknown status, got %v\n", st)
-	}
+	assert.Nil(t, err)
+	assert.Equal(t, -1, pid)
+	assert.Equal(t, Unknown, st)
 
 	// bad service name
 	pid, st, err = upstart.LookupService("nonexistent")
-	if err != nil {
-		t.Error(err)
-	}
-	if pid != -1 {
-		t.Errorf("Expected not found PID, got %d\n", pid)
-	}
-	if st != Unknown {
-		t.Errorf("Expected Unknown status, got %v\n", st)
-	}
+	assert.Nil(t, err)
+	assert.Equal(t, -1, pid)
+	assert.Equal(t, Unknown, st)
 
 	// running as non-root
 	upstart.dummyOutput = "initctl: Unable to connect to system bus: Failed to connect to socket /var/run/dbus/system_bus_socket: No such file or directory"
 	pid, st, err = upstart.LookupService("foo")
-	if err == nil {
-		t.Error("Expected an error")
-	}
-	if pid != 0 {
-		t.Errorf("Expected zero PID, got %d\n", pid)
-	}
-	if st != Unknown {
-		t.Errorf("Expected Unknown status, got %v\n", st)
-	}
+	assert.NotNil(t, err)
+	assert.Equal(t, 0, pid)
+	assert.Equal(t, Unknown, st)
 
 	// garbage
 	upstart.dummyOutput = "what the deuce?"
 	pid, st, err = upstart.LookupService("mysql")
-	if err == nil {
-		t.Error("Expected an error")
-	}
+	assert.NotNil(t, err)
+	assert.Equal(t, 0, pid)
+	assert.Equal(t, Unknown, st)
 	if !strings.Contains(err.Error(), "Unknown upstart output") {
 		t.Error("Unexpected error: " + err.Error())
-	}
-	if pid != 0 {
-		t.Errorf("Expected zero PID, got %d\n", pid)
-	}
-	if st != Unknown {
-		t.Errorf("Expected Unknown status, got %v\n", st)
 	}
 }

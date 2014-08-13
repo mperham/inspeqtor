@@ -6,11 +6,13 @@ import (
 	"inspeqtor/util"
 	"os"
 	"os/exec"
+	"os/user"
 	"strconv"
 	"strings"
 )
 
 type Launchctl struct {
+	dirs []string
 }
 
 func detectLaunchctl(rootDir string) (InitSystem, error) {
@@ -21,25 +23,29 @@ func detectLaunchctl(rootDir string) (InitSystem, error) {
 	if !file {
 		return nil, nil
 	}
-	util.Info("Found launchctl")
-	return Launchctl{}, nil
-}
+	util.Info("Detected OSX, using launchctl")
 
-func (l Launchctl) Name() string {
-	return "launchctl"
-}
+	usr, err := user.Current()
+	if err != nil {
+		return nil, err
+	}
 
-var (
-	OSX_PATHS = []string{
+	dir := usr.HomeDir
+	paths := []string{
+		dir + "/Library/LaunchAgents",
 		"/Library/LaunchAgents",
-		"~/Library/LaunchAgents",
 		"/Library/LaunchDaemons",
 		"/System/Library/LaunchDaemons",
 	}
-)
+	return &Launchctl{paths}, nil
+}
 
-func resolvePlist(serviceName string) (string, error) {
-	for _, path := range OSX_PATHS {
+func (l *Launchctl) Name() string {
+	return "launchctl"
+}
+
+func (l *Launchctl) resolvePlist(serviceName string) (string, error) {
+	for _, path := range l.dirs {
 		candidate := fmt.Sprintf("%s/%s.plist", path, serviceName)
 		_, err := os.Lstat(candidate)
 		if err == nil {
@@ -49,8 +55,8 @@ func resolvePlist(serviceName string) (string, error) {
 	return "", errors.New("Could not find a plist for " + serviceName)
 }
 
-func (l Launchctl) Restart(serviceName string) error {
-	path, err := resolvePlist(serviceName)
+func (l *Launchctl) Restart(serviceName string) error {
+	path, err := l.resolvePlist(serviceName)
 	if err != nil {
 		return err
 	}
