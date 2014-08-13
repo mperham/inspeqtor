@@ -58,7 +58,7 @@ func (i *Inspeqtor) Parse() error {
 	util.DebugDebug("Global config: %+v", config)
 	i.GlobalConfig = config
 
-	host, services, err := ParseInq(i.RootDir + "/conf.d")
+	host, services, err := ParseInq(i.GlobalConfig, i.RootDir+"/conf.d")
 	if err != nil {
 		return err
 	}

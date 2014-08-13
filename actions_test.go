@@ -9,35 +9,39 @@ import (
 	"testing"
 )
 
+func makeAction(actionName, notifType string, config map[string]string) (Action, error) {
+	return Actions[actionName](nil, &AlertRoute{"", notifType, config})
+}
+
 func TestGmailNotifier(t *testing.T) {
-	i, err := Actions["gmail"](map[string]string{
+	action, err := makeAction("alert", "gmail", map[string]string{
 		"username": "mike",
 		"password": "fuzzbucket",
 		"email":    "mike@example.org",
 	})
 	assert.Nil(t, err)
-	assert.NotNil(t, i)
+	assert.NotNil(t, action)
 }
 
 func TestEmailNotifier(t *testing.T) {
-	i, err := Actions["email"](map[string]string{
+	action, err := makeAction("alert", "email", map[string]string{
 		"username": "mike",
 		"password": "fuzzbucket",
 		"hostname": "smtp.example.com",
 		"email":    "mike@example.org",
 	})
 	assert.Nil(t, err)
-	assert.NotNil(t, i)
+	assert.NotNil(t, action)
 }
 
 func TestMissingEmailNotifier(t *testing.T) {
-	i, err := Actions["email"](map[string]string{
+	action, err := makeAction("alert", "email", map[string]string{
 		"username": "mike",
 		"password": "fuzzbucket",
 		"email":    "mike@example.org",
 	})
 	assert.NotNil(t, err)
-	assert.Nil(t, i)
+	assert.Nil(t, action)
 }
 
 func TestEmailTrigger(t *testing.T) {

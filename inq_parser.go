@@ -15,7 +15,7 @@ import (
 /*
 Parses the host- and service-specific rules in /etc/inspeqtor/conf.d/*.inq
 */
-func ParseInq(confDir string) (*Host, []*Service, error) {
+func ParseInq(global *ConfigFile, confDir string) (*Host, []*Service, error) {
 	util.Debug("Parsing config in " + confDir)
 	files, err := filepath.Glob(confDir + "/*.inq")
 	if err != nil {
@@ -45,13 +45,13 @@ func ParseInq(confDir string) (*Host, []*Service, error) {
 			if host != nil {
 				panic("Found more than one \"check host\" configuration in " + confDir)
 			}
-			host, err = convertHost(obj.(*ast.HostCheck))
+			host, err = convertHost(global, obj.(*ast.HostCheck))
 			if err != nil {
 				return nil, nil, err
 			}
 			util.DebugDebug("Host: %+v", *host)
 		case *ast.ProcessCheck:
-			svc, err := convertService(obj.(*ast.ProcessCheck))
+			svc, err := convertService(global, obj.(*ast.ProcessCheck))
 			if err != nil {
 				return nil, nil, err
 			}
@@ -68,7 +68,7 @@ func ParseInq(confDir string) (*Host, []*Service, error) {
 }
 
 // GACK, so ugly
-func convertHost(inqhost *ast.HostCheck) (*Host, error) {
+func convertHost(global *ConfigFile, inqhost *ast.HostCheck) (*Host, error) {
 	hostname, err := os.Hostname()
 	if err != nil {
 		return nil, err
@@ -77,19 +77,19 @@ func convertHost(inqhost *ast.HostCheck) (*Host, error) {
 	storage := metrics.NewHostStore()
 	h := &Host{hostname, nil, storage, inqhost.Parameters}
 	rules := make([]Rule, len(inqhost.Rules))
-	for i, rule := range inqhost.Rules {
-		rule, err := convertRule(h, rule)
+	for idx, rule := range inqhost.Rules {
+		rule, err := convertRule(global, h, rule)
 		util.DebugDebug("Rule: %+v", rule)
 		if err != nil {
 			return nil, err
 		}
-		rules[i] = *rule
+		rules[idx] = *rule
 	}
 	h.Rules = rules
 	return h, nil
 }
 
-func convertRule(check Checkable, inqrule ast.Rule) (*Rule, error) {
+func convertRule(global *ConfigFile, check Checkable, inqrule ast.Rule) (*Rule, error) {
 	op := GT
 	switch inqrule.Operator {
 	case ">":
@@ -107,7 +107,7 @@ func convertRule(check Checkable, inqrule ast.Rule) (*Rule, error) {
 
 	actions := make([]Action, len(inqrule.Actions))
 	for _, action := range inqrule.Actions {
-		act, err := convertAction(check, action.Name, action.Team)
+		act, err := convertAction(global, check, action.Name, action.Team)
 		if err != nil {
 			return nil, err
 		}
@@ -118,22 +118,40 @@ func convertRule(check Checkable, inqrule ast.Rule) (*Rule, error) {
 		op, threshold, 0, inqrule.CycleCount, 0, Ok, actions}, nil
 }
 
-func convertAction(check Checkable, name string, team string) (Action, error) {
+func convertAction(global *ConfigFile, check Checkable, name string, team string) (Action, error) {
+	switch name {
+	case "alert":
+		owner := team
+		if owner == "" {
+			owner = check.Owner()
+		}
+
+		route := global.AlertRoutes[owner]
+		if owner == "" && route == nil {
+			return nil, errors.New("No default alert route configured!")
+		}
+		if route == nil {
+			return nil, errors.New("No such alert route: " + owner)
+		}
+		return Actions["alert"](check, route)
+	case "restart":
+		return Actions["restart"](check, nil)
+	}
 	return nil, nil
 }
 
-func convertService(inqsvc *ast.ProcessCheck) (*Service, error) {
+func convertService(global *ConfigFile, inqsvc *ast.ProcessCheck) (*Service, error) {
 	rules := make([]Rule, len(inqsvc.Rules))
 	storage := metrics.NewProcessStore()
 	svc := &Service{inqsvc.Name, 0, 0, nil, inqsvc.Parameters, storage, nil}
 
-	for i, rule := range inqsvc.Rules {
-		rule, err := convertRule(svc, rule)
+	for idx, rule := range inqsvc.Rules {
+		rule, err := convertRule(global, svc, rule)
 		if err != nil {
 			return nil, err
 		}
 		util.DebugDebug("Rule: %+v", *rule)
-		rules[i] = *rule
+		rules[idx] = *rule
 	}
 	svc.Rules = rules
 	return svc, nil

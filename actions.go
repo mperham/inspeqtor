@@ -3,6 +3,7 @@ package inspeqtor
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"net/smtp"
 	"text/template"
 )
@@ -17,27 +18,55 @@ Subject: [{{.Rule.EntityName}}] {{.Rule.MetricName}} is {{.Rule.Op}} than {{.Rul
 `
 )
 
-type ActionBuilder func(map[string]string) (Action, error)
+/*
+ Global parser parses "send alert" statements and creates alert route objects.
+ Inq parser parses rules and creates action objects based on the name and param.
+*/
+
+/*
+ An Action is something which is triggered when a rule is broken.  This is typically
+ either a notification or to restart the service.
+*/
+
+type ActionBuilder func(Checkable, *AlertRoute) (Action, error)
+type NotificationBuilder func(Checkable, map[string]string) (Action, error)
 
 var (
 	Actions = map[string]ActionBuilder{
-		"email": buildEmailAction,
-		"gmail": buildGmailAction,
+		"alert":   buildNotifier,
+		"restart": buildRestarter,
+	}
+	Notifiers = map[string]NotificationBuilder{
+		"email": buildEmailNotifier,
+		"gmail": buildGmailNotifier,
 	}
 )
 
-func buildEmailAction(params map[string]string) (Action, error) {
+func buildNotifier(check Checkable, route *AlertRoute) (Action, error) {
+	funk := Notifiers[route.Channel]
+	if funk == nil {
+		// TODO Include valid channels
+		return nil, errors.New(fmt.Sprintf("No such notification scheme: %s", route.Channel))
+	}
+	return funk(check, route.Config)
+}
+
+func buildRestarter(check Checkable, _ *AlertRoute) (Action, error) {
+	return nil, nil
+}
+
+func buildEmailNotifier(check Checkable, config map[string]string) (Action, error) {
 	en := &EmailNotifier{}
-	err := en.Setup(params)
+	err := en.Setup(config)
 	if err != nil {
 		return nil, err
 	}
 	return en, nil
 }
 
-func buildGmailAction(params map[string]string) (Action, error) {
+func buildGmailNotifier(check Checkable, params map[string]string) (Action, error) {
 	params["hostname"] = "smtp.gmail.com"
-	return buildEmailAction(params)
+	return buildEmailNotifier(check, params)
 }
 
 var (
@@ -59,8 +88,8 @@ type EmailAlert struct {
 	Config *EmailNotifier
 }
 
-func ValidateChannel(name string, channel string, config map[string]string) (AlertRoute, error) {
-	return AlertRoute{name, channel, config}, nil
+func ValidateChannel(name string, channel string, config map[string]string) (*AlertRoute, error) {
+	return &AlertRoute{name, channel, config}, nil
 }
 
 func (e EmailNotifier) Name() string {

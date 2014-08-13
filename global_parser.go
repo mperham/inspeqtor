@@ -21,7 +21,7 @@ type GlobalConfig struct {
 var Defaults = GlobalConfig{15}
 
 /*
-  An alert route is a customized way to send an alert to a recipient.
+  An alert route is a way to send an alert to a recipient.
 
   Name is the logical entity to be alerted, the default notification
     scheme uses "" for the Name but this might be "ops" or "analytics"
@@ -46,7 +46,7 @@ type AlertRoute struct {
 
 type ConfigFile struct {
 	Top         GlobalConfig
-	AlertRoutes map[string]AlertRoute
+	AlertRoutes map[string]*AlertRoute
 }
 
 func ParseGlobal(rootDir string) (*ConfigFile, error) {
@@ -81,7 +81,7 @@ func ParseGlobal(rootDir string) (*ConfigFile, error) {
 			}
 			config.Top.CycleTime = uint16(time)
 		}
-		config.AlertRoutes = map[string]AlertRoute{}
+		config.AlertRoutes = map[string]*AlertRoute{}
 		for _, v := range ast.Routes {
 			ar, err := ValidateChannel(v.Name, v.Channel, v.Config)
 			if err != nil {
