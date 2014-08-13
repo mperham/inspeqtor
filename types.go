@@ -3,6 +3,7 @@ package inspeqtor
 import (
 	"inspeqtor/metrics"
 	"inspeqtor/services"
+	"inspeqtor/util"
 )
 
 /*
@@ -18,7 +19,7 @@ type Service struct {
 	ServiceName string
 	PID         services.ProcessId
 	Status      services.Status
-	Rules       []Rule
+	Rules       []*Rule
 	Parameters  map[string]string
 	Metrics     *metrics.Storage
 	Manager     services.InitSystem
@@ -66,7 +67,18 @@ type Restartable interface {
 }
 
 func (s *Service) Restart() error {
-	return s.Manager.Restart(s.ServiceName)
+	s.PID = 0
+	s.Status = services.Starting
+	go func() {
+		util.Debug("Restarting %s", s.ServiceName)
+		err := s.Manager.Restart(s.ServiceName)
+		if err != nil {
+			util.Warn(err.Error())
+		} else {
+			util.DebugDebug("Restarted %s", s.ServiceName)
+		}
+	}()
+	return nil
 }
 
 type Operator uint8

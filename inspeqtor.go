@@ -209,17 +209,16 @@ func (i *Inspeqtor) collectService(svc *Service, completeCallback func(*Service)
 		// Couldn't resolve it when we started up so we can't collect it.
 		return
 	}
-	if svc.Status == services.Starting {
+	if svc.Status != services.Up {
 		pid, status, err := svc.Manager.LookupService(svc.Name())
 		if err != nil {
 			util.Warn(err.Error())
+		} else {
+			svc.PID = pid
+			svc.Status = status
 		}
-		svc.PID = pid
-		svc.Status = status
 	}
-	if svc.Status == services.Down {
-		return
-	}
+
 	if svc.Status == services.Up {
 		err := metrics.CaptureProcess(svc.Metrics, "/proc", int(svc.PID))
 		if err != nil {

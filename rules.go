@@ -52,7 +52,7 @@ func (rule *Rule) Check() *Rule {
 	}
 
 	if tripped {
-		rule.trippedCount++
+		rule.trippedCount = rule.trippedCount + 1
 	} else {
 		rule.trippedCount = 0
 	}
@@ -83,7 +83,7 @@ func okHandler(rule *Rule, tripped bool) *Rule {
 
 func recoveredHandler(rule *Rule, tripped bool) *Rule {
 	if tripped && rule.trippedCount == rule.cycleCount {
-		util.Warn("%s[%s] triggered.  Current value = %d", rule.entity.Name(), rule.MetricName(), rule.currentValue)
+		util.Warn("%s[%s] flapped.  Current value = %d", rule.entity.Name(), rule.MetricName(), rule.currentValue)
 		rule.state = Triggered
 		return rule
 	} else {
@@ -98,7 +98,7 @@ func triggeredHandler(rule *Rule, tripped bool) *Rule {
 		rule.state = Recovered
 		return rule
 	} else {
-		util.Debug("%s[%s] tripped. Current: %d, Threshold: %d", rule.entity.Name(), rule.MetricName(), rule.currentValue, rule.threshold)
+		util.Debug("%s[%s] still triggered. Current: %d, Threshold: %d", rule.entity.Name(), rule.MetricName(), rule.currentValue, rule.threshold)
 	}
 	return nil
 }

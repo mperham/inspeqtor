@@ -14,7 +14,7 @@ func makeAction(actionName, notifType string, config map[string]string) (Action,
 }
 
 func mockService(name string) *Service {
-	return &Service{name, 0, 0, nil, nil, nil, services.MockInit()}
+	return &Service{name, 999, services.Up, nil, nil, nil, services.MockInit()}
 }
 
 func TestRestartAlert(t *testing.T) {
@@ -22,6 +22,19 @@ func TestRestartAlert(t *testing.T) {
 	res, err := Actions["restart"](s, nil)
 	assert.Nil(t, err)
 	assert.NotNil(t, res)
+}
+
+func TestRestart(t *testing.T) {
+	s := mockService("foobar")
+	res, err := Actions["restart"](s, nil)
+	assert.Nil(t, err)
+	assert.NotNil(t, res)
+
+	assert.Equal(t, 999, s.PID)
+	assert.Equal(t, services.Up, s.Status)
+	res.Trigger(nil)
+	assert.Equal(t, 0, s.PID)
+	assert.Equal(t, services.Starting, s.Status)
 }
 
 func TestGmailNotifier(t *testing.T) {

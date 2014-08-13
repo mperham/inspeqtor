@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"inspeqtor/services"
 	"net/smtp"
 	"text/template"
 )
@@ -66,11 +65,7 @@ type Restarter struct {
 }
 
 func (r Restarter) Trigger(alert *Alert) error {
-	r.Service.PID = 0
-	r.Service.Status = services.Unknown
-
-	go r.Service.Restart()
-	return nil
+	return r.Service.Restart()
 }
 
 func buildEmailNotifier(check Checkable, config map[string]string) (Action, error) {

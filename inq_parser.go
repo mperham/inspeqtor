@@ -141,7 +141,7 @@ func convertAction(global *ConfigFile, check Checkable, name string, team string
 }
 
 func convertService(global *ConfigFile, inqsvc *ast.ProcessCheck) (*Service, error) {
-	rules := make([]Rule, len(inqsvc.Rules))
+	rules := make([]*Rule, len(inqsvc.Rules))
 	storage := metrics.NewProcessStore()
 	svc := &Service{inqsvc.Name, 0, 0, nil, inqsvc.Parameters, storage, nil}
 
@@ -151,7 +151,7 @@ func convertService(global *ConfigFile, inqsvc *ast.ProcessCheck) (*Service, err
 			return nil, err
 		}
 		util.DebugDebug("Rule: %+v", *rule)
-		rules[idx] = *rule
+		rules[idx] = rule
 	}
 	svc.Rules = rules
 	return svc, nil
