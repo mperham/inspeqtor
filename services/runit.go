@@ -11,8 +11,10 @@
 package services
 
 import (
+	"errors"
 	"inspeqtor/util"
 	"io/ioutil"
+	"os/exec"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -57,6 +59,20 @@ func detectRunit(root string) (InitSystem, error) {
 
 func (r Runit) Name() string {
 	return "runit"
+}
+
+func (r Runit) Restart(serviceName string) error {
+	cmd := exec.Command("sv", "restart", serviceName)
+	sout, err := cmd.CombinedOutput()
+	if err != nil {
+		return err
+	}
+
+	lines, err := util.ReadLines(sout)
+	if len(lines) != 1 {
+		return errors.New("Unexpected output: " + strings.Join(lines, "\n"))
+	}
+	return nil
 }
 
 func (r Runit) LookupService(serviceName string) (ProcessId, Status, error) {

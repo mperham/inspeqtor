@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"inspeqtor/services"
 	"net/smtp"
 	"text/template"
 )
@@ -52,12 +53,29 @@ func buildNotifier(check Checkable, route *AlertRoute) (Action, error) {
 }
 
 func buildRestarter(check Checkable, _ *AlertRoute) (Action, error) {
-	return nil, nil
+	switch check.(type) {
+	case *Service:
+		return &Restarter{check.(*Service)}, nil
+	default:
+		return nil, errors.New("Cannot restart " + check.Name())
+	}
+}
+
+type Restarter struct {
+	*Service
+}
+
+func (r Restarter) Trigger(alert *Alert) error {
+	r.Service.PID = 0
+	r.Service.Status = services.Unknown
+
+	go r.Service.Restart()
+	return nil
 }
 
 func buildEmailNotifier(check Checkable, config map[string]string) (Action, error) {
 	en := &EmailNotifier{}
-	err := en.Setup(config)
+	err := en.setup(config)
 	if err != nil {
 		return nil, err
 	}
@@ -92,10 +110,6 @@ func ValidateChannel(name string, channel string, config map[string]string) (*Al
 	return &AlertRoute{name, channel, config}, nil
 }
 
-func (e EmailNotifier) Name() string {
-	return "email"
-}
-
 func (e EmailNotifier) Trigger(alert *Alert) error {
 	return e.TriggerEmail(alert, sendEmail)
 }
@@ -119,7 +133,7 @@ func sendEmail(e *EmailNotifier, doc bytes.Buffer) error {
 	return nil
 }
 
-func (e *EmailNotifier) Setup(hash map[string]string) error {
+func (e *EmailNotifier) setup(hash map[string]string) error {
 	usr, ok := hash["username"]
 	if !ok {
 		return errors.New("You must have a username configured to send email")

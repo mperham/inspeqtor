@@ -48,6 +48,20 @@ func (u Upstart) Name() string {
 	return "upstart"
 }
 
+func (u Upstart) Restart(serviceName string) error {
+	cmd := exec.Command("restart", serviceName)
+	sout, err := cmd.CombinedOutput()
+	if err != nil {
+		return err
+	}
+
+	lines, err := util.ReadLines(sout)
+	if len(lines) != 1 {
+		return errors.New("Unexpected output: " + strings.Join(lines, "\n"))
+	}
+	return nil
+}
+
 func (u Upstart) LookupService(serviceName string) (ProcessId, Status, error) {
 	matches, err := filepath.Glob(u.path + "/" + serviceName + ".conf")
 	if err != nil {

@@ -13,6 +13,17 @@ func makeAction(actionName, notifType string, config map[string]string) (Action,
 	return Actions[actionName](nil, &AlertRoute{"", notifType, config})
 }
 
+func mockService(name string) *Service {
+	return &Service{name, 0, 0, nil, nil, nil, services.MockInit()}
+}
+
+func TestRestartAlert(t *testing.T) {
+	s := mockService("foobar")
+	res, err := Actions["restart"](s, nil)
+	assert.Nil(t, err)
+	assert.NotNil(t, res)
+}
+
 func TestGmailNotifier(t *testing.T) {
 	action, err := makeAction("alert", "gmail", map[string]string{
 		"username": "mike",
@@ -32,6 +43,12 @@ func TestEmailNotifier(t *testing.T) {
 	})
 	assert.Nil(t, err)
 	assert.NotNil(t, action)
+}
+
+func TestInvalidNotifier(t *testing.T) {
+	action, err := makeAction("alert", "emaul", map[string]string{})
+	assert.NotNil(t, err)
+	assert.Nil(t, action)
 }
 
 func TestMissingEmailNotifier(t *testing.T) {

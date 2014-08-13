@@ -1,7 +1,10 @@
 package services
 
 import (
+	"errors"
+	"fmt"
 	"inspeqtor/util"
+	"os"
 	"os/exec"
 	"strconv"
 	"strings"
@@ -24,6 +27,56 @@ func detectLaunchctl(rootDir string) (InitSystem, error) {
 
 func (l Launchctl) Name() string {
 	return "launchctl"
+}
+
+var (
+	OSX_PATHS = []string{
+		"/Library/LaunchAgents",
+		"~/Library/LaunchAgents",
+		"/Library/LaunchDaemons",
+		"/System/Library/LaunchDaemons",
+	}
+)
+
+func resolvePlist(serviceName string) (string, error) {
+	for _, path := range OSX_PATHS {
+		candidate := fmt.Sprintf("%s/%s.plist", path, serviceName)
+		_, err := os.Lstat(candidate)
+		if err == nil {
+			return candidate, nil
+		}
+	}
+	return "", errors.New("Could not find a plist for " + serviceName)
+}
+
+func (l Launchctl) Restart(serviceName string) error {
+	path, err := resolvePlist(serviceName)
+	if err != nil {
+		return err
+	}
+
+	cmd := exec.Command("launchctl", "unload", path)
+	sout, err := cmd.CombinedOutput()
+	if err != nil {
+		return err
+	}
+
+	lines, err := util.ReadLines(sout)
+	if len(lines) != 0 {
+		return errors.New("Unexpected output: " + strings.Join(lines, "\n"))
+	}
+
+	cmd = exec.Command("launchctl", "load", path)
+	sout, err = cmd.CombinedOutput()
+	if err != nil {
+		return err
+	}
+
+	lines, err = util.ReadLines(sout)
+	if len(lines) != 0 {
+		return errors.New("Unexpected output: " + strings.Join(lines, "\n"))
+	}
+	return nil
 }
 
 func (l Launchctl) LookupService(serviceName string) (ProcessId, Status, error) {

@@ -61,6 +61,14 @@ type Checkable interface {
 	MetricData() *metrics.Storage
 }
 
+type Restartable interface {
+	Restart() error
+}
+
+func (s *Service) Restart() error {
+	return s.Manager.Restart(s.ServiceName)
+}
+
 type Operator uint8
 
 const (
@@ -94,7 +102,5 @@ type Alert struct {
 }
 
 type Action interface {
-	Name() string
-	Setup(map[string]string) error
 	Trigger(alert *Alert) error
 }

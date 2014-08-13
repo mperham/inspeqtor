@@ -22,7 +22,7 @@ const (
 // Your init system(s) manages services.  We use
 // the init system to:
 // 1. find the associated PID
-// 2. start/stop/restart the service
+// 2. restart the service
 //
 type InitSystem interface {
 	// Name of the init system: "upstart", "runit", etc.
@@ -33,6 +33,8 @@ type InitSystem interface {
 	// name was not found or error if there was an
 	// unexpected failure.
 	LookupService(name string) (ProcessId, Status, error)
+
+	Restart(name string) error
 }
 
 var (
@@ -62,4 +64,23 @@ func Detect() []InitSystem {
 	}
 
 	return inits
+}
+
+func MockInit() InitSystem {
+	return &MockInitSystem{}
+}
+
+type MockInitSystem struct {
+	Actions []string
+}
+
+func (m *MockInitSystem) Name() string { return "mock" }
+
+func (m *MockInitSystem) Restart(name string) error {
+	m.Actions = append(m.Actions, "restart "+name)
+	return nil
+}
+
+func (m *MockInitSystem) LookupService(name string) (ProcessId, Status, error) {
+	return ProcessId(123), Up, nil
 }
