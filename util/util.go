@@ -10,8 +10,9 @@ import (
 )
 
 var (
-	Verbose     = false
-	VeryVerbose = false
+	LogInfo    = false
+	LogDebug   = false
+	LogVerbose = false
 )
 
 func Darwin() bool {
@@ -45,6 +46,23 @@ func ReadLines(data []byte) ([]string, error) {
 // Logging functions
 //
 
+func SetLogLevel(level string) {
+	if level == "info" {
+		LogInfo = true
+	}
+
+	if level == "debug" {
+		LogInfo = true
+		LogDebug = true
+	}
+
+	if level == "verbose" {
+		LogInfo = true
+		LogDebug = true
+		LogVerbose = true
+	}
+}
+
 // Uh oh, not good but not worthy of process death
 func Warn(msg string, args ...interface{}) {
 	log.Printf(preamble('W')+msg+"\n", args...)
@@ -52,19 +70,21 @@ func Warn(msg string, args ...interface{}) {
 
 // Typical logging output, the default level
 func Info(msg string, args ...interface{}) {
-	log.Printf(preamble('I')+msg+"\n", args...)
+	if LogInfo {
+		log.Printf(preamble('I')+msg+"\n", args...)
+	}
 }
 
-// -v: Verbosity level which helps track down production issues
+// -l debug: Verbosity level which helps track down production issues
 func Debug(msg string, args ...interface{}) {
-	if Verbose {
+	if LogDebug {
 		log.Printf(preamble('D')+msg+"\n", args...)
 	}
 }
 
-// -V: Very verbose for development purposes
+// -l verbose: Very verbose for development purposes
 func DebugDebug(msg string, args ...interface{}) {
-	if VeryVerbose {
+	if LogVerbose {
 		log.Printf(preamble('V')+msg+"\n", args...)
 	}
 }

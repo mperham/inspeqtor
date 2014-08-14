@@ -1,0 +1,8 @@
+# Allow log file up to 10MB before rotating
+s10000000
+
+# Rotated files should be gzipped (this should be a default)
+!gzip
+
+# Allow runit to delete old logs if out of disk space
+N1

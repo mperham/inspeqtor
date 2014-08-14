@@ -73,6 +73,9 @@ func ParseGlobal(rootDir string) (*ConfigFile, error) {
 
 		var config ConfigFile
 		config.Top = Defaults
+		if val, has := ast.Variables["log_level"]; has {
+			util.SetLogLevel(val)
+		}
 		if val, has := ast.Variables["cycle_time"]; has {
 			time, err := strconv.Atoi(val)
 			if err != nil {

@@ -8,10 +8,9 @@ import (
 )
 
 type CmdOptions struct {
-	Verbose         bool
-	VeryVerbose     bool
 	TestConfig      bool
 	ConfigDirectory string
+	LogLevel        string
 }
 
 func SetupLogging() {
@@ -24,40 +23,34 @@ func SetupLogging() {
 }
 
 func ParseArguments(name string, version string) CmdOptions {
-	defaults := CmdOptions{false, false, false, "/etc/inspeqtor"}
+	defaults := CmdOptions{false, "/etc/inspeqtor", "info"}
 
-	flag.BoolVar(&defaults.Verbose, "v", false, "Enable verbose logging")
-	flag.BoolVar(&defaults.VeryVerbose, "V", false, "Enable very verbose logging")
 	flag.BoolVar(&defaults.TestConfig, "t", false, "Verify configuration and exit")
 	flag.StringVar(&defaults.ConfigDirectory, "c", "/etc/inspeqtor", "Configuration directory")
+	flag.StringVar(&defaults.LogLevel, "l", "info", "Logging level (warn, info, debug, verbose)")
 	helpPtr := flag.Bool("help", false, "You're looking at it")
 	help2Ptr := flag.Bool("h", false, "You're looking at it")
 	flag.Parse()
 
+	log.Println(name, version)
+	log.Println("Copyright © 2014 Contributed Systems LLC")
+	log.Println("Licensed under the GNU Public License Version 3")
+	log.Println("")
+	log.Println("Want more? Upgrade to Inspeqtor Pro for more features and official support.")
+	log.Println("See http://contribsys.com/inspeqtor for details.")
+	log.Println("")
+
 	if *helpPtr || *help2Ptr {
-		log.Println(name, version)
-		log.Println("Copyright (c) 2014 Contributed Systems LLC")
 		log.Println("")
-		log.Println("Upgrading to Inspeqtor Pro gives you more features and better support.")
-		log.Println("See http://contribsys.com/inspeqtor for details.")
-		log.Println("")
-		log.Println("-c [dir]\tConfiguration directory")
+		log.Println("-c [dir]\tConfiguration directory, default: /etc/inspeqtor")
+		log.Println("-l [level]\tSet logging level (warn, info, debug, verbose), default: info")
 		log.Println("-t\t\tVerify configuration and exit")
-		log.Println("-v\t\tEnable verbose logging")
-		log.Println("-V\t\tEnable very verbose logging")
 		log.Println("")
 		log.Println("-h\t\tYou're looking at it")
 		os.Exit(0)
 	}
 
-	if defaults.Verbose {
-		util.Verbose = true
-	}
-
-	if defaults.VeryVerbose {
-		util.Verbose = true
-		util.VeryVerbose = true
-	}
+	util.SetLogLevel(defaults.LogLevel)
 
 	return defaults
 }
