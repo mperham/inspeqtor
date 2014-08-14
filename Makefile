@@ -31,7 +31,7 @@ deploy:
 build_rpm: build
 	# gem install fpm
 	# brew install rpm
-	fpm -f -s dir -t rpm -n $(NAME) -v $(VERSION) -p output \
+	fpm -s dir -t rpm -n $(NAME) -v $(VERSION) -p output \
 		--config-files /etc/$(NAME) --config-files /var/log/$(NAME) \
 		--rpm-compression bzip2 --rpm-os linux -a x86_64 \
 	 	$(NAME)=/usr/bin/$(NAME) \

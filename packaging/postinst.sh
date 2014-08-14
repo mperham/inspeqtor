@@ -5,6 +5,7 @@ set -e
 if [ -x /etc/service/inspeqtor/run ]; then
   sv restart inspeqtor
 else
+  ln -s /etc/sv/inspeqtor /etc/service/inspeqtor
   cat <<"TXT"
  _                            _
 (_)_ __  ___ _ __   ___  __ _| |_ ___  _ __
@@ -14,6 +15,6 @@ else
             |_|            |_|
 
 Please configure your notification settings in /etc/inspeqtor/inspeqtor.conf and
-then start Inspeqtor with 'sudo sv start inspeqtor'.
+then restart Inspeqtor with 'sudo sv restart inspeqtor'.
 TXT
 fi
