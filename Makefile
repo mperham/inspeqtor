@@ -22,7 +22,7 @@ clean:
 	rm -rf output
 	mkdir output
 
-package: build_deb build_rpm
+package: clean build_deb build_rpm
 
 deploy:
 	scp output/$(BASENAME)_amd64.deb $(PRODUCTION):~
@@ -32,26 +32,23 @@ build_rpm: build
 	# gem install fpm
 	# brew install rpm
 	fpm -f -s dir -t rpm -n $(NAME) -v $(VERSION) -p output \
-		--config-files /etc/inspeqtor \
+		--config-files /etc/$(NAME) --config-files /var/log/$(NAME) \
 		--rpm-compression bzip2 --rpm-os linux -a x86_64 \
 	 	$(NAME)=/usr/bin/$(NAME) \
-		packaging/$(NAME).conf.default=/etc/$(NAME)/$(NAME).conf \
-		packaging/system.inq.default=/etc/$(NAME)/conf.d/system.inq \
-		packaging/service.inq.template=/etc/$(NAME)/conf.d/service.inq.template \
+		packaging/root/=/
 
 build_deb: build
 	# gem install fpm
-	fpm -f -s dir -t deb -n $(NAME) -v $(VERSION) -p output \
-		--deb-priority optional --category admin --config-files /etc/$(NAME) \
+	fpm -s dir -t deb -n $(NAME) -v $(VERSION) -p output \
+		--deb-priority optional --category admin \
+		--config-files /etc --config-files /var/log/$(NAME) \
 		--deb-compression bzip2 --after-install packaging/postinst.sh \
 	 	--before-remove packaging/prerm.sh --after-remove packaging/postrm.sh \
 		--url http://contribsys.com/$(NAME) --description "Modern service monitoring" \
 		-m "Mike Perham <oss@contribsys.com>" --iteration $(ITERATION) --license "GPL 3.0" \
 		--vendor "Contributed Systems" -d "runit" -a amd64 \
 	 	$(NAME)=/usr/bin/$(NAME) \
-		packaging/$(NAME).conf.default=/etc/$(NAME)/$(NAME).conf \
-		packaging/system.inq.default=/etc/$(NAME)/conf.d/system.inq \
-		packaging/service.inq.template=/etc/$(NAME)/conf.d/service.inq.template \
+		packaging/root/=/
 
 upload: clean package
 	curl \
@@ -59,7 +56,7 @@ upload: clean package
 		-umperham:${BINTRAY_API_KEY} \
 		"https://api.bintray.com/content/contribsys/releases/$(NAME)/${VERSION}/$(BASENAME)_amd64.deb;publish=1"
 	curl \
-		-T output/$(NAME)_$(VERSION)-$(ITERATION).x86_64.rpm \
+		-T output/$(BASENAME).x86_64.rpm \
 		-umperham:${BINTRAY_API_KEY} \
 		"https://api.bintray.com/content/contribsys/releases/$(NAME)/${VERSION}/$(BASENAME).x86_64.rpm;publish=1"
 

@@ -178,7 +178,7 @@ func (i *Inspeqtor) resolveServices() {
 			}
 			if pid == -1 {
 				util.Debug(sm.Name() + " doesn't have " + svc.Name())
-				return
+				continue
 			}
 			util.Info("Found " + sm.Name() + "/" + svc.Name() + " with PID " + strconv.Itoa(int(pid)))
 			svc.PID = pid

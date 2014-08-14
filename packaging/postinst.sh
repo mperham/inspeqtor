@@ -2,15 +2,6 @@
 
 set -e
 
-case "$1" in
-configure)
-    if [ ! -e /etc/inspeqtor/inspeqtor.conf ]; then
-        mkdir -p /etc/inspeqtor/conf.d
-        cp /usr/share/inspeqtor/inspeqtor.conf.default /etc/inspeqtor/inspeqtor.conf
-    fi
-    ;;
-esac
-
 if [ -x /etc/service/inspeqtor/run ]; then
   sv restart inspeqtor
 else

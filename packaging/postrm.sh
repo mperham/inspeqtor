@@ -9,4 +9,3 @@ fi
 
 rm -f /etc/service/inspeqtor
 rm -rf /etc/sv/inspeqtor
-rm -f /var/run/inspeqtor.pid
