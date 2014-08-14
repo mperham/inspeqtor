@@ -24,9 +24,9 @@ clean:
 
 package: clean build_deb build_rpm
 
-deploy:
+deploy: clean build_deb
 	scp output/$(BASENAME)_amd64.deb $(PRODUCTION):~
-	ssh $(PRODUCTION) 'sudo dpkg -i $(BASENAME)_amd64.deb && sudo sv restart inspeqtor'
+	#ssh $(PRODUCTION) 'sudo dpkg -i $(BASENAME)_amd64.deb && sudo sv restart inspeqtor'
 
 build_rpm: build
 	# gem install fpm
