@@ -41,7 +41,7 @@ build_deb: build
 	# gem install fpm
 	fpm -s dir -t deb -n $(NAME) -v $(VERSION) -p output \
 		--deb-priority optional --category admin \
-		--config-files /etc --config-files /var/log/$(NAME) \
+		--config-files /var/log/$(NAME) \
 		--deb-compression bzip2 --after-install packaging/postinst.sh \
 	 	--before-remove packaging/prerm.sh --after-remove packaging/postrm.sh \
 		--url http://contribsys.com/$(NAME) --description "Modern service monitoring" \
