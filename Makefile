@@ -6,6 +6,7 @@ ITERATION=1
 BASENAME=$(NAME)_$(VERSION)-$(ITERATION)
 
 # Include the secret API key which is needed to upload releases to bintray
+# Also you can set PRODUCTION to a Debian hostname you want Inspeqtor deployed to.
 -include .local.sh
 
 all: test
@@ -22,6 +23,10 @@ clean:
 	mkdir output
 
 package: build_deb build_rpm
+
+deploy:
+	scp output/$(BASENAME)_amd64.deb $(PRODUCTION):~
+	ssh $(PRODUCTION) 'sudo dpkg -i $(BASENAME)_amd64.deb && sudo sv restart inspeqtor'
 
 build_rpm: build
 	# gem install fpm
