@@ -11,13 +11,11 @@ import (
 )
 
 const (
-	emailTemplate = `
-From: {{.Config.From}}
-To: {{.Config.To}}
-Subject: [{{.Rule.EntityName}}] {{.Rule.MetricName}} is {{.Rule.Op}} than {{.Rule.Threshold}}
-
-[{{.Rule.EntityName}}] {{.Rule.MetricName}} is {{.Rule.Op}} than {{.Rule.Threshold}}
-`
+	emailTemplate = "To: {{.Config.To}} <{{.Config.To}}>\r\n" +
+		"From: {{.Config.From}} <{{.Config.From}}>\r\n" +
+		"Subject: [{{.Rule.EntityName}}] {{.Rule.MetricName}} is {{.Rule.Op}} than {{.Rule.Threshold}}\r\n" +
+		"\r\n" +
+		"[{{.Rule.EntityName}}] {{.Rule.MetricName}} is {{.Rule.Op}} than {{.Rule.Threshold}}"
 )
 
 /*
@@ -122,14 +120,15 @@ func (e *EmailNotifier) TriggerEmail(alert *Alert, sender EmailSender) error {
 
 func sendEmail(e *EmailNotifier, doc bytes.Buffer) error {
 	if strings.Index(e.To, "@example.com") > 0 {
+		util.Warn("Invalid email configured: %s", e.To)
 		util.Warn(string(doc.Bytes()))
 	} else {
 		util.Debug("Sending email to %s", e.To)
-		auth := smtp.PlainAuth("", e.Username, "", e.Host)
+		util.Debug("Sending email:\n%s", string(doc.Bytes()))
+		auth := smtp.PlainAuth("", e.Username, e.Password, e.Host)
 		err := smtp.SendMail(e.Host+":587", auth, e.From,
 			[]string{e.To}, doc.Bytes())
 		if err != nil {
-			util.Warn("Error sending email: %s, %+v", err.Error(), *e)
 			return err
 		}
 	}
@@ -155,7 +154,9 @@ func (e *EmailNotifier) setup(hash map[string]string) error {
 	}
 	from, ok := hash["from"]
 	if !ok {
-		from = "Inspeqtor <noreply@example.com>"
+		from = "inspeqtor@example.com"
+	} else {
+		from = from
 	}
 
 	e.Username = usr

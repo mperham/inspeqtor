@@ -24,6 +24,8 @@ func main() {
 	if options.TestConfig {
 		util.Info("Configuration parsed ok.")
 		os.Exit(0)
+	} else if options.TestNotifications {
+		ins.TestNotifications()
 	} else {
 		ins.Start()
 	}

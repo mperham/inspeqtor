@@ -229,3 +229,23 @@ func (i *Inspeqtor) collectService(svc *Service, completeCallback func(*Service)
 		}
 	}
 }
+
+func (i *Inspeqtor) TestNotifications() {
+	for _, route := range i.GlobalConfig.AlertRoutes {
+		nm := route.Name
+		if nm == "" {
+			nm = "default"
+		}
+		util.Info("Creating notification for %s/%s", route.Channel, nm)
+		notifier, err := Actions["alert"](i.Host, route)
+		if err != nil {
+			util.Warn("Error creating %s/%s route: %s", route.Channel, nm, err.Error())
+			continue
+		}
+		util.Info("Triggering notification for %s/%s", route.Channel, nm)
+		err = notifier.Trigger(&Alert{i.Host.Rules[0]})
+		if err != nil {
+			util.Warn("Error firing %s/%s route: %s", route.Channel, nm, err.Error())
+		}
+	}
+}

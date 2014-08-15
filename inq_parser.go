@@ -76,14 +76,14 @@ func convertHost(global *ConfigFile, inqhost *ast.HostCheck) (*Host, error) {
 
 	storage := metrics.NewHostStore()
 	h := &Host{hostname, nil, storage, inqhost.Parameters}
-	rules := make([]Rule, len(inqhost.Rules))
+	rules := make([]*Rule, len(inqhost.Rules))
 	for idx, rule := range inqhost.Rules {
 		rule, err := convertRule(global, h, rule)
 		util.DebugDebug("Rule: %+v", rule)
 		if err != nil {
 			return nil, err
 		}
-		rules[idx] = *rule
+		rules[idx] = rule
 	}
 	h.Rules = rules
 	return h, nil

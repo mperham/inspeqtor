@@ -8,9 +8,10 @@ import (
 )
 
 type CmdOptions struct {
-	TestConfig      bool
-	ConfigDirectory string
-	LogLevel        string
+	TestConfig        bool
+	TestNotifications bool
+	ConfigDirectory   string
+	LogLevel          string
 }
 
 func SetupLogging() {
@@ -23,9 +24,10 @@ func SetupLogging() {
 }
 
 func ParseArguments(name string, version string) CmdOptions {
-	defaults := CmdOptions{false, "/etc/inspeqtor", "info"}
+	defaults := CmdOptions{false, false, "/etc/inspeqtor", "info"}
 
 	flag.BoolVar(&defaults.TestConfig, "t", false, "Verify configuration and exit")
+	flag.BoolVar(&defaults.TestNotifications, "tn", false, "Verify notifications and exit")
 	flag.StringVar(&defaults.ConfigDirectory, "c", "/etc/inspeqtor", "Configuration directory")
 	flag.StringVar(&defaults.LogLevel, "l", "info", "Logging level (warn, info, debug, verbose)")
 	helpPtr := flag.Bool("help", false, "You're looking at it")
@@ -45,6 +47,7 @@ func ParseArguments(name string, version string) CmdOptions {
 		log.Println("-c [dir]\tConfiguration directory, default: /etc/inspeqtor")
 		log.Println("-l [level]\tSet logging level (warn, info, debug, verbose), default: info")
 		log.Println("-t\t\tVerify configuration and exit")
+		log.Println("-tn\t\tVerify notifications and exit")
 		log.Println("")
 		log.Println("-h\t\tYou're looking at it")
 		os.Exit(0)

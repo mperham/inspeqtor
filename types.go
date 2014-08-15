@@ -27,7 +27,7 @@ type Service struct {
 
 type Host struct {
 	Hostname   string
-	Rules      []Rule
+	Rules      []*Rule
 	Metrics    *metrics.Storage
 	Parameters map[string]string
 }
