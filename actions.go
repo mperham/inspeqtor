@@ -129,6 +129,7 @@ func sendEmail(e *EmailNotifier, doc bytes.Buffer) error {
 		err := smtp.SendMail(e.Host+":587", auth, e.From,
 			[]string{e.To}, doc.Bytes())
 		if err != nil {
+			util.Warn("Error sending email: %s, %+v", err.Error(), *e)
 			return err
 		}
 	}

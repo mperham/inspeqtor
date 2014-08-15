@@ -25,7 +25,7 @@ fi
 if [ ! -e /etc/service/inspeqtor ]; then
   ln -s /etc/sv/inspeqtor /etc/service/inspeqtor
 else
-  sv restart inspeqtor
+  sv restart inspeqtor || true
 fi
 
 

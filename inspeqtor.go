@@ -150,7 +150,10 @@ func (i *Inspeqtor) scanSystem() {
 func (i *Inspeqtor) fireAlerts(alerts []*Alert) error {
 	for _, alert := range alerts {
 		for _, action := range alert.Rule.actions {
-			action.Trigger(alert)
+			err := action.Trigger(alert)
+			if err != nil {
+				util.Warn("Error triggering alert: %s", err.Error())
+			}
 		}
 	}
 	return nil
