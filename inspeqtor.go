@@ -4,6 +4,7 @@ import (
 	"inspeqtor/metrics"
 	"inspeqtor/services"
 	"inspeqtor/util"
+	"net"
 	"os"
 	"os/signal"
 	"strconv"
@@ -22,6 +23,7 @@ type Inspeqtor struct {
 	Host            *Host
 	Services        []*Service
 	GlobalConfig    *ConfigFile
+	Socket          net.Listener
 }
 
 func New(dir string) (*Inspeqtor, error) {
@@ -32,7 +34,7 @@ func New(dir string) (*Inspeqtor, error) {
 
 var (
 	Quit           os.Signal = syscall.SIGQUIT
-	SignalHandlers           = map[os.Signal]func(){
+	SignalHandlers           = map[os.Signal]func(*Inspeqtor){
 		Quit:         exit,
 		os.Interrupt: exit,
 	}
@@ -40,14 +42,17 @@ var (
 )
 
 func (i *Inspeqtor) Start() {
+	sockpath := "/var/run/inspeqtor.sock"
+	err := i.openSocket(sockpath)
+	if err != nil {
+		util.Warn("Could not create Unix socket: %s", err.Error())
+		exit(i)
+	}
+
 	go i.runLoop()
 
 	// This method never returns
-	handleSignals()
-}
-
-func HandleSignal(sig os.Signal, handler func()) {
-	SignalHandlers[sig] = handler
+	handleSignals(i)
 }
 
 func (i *Inspeqtor) Parse() error {
@@ -75,7 +80,20 @@ func (i *Inspeqtor) Parse() error {
 
 // private
 
-func handleSignals() {
+func (i *Inspeqtor) openSocket(path string) error {
+	socket, err := net.Listen("unix", path)
+	if err != nil {
+		return err
+	}
+	i.Socket = socket
+	return nil
+}
+
+func HandleSignal(sig os.Signal, handler func(*Inspeqtor)) {
+	SignalHandlers[sig] = handler
+}
+
+func handleSignals(i *Inspeqtor) {
 	signals := make(chan os.Signal)
 	for k, _ := range SignalHandlers {
 		signal.Notify(signals, k)
@@ -85,12 +103,18 @@ func handleSignals() {
 		sig := <-signals
 		util.Debug("Received signal %d", sig)
 		funk := SignalHandlers[sig]
-		funk()
+		funk(i)
 	}
 }
 
-func exit() {
+func exit(i *Inspeqtor) {
 	util.Info(Name + " exiting")
+	if i.Socket != nil {
+		err := i.Socket.Close()
+		if err != nil {
+			util.Warn(err.Error())
+		}
+	}
 	os.Exit(0)
 }
 

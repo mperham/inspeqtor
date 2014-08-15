@@ -13,3 +13,14 @@ func TestInspeqtorParse(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, uint16(15), i.GlobalConfig.Top.CycleTime)
 }
+
+func TestCreateSocket(t *testing.T) {
+	i, err := New("test")
+	assert.Nil(t, err)
+
+	err = i.openSocket("tmp.sock")
+	assert.Nil(t, err)
+
+	err = i.Socket.Close()
+	assert.Nil(t, err)
+}
