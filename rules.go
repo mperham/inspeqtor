@@ -4,7 +4,7 @@ import (
 	"inspeqtor/util"
 )
 
-func (r Rule) MetricName() string {
+func (r *Rule) MetricName() string {
 	s := r.metricFamily
 	if r.metricName != "" {
 		s += "(" + r.metricName + ")"
@@ -12,15 +12,15 @@ func (r Rule) MetricName() string {
 	return s
 }
 
-func (r Rule) EntityName() string {
+func (r *Rule) EntityName() string {
 	return r.entity.Name()
 }
 
-func (r Rule) Threshold() int64 {
+func (r *Rule) Threshold() int64 {
 	return r.threshold
 }
 
-func (r Rule) Op() string {
+func (r *Rule) Op() string {
 	switch r.op {
 	case GT:
 		return ">"
@@ -29,6 +29,10 @@ func (r Rule) Op() string {
 	default:
 		return "?"
 	}
+}
+
+func (r *Rule) Reset() {
+	r.trippedCount = 0
 }
 
 /*

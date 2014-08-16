@@ -15,10 +15,11 @@ import (
 Parses the global inspeqtor configuration in /etc/inspeqtor/inspeqtor.conf.
 */
 type GlobalConfig struct {
-	CycleTime uint16
+	CycleTime    uint16
+	DeployLength uint16
 }
 
-var Defaults = GlobalConfig{15}
+var Defaults = GlobalConfig{15, 300}
 
 /*
   An alert route is a way to send an alert to a recipient.
@@ -76,14 +77,9 @@ func ParseGlobal(rootDir string) (*ConfigFile, error) {
 		if val, has := ast.Variables["log_level"]; has {
 			util.SetLogLevel(val)
 		}
-		if val, has := ast.Variables["cycle_time"]; has {
-			time, err := strconv.Atoi(val)
-			if err != nil {
-				util.Warn("Invalid cycle time: " + val)
-				time = 15
-			}
-			config.Top.CycleTime = uint16(time)
-		}
+		parseValue(ast, &config.Top.CycleTime, "cycle_time", 15)
+		parseValue(ast, &config.Top.DeployLength, "deploy_length", 300)
+
 		config.AlertRoutes = map[string]*AlertRoute{}
 		for _, v := range ast.Routes {
 			ar, err := ValidateChannel(v.Name, v.Channel, v.Config)
@@ -99,5 +95,16 @@ func ParseGlobal(rootDir string) (*ConfigFile, error) {
 	} else {
 		util.Info("No configuration file found at " + rootDir + "/inspector.conf")
 		return &ConfigFile{Defaults, nil}, nil
+	}
+}
+
+func parseValue(ast ast.Config, store *uint16, name string, def int) {
+	if val, has := ast.Variables[name]; has {
+		ival, err := strconv.Atoi(val)
+		if err != nil {
+			util.Warn("Invalid %s: %d", name, val)
+			ival = def
+		}
+		*store = uint16(ival)
 	}
 }

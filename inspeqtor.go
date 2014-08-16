@@ -1,6 +1,8 @@
 package inspeqtor
 
 import (
+	"bufio"
+	"errors"
 	"inspeqtor/metrics"
 	"inspeqtor/services"
 	"inspeqtor/util"
@@ -24,11 +26,11 @@ type Inspeqtor struct {
 	Services        []*Service
 	GlobalConfig    *ConfigFile
 	Socket          net.Listener
+	SilenceUntil    time.Time
 }
 
 func New(dir string) (*Inspeqtor, error) {
-	i := &Inspeqtor{RootDir: dir}
-	i.ServiceManagers = services.Detect()
+	i := &Inspeqtor{RootDir: dir, SilenceUntil: time.Now()}
 	return i, nil
 }
 
@@ -42,12 +44,18 @@ var (
 )
 
 func (i *Inspeqtor) Start() {
-	sockpath := "/var/run/inspeqtor.sock"
-	err := i.openSocket(sockpath)
+	sockpath := "inspeqtor.sock"
+	_, err := i.openSocket(sockpath)
 	if err != nil {
 		util.Warn("Could not create Unix socket: %s", err.Error())
 		exit(i)
 	}
+
+	go func() {
+		for {
+			i.acceptCommand()
+		}
+	}()
 
 	go i.runLoop()
 
@@ -56,6 +64,8 @@ func (i *Inspeqtor) Start() {
 }
 
 func (i *Inspeqtor) Parse() error {
+	i.ServiceManagers = services.Detect()
+
 	config, err := ParseGlobal(i.RootDir)
 	if err != nil {
 		return err
@@ -80,13 +90,43 @@ func (i *Inspeqtor) Parse() error {
 
 // private
 
-func (i *Inspeqtor) openSocket(path string) error {
+func (i *Inspeqtor) openSocket(path string) (net.Listener, error) {
+	if i.Socket != nil {
+		return nil, errors.New("Socket is already open!")
+	}
+
 	socket, err := net.Listen("unix", path)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	i.Socket = socket
-	return nil
+	return socket, nil
+}
+
+func (i *Inspeqtor) acceptCommand() {
+	c, err := i.Socket.Accept()
+	if err != nil {
+		util.Info("Unix socket shutdown: %s", err.Error())
+		return
+	}
+	defer c.Close()
+
+	reader := bufio.NewReader(c)
+	line, err := reader.ReadString('\n')
+	if len(line) == 0 && err != nil {
+		util.Info(err.Error())
+	}
+	switch line[0] {
+	case 's': // "start deploy"
+		util.Info("Starting deploy")
+		length := time.Duration(i.GlobalConfig.Top.DeployLength) * time.Second
+		i.SilenceUntil = time.Now().Add(length)
+	case 'f': // "finish deploy"
+		util.Info("Finished deploy")
+		i.SilenceUntil = time.Now()
+	default:
+		util.Warn("Unknown command: %s", line)
+	}
 }
 
 func HandleSignal(sig os.Signal, handler func(*Inspeqtor)) {
@@ -131,6 +171,10 @@ func (i *Inspeqtor) runLoop() {
 	}
 }
 
+func (i *Inspeqtor) silenced() bool {
+	return time.Now().Before(i.SilenceUntil)
+}
+
 func (i *Inspeqtor) scanSystem() {
 	start := time.Now()
 	var barrier sync.WaitGroup
@@ -148,35 +192,47 @@ func (i *Inspeqtor) scanSystem() {
 	barrier.Wait()
 	util.Debug("Collection complete in " + time.Now().Sub(start).String())
 
-	rulesToAlert := []*Alert{}
-	for _, rule := range i.Host.Rules {
-		rule := rule.Check()
-		if rule != nil {
-			rulesToAlert = append(rulesToAlert, &Alert{rule})
-		}
-	}
-	for _, svc := range i.Services {
-		for _, rule := range svc.Rules {
+	rulesToTrigger := []*Alert{}
+	i.eachRule(func(rule *Rule) {
+		if i.silenced() {
+			// We are silenced until some point in the future.
+			// We don't want to check rules (as a deploy might use
+			// enough resources to trip a threshold) or trigger
+			// any actions
+			rule.Reset()
+		} else {
 			rule := rule.Check()
 			if rule != nil {
-				rulesToAlert = append(rulesToAlert, &Alert{rule})
+				rulesToTrigger = append(rulesToTrigger, &Alert{rule})
 			}
 		}
-	}
+	})
 
 	/*
-	   We now have a set of rules which have triggered.  We need to run
-	   the alerts for each.
+	   We now have a set of rules which have failed.  We need to trigger
+	   the actions for each.
 	*/
-	i.fireAlerts(rulesToAlert)
+	i.triggerActions(rulesToTrigger)
 }
 
-func (i *Inspeqtor) fireAlerts(alerts []*Alert) error {
+func (i *Inspeqtor) eachRule(funk func(*Rule)) {
+	for _, rule := range i.Host.Rules {
+		funk(rule)
+	}
+
+	for _, svc := range i.Services {
+		for _, rule := range svc.Rules {
+			funk(rule)
+		}
+	}
+}
+
+func (i *Inspeqtor) triggerActions(alerts []*Alert) error {
 	for _, alert := range alerts {
 		for _, action := range alert.Rule.actions {
 			err := action.Trigger(alert)
 			if err != nil {
-				util.Warn("Error triggering alert: %s", err.Error())
+				util.Warn("Error triggering action: %s", err.Error())
 			}
 		}
 	}
