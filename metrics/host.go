@@ -9,25 +9,6 @@ import (
 	"strings"
 )
 
-func NewHostStore() *Storage {
-	store := &Storage{
-		map[string]*family{},
-	}
-
-	store.declareGauge("swap", "", nil, displayPercent)
-	store.declareGauge("load", "1", multiplyBy100, displayLoad)
-	store.declareGauge("load", "5", multiplyBy100, displayLoad)
-	store.declareGauge("load", "15", multiplyBy100, displayLoad)
-	store.declareCounter("cpu", "", tickPercentage, displayPercent)
-	store.declareCounter("cpu", "user", tickPercentage, displayPercent)
-	store.declareCounter("cpu", "system", tickPercentage, displayPercent)
-	store.declareCounter("cpu", "iowait", tickPercentage, displayPercent)
-	store.declareCounter("cpu", "steal", tickPercentage, displayPercent)
-	store.declareDynamicFamily("disk")
-	store.declareGauge("disk", "/", nil, displayPercent)
-	return store
-}
-
 const (
 	cycle_ticks float64 = CLK_TCK * 15
 )
@@ -47,7 +28,29 @@ var (
 	displayPercent = func(val int64) string {
 		return strconv.Itoa(int(val)) + "%"
 	}
+	displayInMB = func(val int64) string {
+		return strconv.FormatFloat(float64(val)/(1024*1024), 'f', 2, 64) + "m"
+	}
 )
+
+func NewHostStore() *Storage {
+	store := &Storage{
+		map[string]*family{},
+	}
+
+	store.declareGauge("swap", "", nil, displayPercent)
+	store.declareGauge("load", "1", multiplyBy100, displayLoad)
+	store.declareGauge("load", "5", multiplyBy100, displayLoad)
+	store.declareGauge("load", "15", multiplyBy100, displayLoad)
+	store.declareCounter("cpu", "", tickPercentage, displayPercent)
+	store.declareCounter("cpu", "user", tickPercentage, displayPercent)
+	store.declareCounter("cpu", "system", tickPercentage, displayPercent)
+	store.declareCounter("cpu", "iowait", tickPercentage, displayPercent)
+	store.declareCounter("cpu", "steal", tickPercentage, displayPercent)
+	store.declareDynamicFamily("disk")
+	store.declareGauge("disk", "/", nil, displayPercent)
+	return store
+}
 
 func CollectHostMetrics(store *Storage, path string) error {
 	var err error

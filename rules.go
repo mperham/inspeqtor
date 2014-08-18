@@ -16,12 +16,28 @@ func (r *Rule) EntityName() string {
 	return r.entity.Name()
 }
 
+func (r *Rule) DisplayState() string {
+	if r.state == Triggered {
+		return "!"
+	} else {
+		return ""
+	}
+}
+
 func (r *Rule) DisplayThreshold() string {
 	return r.displayThreshold
 }
 
 func (r *Rule) Threshold() int64 {
 	return r.threshold
+}
+
+func (r *Rule) CurrentValue() int64 {
+	return r.entity.MetricData().Get(r.metricFamily, r.metricName)
+}
+
+func (r *Rule) DisplayCurrentValue() string {
+	return r.entity.MetricData().Display(r.metricFamily, r.metricName)
 }
 
 func (r *Rule) Op() string {

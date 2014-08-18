@@ -2,8 +2,10 @@ package inspeqtor
 
 import (
 	"bytes"
+	"fmt"
 	"github.com/stretchr/testify/assert"
 	"net"
+	"regexp"
 	"testing"
 	"time"
 )
@@ -89,4 +91,23 @@ func TestTheLove(t *testing.T) {
 	output, err := resp.ReadString('\n')
 	assert.Nil(t, err)
 	assert.Equal(t, "Awwww, I love you too.\n", output)
+}
+
+func TestInfo(t *testing.T) {
+	t.Parallel()
+	i, err := New("_")
+
+	outbuf := make([]byte, 0)
+	resp := bytes.NewBuffer(outbuf)
+
+	assert.Nil(t, err)
+	proc := CommandHandlers['i']
+	proc(i, resp)
+
+	line, err := resp.ReadString('\n')
+	assert.Nil(t, err)
+
+	idxs := regexp.MustCompile(fmt.Sprintf("\\AInspeqtor %s, uptime: ", VERSION)).FindStringIndex(line)
+	assert.NotNil(t, idxs)
+	assert.Equal(t, 0, idxs[0])
 }

@@ -20,6 +20,7 @@ const (
 
 type Inspeqtor struct {
 	RootDir         string
+	StartedAt       time.Time
 	ServiceManagers []services.InitSystem
 	Host            *Host
 	Services        []*Service
@@ -29,8 +30,9 @@ type Inspeqtor struct {
 }
 
 func New(dir string) (*Inspeqtor, error) {
-	i := &Inspeqtor{RootDir: dir,
+	i := &Inspeqtor{RootDir: dir, StartedAt: time.Now(),
 		SilenceUntil: time.Now(),
+		Host:         &Host{Hostname: "localhost"},
 		GlobalConfig: &ConfigFile{Defaults, nil}}
 	return i, nil
 }

@@ -2,6 +2,7 @@ package inspeqtor
 
 import (
 	"bufio"
+	"fmt"
 	"inspeqtor/util"
 	"io"
 	"time"
@@ -21,7 +22,7 @@ var (
 func (i *Inspeqtor) acceptCommand() {
 	c, err := i.Socket.Accept()
 	if err != nil {
-		util.Info("Unix socket shutdown: %s", err.Error())
+		util.Warn("Unix socket shutdown: %s", err.Error())
 		return
 	}
 	defer c.Close()
@@ -36,6 +37,7 @@ func (i *Inspeqtor) acceptCommand() {
 	funk := CommandHandlers[firstChar]
 	if funk == nil {
 		util.Warn("Unknown command: " + line)
+		io.WriteString(c, "Unknown command: "+line)
 		return
 	}
 
@@ -57,7 +59,23 @@ func finishDeploy(i *Inspeqtor, resp io.Writer) {
 }
 
 func currentInfo(i *Inspeqtor, resp io.Writer) {
+	io.WriteString(resp, fmt.Sprintf(
+		"%s %s, uptime: %s\n", Name, VERSION, time.Now().Sub(i.StartedAt).String()))
+	io.WriteString(resp, "\n")
 
+	io.WriteString(resp, fmt.Sprintf("Host: %s\n", i.Host.Hostname))
+	for _, rule := range i.Host.Rules {
+		io.WriteString(resp, fmt.Sprintf("  %-1s %-20s %-15s %s\n", rule.DisplayState(), rule.MetricName(), rule.DisplayCurrentValue(), rule.DisplayThreshold()))
+	}
+	io.WriteString(resp, "\n")
+
+	for _, svc := range i.Services {
+		io.WriteString(resp, fmt.Sprintf("Service: %s\n", svc.Name()))
+
+		for _, rule := range svc.Rules {
+			io.WriteString(resp, fmt.Sprintf("  %-1s %-20s %-15s %s\n", rule.DisplayState(), rule.MetricName(), rule.DisplayCurrentValue(), rule.DisplayThreshold()))
+		}
+	}
 }
 
 func heart(i *Inspeqtor, resp io.Writer) {
