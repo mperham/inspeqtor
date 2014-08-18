@@ -3,10 +3,11 @@ package inspeqtor
 import (
 	"bufio"
 	"inspeqtor/util"
+	"io"
 	"time"
 )
 
-type commandFunc func(*Inspeqtor, *bufio.Writer)
+type commandFunc func(*Inspeqtor, io.Writer)
 
 var (
 	CommandHandlers = map[rune]commandFunc{
@@ -38,30 +39,27 @@ func (i *Inspeqtor) acceptCommand() {
 		return
 	}
 
-	response := bufio.NewWriter(c)
-	defer response.Flush()
-
-	funk(i, response)
+	funk(i, c)
 }
 
-func startDeploy(i *Inspeqtor, resp *bufio.Writer) {
+func startDeploy(i *Inspeqtor, resp io.Writer) {
 	length := time.Duration(i.GlobalConfig.Top.DeployLength) * time.Second
 	i.SilenceUntil = time.Now().Add(length)
 
 	util.Info("Starting deploy")
-	resp.WriteString("Starting deploy, now silenced\n")
+	io.WriteString(resp, "Starting deploy, now silenced\n")
 }
 
-func finishDeploy(i *Inspeqtor, resp *bufio.Writer) {
+func finishDeploy(i *Inspeqtor, resp io.Writer) {
 	i.SilenceUntil = time.Now()
 	util.Info("Finished deploy")
-	resp.WriteString("Finished deploy, volume turned to 11\n")
+	io.WriteString(resp, "Finished deploy, volume turned to 11\n")
 }
 
-func currentInfo(i *Inspeqtor, resp *bufio.Writer) {
+func currentInfo(i *Inspeqtor, resp io.Writer) {
 
 }
 
-func heart(i *Inspeqtor, resp *bufio.Writer) {
-	resp.WriteString("Awwww, I love you too.\n")
+func heart(i *Inspeqtor, resp io.Writer) {
+	io.WriteString(resp, "Awwww, I love you too.\n")
 }

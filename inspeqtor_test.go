@@ -2,7 +2,6 @@ package inspeqtor
 
 import (
 	"github.com/stretchr/testify/assert"
-	"net"
 	"testing"
 )
 
@@ -16,6 +15,7 @@ func TestInspeqtorParse(t *testing.T) {
 }
 
 func TestCreateSocket(t *testing.T) {
+	// not parallelizable since it uses a Unix sock
 	i, err := New("test")
 	assert.Nil(t, err)
 
@@ -24,23 +24,6 @@ func TestCreateSocket(t *testing.T) {
 
 	sock, err := i.openSocket("tmp.sock")
 	assert.Nil(t, err)
+	assert.NotNil(t, sock)
 	defer sock.Close()
-
-	go func() {
-		conn, err := net.Dial("unix", "tmp.sock")
-		assert.Nil(t, err)
-		conn.Write([]byte("start deploy"))
-		conn.Close()
-
-		conn, err = net.Dial("unix", "tmp.sock")
-		assert.Nil(t, err)
-		conn.Write([]byte("finish deploy"))
-		conn.Close()
-	}()
-
-	assert.False(t, i.silenced())
-	i.acceptCommand()
-	assert.True(t, i.silenced())
-	i.acceptCommand()
-	assert.False(t, i.silenced())
 }

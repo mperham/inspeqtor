@@ -29,7 +29,9 @@ type Inspeqtor struct {
 }
 
 func New(dir string) (*Inspeqtor, error) {
-	i := &Inspeqtor{RootDir: dir, SilenceUntil: time.Now()}
+	i := &Inspeqtor{RootDir: dir,
+		SilenceUntil: time.Now(),
+		GlobalConfig: &ConfigFile{Defaults, nil}}
 	return i, nil
 }
 
