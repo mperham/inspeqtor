@@ -32,10 +32,20 @@ func TestCollectHostMetrics(t *testing.T) {
 	assert.Equal(t, store.Get("cpu", "system"), 40)
 	assert.Equal(t, store.Get("cpu", "iowait"), 20)
 	assert.Equal(t, store.Get("cpu", "steal"), 20)
+	assert.Equal(t, store.Display("cpu", "user"), "66%")
+	assert.Equal(t, store.Display("cpu", "system"), "40%")
+	assert.Equal(t, store.Display("cpu", "iowait"), "20%")
+	assert.Equal(t, store.Display("cpu", "steal"), "20%")
 	assert.Equal(t, store.Get("load", "1"), 2)
 	assert.Equal(t, store.Get("load", "5"), 3)
 	assert.Equal(t, store.Get("load", "15"), 5)
+	assert.Equal(t, store.Display("load", "1"), "0.02")
+	assert.Equal(t, store.Display("load", "5"), "0.03")
+	assert.Equal(t, store.Display("load", "15"), "0.05")
+
 	assert.Equal(t, store.Get("swap", ""), 2)
+	assert.Equal(t, store.Display("swap", ""), "2%")
+
 }
 
 func TestCollectRealHostMetrics(t *testing.T) {

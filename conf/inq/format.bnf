@@ -95,7 +95,7 @@ Metric
   | name "(" uint_lit ")"       << ast.Metric($0, $2) >>;
 
 Rule
-  : "if" Metric operator HumanAmount "then" ActionList  << ast.NewRule($1, $2, $3, $5, int64(1)), nil >>
+  : "if" Metric operator HumanAmount "then" ActionList  << ast.NewRule($1, $2, $3, $5, &ast.Amount{"1",1}), nil >>
   | "if" Metric operator HumanAmount "for" IntAmount "cycles" "then" ActionList  << ast.NewRule($1, $2, $3, $8, $5), nil >>;
 
 RuleList

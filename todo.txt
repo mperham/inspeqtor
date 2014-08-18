@@ -1,3 +1,1 @@
 - Better config parser error handling, turn on parser error recovery in gocc
-- Collect per-process metrics per cycle
-- Write alerting logic

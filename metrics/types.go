@@ -2,8 +2,8 @@ package metrics
 
 import (
 	"errors"
-	"fmt"
 	"inspeqtor/util"
+	"strconv"
 )
 
 const (
@@ -28,30 +28,35 @@ type Storage struct {
 	tree map[string]*family
 }
 
-func (store Storage) Get(family string, name string) int64 {
-	fam := store.tree[family]
-	if fam == nil {
-		panic(fmt.Sprintf("No such metric: %s", displayName(family, name)))
-	}
-	metric := fam.metrics[name]
-	if metric == nil {
-		panic(fmt.Sprintf("No such metric: %s", displayName(family, name)))
-	}
+func (store *Storage) Get(family string, name string) int64 {
+	metric, _ := store.find(family, name)
 	return metric.get()
 }
 
-func (store Storage) PrepareRule(family string, name string, threshold int64) (int64, error) {
+func (store *Storage) Display(family string, name string) string {
+	metric, _ := store.find(family, name)
+	return metric.display()
+}
+
+func (store *Storage) PrepareRule(family string, name string, threshold int64) (int64, error) {
+	metric, err := store.find(family, name)
+	if err != nil {
+		return 0, err
+	}
+	return metric.prepare(threshold), nil
+}
+
+func (store *Storage) find(family, name string) (metric, error) {
 	fam := store.tree[family]
 	if fam == nil {
-		return 0, errors.New("No such metric family: " + family)
+		return nil, errors.New("No such metric family: " + family)
 	}
 
 	metric := fam.metrics[name]
 	if metric == nil && !fam.allowDynamic {
-		return 0, errors.New("No such metric: " + displayName(family, name))
+		return nil, errors.New("No such metric: " + displayName(family, name))
 	}
-
-	return metric.prepare(threshold), nil
+	return metric, nil
 }
 
 func displayName(family, name string) string {
@@ -79,21 +84,32 @@ const (
 
 type prepareFunc func(int64) int64
 type transformFunc func(int64, int64) int64
+type displayFunc func(int64) string
 
 type metric interface {
 	put(val int64)
 	get() int64
+	display() string
+
+	// Prepare is called on a rule threshold to ensure it's in the
+	// same format as the collected metric values.
+	// For example, load average is expressed as 1.55 but internally
+	// stored as 155 since all metrics are int64.  We "prepare" a rule
+	// threshold of 10 by multiplying it by 100 so the actual threshold
+	// internally is 1000.
 	prepare(threshold int64) int64
 }
 
 type gauge struct {
 	buf           *util.RingBuffer
 	prepThreshold prepareFunc
+	forDisplay    displayFunc
 }
 
 type counter struct {
-	buf       *util.RingBuffer
-	transform transformFunc
+	buf        *util.RingBuffer
+	transform  transformFunc
+	forDisplay displayFunc
 }
 
 func (g gauge) prepare(val int64) int64 {
@@ -122,6 +138,24 @@ func (g gauge) get() int64 {
 		return -1
 	}
 	return cur.(int64)
+}
+
+func (g gauge) display() string {
+	val := g.get()
+	if g.forDisplay != nil {
+		return g.forDisplay(val)
+	} else {
+		return strconv.FormatInt(val, 10)
+	}
+}
+
+func (c counter) display() string {
+	val := c.get()
+	if c.forDisplay != nil {
+		return c.forDisplay(val)
+	} else {
+		return strconv.FormatInt(val, 10)
+	}
 }
 
 /*
@@ -153,7 +187,7 @@ func (store Storage) declareDynamicFamily(familyName string) {
 	store.tree[familyName] = &family{familyName, true, map[string]metric{}}
 }
 
-func (store Storage) declareGauge(familyName string, name string, prep prepareFunc) gauge {
+func (store Storage) declareGauge(familyName string, name string, prep prepareFunc, display displayFunc) gauge {
 	fam := store.tree[familyName]
 	if fam == nil {
 		store.tree[familyName] = &family{familyName, false, map[string]metric{}}
@@ -162,13 +196,13 @@ func (store Storage) declareGauge(familyName string, name string, prep prepareFu
 
 	data := fam.metrics[name]
 	if data == nil {
-		fam.metrics[name] = gauge{util.NewRingBuffer(SLOTS), prep}
+		fam.metrics[name] = gauge{util.NewRingBuffer(SLOTS), prep, display}
 		data = fam.metrics[name]
 	}
 	return data.(gauge)
 }
 
-func (store Storage) declareCounter(familyName string, name string, xform transformFunc) counter {
+func (store Storage) declareCounter(familyName string, name string, xform transformFunc, display displayFunc) counter {
 	fam := store.tree[familyName]
 	if fam == nil {
 		store.tree[familyName] = &family{familyName, false, map[string]metric{}}
@@ -177,7 +211,7 @@ func (store Storage) declareCounter(familyName string, name string, xform transf
 
 	data := fam.metrics[name]
 	if data == nil {
-		fam.metrics[name] = counter{util.NewRingBuffer(SLOTS), xform}
+		fam.metrics[name] = counter{util.NewRingBuffer(SLOTS), xform, display}
 		data = fam.metrics[name]
 	}
 	return data.(counter)
@@ -195,12 +229,12 @@ func (store Storage) saveType(family string, name string, value int64, t metricT
 	fam := store.tree[family]
 	met := fam.metrics[name]
 	if met == nil && fam.allowDynamic {
-		// dynamically declare metrics for disk metrics where the name
+		// declare metrics for disk metrics where the name
 		// is dynamic based on the mount point
 		if t == Gauge {
-			store.declareGauge(family, name, nil)
+			store.declareGauge(family, name, nil, displayPercent)
 		} else {
-			store.declareCounter(family, name, nil)
+			store.declareCounter(family, name, nil, nil)
 		}
 		met = store.tree[family].metrics[name]
 	}

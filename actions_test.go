@@ -84,7 +84,7 @@ func TestEmailTrigger(t *testing.T) {
 	t.Parallel()
 	svc := Service{"mysql", 0, services.Down, nil, nil, metrics.NewProcessStore(), nil}
 	alert := &Alert{
-		&Rule{&svc, "memory", "rss", GT, 64 * 1024 * 1024, 0, 1, 0, Ok, nil},
+		&Rule{&svc, "memory", "rss", GT, "64m", 64 * 1024 * 1024, 0, 1, 0, Ok, nil},
 	}
 
 	err := validEmailSetup().TriggerEmail(alert, func(e *EmailNotifier, doc bytes.Buffer) error {

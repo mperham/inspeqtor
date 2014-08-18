@@ -13,9 +13,9 @@ import (
 const (
 	emailTemplate = "To: {{.Config.To}} <{{.Config.To}}>\r\n" +
 		"From: {{.Config.From}} <{{.Config.From}}>\r\n" +
-		"Subject: [{{.Rule.EntityName}}] {{.Rule.MetricName}} is {{.Rule.Op}} than {{.Rule.Threshold}}\r\n" +
+		"Subject: [{{.Rule.EntityName}}] {{.Rule.MetricName}} is {{.Rule.Op}} than {{.Rule.DisplayThreshold}}\r\n" +
 		"\r\n" +
-		"[{{.Rule.EntityName}}] {{.Rule.MetricName}} is {{.Rule.Op}} than {{.Rule.Threshold}}"
+		"[{{.Rule.EntityName}}] {{.Rule.MetricName}} is {{.Rule.Op}} than {{.Rule.DisplayThreshold}}"
 )
 
 /*

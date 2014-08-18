@@ -14,17 +14,17 @@ func NewHostStore() *Storage {
 		map[string]*family{},
 	}
 
-	store.declareGauge("swap", "", nil)
-	store.declareGauge("load", "1", multiplyBy100)
-	store.declareGauge("load", "5", multiplyBy100)
-	store.declareGauge("load", "15", multiplyBy100)
-	store.declareCounter("cpu", "", percentage)
-	store.declareCounter("cpu", "user", percentage)
-	store.declareCounter("cpu", "system", percentage)
-	store.declareCounter("cpu", "iowait", percentage)
-	store.declareCounter("cpu", "steal", percentage)
+	store.declareGauge("swap", "", nil, displayPercent)
+	store.declareGauge("load", "1", multiplyBy100, displayLoad)
+	store.declareGauge("load", "5", multiplyBy100, displayLoad)
+	store.declareGauge("load", "15", multiplyBy100, displayLoad)
+	store.declareCounter("cpu", "", tickPercentage, displayPercent)
+	store.declareCounter("cpu", "user", tickPercentage, displayPercent)
+	store.declareCounter("cpu", "system", tickPercentage, displayPercent)
+	store.declareCounter("cpu", "iowait", tickPercentage, displayPercent)
+	store.declareCounter("cpu", "steal", tickPercentage, displayPercent)
 	store.declareDynamicFamily("disk")
-	store.declareGauge("disk", "/", nil)
+	store.declareGauge("disk", "/", nil, displayPercent)
 	return store
 }
 
@@ -33,13 +33,19 @@ const (
 )
 
 var (
-	meminfoParser = regexp.MustCompile("([^:]+):\\s+(\\d+)")
-	swapRegexp    = regexp.MustCompile("= (\\d+\\.\\d{2}[A-Z])(.*)")
-	percentage    = func(cur, prev int64) int64 {
+	meminfoParser  = regexp.MustCompile("([^:]+):\\s+(\\d+)")
+	swapRegexp     = regexp.MustCompile("= (\\d+\\.\\d{2}[A-Z])(.*)")
+	tickPercentage = func(cur, prev int64) int64 {
 		return int64((float64(cur-prev) / cycle_ticks) * 100)
 	}
 	multiplyBy100 = func(val int64) int64 {
 		return val * 100
+	}
+	displayLoad = func(val int64) string {
+		return strconv.FormatFloat(float64(val)/100, 'f', 2, 64)
+	}
+	displayPercent = func(val int64) string {
+		return strconv.Itoa(int(val)) + "%"
 	}
 )
 

@@ -27,7 +27,7 @@ type RuleMetric struct {
 type Rule struct {
 	Metric     RuleMetric
 	Operator   string
-	Value      int64
+	Threshold  Amount
 	Actions    []Action
 	CycleCount int
 }
@@ -35,6 +35,11 @@ type Rule struct {
 type Action struct {
 	Name string
 	Team string
+}
+
+type Amount struct {
+	Raw    string
+	Parsed int64
 }
 
 func AppendAction(action interface{}, list interface{}) ([]Action, error) {
@@ -95,9 +100,9 @@ func NewRule(metric interface{}, operator interface{}, value interface{}, action
 	return Rule{
 		*metric.(*RuleMetric),
 		string(operator.(*token.Token).Lit),
-		value.(int64),
+		*(value.(*Amount)),
 		actions.([]Action),
-		int(cycleCount.(int64)),
+		int(cycleCount.(*Amount).Parsed),
 	}
 }
 
@@ -109,13 +114,13 @@ func Metric(family interface{}, name interface{}) (*RuleMetric, error) {
 	return m, nil
 }
 
-func HumanAmount(digits interface{}) (int64, error) {
+func HumanAmount(digits interface{}) (*Amount, error) {
 	str := string(digits.(*token.Token).Lit)
 	sizecode := str[len(str)-1:]
-	str = str[0 : len(str)-1]
-	amt, err := strconv.ParseInt(str, 10, 64)
+	val := str[0 : len(str)-1]
+	amt, err := strconv.ParseInt(val, 10, 64)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 
 	sizecode = strings.ToLower(sizecode)
@@ -132,9 +137,14 @@ func HumanAmount(digits interface{}) (int64, error) {
 	} else if sizecode == "%" {
 		// nothing to do
 	}
-	return amt, nil
+	return &Amount{str, amt}, nil
 }
 
-func ToInt64(v interface{}) (int64, error) {
-	return strconv.ParseInt(string(v.(*token.Token).Lit), 10, 64)
+func ToInt64(v interface{}) (*Amount, error) {
+	raw := string(v.(*token.Token).Lit)
+	parsed, err := strconv.ParseInt(raw, 10, 64)
+	if err != nil {
+		return nil, err
+	}
+	return &Amount{raw, parsed}, nil
 }

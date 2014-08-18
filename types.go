@@ -97,16 +97,17 @@ const (
 )
 
 type Rule struct {
-	entity       Checkable
-	metricFamily string
-	metricName   string
-	op           Operator
-	threshold    int64
-	currentValue int64
-	cycleCount   int
-	trippedCount int
-	state        RuleState
-	actions      []Action
+	entity           Checkable
+	metricFamily     string
+	metricName       string
+	op               Operator
+	displayThreshold string
+	threshold        int64
+	currentValue     int64
+	cycleCount       int
+	trippedCount     int
+	state            RuleState
+	actions          []Action
 }
 
 type Alert struct {

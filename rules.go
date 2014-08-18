@@ -16,6 +16,10 @@ func (r *Rule) EntityName() string {
 	return r.entity.Name()
 }
 
+func (r *Rule) DisplayThreshold() string {
+	return r.displayThreshold
+}
+
 func (r *Rule) Threshold() int64 {
 	return r.threshold
 }
@@ -23,9 +27,9 @@ func (r *Rule) Threshold() int64 {
 func (r *Rule) Op() string {
 	switch r.op {
 	case GT:
-		return ">"
+		return "greater than"
 	case LT:
-		return "<"
+		return "less than"
 	default:
 		return "?"
 	}
