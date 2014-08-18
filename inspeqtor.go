@@ -1,7 +1,6 @@
 package inspeqtor
 
 import (
-	"bufio"
 	"errors"
 	"inspeqtor/metrics"
 	"inspeqtor/services"
@@ -101,32 +100,6 @@ func (i *Inspeqtor) openSocket(path string) (net.Listener, error) {
 	}
 	i.Socket = socket
 	return socket, nil
-}
-
-func (i *Inspeqtor) acceptCommand() {
-	c, err := i.Socket.Accept()
-	if err != nil {
-		util.Info("Unix socket shutdown: %s", err.Error())
-		return
-	}
-	defer c.Close()
-
-	reader := bufio.NewReader(c)
-	line, err := reader.ReadString('\n')
-	if len(line) == 0 && err != nil {
-		util.Info(err.Error())
-	}
-	switch line[0] {
-	case 's': // "start deploy"
-		util.Info("Starting deploy")
-		length := time.Duration(i.GlobalConfig.Top.DeployLength) * time.Second
-		i.SilenceUntil = time.Now().Add(length)
-	case 'f': // "finish deploy"
-		util.Info("Finished deploy")
-		i.SilenceUntil = time.Now()
-	default:
-		util.Warn("Unknown command: %s", line)
-	}
 }
 
 func HandleSignal(sig os.Signal, handler func(*Inspeqtor)) {
@@ -252,8 +225,14 @@ Resolve each defined service to its managing init system.
 */
 func (i *Inspeqtor) resolveServices() {
 	for _, svc := range i.Services {
+		nm := svc.Name()
 		for _, sm := range i.ServiceManagers {
-			nm := svc.Name()
+			// TODO There's a bizarre race condition here. Figure out
+			// why this is necessary.  We shouldn't be multi-threaded yet.
+			if sm == nil {
+				continue
+			}
+
 			pid, status, err := sm.LookupService(nm)
 			if err != nil {
 				util.Warn(err.Error())
