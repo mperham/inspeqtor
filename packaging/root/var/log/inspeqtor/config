@@ -1,7 +1,8 @@
 # Allow log file up to 10MB before rotating
 s10000000
 
-# Rotated files should be gzipped (this should be a default)
+# Rotated files should be gzipped (why isn't this runit's default??)
+# Pro tip: use zcat and zgrep to view and search through compressed log files
 !gzip
 
 # Allow runit to delete old logs if out of disk space
