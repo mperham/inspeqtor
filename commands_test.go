@@ -18,9 +18,9 @@ func TestAcceptSocket(t *testing.T) {
 	err = i.Parse()
 	assert.Nil(t, err)
 
-	sock, err := i.openSocket("tmp.sock")
+	err = i.openSocket("tmp.sock")
 	assert.Nil(t, err)
-	defer sock.Close()
+	defer i.Socket.Close()
 
 	go func() {
 		conn, err := net.Dial("unix", "tmp.sock")

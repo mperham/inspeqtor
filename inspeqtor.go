@@ -47,8 +47,8 @@ var (
 )
 
 func (i *Inspeqtor) Start() {
-	sockpath := "inspeqtor.sock"
-	_, err := i.openSocket(sockpath)
+	sockpath := "/var/run/inspeqtor.sock"
+	err := i.openSocket(sockpath)
 	if err != nil {
 		util.Warn("Could not create Unix socket: %s", err.Error())
 		exit(i)
@@ -93,17 +93,17 @@ func (i *Inspeqtor) Parse() error {
 
 // private
 
-func (i *Inspeqtor) openSocket(path string) (net.Listener, error) {
+func (i *Inspeqtor) openSocket(path string) error {
 	if i.Socket != nil {
-		return nil, errors.New("Socket is already open!")
+		return errors.New("Socket is already open!")
 	}
 
 	socket, err := net.Listen("unix", path)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	i.Socket = socket
-	return socket, nil
+	return nil
 }
 
 func HandleSignal(sig os.Signal, handler func(*Inspeqtor)) {

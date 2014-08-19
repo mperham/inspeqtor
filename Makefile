@@ -22,7 +22,8 @@ clean:
 	rm -rf output
 	mkdir output
 
-package: clean build_deb build_rpm
+# TODO add build_rpm when working
+package: clean build_deb
 
 deploy: clean build_deb
 	scp output/$(BASENAME)_amd64.deb $(PRODUCTION):~
