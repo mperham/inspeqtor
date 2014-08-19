@@ -38,9 +38,7 @@ func New(dir string) (*Inspeqtor, error) {
 }
 
 var (
-	// Odd that this isn't in Go itself.  It's fundamental
-	// to building a modern Unix daemon AFAIK.
-	Term os.Signal = syscall.Signal(15)
+	Term os.Signal = syscall.SIGTERM
 
 	SignalHandlers = map[os.Signal]func(*Inspeqtor){
 		Term:         exit,

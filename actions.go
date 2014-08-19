@@ -25,25 +25,29 @@ const (
 
 /*
  An Action is something which is triggered when a rule is broken.  This is typically
- either a notification or to restart the service.
+ either a Notification or to Restart the service.
 */
-
 type ActionBuilder func(Checkable, *AlertRoute) (Action, error)
-type NotificationBuilder func(Checkable, map[string]string) (Action, error)
+
+/*
+ A Notifier is a route to send an alert somewhere else.  The global
+ conf sets up the necessary params for the notification to work.
+*/
+type NotifierBuilder func(Checkable, map[string]string) (Action, error)
 
 var (
 	Actions = map[string]ActionBuilder{
-		"alert":   buildNotifier,
+		"alert":   buildAlerter,
 		"restart": buildRestarter,
 	}
-	Notifiers = map[string]NotificationBuilder{
+	Notifier = map[string]NotifierBuilder{
 		"email": buildEmailNotifier,
 		"gmail": buildGmailNotifier,
 	}
 )
 
-func buildNotifier(check Checkable, route *AlertRoute) (Action, error) {
-	funk := Notifiers[route.Channel]
+func buildAlerter(check Checkable, route *AlertRoute) (Action, error) {
+	funk := Notifier[route.Channel]
 	if funk == nil {
 		// TODO Include valid channels
 		return nil, errors.New(fmt.Sprintf("No such notification scheme: %s", route.Channel))
