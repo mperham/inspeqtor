@@ -38,9 +38,12 @@ func New(dir string) (*Inspeqtor, error) {
 }
 
 var (
-	Quit           os.Signal = syscall.SIGQUIT
-	SignalHandlers           = map[os.Signal]func(*Inspeqtor){
-		Quit:         exit,
+	// Odd that this isn't in Go itself.  It's fundamental
+	// to building a modern Unix daemon AFAIK.
+	Term os.Signal = syscall.Signal(15)
+
+	SignalHandlers = map[os.Signal]func(*Inspeqtor){
+		Term:         exit,
 		os.Interrupt: exit,
 	}
 	Name string = "Inspeqtor"
