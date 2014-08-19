@@ -1,1 +1,2 @@
-- Better config parser error handling, turn on parser error recovery in gocc
+- Better config parser error handling?
+- Support RPM binaries, get build_rpm working in Makefile

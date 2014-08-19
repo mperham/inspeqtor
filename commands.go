@@ -8,6 +8,11 @@ import (
 	"time"
 )
 
+/*
+ * Commands are ways for the external world to communicate with Inspeqtor
+ * via its command socket.
+ */
+
 type commandFunc func(*Inspeqtor, io.Writer)
 
 var (

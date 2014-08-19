@@ -34,7 +34,7 @@ build_rpm: build
 	fpm -s dir -t rpm -n $(NAME) -v $(VERSION) -p output \
 		--config-files /etc/$(NAME) --config-files /var/log/$(NAME) \
 		--rpm-compression bzip2 --rpm-os linux -a x86_64 \
-	 	$(NAME)=/usr/bin/$(NAME) \
+		$(NAME)=/usr/bin/$(NAME) \
 		packaging/root/=/
 
 build_deb: build
@@ -55,9 +55,9 @@ upload: clean package
 		-T output/$(BASENAME)_amd64.deb \
 		-umperham:${BINTRAY_API_KEY} \
 		"https://api.bintray.com/content/contribsys/releases/$(NAME)/${VERSION}/$(BASENAME)_amd64.deb;publish=1"
-	curl \
-		-T output/$(BASENAME).x86_64.rpm \
-		-umperham:${BINTRAY_API_KEY} \
-		"https://api.bintray.com/content/contribsys/releases/$(NAME)/${VERSION}/$(BASENAME).x86_64.rpm;publish=1"
+	#curl \
+		#-T output/$(BASENAME).x86_64.rpm \
+		#-umperham:${BINTRAY_API_KEY} \
+		#"https://api.bintray.com/content/contribsys/releases/$(NAME)/${VERSION}/$(BASENAME).x86_64.rpm;publish=1"
 
 .PHONY: all clean test build package upload
