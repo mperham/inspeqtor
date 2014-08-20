@@ -106,6 +106,10 @@ type EmailAlert struct {
 }
 
 func ValidateChannel(name string, channel string, config map[string]string) (*AlertRoute, error) {
+	_, ok := Notifier[channel]
+	if !ok {
+		return nil, errors.New("No such notification type: " + channel)
+	}
 	return &AlertRoute{name, channel, config}, nil
 }
 

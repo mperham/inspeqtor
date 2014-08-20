@@ -97,7 +97,7 @@ const (
 )
 
 type Rule struct {
-	entity           Checkable
+	Entity           Checkable
 	metricFamily     string
 	metricName       string
 	op               Operator
