@@ -6,15 +6,16 @@ server-side applications.
 
 What it does:
 
-* Monitor upstart-, runit-, systemd- or launchctl-managed services
+* Monitor upstart-, runit-, systemd- or launchd-managed services
 * Monitor process memory and CPU usage
-* Monitor host CPU, swap and disk usage
+* Monitor host CPU, load, swap and disk usage
 * Notify if processes disappear or change PID
 * Notify if processes or host goes over defined RAM or CPU utilization
 * Email notification
 * As developer friendly as possible:
   - Test configuration
   - Test notifications
+  - Signal deploy start/stop to silence Inspeqtor during deploy
 
 What it doesn't:
 
@@ -23,21 +24,16 @@ What it doesn't:
 * know how to start/stop services.  Defers to your OS's init system
 * have *any* runtime or 3rd party dependencies at all, not even libc.
 
-The default monitoring rules out of the box perform basic health checks:
+## Installation
 
-* / partition is > 90% full
-* Swap is more than 20% utilized
-* CPU(user) is > 90% for more than 4 cycles
-* load(5) is > 10
-* load(1) is > 20
+See the Inspeqtor wiki for complete documentation.
 
 
 ## Platforms
 
 inspeqtor's platform target is Linux 3.0+.  Other platforms (OSX,
 FreeBSD) aren't as well-supported but I welcome help to improve it.
-Non-Unix platforms, e.g. Windows, aren't supported at this time, mostly
-because I don't have a Windows machine and so have no way of testing on it.
+Non-Unix platforms, e.g. Windows, aren't supported at this time.
 
 
 ## Requirements
