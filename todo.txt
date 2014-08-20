@@ -1,3 +1,4 @@
 - Better config parser error handling?
 - Better key/value parsing, allow quoted values so they can contain whitespace
 - Support RPM binaries, get build_rpm working in Makefile
+- Implement "Does not exist" service logic
