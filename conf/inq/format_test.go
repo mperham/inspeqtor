@@ -52,7 +52,7 @@ func TestBasicServiceParsing(t *testing.T) {
 }
 
 func TestBasicHostParsing(t *testing.T) {
-	data, err := ioutil.ReadFile("conf.d/system.inq")
+	data, err := ioutil.ReadFile("conf.d/host.inq")
 	if err != nil {
 		t.Fatal(err)
 	}
