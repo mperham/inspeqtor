@@ -55,7 +55,7 @@ upload: clean package
 	curl \
 		-T output/$(BASENAME)_amd64.deb \
 		-umperham:${BINTRAY_API_KEY} \
-		"https://api.bintray.com/content/contribsys/releases/$(NAME)/${VERSION}/$(BASENAME)_amd64.deb;publish=1"
+		"https://api.bintray.com/content/contribsys/releases-deb/$(NAME)/${VERSION}/$(BASENAME)_amd64.deb;publish=1"
 	#curl \
 		#-T output/$(BASENAME).x86_64.rpm \
 		#-umperham:${BINTRAY_API_KEY} \

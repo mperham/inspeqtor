@@ -13,6 +13,7 @@ Pull requests should:
  1. Come with a solid description of what you are trying to achieve.
  1. Have a reasonable amount of tests which verify the changes.
  1. Fit the existing code style and design of the project.
+ 1. Not require any third party code.
 
 When in doubt, open an issue first and let's chat about what needs to be
 done and how.
