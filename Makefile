@@ -43,8 +43,8 @@ build_deb: build
 	fpm -s dir -t deb -n $(NAME) -v $(VERSION) -p output \
 		--deb-priority optional --category admin \
 		--config-files /var/log/$(NAME) \
-		--deb-compression bzip2 --after-install packaging/postinst.sh \
-	 	--before-remove packaging/prerm.sh --after-remove packaging/postrm.sh \
+		--deb-compression bzip2 --after-install packaging/postinst \
+	 	--before-remove packaging/prerm --after-remove packaging/postrm \
 		--url http://contribsys.com/$(NAME) --description "Modern service monitoring" \
 		-m "Mike Perham <oss@contribsys.com>" --iteration $(ITERATION) --license "GPL 3.0" \
 		--vendor "Contributed Systems" -d "runit" -a amd64 \

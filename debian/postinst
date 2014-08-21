@@ -21,6 +21,7 @@ if [ ! -f /etc/inspeqtor/inspeqtor.conf ]; then
   chmod 600 /etc/inspeqtor/inspeqtor.conf
 fi
 
+cp -r /usr/share/inspeqtor/sv/inspeqtor /etc/sv/inspeqtor
 
 if [ ! -e /etc/service/inspeqtor ]; then
   ln -s /etc/sv/inspeqtor /etc/service/inspeqtor

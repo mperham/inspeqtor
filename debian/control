@@ -1,0 +1,14 @@
+Package: inspeqtor
+Version: @VERSION@
+License: GPL 3.0
+Vendor: Contributed Systems
+Architecture: amd64
+Maintainer: Mike Perham <oss@contribsys.com>
+Installed-Size: @SIZE@
+Depends: runit
+Section: admin
+Priority: optional
+Homepage: http://contribsys.com/inspeqtor
+Description: Modern service monitoring
+ Inspeqtor is service and host monitoring tool, heavily influenced
+ by Monit.
