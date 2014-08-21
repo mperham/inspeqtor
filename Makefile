@@ -9,6 +9,9 @@ BASENAME=$(NAME)_$(VERSION)-$(ITERATION)
 # Also you can set PRODUCTION to a Debian hostname you want Inspeqtor deployed to.
 -include .local.sh
 
+# TODO I'd love some help making this a proper Makefile
+# with real file dependencies.
+
 all: test
 
 test:
@@ -19,20 +22,20 @@ build: test
 
 clean:
 	rm -f main $(NAME)
-	rm -rf output
-	mkdir output
+	rm -rf packaging/output
+	mkdir packaging/output
 
 # TODO add build_rpm when working
-package: clean build_deb
+package: build_deb
 
 deploy: clean build_deb
-	scp output/$(BASENAME)_amd64.deb $(PRODUCTION):~
+	scp packaging/output/$(BASENAME)_amd64.deb $(PRODUCTION):~
 	ssh $(PRODUCTION) 'sudo dpkg -i $(BASENAME)_amd64.deb && sudo ./fix && sudo sv restart inspeqtor'
 
 build_rpm: build
 	# gem install fpm
 	# brew install rpm
-	fpm -s dir -t rpm -n $(NAME) -v $(VERSION) -p output \
+	fpm -s dir -t rpm -n $(NAME) -v $(VERSION) -p packaging/output \
 		--config-files /etc/$(NAME) --config-files /var/log/$(NAME) \
 		--rpm-compression bzip2 --rpm-os linux -a x86_64 \
 		$(NAME)=/usr/bin/$(NAME) \
@@ -40,24 +43,24 @@ build_rpm: build
 
 build_deb: build
 	# gem install fpm
-	fpm -s dir -t deb -n $(NAME) -v $(VERSION) -p output \
+	fpm -s dir -t deb -n $(NAME) -v $(VERSION) -p packaging/output \
 		--deb-priority optional --category admin \
 		--config-files /var/log/$(NAME) \
-		--deb-compression bzip2 --after-install packaging/postinst \
-	 	--before-remove packaging/prerm --after-remove packaging/postrm \
-		--url http://contribsys.com/$(NAME) --description "Modern service monitoring" \
-		-m "Mike Perham <oss@contribsys.com>" --iteration $(ITERATION) --license "GPL 3.0" \
+		--deb-compression bzip2 --after-install packaging/debian/postinst \
+	 	--before-remove packaging/debian/prerm --after-remove packaging/debian/postrm \
+		--url http://contribsys.com/$(NAME) --description "Modern service and host monitoring" \
+		-m "Contributed Systems LLC <oss@contribsys.com>" --iteration $(ITERATION) --license "GPL 3.0" \
 		--vendor "Contributed Systems" -d "runit" -a amd64 \
 	 	$(NAME)=/usr/bin/$(NAME) \
 		packaging/root/=/
 
 upload: clean package
 	curl \
-		-T output/$(BASENAME)_amd64.deb \
+		-T packaging/output/$(BASENAME)_amd64.deb \
 		-umperham:${BINTRAY_API_KEY} \
 		"https://api.bintray.com/content/contribsys/releases-deb/$(NAME)/${VERSION}/$(BASENAME)_amd64.deb;publish=1"
 	#curl \
-		#-T output/$(BASENAME).x86_64.rpm \
+		#-T packaging/output/$(BASENAME).x86_64.rpm \
 		#-umperham:${BINTRAY_API_KEY} \
 		#"https://api.bintray.com/content/contribsys/releases/$(NAME)/${VERSION}/$(BASENAME).x86_64.rpm;publish=1"
 
