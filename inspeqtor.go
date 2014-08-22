@@ -19,8 +19,10 @@ const (
 )
 
 type Inspeqtor struct {
-	RootDir         string
-	StartedAt       time.Time
+	RootDir    string
+	SocketPath string
+	StartedAt  time.Time
+
 	ServiceManagers []services.InitSystem
 	Host            *Host
 	Services        []*Service
@@ -29,8 +31,10 @@ type Inspeqtor struct {
 	SilenceUntil    time.Time
 }
 
-func New(dir string) (*Inspeqtor, error) {
-	i := &Inspeqtor{RootDir: dir, StartedAt: time.Now(),
+func New(dir string, socketpath string) (*Inspeqtor, error) {
+	i := &Inspeqtor{RootDir: dir,
+		SocketPath:   socketpath,
+		StartedAt:    time.Now(),
 		SilenceUntil: time.Now(),
 		Host:         &Host{Hostname: "localhost"},
 		GlobalConfig: &ConfigFile{Defaults, nil}}
@@ -48,8 +52,7 @@ var (
 )
 
 func (i *Inspeqtor) Start() {
-	sockpath := "/var/run/inspeqtor.sock"
-	err := i.openSocket(sockpath)
+	err := i.openSocket(i.SocketPath)
 	if err != nil {
 		util.Warn("Could not create Unix socket: %s", err.Error())
 		exit(i)

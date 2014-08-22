@@ -12,7 +12,7 @@ func main() {
 	cli.SetupLogging()
 	options := cli.ParseArguments("Inspeqtor", inspeqtor.VERSION)
 
-	ins, err := inspeqtor.New(options.ConfigDirectory)
+	ins, err := inspeqtor.New(options.ConfigDirectory, options.SocketPath)
 	if err != nil {
 		log.Fatalln(err)
 	}

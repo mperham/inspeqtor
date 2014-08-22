@@ -7,7 +7,7 @@ import (
 
 func TestInspeqtorParse(t *testing.T) {
 	t.Parallel()
-	i, err := New("test")
+	i, err := New("test", "")
 	assert.Nil(t, err)
 	err = i.Parse()
 	assert.Nil(t, err)
@@ -16,7 +16,7 @@ func TestInspeqtorParse(t *testing.T) {
 
 func TestCreateSocket(t *testing.T) {
 	// not parallelizable since it uses a Unix sock
-	i, err := New("test")
+	i, err := New("test", "")
 	assert.Nil(t, err)
 
 	err = i.Parse()

@@ -12,7 +12,7 @@ import (
 
 func TestAcceptSocket(t *testing.T) {
 	// not parallelizable since it uses a Unix sock
-	i, err := New("test")
+	i, err := New("test", "")
 	assert.Nil(t, err)
 
 	err = i.Parse()
@@ -43,7 +43,7 @@ func TestAcceptSocket(t *testing.T) {
 
 func TestStartDeploy(t *testing.T) {
 	t.Parallel()
-	i, err := New("_")
+	i, err := New("_", "")
 	i.SilenceUntil = time.Now()
 
 	outbuf := make([]byte, 0)
@@ -62,7 +62,7 @@ func TestStartDeploy(t *testing.T) {
 
 func TestFinishDeploy(t *testing.T) {
 	t.Parallel()
-	i, err := New("_")
+	i, err := New("_", "")
 
 	outbuf := make([]byte, 0)
 	resp := bytes.NewBuffer(outbuf)
@@ -79,7 +79,7 @@ func TestFinishDeploy(t *testing.T) {
 
 func TestTheLove(t *testing.T) {
 	t.Parallel()
-	i, err := New("_")
+	i, err := New("_", "")
 
 	outbuf := make([]byte, 0)
 	resp := bytes.NewBuffer(outbuf)
@@ -95,7 +95,7 @@ func TestTheLove(t *testing.T) {
 
 func TestInfo(t *testing.T) {
 	t.Parallel()
-	i, err := New("_")
+	i, err := New("_", "")
 
 	outbuf := make([]byte, 0)
 	resp := bytes.NewBuffer(outbuf)
