@@ -256,6 +256,9 @@ func (i *Inspeqtor) resolveServices() {
 			svc.Manager = sm
 			break
 		}
+		if svc.Manager == nil {
+			util.Warn("Could not find service %s, did you misspell it?", nm)
+		}
 	}
 }
 

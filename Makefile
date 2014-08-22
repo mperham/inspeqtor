@@ -25,6 +25,9 @@ clean:
 	rm -rf packaging/output
 	mkdir packaging/output
 
+real:
+	go run cmd/main.go -l debug -s i.sock -c realtest
+
 # TODO add build_rpm when working
 package: build_deb
 

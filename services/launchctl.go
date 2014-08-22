@@ -99,7 +99,7 @@ func (l *Launchctl) LookupService(serviceName string) (ProcessId, Status, error)
 
 	for _, line := range lines {
 		if strings.Contains(line, serviceName) {
-			util.Debug("Found " + serviceName)
+			util.Debug("launchctl found " + serviceName)
 			parts := strings.SplitN(line, "\t", 3)
 			pid, err := strconv.ParseInt(parts[0], 10, 32)
 			if err != nil {
