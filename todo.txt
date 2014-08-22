@@ -10,12 +10,4 @@ Non-blockers
 
 Packaging
 - Support RPM binaries, get build_rpm working in Makefile
-- Fix .deb "cannot authenticate package" issue
 - Provide a real man page
-
-Pro
-- Daemon-specific metrics
-  * mysql
-  * postgresql
-  * redis
-  * memcached

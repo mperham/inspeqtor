@@ -46,16 +46,22 @@ build_deb: build
 	fpm -s dir -t deb -n $(NAME) -v $(VERSION) -p packaging/output \
 		--deb-priority optional --category admin \
 		--config-files /var/log/$(NAME) \
-		--deb-compression bzip2 --after-install packaging/debian/postinst \
-	 	--before-remove packaging/debian/prerm --after-remove packaging/debian/postrm \
-		--url http://contribsys.com/$(NAME) --description "Modern service and host monitoring" \
-		-m "Contributed Systems LLC <oss@contribsys.com>" --iteration $(ITERATION) --license "GPL 3.0" \
+		--deb-compression bzip2 \
+	 	--after-install packaging/debian/postinst \
+	 	--before-remove packaging/debian/prerm \
+		--after-remove packaging/debian/postrm \
+		--url http://contribsys.com/$(NAME) \
+		--description "Modern service and host monitoring" \
+		-m "Contributed Systems LLC <oss@contribsys.com>" \
+		--iteration $(ITERATION) --license "GPL 3.0" \
 		--vendor "Contributed Systems" -d "runit" -a amd64 \
 	 	$(NAME)=/usr/bin/$(NAME) \
 		packaging/root/=/
 
 upload: clean package
 	curl \
+		-v \
+		-H "X-GPG-PASSPHRASE: $(PASSPHRASE)" \
 		-T packaging/output/$(BASENAME)_amd64.deb \
 		-umperham:${BINTRAY_API_KEY} \
 		"https://api.bintray.com/content/contribsys/releases-deb/$(NAME)/${VERSION}/$(BASENAME)_amd64.deb;publish=1"
