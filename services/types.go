@@ -13,9 +13,6 @@ const (
 	Starting
 	Up
 	Stopping
-	// if we try to start the service and it does not start, we mark it as broken so we
-	// don't continually try to start a broken service.
-	Broken
 )
 
 //
