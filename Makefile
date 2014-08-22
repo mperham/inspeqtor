@@ -58,16 +58,14 @@ build_deb: build
 	 	$(NAME)=/usr/bin/$(NAME) \
 		packaging/root/=/
 
-upload: clean package
+upload:	clean package
 	curl \
-		-v \
-		-H "X-GPG-PASSPHRASE: $(PASSPHRASE)" \
 		-T packaging/output/$(BASENAME)_amd64.deb \
 		-umperham:${BINTRAY_API_KEY} \
 		"https://api.bintray.com/content/contribsys/releases-deb/$(NAME)/${VERSION}/$(BASENAME)_amd64.deb;publish=1"
-	#curl \
-		#-T packaging/output/$(BASENAME).x86_64.rpm \
-		#-umperham:${BINTRAY_API_KEY} \
-		#"https://api.bintray.com/content/contribsys/releases/$(NAME)/${VERSION}/$(BASENAME).x86_64.rpm;publish=1"
+	curl \
+		-X POST -H "X-GPG-PASSPHRASE: $(PASSPHRASE)" \
+		-umperham:${BINTRAY_API_KEY} \
+		"https://api.bintray.com/gpg/contribsys/releases-deb/$(NAME)/versions/${VERSION}"
 
 .PHONY: all clean test build package upload
