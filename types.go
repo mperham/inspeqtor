@@ -110,10 +110,37 @@ type Rule struct {
 	actions          []Action
 }
 
-type Alert struct {
-	*Rule
+type Action interface {
+	Trigger(event *Event) error
 }
 
-type Action interface {
-	Trigger(alert *Alert) error
+/*
+ There are several different types of Events:
+
+ * Process disappeared (or did not exist when we started up)
+ * Process appeared
+ * Rule triggered based on metric check
+ * Metric has recovered
+ * Process is restarting due to rule trigger
+ * Process has restarted
+*/
+type EventType uint8
+
+const (
+	ServiceDoesNotExist EventType = iota
+	ServiceExists
+	HealthFailure
+	HealthRecovered
+	ServiceRestarting
+	ServiceRestarted
+)
+
+type Event struct {
+	Check Checkable
+	Rule  *Rule
+	Type  EventType
+}
+
+type EventHandler interface {
+	Fire(event *Event)
 }

@@ -10,6 +10,18 @@ import (
 	"text/template"
 )
 
+/*
+ There are 3 pairs of events we need to handle:
+ 1. Process does not exist, either on startup or disappearing during a cycle.
+ 2. Process exists, it appears after previously not existing.
+
+ 3. Rule triggered after metric crossed threshold for N cycles (simple alert)
+ 4. Metric recovered
+
+ 5. Service needs restarting due to rule triggering.
+ 6. Service started correctly (shared with 2?)
+*/
+
 const (
 	emailTemplate = "To: {{.Config.To}} <{{.Config.To}}>\r\n" +
 		"From: {{.Config.From}} <{{.Config.From}}>\r\n" +
@@ -68,7 +80,7 @@ type Restarter struct {
 	*Service
 }
 
-func (r Restarter) Trigger(alert *Alert) error {
+func (r Restarter) Trigger(event *Event) error {
 	return r.Service.Restart()
 }
 
@@ -100,8 +112,8 @@ type EmailNotifier struct {
 	To       string
 }
 
-type EmailAlert struct {
-	*Alert
+type EmailEvent struct {
+	*Event
 	Config *EmailNotifier
 }
 
@@ -113,13 +125,13 @@ func ValidateChannel(name string, channel string, config map[string]string) (*Al
 	return &AlertRoute{name, channel, config}, nil
 }
 
-func (e EmailNotifier) Trigger(alert *Alert) error {
-	return e.TriggerEmail(alert, sendEmail)
+func (e EmailNotifier) Trigger(event *Event) error {
+	return e.TriggerEmail(event, sendEmail)
 }
 
-func (e *EmailNotifier) TriggerEmail(alert *Alert, sender EmailSender) error {
+func (e *EmailNotifier) TriggerEmail(event *Event, sender EmailSender) error {
 	var doc bytes.Buffer
-	err := email.Execute(&doc, &EmailAlert{alert, e})
+	err := email.Execute(&doc, &EmailEvent{event, e})
 	if err != nil {
 		return err
 	}

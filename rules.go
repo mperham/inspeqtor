@@ -67,7 +67,7 @@ func (r *Rule) Reset() {
  Triggered - threshold breached enough times, action should be taken
  Recovered - rule is currently Triggered but threshold was not breached this time
 */
-func (rule *Rule) Check() *Rule {
+func (rule *Rule) Check() *Event {
 	rule.currentValue = rule.Entity.MetricData().Get(rule.metricFamily, rule.metricName)
 	if rule.currentValue == -1 {
 		return nil
@@ -91,7 +91,7 @@ func (rule *Rule) Check() *Rule {
 	return stateMachine[rule.state](rule, tripped)
 }
 
-type stateHandler func(*Rule, bool) *Rule
+type stateHandler func(*Rule, bool) *Event
 
 var (
 	stateMachine = map[RuleState]stateHandler{
@@ -101,33 +101,33 @@ var (
 	}
 )
 
-func okHandler(rule *Rule, tripped bool) *Rule {
+func okHandler(rule *Rule, tripped bool) *Event {
 	if tripped && rule.trippedCount == rule.cycleCount {
 		util.Warn("%s[%s] triggered.  Current value = %d", rule.EntityName(), rule.MetricName(), rule.currentValue)
 		rule.state = Triggered
-		return rule
+		return &Event{rule.Entity, rule, HealthFailure}
 	} else if tripped {
 		util.Debug("%s[%s] tripped. Current: %d, Threshold: %d", rule.EntityName(), rule.MetricName(), rule.currentValue, rule.threshold)
 	}
 	return nil
 }
 
-func recoveredHandler(rule *Rule, tripped bool) *Rule {
+func recoveredHandler(rule *Rule, tripped bool) *Event {
 	if tripped && rule.trippedCount == rule.cycleCount {
 		util.Warn("%s[%s] flapped.  Current value = %d", rule.EntityName(), rule.MetricName(), rule.currentValue)
 		rule.state = Triggered
-		return rule
 	} else {
 		rule.state = Ok
+		return &Event{rule.Entity, rule, HealthRecovered}
 	}
 	return nil
 }
 
-func triggeredHandler(rule *Rule, tripped bool) *Rule {
+func triggeredHandler(rule *Rule, tripped bool) *Event {
 	if !tripped {
 		util.Info("%s[%s] recovered.", rule.EntityName(), rule.MetricName())
 		rule.state = Recovered
-		return rule
+		return nil
 	} else {
 		util.Debug("%s[%s] still triggered. Current: %d, Threshold: %d", rule.EntityName(), rule.MetricName(), rule.currentValue, rule.threshold)
 	}

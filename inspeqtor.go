@@ -173,7 +173,7 @@ func (i *Inspeqtor) scanSystem() {
 	barrier.Wait()
 	util.Debug("Collection complete in " + time.Now().Sub(start).String())
 
-	rulesToTrigger := []*Alert{}
+	eventsToTrigger := []*Event{}
 	i.eachRule(func(rule *Rule) {
 		if i.silenced() {
 			// We are silenced until some point in the future.
@@ -182,9 +182,9 @@ func (i *Inspeqtor) scanSystem() {
 			// any actions
 			rule.Reset()
 		} else {
-			rule := rule.Check()
-			if rule != nil {
-				rulesToTrigger = append(rulesToTrigger, &Alert{rule})
+			event := rule.Check()
+			if event != nil {
+				eventsToTrigger = append(eventsToTrigger, event)
 			}
 		}
 	})
@@ -193,7 +193,7 @@ func (i *Inspeqtor) scanSystem() {
 	   We now have a set of rules which have failed.  We need to trigger
 	   the actions for each.
 	*/
-	i.triggerActions(rulesToTrigger)
+	i.triggerActions(eventsToTrigger)
 }
 
 func (i *Inspeqtor) eachRule(funk func(*Rule)) {
@@ -208,7 +208,7 @@ func (i *Inspeqtor) eachRule(funk func(*Rule)) {
 	}
 }
 
-func (i *Inspeqtor) triggerActions(alerts []*Alert) error {
+func (i *Inspeqtor) triggerActions(alerts []*Event) error {
 	for _, alert := range alerts {
 		for _, action := range alert.Rule.actions {
 			err := action.Trigger(alert)
@@ -224,12 +224,13 @@ func (i *Inspeqtor) collectHost(completeCallback func()) {
 	defer completeCallback()
 	err := metrics.CollectHostMetrics(i.Host.Metrics, "/proc")
 	if err != nil {
-		util.Warn("%v", err)
+		util.Warn("Error collecting host metrics: %s", err.Error())
 	}
 }
 
 /*
-Resolve each defined service to its managing init system.
+Resolve each defined service to its managing init system.  Called only
+at startup, this is what maps services to init and fires ServiceDoesNotExist events.
 */
 func (i *Inspeqtor) resolveServices() {
 	for _, svc := range i.Services {
@@ -254,11 +255,20 @@ func (i *Inspeqtor) resolveServices() {
 			svc.PID = pid
 			svc.Status = status
 			svc.Manager = sm
+			if svc.PID == 0 {
+				i.fireEvent(ServiceDoesNotExist, svc, nil)
+			}
 			break
 		}
 		if svc.Manager == nil {
 			util.Warn("Could not find service %s, did you misspell it?", nm)
 		}
+	}
+}
+
+func (i *Inspeqtor) fireEvent(etype EventType, check Checkable, rule *Rule) {
+	if i.silenced() {
+		return
 	}
 }
 
@@ -286,16 +296,27 @@ func (i *Inspeqtor) collectService(svc *Service, completeCallback func(*Service)
 		if err != nil {
 			util.Warn(err.Error())
 		} else {
+			oldpid := svc.PID
 			svc.PID = pid
 			svc.Status = status
+			if oldpid == 0 && pid > 0 && status == services.Up {
+				i.fireEvent(ServiceExists, svc, nil)
+			}
 		}
 	}
 
 	if svc.Status == services.Up {
 		err := metrics.CaptureProcess(svc.Metrics, "/proc", int(svc.PID))
 		if err != nil {
-			util.Warn("Error capturing process " + strconv.Itoa(int(svc.PID)) + ", marking as Down: " + err.Error())
-			svc.Status = services.Down
+			_, othererr := os.FindProcess(int(svc.PID))
+			if othererr != nil {
+				util.Info("Service %s with PID %d does not exist: %s", svc.Name(), svc.PID, othererr.Error())
+				svc.Status = services.Down
+				svc.PID = 0
+				i.fireEvent(ServiceDoesNotExist, svc, nil)
+			} else {
+				util.Warn("Error capturing metrics for process %d: %s", svc.PID, err.Error())
+			}
 		}
 	}
 }
@@ -313,7 +334,7 @@ func (i *Inspeqtor) TestNotifications() {
 			continue
 		}
 		util.Info("Triggering notification for %s/%s", route.Channel, nm)
-		err = notifier.Trigger(&Alert{i.Host.Rules[0]})
+		err = notifier.Trigger(&Event{i.Host, i.Host.Rules[0], HealthFailure})
 		if err != nil {
 			util.Warn("Error firing %s/%s route: %s", route.Channel, nm, err.Error())
 		}
