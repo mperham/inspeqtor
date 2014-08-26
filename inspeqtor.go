@@ -8,7 +8,6 @@ import (
 	"net"
 	"os"
 	"os/signal"
-	"strconv"
 	"sync"
 	"syscall"
 	"time"
@@ -242,20 +241,20 @@ func (i *Inspeqtor) resolveServices() {
 				continue
 			}
 
-			pid, status, err := sm.LookupService(nm)
+			status, err := sm.LookupService(nm)
 			if err != nil {
+				serr := err.(*services.ServiceError)
+				if serr.Err == services.ErrServiceNotFound {
+					util.Debug(sm.Name() + " doesn't have " + svc.Name())
+					continue
+				}
 				util.Warn(err.Error())
 				return
 			}
-			if pid == -1 {
-				util.Debug(sm.Name() + " doesn't have " + svc.Name())
-				continue
-			}
-			util.Info("Found " + sm.Name() + "/" + svc.Name() + " with PID " + strconv.Itoa(int(pid)))
-			svc.PID = pid
-			svc.Status = status
+			util.Info("Found %s/%s with status %s", sm.Name(), svc.Name(), status)
+			svc.Process = status
 			svc.Manager = sm
-			if svc.PID == 0 {
+			if svc.Process.Status == services.Down {
 				i.fireEvent(ServiceDoesNotExist, svc, nil)
 			}
 			break
@@ -291,31 +290,30 @@ func (i *Inspeqtor) collectService(svc *Service, completeCallback func(*Service)
 		// Couldn't resolve it when we started up so we can't collect it.
 		return
 	}
-	if svc.Status != services.Up {
-		pid, status, err := svc.Manager.LookupService(svc.Name())
+	if svc.Process.Status != services.Up {
+		status, err := svc.Manager.LookupService(svc.Name())
 		if err != nil {
 			util.Warn(err.Error())
 		} else {
-			oldpid := svc.PID
-			svc.PID = pid
-			svc.Status = status
-			if oldpid == 0 && pid > 0 && status == services.Up {
+			oldpid := svc.Process.Pid
+			svc.Process = status
+			if oldpid == 0 && status.Pid > 0 && status.Status == services.Up {
 				i.fireEvent(ServiceExists, svc, nil)
 			}
 		}
 	}
 
-	if svc.Status == services.Up {
-		err := metrics.CaptureProcess(svc.Metrics, "/proc", int(svc.PID))
+	if svc.Process.Status == services.Up {
+		err := metrics.CaptureProcess(svc.Metrics, "/proc", svc.Process.Pid)
 		if err != nil {
-			_, othererr := os.FindProcess(int(svc.PID))
+			_, othererr := os.FindProcess(svc.Process.Pid)
 			if othererr != nil {
-				util.Info("Service %s with PID %d does not exist: %s", svc.Name(), svc.PID, othererr.Error())
-				svc.Status = services.Down
-				svc.PID = 0
+				util.Info("Service %s with process %d does not exist: %s", svc.Name(), svc.Process.Pid, othererr.Error())
+				svc.Process.Status = services.Down
+				svc.Process.Pid = 0
 				i.fireEvent(ServiceDoesNotExist, svc, nil)
 			} else {
-				util.Warn("Error capturing metrics for process %d: %s", svc.PID, err.Error())
+				util.Warn("Error capturing metrics for process %d: %s", svc.Process.Pid, err.Error())
 			}
 		}
 	}

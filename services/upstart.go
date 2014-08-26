@@ -57,25 +57,25 @@ func (u *Upstart) Restart(serviceName string) error {
 		cmd := exec.Command("restart", serviceName)
 		sout, err = cmd.CombinedOutput()
 		if err != nil {
-			return err
+			return &ServiceError{u.Name(), serviceName, err}
 		}
 	}
 
 	lines, err := util.ReadLines(sout)
 	if len(lines) != 1 {
-		return errors.New("Unexpected output: " + strings.Join(lines, "\n"))
+		return &ServiceError{u.Name(), serviceName, errors.New("Unexpected output: " + strings.Join(lines, "\n"))}
 	}
 	return nil
 }
 
-func (u *Upstart) LookupService(serviceName string) (ProcessId, Status, error) {
+func (u *Upstart) LookupService(serviceName string) (*ProcessStatus, error) {
 	matches, err := filepath.Glob(u.path + "/" + serviceName + ".conf")
 	if err != nil {
-		return 0, Unknown, err
+		return nil, &ServiceError{u.Name(), serviceName, err}
 	}
 
 	if len(matches) == 0 {
-		return -1, Unknown, nil
+		return nil, &ServiceError{u.Name(), serviceName, ErrServiceNotFound}
 	}
 
 	var sout []byte
@@ -85,20 +85,20 @@ func (u *Upstart) LookupService(serviceName string) (ProcessId, Status, error) {
 		cmd := exec.Command("status", serviceName)
 		sout, err = cmd.CombinedOutput()
 		if err != nil {
-			return 0, Unknown, err
+			return nil, &ServiceError{u.Name(), serviceName, err}
 		}
 	}
 
 	lines, err := util.ReadLines(sout)
 	if len(lines) != 1 {
-		return 0, Unknown, errors.New("Unexpected output: " + strings.Join(lines, "\n"))
+		return nil, &ServiceError{u.Name(), serviceName, errors.New("Unexpected output: " + strings.Join(lines, "\n"))}
 	}
 
 	// mysql start/running, process 14190
 	// sshdgenkeys stop/waiting
 	line := lines[0]
 	if strings.Contains(line, "Unknown job") {
-		return -1, Unknown, nil
+		return nil, &ServiceError{u.Name(), serviceName, ErrServiceNotFound}
 	}
 
 	results := pidScanner.FindStringSubmatch(line)
@@ -106,21 +106,21 @@ func (u *Upstart) LookupService(serviceName string) (ProcessId, Status, error) {
 	if len(results) == 4 && len(results[3]) > 0 {
 		pid, err := strconv.ParseInt(results[3], 10, 32)
 		if err != nil {
-			return 0, Unknown, err
+			return nil, &ServiceError{u.Name(), serviceName, err}
 		}
-		return ProcessId(pid), Up, nil
+		return &ProcessStatus{int(pid), Up}, nil
 	}
 
 	if len(results) == 3 {
 		switch {
 		case results[1] == "start":
-			return 0, Starting, nil
+			return &ProcessStatus{0, Starting}, nil
 		case results[1] == "stop" && results[2] != "waiting":
-			return 0, Stopping, nil
+			return &ProcessStatus{0, Stopping}, nil
 		case results[1] == "stop":
-			return 0, Down, nil
+			return &ProcessStatus{0, Down}, nil
 		}
 	}
 
-	return 0, Unknown, errors.New("Unknown upstart output: " + line)
+	return nil, &ServiceError{u.Name(), serviceName, errors.New("Unknown upstart output: " + line)}
 }

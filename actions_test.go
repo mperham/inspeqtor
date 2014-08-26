@@ -14,7 +14,7 @@ func makeAction(actionName, notifType string, config map[string]string) (Action,
 }
 
 func mockService(name string) *Service {
-	return &Service{name, 999, services.Up, nil, nil, nil, services.MockInit()}
+	return &Service{name, &services.ProcessStatus{999, services.Up}, nil, nil, nil, services.MockInit()}
 }
 
 func TestRestartAlert(t *testing.T) {
@@ -32,11 +32,11 @@ func TestRestart(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, res)
 
-	assert.Equal(t, 999, s.PID)
-	assert.Equal(t, services.Up, s.Status)
+	assert.Equal(t, 999, s.Process.Pid)
+	assert.Equal(t, services.Up, s.Process.Status)
 	res.Trigger(nil)
-	assert.Equal(t, 0, s.PID)
-	assert.Equal(t, services.Starting, s.Status)
+	assert.Equal(t, 0, s.Process.Pid)
+	assert.Equal(t, services.Starting, s.Process.Status)
 }
 
 func TestGmailNotifier(t *testing.T) {
@@ -82,7 +82,7 @@ func TestMissingEmailNotifier(t *testing.T) {
 
 func TestEmailTrigger(t *testing.T) {
 	t.Parallel()
-	svc := Service{"mysql", 0, services.Down, nil, nil, metrics.NewProcessStore(), nil}
+	svc := Service{"mysql", nil, nil, nil, metrics.NewProcessStore(), nil}
 	alert := &Event{
 		&svc, &Rule{&svc, "memory", "rss", GT, "64m", 64 * 1024 * 1024, 0, 1, 0, Ok, nil}, HealthFailure,
 	}

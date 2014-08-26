@@ -1,11 +1,38 @@
 package services
 
 import (
+	"errors"
+	"fmt"
 	"inspeqtor/util"
 )
 
-type ProcessId int
+type ProcessStatus struct {
+	Pid int
+	Status
+}
+
+func (s *ProcessStatus) String() string {
+	return fmt.Sprintf("%s/%d", s.Status, s.Pid)
+}
+
 type Status uint8
+
+func (s Status) String() string {
+	switch s {
+	case Unknown:
+		return "Unknown"
+	case Down:
+		return "Down"
+	case Starting:
+		return "Starting"
+	case Up:
+		return "Up"
+	case Stopping:
+		return "Stopping"
+	default:
+		return fmt.Sprintf("Oops: %d", s)
+	}
+}
 
 const (
 	Unknown Status = iota
@@ -15,22 +42,30 @@ const (
 	Stopping
 )
 
-//
+type ServiceError struct {
+	Name string
+	Init string
+	Err  error
+}
+
+func (e *ServiceError) Error() string { return e.Init + "/" + e.Name + ": " + e.Err.Error() }
+
+var ErrServiceNotFound = errors.New("No such service")
+
 // Your init system(s) manages services.  We use
 // the init system to:
-// 1. find the associated PID
+// 1. find the associated process
 // 2. restart the service
-//
 type InitSystem interface {
 	// Name of the init system: "upstart", "runit", etc.
 	Name() string
 
-	// Look up PID for the given service name, returns
-	// positive integer if successful, -1 if the service
-	// name was not found or error if there was an
-	// unexpected failure.
-	LookupService(name string) (ProcessId, Status, error)
+	// Find the process info for a given service name.  All errors
+	// returned must be of type ServiceError.
+	LookupService(name string) (*ProcessStatus, error)
 
+	// Restart the process associated with the given service name.  All errors
+	// returned must be of type ServiceError.
 	Restart(name string) error
 }
 
@@ -55,7 +90,10 @@ func Detect() []InitSystem {
 		sm, err := funk()
 		if err != nil {
 			util.Warn("Couldn't detect %s: %s", name, err.Error())
-		} else {
+			continue
+		}
+
+		if sm != nil {
 			inits = append(inits, sm)
 		}
 	}
@@ -82,6 +120,6 @@ func (m *MockInitSystem) Restart(name string) error {
 	return nil
 }
 
-func (m *MockInitSystem) LookupService(name string) (ProcessId, Status, error) {
-	return ProcessId(123), Up, nil
+func (m *MockInitSystem) LookupService(name string) (*ProcessStatus, error) {
+	return &ProcessStatus{123, Up}, nil
 }

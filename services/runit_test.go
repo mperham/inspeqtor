@@ -11,16 +11,16 @@ func TestDetectRunit(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, runit)
 
-	pid, status, err := runit.LookupService("memcached")
+	st, err := runit.LookupService("memcached")
+	assert.NotNil(t, st)
 	assert.Nil(t, err)
-	assert.Equal(t, 1234, pid)
-	assert.Equal(t, Up, status)
+	assert.Equal(t, 1234, st.Pid)
+	assert.Equal(t, Up, st.Status)
 
 	// bad service name
-	pid, status, err = runit.LookupService("nonexistent")
-	assert.Nil(t, err)
-	assert.Equal(t, Unknown, status)
-	assert.Equal(t, -1, pid)
+	st, err = runit.LookupService("nonexistent")
+	assert.Nil(t, st)
+	assert.NotNil(t, err)
 
 	runit.(*Runit).dummyOutput = "ok: run: memcached: (pid 28125) 1s"
 	err = runit.Restart("memcached")

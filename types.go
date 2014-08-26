@@ -17,8 +17,7 @@ import (
 */
 type Service struct {
 	ServiceName string
-	PID         services.ProcessId
-	Status      services.Status
+	Process     *services.ProcessStatus
 	Rules       []*Rule
 	Parameters  map[string]string
 	Metrics     *metrics.Storage
@@ -67,8 +66,8 @@ type Restartable interface {
 }
 
 func (s *Service) Restart() error {
-	s.PID = 0
-	s.Status = services.Starting
+	s.Process.Pid = 0
+	s.Process.Status = services.Starting
 	go func() {
 		util.Debug("Restarting %s", s.ServiceName)
 		err := s.Manager.Restart(s.ServiceName)

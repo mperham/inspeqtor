@@ -69,7 +69,7 @@ func (r *Runit) Restart(serviceName string) error {
 		cmd := exec.Command("sv", "restart", serviceName)
 		sout, err := cmd.CombinedOutput()
 		if err != nil {
-			return err
+			return &ServiceError{r.Name(), serviceName, err}
 		}
 		out = sout
 	} else {
@@ -79,33 +79,33 @@ func (r *Runit) Restart(serviceName string) error {
 
 	lines, err := util.ReadLines(out)
 	if err != nil {
-		return err
+		return &ServiceError{r.Name(), serviceName, err}
 	}
 	if len(lines) != 1 {
-		return errors.New("Unexpected output: " + strings.Join(lines, "\n"))
+		return &ServiceError{r.Name(), serviceName, errors.New("Unexpected output: " + strings.Join(lines, "\n"))}
 	}
 	return nil
 }
 
-func (r *Runit) LookupService(serviceName string) (ProcessId, Status, error) {
+func (r *Runit) LookupService(serviceName string) (*ProcessStatus, error) {
 	matches, err := filepath.Glob(r.path + "/" + serviceName + "/run")
 	if err != nil {
-		return 0, Unknown, err
+		return nil, &ServiceError{r.Name(), serviceName, err}
 	}
 
 	if len(matches) == 0 {
-		return -1, Unknown, nil
+		return nil, &ServiceError{r.Name(), serviceName, ErrServiceNotFound}
 	}
 
 	content, err := ioutil.ReadFile(r.path + "/" + serviceName + "/supervise/pid")
 	if len(content) == 0 {
 		// service exists but is not running
-		return 0, Down, nil
+		return &ProcessStatus{0, Down}, nil
 	}
 	pid, err := strconv.ParseInt(strings.TrimSpace(string(content)), 10, 32)
 	if err != nil {
-		return 0, Unknown, err
+		return nil, &ServiceError{r.Name(), serviceName, err}
 	}
 
-	return ProcessId(pid), Up, nil
+	return &ProcessStatus{int(pid), Up}, nil
 }

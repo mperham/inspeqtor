@@ -58,43 +58,43 @@ func (l *Launchctl) resolvePlist(serviceName string) (string, error) {
 func (l *Launchctl) Restart(serviceName string) error {
 	path, err := l.resolvePlist(serviceName)
 	if err != nil {
-		return err
+		return &ServiceError{l.Name(), serviceName, err}
 	}
 
 	cmd := exec.Command("launchctl", "unload", path)
 	sout, err := cmd.CombinedOutput()
 	if err != nil {
-		return err
+		return &ServiceError{l.Name(), serviceName, err}
 	}
 
 	lines, err := util.ReadLines(sout)
 	if len(lines) != 0 {
-		return errors.New("Unexpected output: " + strings.Join(lines, "\n"))
+		return &ServiceError{l.Name(), serviceName, errors.New("Unexpected output: " + strings.Join(lines, "\n"))}
 	}
 
 	cmd = exec.Command("launchctl", "load", path)
 	sout, err = cmd.CombinedOutput()
 	if err != nil {
-		return err
+		return &ServiceError{l.Name(), serviceName, err}
 	}
 
 	lines, err = util.ReadLines(sout)
 	if len(lines) != 0 {
-		return errors.New("Unexpected output: " + strings.Join(lines, "\n"))
+		return &ServiceError{l.Name(), serviceName, errors.New("Unexpected output: " + strings.Join(lines, "\n"))}
 	}
 	return nil
 }
 
-func (l *Launchctl) LookupService(serviceName string) (ProcessId, Status, error) {
+func (l *Launchctl) LookupService(serviceName string) (*ProcessStatus, error) {
 	cmd := exec.Command("launchctl", "list")
 	sout, err := cmd.CombinedOutput()
 	if err != nil {
-		return 0, 0, err
+		return nil, &ServiceError{l.Name(), serviceName, err}
 	}
 
 	lines, err := util.ReadLines(sout)
 	if err != nil {
-		return 0, 0, err
+		return nil, &ServiceError{l.Name(), serviceName, err}
 	}
 
 	for _, line := range lines {
@@ -103,12 +103,12 @@ func (l *Launchctl) LookupService(serviceName string) (ProcessId, Status, error)
 			parts := strings.SplitN(line, "\t", 3)
 			pid, err := strconv.ParseInt(parts[0], 10, 32)
 			if err != nil {
-				return 0, 0, err
+				return nil, &ServiceError{l.Name(), serviceName, err}
 			}
 
-			return ProcessId(pid), Up, nil
+			return &ProcessStatus{int(pid), Up}, nil
 		}
 	}
 
-	return -1, Unknown, nil
+	return nil, &ServiceError{l.Name(), serviceName, ErrServiceNotFound}
 }

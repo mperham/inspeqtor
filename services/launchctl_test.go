@@ -13,26 +13,26 @@ func TestLaunchctl(t *testing.T) {
 
 	// Verify we can find a known good service.
 	// Should be running on all OSX machines, right?
-	pid, status, err := l.LookupService("com.apple.Finder")
+	st, err := l.LookupService("com.apple.Finder")
+	assert.NotNil(t, st)
 	assert.Nil(t, err)
-	assert.True(t, pid > 0, "Expected positive value for PID")
-	assert.Equal(t, Up, status)
+	assert.True(t, st.Pid > 0, "Expected positive value for PID")
+	assert.Equal(t, Up, st.Status)
 
-	pid, status, err = l.LookupService("some.fake.service")
-	assert.Nil(t, err)
-	assert.Equal(t, Unknown, status)
-	assert.Equal(t, -1, pid)
+	st, err = l.LookupService("some.fake.service")
+	assert.Nil(t, st)
+	assert.NotNil(t, err)
 
 	err = l.Restart("some.jacked.up.name")
 	assert.NotNil(t, err)
 
-	pid1, status, err := l.LookupService("homebrew.mxcl.memcached")
-	if pid > 0 && status == Up {
+	st1, err := l.LookupService("homebrew.mxcl.memcached")
+	if st1.Pid > 0 && st1.Status == Up {
 		err = l.Restart("homebrew.mxcl.memcached")
 		assert.Nil(t, err)
-		pid2, status, err := l.LookupService("homebrew.mxcl.memcached")
+		st2, err := l.LookupService("homebrew.mxcl.memcached")
 		assert.Nil(t, err)
-		assert.Equal(t, Up, status)
-		assert.NotEqual(t, pid1, pid2)
+		assert.Equal(t, Up, st2.Status)
+		assert.NotEqual(t, st1.Pid, st2.Pid)
 	}
 }
