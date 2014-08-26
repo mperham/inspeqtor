@@ -11,11 +11,11 @@ import (
 	"strings"
 )
 
-type Launchctl struct {
+type Launchd struct {
 	dirs []string
 }
 
-func detectLaunchctl(rootDir string) (InitSystem, error) {
+func detectLaunchd(rootDir string) (InitSystem, error) {
 	file, err := util.FileExists(rootDir + "mach_kernel")
 	if err != nil {
 		return nil, err
@@ -23,7 +23,7 @@ func detectLaunchctl(rootDir string) (InitSystem, error) {
 	if !file {
 		return nil, nil
 	}
-	util.Info("Detected OSX, using launchctl")
+	util.Info("Detected OSX, using launchd")
 
 	usr, err := user.Current()
 	if err != nil {
@@ -37,14 +37,14 @@ func detectLaunchctl(rootDir string) (InitSystem, error) {
 		"/Library/LaunchDaemons",
 		"/System/Library/LaunchDaemons",
 	}
-	return &Launchctl{paths}, nil
+	return &Launchd{paths}, nil
 }
 
-func (l *Launchctl) Name() string {
-	return "launchctl"
+func (l *Launchd) Name() string {
+	return "launchd"
 }
 
-func (l *Launchctl) resolvePlist(serviceName string) (string, error) {
+func (l *Launchd) resolvePlist(serviceName string) (string, error) {
 	for _, path := range l.dirs {
 		candidate := fmt.Sprintf("%s/%s.plist", path, serviceName)
 		_, err := os.Lstat(candidate)
@@ -55,7 +55,7 @@ func (l *Launchctl) resolvePlist(serviceName string) (string, error) {
 	return "", errors.New("Could not find a plist for " + serviceName)
 }
 
-func (l *Launchctl) Restart(serviceName string) error {
+func (l *Launchd) Restart(serviceName string) error {
 	path, err := l.resolvePlist(serviceName)
 	if err != nil {
 		return &ServiceError{l.Name(), serviceName, err}
@@ -85,7 +85,7 @@ func (l *Launchctl) Restart(serviceName string) error {
 	return nil
 }
 
-func (l *Launchctl) LookupService(serviceName string) (*ProcessStatus, error) {
+func (l *Launchd) LookupService(serviceName string) (*ProcessStatus, error) {
 	cmd := exec.Command("launchctl", "list")
 	sout, err := cmd.CombinedOutput()
 	if err != nil {

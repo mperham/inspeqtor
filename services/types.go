@@ -71,8 +71,8 @@ type InitSystem interface {
 
 var (
 	SupportedInits = map[string]func() (InitSystem, error){
-		"launchctl": func() (InitSystem, error) {
-			return detectLaunchctl("/")
+		"launchd": func() (InitSystem, error) {
+			return detectLaunchd("/")
 		},
 		"upstart": func() (InitSystem, error) {
 			return detectUpstart("/etc/init")

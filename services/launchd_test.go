@@ -5,9 +5,9 @@ import (
 	"testing"
 )
 
-func TestLaunchctl(t *testing.T) {
+func TestLaunchd(t *testing.T) {
 	t.Parallel()
-	l, err := detectLaunchctl("darwin/")
+	l, err := detectLaunchd("darwin/")
 	assert.Nil(t, err)
 	assert.NotNil(t, l)
 
