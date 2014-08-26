@@ -138,11 +138,14 @@ func exit(i *Inspeqtor) {
 	os.Exit(0)
 }
 
+// this method never returns.
+//
+// since we can't test this method in an automated fashion, it should
+// contain as little logic as possible.
 func (i *Inspeqtor) runLoop() {
-	util.DebugDebug("Resolving services")
 	i.resolveServices()
-
 	i.scanSystem()
+
 	for {
 		select {
 		case <-time.After(time.Duration(i.GlobalConfig.Top.CycleTime) * time.Second):
@@ -156,6 +159,11 @@ func (i *Inspeqtor) silenced() bool {
 }
 
 func (i *Inspeqtor) scanSystem() {
+	i.collect()
+	i.verify()
+}
+
+func (i *Inspeqtor) collect() {
 	start := time.Now()
 	var barrier sync.WaitGroup
 	barrier.Add(1)
@@ -171,7 +179,9 @@ func (i *Inspeqtor) scanSystem() {
 	}
 	barrier.Wait()
 	util.Debug("Collection complete in " + time.Now().Sub(start).String())
+}
 
+func (i *Inspeqtor) verify() {
 	eventsToTrigger := []*Event{}
 	i.eachRule(func(rule *Rule) {
 		if i.silenced() {
@@ -232,6 +242,7 @@ Resolve each defined service to its managing init system.  Called only
 at startup, this is what maps services to init and fires ServiceDoesNotExist events.
 */
 func (i *Inspeqtor) resolveServices() {
+	util.DebugDebug("Resolving services")
 	for _, svc := range i.Services {
 		nm := svc.Name()
 		for _, sm := range i.ServiceManagers {
