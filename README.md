@@ -24,9 +24,10 @@ What it doesn't:
 * know how to start/stop services.  Defers to your OS's init system
 * have *any* runtime or 3rd party dependencies at all, not even libc.
 
+
 ## Installation
 
-See the Inspeqtor wiki for complete documentation.
+See the [Inspeqtor wiki](https://github.com/mperham/inspeqtor/wiki) for complete documentation.
 
 
 ## Platforms
@@ -48,6 +49,6 @@ Licensed under GPLv3.
 
 # Author
 
-inspeqtor is written by [Mike Perham](http://twitter.com/mperham) of [Contributed Systems](http://contribsys.com).  We build awesome open source-based products.
+inspeqtor is written by [Mike Perham](http://twitter.com/mperham) of [Contributed Systems](http://contribsys.com).  We build awesome open source-based infrastructure to help you build awesome apps.
 
 We also develop [Sidekiq](http://sidekiq.org) and sell [Sidekiq Pro](http://sidekiq.org/pro), the best Ruby background job processing system.
