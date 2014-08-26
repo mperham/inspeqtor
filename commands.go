@@ -72,10 +72,10 @@ func currentInfo(i *Inspeqtor, resp io.Writer) {
 	for _, rule := range i.Host.Rules {
 		io.WriteString(resp, fmt.Sprintf("  %-1s %-20s %-15s %s\n", rule.DisplayState(), rule.MetricName(), rule.DisplayCurrentValue(), rule.DisplayThreshold()))
 	}
-	io.WriteString(resp, "\n")
 
 	for _, svc := range i.Services {
-		io.WriteString(resp, fmt.Sprintf("Service: %s\n", svc.Name()))
+		io.WriteString(resp, "\n")
+		io.WriteString(resp, fmt.Sprintf("Service: %s [%s]\n", svc.Name(), svc.Process))
 
 		for _, rule := range svc.Rules {
 			io.WriteString(resp, fmt.Sprintf("  %-1s %-20s %-15s %s\n", rule.DisplayState(), rule.MetricName(), rule.DisplayCurrentValue(), rule.DisplayThreshold()))
