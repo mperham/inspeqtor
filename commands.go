@@ -68,7 +68,7 @@ func currentInfo(i *Inspeqtor, resp io.Writer) {
 		"%s %s, uptime: %s\n", Name, VERSION, time.Now().Sub(i.StartedAt).String()))
 	io.WriteString(resp, "\n")
 
-	io.WriteString(resp, fmt.Sprintf("Host: %s\n", i.Host.Hostname))
+	io.WriteString(resp, fmt.Sprintf("Host: %s\n", i.Host.Name()))
 	for _, rule := range i.Host.Rules {
 		io.WriteString(resp, fmt.Sprintf("  %-1s %-20s %-15s %s\n", rule.DisplayState(), rule.MetricName(), rule.DisplayCurrentValue(), rule.DisplayThreshold()))
 	}

@@ -105,12 +105,13 @@ func Detect() []InitSystem {
 	return inits
 }
 
-func MockInit() InitSystem {
+func MockInit() *MockInitSystem {
 	return &MockInitSystem{}
 }
 
 type MockInitSystem struct {
-	Actions []string
+	Actions       []string
+	CurrentStatus *ProcessStatus
 }
 
 func (m *MockInitSystem) Name() string { return "mock" }
@@ -121,5 +122,9 @@ func (m *MockInitSystem) Restart(name string) error {
 }
 
 func (m *MockInitSystem) LookupService(name string) (*ProcessStatus, error) {
-	return &ProcessStatus{123, Up}, nil
+	if m.CurrentStatus != nil {
+		return m.CurrentStatus, nil
+	} else {
+		return &ProcessStatus{123, Up}, nil
+	}
 }

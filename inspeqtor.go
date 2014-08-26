@@ -35,7 +35,7 @@ func New(dir string, socketpath string) (*Inspeqtor, error) {
 		SocketPath:   socketpath,
 		StartedAt:    time.Now(),
 		SilenceUntil: time.Now(),
-		Host:         &Host{Hostname: "localhost"},
+		Host:         &Host{&Entity{EntityName: "localhost"}},
 		GlobalConfig: &ConfigFile{Defaults, nil}}
 	return i, nil
 }
@@ -255,7 +255,7 @@ func (i *Inspeqtor) resolveServices() {
 			svc.Process = status
 			svc.Manager = sm
 			if svc.Process.Status == services.Down {
-				i.fireEvent(ServiceDoesNotExist, svc, nil)
+				i.fireEvent(ProcessDoesNotExist, svc, nil)
 			}
 			break
 		}
@@ -293,30 +293,31 @@ func (i *Inspeqtor) collectService(svc *Service, completeCallback func(*Service)
 	if svc.Process.Status != services.Up {
 		status, err := svc.Manager.LookupService(svc.Name())
 		if err != nil {
-			util.Warn(err.Error())
+			util.Warn("%s", err)
 		} else {
 			oldpid := svc.Process.Pid
 			svc.Process = status
 			if oldpid == 0 && status.Pid > 0 && status.Status == services.Up {
-				i.fireEvent(ServiceExists, svc, nil)
+				i.fireEvent(ProcessExists, svc, nil)
 			}
 		}
 	}
 
 	if svc.Process.Status == services.Up {
-		err := metrics.CaptureProcess(svc.Metrics, "/proc", svc.Process.Pid)
-		if err != nil {
-			_, othererr := os.FindProcess(svc.Process.Pid)
-			if othererr != nil {
-				util.Info("Service %s with process %d does not exist: %s", svc.Name(), svc.Process.Pid, othererr.Error())
-				svc.Process.Status = services.Down
+		merr := metrics.CaptureProcess(svc.Metrics, "/proc", svc.Process.Pid)
+		if merr != nil {
+			err := syscall.Kill(svc.Process.Pid, syscall.Signal(0))
+			if err != nil {
+				util.Info("Service %s with process %d does not exist: %s", svc.Name(), svc.Process.Pid, err)
 				svc.Process.Pid = 0
-				i.fireEvent(ServiceDoesNotExist, svc, nil)
+				svc.Process.Status = services.Down
+				i.fireEvent(ProcessDoesNotExist, svc, nil)
 			} else {
-				util.Warn("Error capturing metrics for process %d: %s", svc.Process.Pid, err.Error())
+				util.Warn("Error capturing metrics for process %d: %s", svc.Process.Pid, merr)
 			}
 		}
 	}
+	return
 }
 
 func (i *Inspeqtor) TestNotifications() {

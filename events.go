@@ -25,8 +25,8 @@ package inspeqtor
 type EventType uint8
 
 const (
-	ServiceDoesNotExist EventType = iota
-	ServiceExists
+	ProcessDoesNotExist EventType = iota
+	ProcessExists
 	HealthFailure
 	HealthRecovered
 	ServiceRestarting

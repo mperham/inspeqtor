@@ -64,7 +64,7 @@ func CaptureProcess(store *Storage, rootPath string, pid int) error {
  * So many hacks in this.  OSX support can be seen as "bad" at best.
  */
 func capturePs(store *Storage, pid int) error {
-	cmd := exec.Command("ps", "So", "rss,vsz,time,utime", "-p", strconv.Itoa(int(pid)))
+	cmd := exec.Command("ps", "So", "rss,vsz,time,utime", "-p", strconv.Itoa(pid))
 	sout, err := cmd.CombinedOutput()
 	if err != nil {
 		return err

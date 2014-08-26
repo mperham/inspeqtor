@@ -14,7 +14,7 @@ func makeAction(actionName, notifType string, config map[string]string) (Action,
 }
 
 func mockService(name string) *Service {
-	return &Service{name, &services.ProcessStatus{999, services.Up}, nil, nil, nil, services.MockInit()}
+	return &Service{&Entity{name, nil, nil, nil}, &services.ProcessStatus{999, services.Up}, services.MockInit()}
 }
 
 func TestRestartAlert(t *testing.T) {
@@ -82,7 +82,7 @@ func TestMissingEmailNotifier(t *testing.T) {
 
 func TestEmailTrigger(t *testing.T) {
 	t.Parallel()
-	svc := Service{"mysql", nil, nil, nil, metrics.NewProcessStore(), nil}
+	svc := Service{&Entity{"mysql", nil, nil, metrics.NewProcessStore()}, nil, nil}
 	alert := &Event{
 		&svc, &Rule{&svc, "memory", "rss", GT, "64m", 64 * 1024 * 1024, 0, 1, 0, Ok, nil}, HealthFailure,
 	}
