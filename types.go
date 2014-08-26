@@ -7,10 +7,6 @@ import (
 )
 
 /*
- Core Inspeqtor types, interfaces, etc.
-*/
-
-/*
   A service is a logical named entity we wish to monitor, "mysql".
   A logical service maps onto a physical process with a PID.
   PID 0 means the process did not exist during that cycle.
@@ -61,6 +57,7 @@ type Checkable interface {
 	MetricData() *metrics.Storage
 }
 
+// Service is Restartable, Host is not.
 type Restartable interface {
 	Restart() error
 }
@@ -78,68 +75,4 @@ func (s *Service) Restart() error {
 		}
 	}()
 	return nil
-}
-
-type Operator uint8
-
-const (
-	LT Operator = iota
-	GT
-)
-
-type RuleState uint8
-
-const (
-	Ok RuleState = iota
-	Triggered
-	Recovered
-)
-
-type Rule struct {
-	Entity           Checkable
-	metricFamily     string
-	metricName       string
-	op               Operator
-	displayThreshold string
-	threshold        int64
-	currentValue     int64
-	cycleCount       int
-	trippedCount     int
-	state            RuleState
-	actions          []Action
-}
-
-type Action interface {
-	Trigger(event *Event) error
-}
-
-/*
- There are several different types of Events:
-
- * Process disappeared (or did not exist when we started up)
- * Process appeared
- * Rule triggered based on metric check
- * Metric has recovered
- * Process is restarting due to rule trigger
- * Process has restarted
-*/
-type EventType uint8
-
-const (
-	ServiceDoesNotExist EventType = iota
-	ServiceExists
-	HealthFailure
-	HealthRecovered
-	ServiceRestarting
-	ServiceRestarted
-)
-
-type Event struct {
-	Check Checkable
-	Rule  *Rule
-	Type  EventType
-}
-
-type EventHandler interface {
-	Fire(event *Event)
 }

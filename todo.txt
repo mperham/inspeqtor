@@ -1,7 +1,6 @@
 Blockers
 - Implement "Does not exist" service logic
-- Debug missing emails
-- Improve email template
+- Implement events
 
 Non-blockers
 - Better config parser error handling?
