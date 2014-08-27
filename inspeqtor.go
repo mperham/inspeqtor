@@ -246,7 +246,6 @@ Resolve each defined service to its managing init system.  Called only
 at startup, this is what maps services to init and fires ProcessDoesNotExist events.
 */
 func (i *Inspeqtor) resolveService(svc *Service) {
-	nm := svc.Name()
 	for _, sm := range i.ServiceManagers {
 		// TODO There's a bizarre race condition here. Figure out
 		// why this is necessary.  We shouldn't be multi-threaded yet.
@@ -254,7 +253,7 @@ func (i *Inspeqtor) resolveService(svc *Service) {
 			continue
 		}
 
-		ps, err := sm.LookupService(nm)
+		ps, err := sm.LookupService(svc.Name())
 		if err != nil {
 			serr := err.(*services.ServiceError)
 			if serr.Err == services.ErrServiceNotFound {
@@ -272,7 +271,7 @@ func (i *Inspeqtor) resolveService(svc *Service) {
 		break
 	}
 	if svc.Manager == nil {
-		util.Warn("Could not find service %s, did you misspell it?", nm)
+		util.Warn("Could not find service %s, did you misspell it?", svc.Name())
 	}
 }
 
