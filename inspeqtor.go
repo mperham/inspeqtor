@@ -36,7 +36,7 @@ func New(dir string, socketpath string) (*Inspeqtor, error) {
 		StartedAt:    time.Now(),
 		SilenceUntil: time.Now(),
 		Host:         &Host{&Entity{EntityName: "localhost"}},
-		GlobalConfig: &ConfigFile{Defaults, nil}}
+		GlobalConfig: &ConfigFile{Defaults, map[string]*AlertRoute{}}}
 	return i, nil
 }
 
@@ -278,7 +278,32 @@ func (i *Inspeqtor) resolveServices() {
 
 func (i *Inspeqtor) fireEvent(etype EventType, check Checkable, rule *Rule) {
 	if i.silenced() {
+		util.Debug("SILENCED %s %s", etype, check.Name())
 		return
+	}
+
+	util.Warn("%s %s", etype, check.Name())
+
+	var actions []Action
+	if rule != nil {
+		actions = rule.actions
+	} else {
+		route := i.GlobalConfig.AlertRoutes[check.Owner()]
+		if route == nil {
+			util.Warn("No such route: %s, did you misspell it?", check.Owner)
+		}
+		action, err := Actions["alert"](check, route)
+		if err != nil {
+			util.Warn("Unable to send alert: %s", err)
+			return
+		}
+		actions = append(actions, action)
+	}
+
+	evt := Event{etype, check, rule}
+
+	for _, action := range actions {
+		action.Trigger(&evt)
 	}
 }
 
@@ -344,7 +369,7 @@ func (i *Inspeqtor) TestNotifications() {
 			continue
 		}
 		util.Info("Triggering notification for %s/%s", route.Channel, nm)
-		err = notifier.Trigger(&Event{i.Host, i.Host.Rules[0], HealthFailure})
+		err = notifier.Trigger(&Event{MetricFailed, i.Host, i.Host.Rules[0]})
 		if err != nil {
 			util.Warn("Error firing %s/%s route: %s", route.Channel, nm, err.Error())
 		}

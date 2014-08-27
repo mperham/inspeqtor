@@ -1,5 +1,9 @@
 package inspeqtor
 
+import (
+	"fmt"
+)
+
 /*
  There are 3 pairs of events we need to handle:
  1. Process does not exist, either on startup or disappearing during a cycle.
@@ -27,14 +31,35 @@ type EventType uint8
 const (
 	ProcessDoesNotExist EventType = iota
 	ProcessExists
-	HealthFailure
-	HealthRecovered
+	MetricFailed
+	MetricRecovered
 	ServiceRestarting
 	ServiceRestarted
 )
 
+// Go question: is there a way to automate / DRY up
+// this boilerplate?
+func (s EventType) String() string {
+	switch s {
+	case ProcessDoesNotExist:
+		return "ProcessDoesNotExist"
+	case ProcessExists:
+		return "ProcessExists"
+	case MetricFailed:
+		return "MetricFailed"
+	case MetricRecovered:
+		return "MetricRecovered"
+	case ServiceRestarting:
+		return "ServiceRestarting"
+	case ServiceRestarted:
+		return "ServiceRestarted"
+	default:
+		return fmt.Sprintf("Oops: %d", s)
+	}
+}
+
 type Event struct {
+	Type  EventType
 	Check Checkable
 	Rule  *Rule
-	Type  EventType
 }

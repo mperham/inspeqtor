@@ -134,7 +134,7 @@ func okHandler(rule *Rule, tripped bool) *Event {
 	if tripped && rule.trippedCount == rule.cycleCount {
 		util.Warn("%s[%s] triggered.  Current value = %d", rule.EntityName(), rule.MetricName(), rule.currentValue)
 		rule.state = Triggered
-		return &Event{rule.Entity, rule, HealthFailure}
+		return &Event{MetricFailed, rule.Entity, rule}
 	} else if tripped {
 		util.Debug("%s[%s] tripped. Current: %d, Threshold: %d", rule.EntityName(), rule.MetricName(), rule.currentValue, rule.threshold)
 	}
@@ -147,7 +147,7 @@ func recoveredHandler(rule *Rule, tripped bool) *Event {
 		rule.state = Triggered
 	} else {
 		rule.state = Ok
-		return &Event{rule.Entity, rule, HealthRecovered}
+		return &Event{MetricRecovered, rule.Entity, rule}
 	}
 	return nil
 }
