@@ -12,7 +12,7 @@ const (
 
 func TestRulesCheck(t *testing.T) {
 	t.Parallel()
-	svc := Service{&Entity{"mysql", nil, nil, metrics.NewProcessStore()}, nil, nil}
+	svc := Service{&Entity{"mysql", nil, nil, metrics.NewProcessStore()}, nil, nil, nil}
 	rule := &Rule{&svc, "memory", "rss", LT, "64m", 64 * MB, 0, 2, 0, Ok, nil}
 
 	// no data in the buffer

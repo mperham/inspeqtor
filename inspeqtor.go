@@ -143,7 +143,11 @@ func exit(i *Inspeqtor) {
 // since we can't test this method in an automated fashion, it should
 // contain as little logic as possible.
 func (i *Inspeqtor) runLoop() {
-	i.resolveServices()
+	util.DebugDebug("Resolving services")
+	for _, svc := range i.Services {
+		i.resolveService(svc)
+	}
+
 	i.scanSystem()
 
 	for {
@@ -239,44 +243,55 @@ func (i *Inspeqtor) collectHost(completeCallback func()) {
 
 /*
 Resolve each defined service to its managing init system.  Called only
-at startup, this is what maps services to init and fires ServiceDoesNotExist events.
+at startup, this is what maps services to init and fires ProcessDoesNotExist events.
 */
-func (i *Inspeqtor) resolveServices() {
-	util.DebugDebug("Resolving services")
-	for _, svc := range i.Services {
-		nm := svc.Name()
-		for _, sm := range i.ServiceManagers {
-			// TODO There's a bizarre race condition here. Figure out
-			// why this is necessary.  We shouldn't be multi-threaded yet.
-			if sm == nil {
+func (i *Inspeqtor) resolveService(svc *Service) {
+	nm := svc.Name()
+	for _, sm := range i.ServiceManagers {
+		// TODO There's a bizarre race condition here. Figure out
+		// why this is necessary.  We shouldn't be multi-threaded yet.
+		if sm == nil {
+			continue
+		}
+
+		ps, err := sm.LookupService(nm)
+		if err != nil {
+			serr := err.(*services.ServiceError)
+			if serr.Err == services.ErrServiceNotFound {
+				util.Debug(sm.Name() + " doesn't have " + svc.Name())
 				continue
 			}
-
-			status, err := sm.LookupService(nm)
-			if err != nil {
-				serr := err.(*services.ServiceError)
-				if serr.Err == services.ErrServiceNotFound {
-					util.Debug(sm.Name() + " doesn't have " + svc.Name())
-					continue
-				}
-				util.Warn(err.Error())
-				return
-			}
-			util.Info("Found %s/%s with status %s", sm.Name(), svc.Name(), status)
-			svc.Process = status
-			svc.Manager = sm
-			if svc.Process.Status == services.Down {
-				i.fireEvent(ProcessDoesNotExist, svc, nil)
-			}
-			break
+			util.Warn(err.Error())
+			return
 		}
-		if svc.Manager == nil {
-			util.Warn("Could not find service %s, did you misspell it?", nm)
-		}
+		util.Info("Found %s/%s with status %s", sm.Name(), svc.Name(), ps)
+		svc.Manager = sm
+		svc.Transition(ps, func(et EventType) {
+			i.handleProcessEvent(et, svc)
+		})
+		break
+	}
+	if svc.Manager == nil {
+		util.Warn("Could not find service %s, did you misspell it?", nm)
 	}
 }
 
-func (i *Inspeqtor) fireEvent(etype EventType, check Checkable, rule *Rule) {
+func (i *Inspeqtor) handleProcessEvent(etype EventType, svc *Service) {
+	if i.silenced() {
+		util.Debug("SILENCED %s %s", etype, svc.Name())
+		return
+	}
+
+	util.Warn("%s %s", etype, svc.Name())
+
+	evt := Event{etype, svc, nil}
+	err := svc.EventHandler.Trigger(&evt)
+	if err != nil {
+		util.Warn("%s", err)
+	}
+}
+
+func (i *Inspeqtor) handleRuleEvent(etype EventType, check Checkable, rule *Rule) {
 	if i.silenced() {
 		util.Debug("SILENCED %s %s", etype, check.Name())
 		return
@@ -284,26 +299,12 @@ func (i *Inspeqtor) fireEvent(etype EventType, check Checkable, rule *Rule) {
 
 	util.Warn("%s %s", etype, check.Name())
 
-	var actions []Action
-	if rule != nil {
-		actions = rule.actions
-	} else {
-		route := i.GlobalConfig.AlertRoutes[check.Owner()]
-		if route == nil {
-			util.Warn("No such route: %s, did you misspell it?", check.Owner)
-		}
-		action, err := Actions["alert"](check, route)
-		if err != nil {
-			util.Warn("Unable to send alert: %s", err)
-			return
-		}
-		actions = append(actions, action)
-	}
-
 	evt := Event{etype, check, rule}
-
-	for _, action := range actions {
-		action.Trigger(&evt)
+	for _, action := range rule.actions {
+		err := action.Trigger(&evt)
+		if err != nil {
+			util.Warn("%s", err)
+		}
 	}
 }
 
@@ -331,11 +332,9 @@ func (i *Inspeqtor) collectService(svc *Service, completeCallback func(*Service)
 		if err != nil {
 			util.Warn("%s", err)
 		} else {
-			oldpid := svc.Process.Pid
-			svc.Process = status
-			if oldpid == 0 && status.Pid > 0 && status.Status == services.Up {
-				i.fireEvent(ProcessExists, svc, nil)
-			}
+			svc.Transition(status, func(et EventType) {
+				i.handleProcessEvent(et, svc)
+			})
 		}
 	}
 
@@ -345,9 +344,9 @@ func (i *Inspeqtor) collectService(svc *Service, completeCallback func(*Service)
 			err := syscall.Kill(svc.Process.Pid, syscall.Signal(0))
 			if err != nil {
 				util.Info("Service %s with process %d does not exist: %s", svc.Name(), svc.Process.Pid, err)
-				svc.Process.Pid = 0
-				svc.Process.Status = services.Down
-				i.fireEvent(ProcessDoesNotExist, svc, nil)
+				svc.Transition(&services.ProcessStatus{0, services.Down}, func(et EventType) {
+					i.handleProcessEvent(et, svc)
+				})
 			} else {
 				util.Warn("Error capturing metrics for process %d: %s", svc.Process.Pid, merr)
 			}

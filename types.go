@@ -32,8 +32,10 @@ func (e *Entity) MetricData() *metrics.Storage {
 */
 type Service struct {
 	*Entity
-	Process *services.ProcessStatus
-	Manager services.InitSystem
+	// Handles process events: exists, doesn't exist
+	EventHandler Action
+	Process      *services.ProcessStatus
+	Manager      services.InitSystem
 }
 
 /*
@@ -67,4 +69,22 @@ func (s *Service) Restart() error {
 		}
 	}()
 	return nil
+}
+
+func (s *Service) Transition(ps *services.ProcessStatus, emitter func(EventType)) {
+	oldst := s.Process.Status
+	s.Process = ps
+
+	switch ps.Status {
+	case services.Up:
+		if oldst != services.Unknown {
+			// Don't need to fire the event when first starting up and
+			// transitioning from Unknown to Up.
+			emitter(ProcessExists)
+		}
+	case services.Down:
+		emitter(ProcessDoesNotExist)
+	default:
+		// do nothing
+	}
 }
