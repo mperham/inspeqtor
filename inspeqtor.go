@@ -35,7 +35,7 @@ func New(dir string, socketpath string) (*Inspeqtor, error) {
 		SocketPath:   socketpath,
 		StartedAt:    time.Now(),
 		SilenceUntil: time.Now(),
-		Host:         &Host{&Entity{EntityName: "localhost"}},
+		Host:         &Host{&Entity{name: "localhost"}},
 		GlobalConfig: &ConfigFile{Defaults, map[string]*AlertRoute{}}}
 	return i, nil
 }
@@ -164,7 +164,7 @@ func (i *Inspeqtor) silenced() bool {
 
 func (i *Inspeqtor) scanSystem() {
 	i.collect()
-	i.verify()
+	i.verify(i.Host, i.Services)
 }
 
 func (i *Inspeqtor) collect() {
@@ -185,9 +185,9 @@ func (i *Inspeqtor) collect() {
 	util.Debug("Collection complete in " + time.Now().Sub(start).String())
 }
 
-func (i *Inspeqtor) verify() {
+func (i *Inspeqtor) verify(host *Host, services []*Service) []*Event {
 	eventsToTrigger := []*Event{}
-	i.eachRule(func(rule *Rule) {
+	checker := func(rule *Rule) {
 		if i.silenced() {
 			// We are silenced until some point in the future.
 			// We don't want to check rules (as a deploy might use
@@ -200,25 +200,24 @@ func (i *Inspeqtor) verify() {
 				eventsToTrigger = append(eventsToTrigger, event)
 			}
 		}
-	})
+	}
+
+	for _, rule := range host.Rules() {
+		checker(rule)
+	}
+
+	for _, svc := range services {
+		for _, rule := range svc.Rules() {
+			checker(rule)
+		}
+	}
 
 	/*
 	   We now have a set of rules which have failed.  We need to trigger
 	   the actions for each.
 	*/
 	i.triggerActions(eventsToTrigger)
-}
-
-func (i *Inspeqtor) eachRule(funk func(*Rule)) {
-	for _, rule := range i.Host.Rules {
-		funk(rule)
-	}
-
-	for _, svc := range i.Services {
-		for _, rule := range svc.Rules {
-			funk(rule)
-		}
-	}
+	return eventsToTrigger
 }
 
 func (i *Inspeqtor) triggerActions(alerts []*Event) error {
@@ -235,7 +234,7 @@ func (i *Inspeqtor) triggerActions(alerts []*Event) error {
 
 func (i *Inspeqtor) collectHost(completeCallback func()) {
 	defer completeCallback()
-	err := metrics.CollectHostMetrics(i.Host.Metrics, "/proc")
+	err := metrics.CollectHostMetrics(i.Host.Metrics(), "/proc")
 	if err != nil {
 		util.Warn("Error collecting host metrics: %s", err.Error())
 	}
@@ -338,7 +337,7 @@ func (i *Inspeqtor) collectService(svc *Service, completeCallback func(*Service)
 	}
 
 	if svc.Process.Status == services.Up {
-		merr := metrics.CaptureProcess(svc.Metrics, "/proc", svc.Process.Pid)
+		merr := metrics.CaptureProcess(svc.Metrics(), "/proc", svc.Process.Pid)
 		if merr != nil {
 			err := syscall.Kill(svc.Process.Pid, syscall.Signal(0))
 			if err != nil {
@@ -367,7 +366,7 @@ func (i *Inspeqtor) TestNotifications() {
 			continue
 		}
 		util.Info("Triggering notification for %s/%s", route.Channel, nm)
-		err = notifier.Trigger(&Event{MetricFailed, i.Host, i.Host.Rules[0]})
+		err = notifier.Trigger(&Event{MetricFailed, i.Host, i.Host.Rules()[0]})
 		if err != nil {
 			util.Warn("Error firing %s/%s route: %s", route.Channel, nm, err.Error())
 		}

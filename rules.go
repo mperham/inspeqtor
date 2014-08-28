@@ -62,11 +62,11 @@ func (r *Rule) Threshold() int64 {
 }
 
 func (r *Rule) CurrentValue() int64 {
-	return r.Entity.MetricData().Get(r.metricFamily, r.metricName)
+	return r.Entity.Metrics().Get(r.metricFamily, r.metricName)
 }
 
 func (r *Rule) DisplayCurrentValue() string {
-	return r.Entity.MetricData().Display(r.metricFamily, r.metricName)
+	return r.Entity.Metrics().Display(r.metricFamily, r.metricName)
 }
 
 func (r *Rule) Op() string {
@@ -97,7 +97,7 @@ func (r *Rule) Reset() {
  Recovered - rule is currently Triggered but threshold was not breached this time
 */
 func (rule *Rule) Check() *Event {
-	rule.currentValue = rule.Entity.MetricData().Get(rule.metricFamily, rule.metricName)
+	rule.currentValue = rule.Entity.Metrics().Get(rule.metricFamily, rule.metricName)
 	if rule.currentValue == -1 {
 		return nil
 	}

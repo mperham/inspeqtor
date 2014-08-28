@@ -8,22 +8,30 @@ import (
 
 // A named thing which can checked by Inspeqtor
 type Entity struct {
-	EntityName string
-	Rules      []*Rule
-	Parameters map[string]string
-	Metrics    *metrics.Storage
+	name       string
+	rules      []*Rule
+	metrics    *metrics.Storage
+	parameters map[string]string
 }
 
 func (e *Entity) Name() string {
-	return e.EntityName
+	return e.name
+}
+
+func (e *Entity) Rules() []*Rule {
+	return e.rules
+}
+
+func (e *Entity) Parameter(key string) string {
+	return e.parameters[key]
 }
 
 func (e *Entity) Owner() string {
-	return e.Parameters["owner"]
+	return e.Parameter("owner")
 }
 
-func (e *Entity) MetricData() *metrics.Storage {
-	return e.Metrics
+func (e *Entity) Metrics() *metrics.Storage {
+	return e.metrics
 }
 
 /*
@@ -48,7 +56,7 @@ type Host struct {
 type Checkable interface {
 	Name() string
 	Owner() string
-	MetricData() *metrics.Storage
+	Metrics() *metrics.Storage
 }
 
 // A Service is Restartable, Host is not.

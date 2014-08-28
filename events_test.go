@@ -42,7 +42,7 @@ func TestEventProcessAppears(t *testing.T) {
 	act := mockAction()
 
 	assert.Equal(t, 0, act.Size())
-	svc := &Service{&Entity{"foo", nil, nil, metrics.NewProcessStore()}, act, &services.ProcessStatus{0, services.Down}, init}
+	svc := &Service{&Entity{"foo", nil, metrics.NewProcessStore(), nil}, act, &services.ProcessStatus{0, services.Down}, init}
 	i.collectService(svc, func(_ *Service) {})
 	assert.Equal(t, 1, act.Size())
 	assert.Equal(t, services.Up, svc.Process.Status)
@@ -63,7 +63,7 @@ func TestEventProcessDneAtStartup(t *testing.T) {
 	act := mockAction()
 
 	assert.Equal(t, 0, act.Size())
-	svc := &Service{&Entity{"dne", nil, nil, metrics.NewProcessStore()}, act, &services.ProcessStatus{0, services.Unknown}, nil}
+	svc := &Service{&Entity{"dne", nil, metrics.NewProcessStore(), nil}, act, &services.ProcessStatus{0, services.Unknown}, nil}
 	i.resolveService(svc)
 	assert.Equal(t, services.Down, svc.Process.Status)
 	assert.Equal(t, 0, svc.Process.Pid)
@@ -84,11 +84,38 @@ func TestEventProcessExistsAtStartup(t *testing.T) {
 	act := mockAction()
 
 	assert.Equal(t, 0, act.Size())
-	svc := &Service{&Entity{"exists", nil, nil, metrics.NewProcessStore()}, act, &services.ProcessStatus{0, services.Unknown}, init}
+	svc := &Service{&Entity{"exists", nil, metrics.NewProcessStore(), nil}, act, &services.ProcessStatus{0, services.Unknown}, init}
 	i.resolveService(svc)
 	assert.Equal(t, services.Up, svc.Process.Status)
 	assert.Equal(t, 100, svc.Process.Pid)
 	assert.Equal(t, 0, act.Size())
+}
+
+func TestEventMetricFails(t *testing.T) {
+	t.Parallel()
+
+	i, err := New("", "")
+	assert.Nil(t, err)
+
+	init := services.MockInit()
+	init.CurrentStatus = &services.ProcessStatus{os.Getpid(), services.Up}
+	i.ServiceManagers = append(i.ServiceManagers, init)
+
+	act := mockAction()
+
+	assert.Equal(t, 0, act.Size())
+	svc := &Service{&Entity{"me", nil, metrics.NewProcessStore(), nil}, act, &services.ProcessStatus{0, services.Unknown}, init}
+	rule := &Rule{svc, "memory", "rss", LT, "100m", 100 * 1024 * 1024, 0, 1, 0, Ok, []Action{act}}
+	svc.rules = []*Rule{rule}
+
+	i.collectService(svc, func(_ *Service) {})
+	events := i.verify(i.Host, []*Service{svc})
+	assert.Equal(t, 1, len(events))
+
+	assert.Equal(t, services.Up, svc.Process.Status)
+	assert.Equal(t, os.Getpid(), svc.Process.Pid)
+	assert.Equal(t, 1, act.Size())
+	assert.Equal(t, MetricFailed, act.Latest().Type)
 }
 
 type TestAction struct {

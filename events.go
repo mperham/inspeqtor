@@ -21,10 +21,8 @@ import (
 
  * Process disappeared (or did not exist when we started up)
  * Process appeared
- * Rule triggered based on metric check
+ * Metric failed check
  * Metric has recovered
- * Process is restarting due to rule trigger
- * Process has restarted
 */
 type EventType uint8
 
@@ -33,8 +31,6 @@ const (
 	ProcessExists
 	MetricFailed
 	MetricRecovered
-	ServiceRestarting
-	ServiceRestarted
 )
 
 // Go question: is there a way to automate / DRY up
@@ -49,10 +45,6 @@ func (s EventType) String() string {
 		return "MetricFailed"
 	case MetricRecovered:
 		return "MetricRecovered"
-	case ServiceRestarting:
-		return "ServiceRestarting"
-	case ServiceRestarted:
-		return "ServiceRestarted"
 	default:
 		return fmt.Sprintf("Oops: %d", s)
 	}

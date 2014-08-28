@@ -75,7 +75,7 @@ func convertHost(global *ConfigFile, inqhost *ast.HostCheck) (*Host, error) {
 	}
 
 	storage := metrics.NewHostStore()
-	h := &Host{&Entity{hostname, nil, inqhost.Parameters, storage}}
+	h := &Host{&Entity{hostname, nil, storage, inqhost.Parameters}}
 	rules := make([]*Rule, len(inqhost.Rules))
 	for idx, rule := range inqhost.Rules {
 		rule, err := convertRule(global, h, rule)
@@ -85,7 +85,7 @@ func convertHost(global *ConfigFile, inqhost *ast.HostCheck) (*Host, error) {
 		}
 		rules[idx] = rule
 	}
-	h.Rules = rules
+	h.rules = rules
 	return h, nil
 }
 
@@ -100,7 +100,7 @@ func convertRule(global *ConfigFile, check Checkable, inqrule ast.Rule) (*Rule, 
 		return nil, errors.New("Unknown operator: " + inqrule.Operator)
 	}
 
-	threshold, err := check.MetricData().PrepareRule(inqrule.Metric.Family, inqrule.Metric.Name, inqrule.Threshold.Parsed)
+	threshold, err := check.Metrics().PrepareRule(inqrule.Metric.Family, inqrule.Metric.Name, inqrule.Threshold.Parsed)
 	if err != nil {
 		return nil, err
 	}
@@ -144,7 +144,7 @@ func convertService(global *ConfigFile, inqsvc *ast.ProcessCheck) (*Service, err
 	rules := make([]*Rule, len(inqsvc.Rules))
 	storage := metrics.NewProcessStore()
 
-	svc := &Service{&Entity{inqsvc.Name, nil, inqsvc.Parameters, storage}, nil, nil, nil}
+	svc := &Service{&Entity{inqsvc.Name, nil, storage, inqsvc.Parameters}, nil, nil, nil}
 
 	action, err := convertAction(global, svc, "alert", inqsvc.Parameters["owner"])
 	if err != nil {
@@ -160,6 +160,6 @@ func convertService(global *ConfigFile, inqsvc *ast.ProcessCheck) (*Service, err
 		util.DebugDebug("Rule: %+v", *rule)
 		rules[idx] = rule
 	}
-	svc.Rules = rules
+	svc.rules = rules
 	return svc, nil
 }

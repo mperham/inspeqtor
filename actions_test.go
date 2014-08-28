@@ -82,7 +82,7 @@ func TestMissingEmailNotifier(t *testing.T) {
 
 func TestEmailTrigger(t *testing.T) {
 	t.Parallel()
-	svc := Service{&Entity{"mysql", nil, nil, metrics.NewProcessStore()}, nil, nil, nil}
+	svc := Service{&Entity{"mysql", nil, metrics.NewProcessStore(), nil}, nil, nil, nil}
 	alert := &Event{
 		MetricFailed, &svc, &Rule{&svc, "memory", "rss", GT, "64m", 64 * 1024 * 1024, 0, 1, 0, Ok, nil},
 	}
