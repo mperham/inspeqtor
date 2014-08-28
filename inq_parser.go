@@ -6,6 +6,7 @@ import (
 	"inspeqtor/conf/inq/lexer"
 	"inspeqtor/conf/inq/parser"
 	"inspeqtor/metrics"
+	"inspeqtor/services"
 	"inspeqtor/util"
 	"io/ioutil"
 	"os"
@@ -144,7 +145,7 @@ func convertService(global *ConfigFile, inqsvc *ast.ProcessCheck) (*Service, err
 	rules := make([]*Rule, len(inqsvc.Rules))
 	storage := metrics.NewProcessStore()
 
-	svc := &Service{&Entity{inqsvc.Name, nil, storage, inqsvc.Parameters}, nil, nil, nil}
+	svc := &Service{&Entity{inqsvc.Name, nil, storage, inqsvc.Parameters}, nil, services.NewStatus(), nil}
 
 	action, err := convertAction(global, svc, "alert", inqsvc.Parameters["owner"])
 	if err != nil {

@@ -11,6 +11,10 @@ type ProcessStatus struct {
 	Status
 }
 
+func NewStatus() *ProcessStatus {
+	return &ProcessStatus{}
+}
+
 func (s *ProcessStatus) String() string {
 	return fmt.Sprintf("%s/%d", s.Status, s.Pid)
 }

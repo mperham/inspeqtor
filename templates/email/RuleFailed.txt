@@ -1,5 +1,5 @@
 To: {{.Config.To}} <{{.Config.To}}>
 From: {{.Config.From}} <{{.Config.From}}>
-Subject: [{{.Rule.EntityName}}] {{.Rule.MetricName}} is {{.Rule.Op}} than {{.Rule.DisplayThreshold}}
+Subject: [{{.Rule.EntityName}}] {{.Rule.MetricName}} has failed its check
 
 {{.Rule.MetricName}} is {{.Rule.Op}} than {{.Rule.DisplayThreshold}} for the {{.Rule.EntityName}} service.
