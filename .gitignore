@@ -26,3 +26,4 @@ output/
 tags
 .local.sh
 realtest
+templates.go
