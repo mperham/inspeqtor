@@ -43,7 +43,11 @@ func (s EventType) String() string {
 }
 
 type Event struct {
-	Type  EventType
-	Check Checkable
-	Rule  *Rule
+	Type EventType
+	Checkable
+	*Rule
+}
+
+func (e *Event) Service() *Service {
+	return e.Checkable.(*Service)
 }

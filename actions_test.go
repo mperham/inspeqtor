@@ -80,12 +80,9 @@ func TestMissingEmailNotifier(t *testing.T) {
 	assert.Nil(t, action)
 }
 
-func TestEmailTrigger(t *testing.T) {
+func TestEmailEventRuleFailed(t *testing.T) {
 	t.Parallel()
-	svc := Service{&Entity{"mysql", nil, metrics.NewProcessStore(), nil}, nil, nil, nil}
-	alert := &Event{
-		RuleFailed, &svc, &Rule{&svc, "memory", "rss", GT, "64m", 64 * 1024 * 1024, 0, 1, 0, Ok, nil},
-	}
+	alert := validRuleEvent(RuleFailed)
 
 	err := validEmailSetup().TriggerEmail(alert, func(e *EmailNotifier, doc bytes.Buffer) error {
 		content := string(doc.Bytes())
@@ -94,6 +91,57 @@ func TestEmailTrigger(t *testing.T) {
 		return nil
 	})
 	assert.Nil(t, err)
+}
+
+func TestEmailEventProcessExists(t *testing.T) {
+	t.Parallel()
+	alert := validProcessEvent(ProcessExists)
+
+	err := validEmailSetup().TriggerEmail(alert, func(e *EmailNotifier, doc bytes.Buffer) error {
+		content := string(doc.Bytes())
+		assert.True(t, strings.Index(content, "PID 100") > 0, "email does not contain expected content")
+		assert.True(t, strings.Index(content, "The mysql service") > 0, "email does not contain expected content")
+		return nil
+	})
+	assert.Nil(t, err)
+}
+
+func TestEmailEventProcessDoesNotExist(t *testing.T) {
+	t.Parallel()
+	alert := validProcessEvent(ProcessDoesNotExist)
+
+	err := validEmailSetup().TriggerEmail(alert, func(e *EmailNotifier, doc bytes.Buffer) error {
+		content := string(doc.Bytes())
+		assert.True(t, strings.Index(content, "can't locate") > 0, "email does not contain expected content")
+		assert.True(t, strings.Index(content, "the mysql service") > 0, "email does not contain expected content")
+		return nil
+	})
+	assert.Nil(t, err)
+}
+
+func TestEmailEventRuleRecovered(t *testing.T) {
+	t.Parallel()
+	alert := validRuleEvent(RuleRecovered)
+
+	err := validEmailSetup().TriggerEmail(alert, func(e *EmailNotifier, doc bytes.Buffer) error {
+		content := string(doc.Bytes())
+		assert.True(t, strings.Index(content, "has recovered") > 0, "email does not contain expected content")
+		assert.True(t, strings.Index(content, "[mysql]") > 0, "email does not contain expected content")
+		return nil
+	})
+	assert.Nil(t, err)
+}
+
+func validRuleEvent(etype EventType) *Event {
+	svc := &Service{&Entity{"mysql", nil, metrics.NewProcessStore(), nil}, nil, &services.ProcessStatus{100, services.Up}, nil}
+	return &Event{
+		etype, svc, &Rule{svc, "memory", "rss", GT, "64m", 64 * 1024 * 1024, 0, 1, 0, Ok, nil},
+	}
+}
+
+func validProcessEvent(etype EventType) *Event {
+	svc := &Service{&Entity{"mysql", nil, metrics.NewProcessStore(), nil}, nil, &services.ProcessStatus{100, services.Up}, nil}
+	return &Event{etype, svc, nil}
 }
 
 func validEmailSetup() *EmailNotifier {

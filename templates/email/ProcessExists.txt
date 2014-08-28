@@ -1,0 +1,8 @@
+To: {{.Config.To}} <{{.Config.To}}>
+From: {{.Config.From}} <{{.Config.From}}>
+Subject: [Inspeqtor] {{.Checkable.Name}} is now running.
+
+The {{.Checkable.Name}} service is now running with PID {{.Service.Process.Pid}}
+
+Your Pal,
+Inspeqtor
