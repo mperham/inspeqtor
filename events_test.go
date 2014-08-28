@@ -91,7 +91,7 @@ func TestEventProcessExistsAtStartup(t *testing.T) {
 	assert.Equal(t, 0, act.Size())
 }
 
-func TestEventMetricFails(t *testing.T) {
+func TestEventRuleFails(t *testing.T) {
 	t.Parallel()
 
 	i, err := New("", "")
@@ -112,10 +112,10 @@ func TestEventMetricFails(t *testing.T) {
 	events = i.verify(nil, []*Service{svc})
 	assert.Equal(t, 1, len(events))
 	assert.Equal(t, 1, act.Size())
-	assert.Equal(t, MetricFailed, act.Latest().Type)
+	assert.Equal(t, RuleFailed, act.Latest().Type)
 }
 
-func TestEventMetricRecovers(t *testing.T) {
+func TestEventRuleRecovers(t *testing.T) {
 	t.Parallel()
 
 	i, err := New("", "")
@@ -130,7 +130,7 @@ func TestEventMetricRecovers(t *testing.T) {
 	events := i.verify(nil, []*Service{svc})
 	assert.Equal(t, 1, len(events))
 	assert.Equal(t, 1, act.Size())
-	assert.Equal(t, MetricFailed, act.Latest().Type)
+	assert.Equal(t, RuleFailed, act.Latest().Type)
 
 	// recovery takes 2 cycles so we don't flap unnecessarily
 	rule.threshold = 1
@@ -142,7 +142,7 @@ func TestEventMetricRecovers(t *testing.T) {
 	events = i.verify(nil, []*Service{svc})
 	assert.Equal(t, 1, len(events))
 	assert.Equal(t, 2, act.Size())
-	assert.Equal(t, MetricRecovered, act.Latest().Type)
+	assert.Equal(t, RuleRecovered, act.Latest().Type)
 }
 
 type TestAction struct {

@@ -37,7 +37,7 @@ func TestRulesCheck(t *testing.T) {
 	svc.metrics = metrics.NewProcessStore("memory", "rss", 62*MB)
 	result = rule.Check()
 	assert.NotNil(t, result)
-	assert.Equal(t, result.Type, MetricFailed)
+	assert.Equal(t, result.Type, RuleFailed)
 	assert.Equal(t, 2, rule.trippedCount)
 	assert.Equal(t, 62*MB, rule.currentValue)
 	assert.Equal(t, Triggered, rule.state)
@@ -58,7 +58,7 @@ func TestRulesCheck(t *testing.T) {
 	svc.metrics = metrics.NewProcessStore("memory", "rss", 66*MB)
 	result = rule.Check()
 	assert.NotNil(t, result)
-	assert.Equal(t, result.Type, MetricRecovered)
+	assert.Equal(t, result.Type, RuleRecovered)
 	assert.Equal(t, 66*MB, rule.currentValue)
 	assert.Equal(t, Ok, rule.state)
 }

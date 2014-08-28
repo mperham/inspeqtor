@@ -14,13 +14,20 @@ type Action interface {
 	Trigger(event *Event) error
 }
 
-const (
-	emailTemplate = "To: {{.Config.To}} <{{.Config.To}}>\r\n" +
-		"From: {{.Config.From}} <{{.Config.From}}>\r\n" +
-		"Subject: [{{.Rule.EntityName}}] {{.Rule.MetricName}} is {{.Rule.Op}} than {{.Rule.DisplayThreshold}}\r\n" +
-		"\r\n" +
-		"[{{.Rule.EntityName}}] {{.Rule.MetricName}} is {{.Rule.Op}} than {{.Rule.DisplayThreshold}}"
+var (
+	emailTemplates = map[EventType]*template.Template{}
 )
+
+func init() {
+	for _, event := range Events {
+		str := event.String()
+		asset, err := Asset("templates/email/" + str + ".txt")
+		if err != nil {
+			panic(err)
+		}
+		emailTemplates[event] = template.Must(template.New(str).Parse(string(asset)))
+	}
+}
 
 /*
  Global parser parses "send alert" statements and creates alert route objects.
@@ -90,10 +97,6 @@ func buildGmailNotifier(check Checkable, params map[string]string) (Action, erro
 	return buildEmailNotifier(check, params)
 }
 
-var (
-	email = template.Must(template.New("emailTemplate").Parse(emailTemplate))
-)
-
 type EmailSender func(e *EmailNotifier, doc bytes.Buffer) error
 
 type EmailNotifier struct {
@@ -123,7 +126,8 @@ func (e EmailNotifier) Trigger(event *Event) error {
 
 func (e *EmailNotifier) TriggerEmail(event *Event, sender EmailSender) error {
 	var doc bytes.Buffer
-	err := email.Execute(&doc, &EmailEvent{event, e})
+	template := emailTemplates[event.Type]
+	err := template.Execute(&doc, &EmailEvent{event, e})
 	if err != nil {
 		return err
 	}

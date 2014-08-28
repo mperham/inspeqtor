@@ -368,7 +368,7 @@ func (i *Inspeqtor) TestNotifications() {
 			continue
 		}
 		util.Info("Triggering notification for %s/%s", route.Channel, nm)
-		err = notifier.Trigger(&Event{MetricFailed, i.Host, i.Host.Rules()[0]})
+		err = notifier.Trigger(&Event{RuleFailed, i.Host, i.Host.Rules()[0]})
 		if err != nil {
 			util.Warn("Error firing %s/%s route: %s", route.Channel, nm, err.Error())
 		}

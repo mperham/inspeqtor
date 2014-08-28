@@ -14,7 +14,9 @@ BASENAME=$(NAME)_$(VERSION)-$(ITERATION)
 
 all: test
 
+# go get github.com/jteeuwen/go-bindata/...
 test:
+	@go-bindata -pkg inspeqtor -o templates.go templates/...
 	@go test -parallel 4 ./... | grep -v "no test files"
 
 build: test
