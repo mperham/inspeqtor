@@ -1,8 +1,5 @@
 # Blockers
 
-- Implement "Does not exist" service logic
-- Implement events
-
 # Non-blockers
 
 - Better config parser error handling?
