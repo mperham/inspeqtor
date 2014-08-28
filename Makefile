@@ -1,5 +1,5 @@
 NAME=inspeqtor
-VERSION=0.0.1
+VERSION=0.0.2
 
 # when fixing packaging bugs but not changing the binary, we increment this number
 ITERATION=1
@@ -31,7 +31,7 @@ real:
 	go run cmd/main.go -l debug -s i.sock -c realtest
 
 # TODO add build_rpm when working
-package: build_deb
+package: clean build_deb
 
 deploy: clean build_deb
 	scp packaging/output/$(BASENAME)_amd64.deb $(PRODUCTION):~
