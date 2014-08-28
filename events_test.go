@@ -28,6 +28,7 @@ func TestEventProcessDisappears(t *testing.T) {
 	assert.Equal(t, services.Down, svc.Process.Status)
 	assert.Equal(t, 0, svc.Process.Pid)
 	assert.Equal(t, 1, act.Size())
+	assert.Equal(t, ProcessDoesNotExist, act.Latest().Type)
 }
 
 func TestEventProcessAppears(t *testing.T) {
@@ -46,6 +47,7 @@ func TestEventProcessAppears(t *testing.T) {
 	assert.Equal(t, 1, act.Size())
 	assert.Equal(t, services.Up, svc.Process.Status)
 	assert.Equal(t, os.Getpid(), svc.Process.Pid)
+	assert.Equal(t, ProcessExists, act.Latest().Type)
 }
 
 func TestEventProcessDneAtStartup(t *testing.T) {
@@ -63,9 +65,10 @@ func TestEventProcessDneAtStartup(t *testing.T) {
 	assert.Equal(t, 0, act.Size())
 	svc := &Service{&Entity{"dne", nil, nil, metrics.NewProcessStore()}, act, &services.ProcessStatus{0, services.Unknown}, nil}
 	i.resolveService(svc)
-	assert.Equal(t, 1, act.Size())
 	assert.Equal(t, services.Down, svc.Process.Status)
 	assert.Equal(t, 0, svc.Process.Pid)
+	assert.Equal(t, 1, act.Size())
+	assert.Equal(t, ProcessDoesNotExist, act.Latest().Type)
 }
 
 func TestEventProcessExistsAtStartup(t *testing.T) {
@@ -83,13 +86,17 @@ func TestEventProcessExistsAtStartup(t *testing.T) {
 	assert.Equal(t, 0, act.Size())
 	svc := &Service{&Entity{"exists", nil, nil, metrics.NewProcessStore()}, act, &services.ProcessStatus{0, services.Unknown}, init}
 	i.resolveService(svc)
-	assert.Equal(t, 0, act.Size())
 	assert.Equal(t, services.Up, svc.Process.Status)
 	assert.Equal(t, 100, svc.Process.Pid)
+	assert.Equal(t, 0, act.Size())
 }
 
 type TestAction struct {
 	events []Event
+}
+
+func (t *TestAction) Latest() Event {
+	return t.events[len(t.events)-1]
 }
 
 func (t *TestAction) Size() int {
