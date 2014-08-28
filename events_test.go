@@ -96,26 +96,53 @@ func TestEventMetricFails(t *testing.T) {
 
 	i, err := New("", "")
 	assert.Nil(t, err)
-
-	init := services.MockInit()
-	init.CurrentStatus = &services.ProcessStatus{os.Getpid(), services.Up}
-	i.ServiceManagers = append(i.ServiceManagers, init)
-
 	act := mockAction()
 
+	svc := &Service{&Entity{"me", nil, metrics.NewProcessStore(), nil}, act, &services.ProcessStatus{os.Getpid(), services.Up}, services.MockInit()}
+	rule := &Rule{svc, "memory", "rss", LT, "100m", 100 * 1024 * 1024, 0, 2, 0, Ok, []Action{act}}
+	svc.rules = []*Rule{rule}
+
+	// first collection should trip but not trigger since rule requires 2 cycles
+	i.collectService(svc, func(_ *Service) {})
+	events := i.verify(nil, []*Service{svc})
+	assert.Equal(t, 0, len(events))
 	assert.Equal(t, 0, act.Size())
-	svc := &Service{&Entity{"me", nil, metrics.NewProcessStore(), nil}, act, &services.ProcessStatus{0, services.Unknown}, init}
+
+	i.collectService(svc, func(_ *Service) {})
+	events = i.verify(nil, []*Service{svc})
+	assert.Equal(t, 1, len(events))
+	assert.Equal(t, 1, act.Size())
+	assert.Equal(t, MetricFailed, act.Latest().Type)
+}
+
+func TestEventMetricRecovers(t *testing.T) {
+	t.Parallel()
+
+	i, err := New("", "")
+	assert.Nil(t, err)
+	act := mockAction()
+
+	svc := &Service{&Entity{"me", nil, metrics.NewProcessStore(), nil}, act, &services.ProcessStatus{os.Getpid(), services.Up}, services.MockInit()}
 	rule := &Rule{svc, "memory", "rss", LT, "100m", 100 * 1024 * 1024, 0, 1, 0, Ok, []Action{act}}
 	svc.rules = []*Rule{rule}
 
 	i.collectService(svc, func(_ *Service) {})
-	events := i.verify(i.Host, []*Service{svc})
+	events := i.verify(nil, []*Service{svc})
 	assert.Equal(t, 1, len(events))
-
-	assert.Equal(t, services.Up, svc.Process.Status)
-	assert.Equal(t, os.Getpid(), svc.Process.Pid)
 	assert.Equal(t, 1, act.Size())
 	assert.Equal(t, MetricFailed, act.Latest().Type)
+
+	// recovery takes 2 cycles so we don't flap unnecessarily
+	rule.threshold = 1
+	i.collectService(svc, func(_ *Service) {})
+	events = i.verify(nil, []*Service{svc})
+	assert.Equal(t, 0, len(events))
+
+	i.collectService(svc, func(_ *Service) {})
+	events = i.verify(nil, []*Service{svc})
+	assert.Equal(t, 1, len(events))
+	assert.Equal(t, 2, act.Size())
+	assert.Equal(t, MetricRecovered, act.Latest().Type)
 }
 
 type TestAction struct {

@@ -202,8 +202,10 @@ func (i *Inspeqtor) verify(host *Host, services []*Service) []*Event {
 		}
 	}
 
-	for _, rule := range host.Rules() {
-		checker(rule)
+	if host != nil {
+		for _, rule := range host.Rules() {
+			checker(rule)
+		}
 	}
 
 	for _, svc := range services {
