@@ -11,13 +11,28 @@ const (
 	GT
 )
 
-type RuleState uint8
+func (o Operator) String() string {
+	switch o {
+	case GT:
+		return "greater than"
+	case LT:
+		return "less than"
+	default:
+		return "???"
+	}
+}
+
+type RuleState string
 
 const (
-	Ok RuleState = iota
-	Triggered
-	Recovered
+	Ok        RuleState = "Ok"
+	Triggered RuleState = "Triggered"
+	Recovered RuleState = "Recovered"
 )
+
+func (o RuleState) String() string {
+	return string(o)
+}
 
 type Rule struct {
 	Entity           Checkable
@@ -70,14 +85,7 @@ func (r *Rule) DisplayCurrentValue() string {
 }
 
 func (r *Rule) Op() string {
-	switch r.op {
-	case GT:
-		return "greater than"
-	case LT:
-		return "less than"
-	default:
-		return "?"
-	}
+	return r.op.String()
 }
 
 func (r *Rule) Reset() {

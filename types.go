@@ -34,6 +34,14 @@ func (e *Entity) Metrics() *metrics.Storage {
 	return e.metrics
 }
 
+func NewHost() *Host {
+	return &Host{&Entity{"localhost", nil, metrics.NewHostStore(), nil}}
+}
+
+func NewService(name string) *Service {
+	return &Service{&Entity{name, nil, metrics.NewProcessStore(), nil}, nil, services.NewStatus(), nil}
+}
+
 /*
   A service is an Entity which resolves to a Process
   we can monitor.
