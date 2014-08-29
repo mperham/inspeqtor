@@ -86,8 +86,8 @@ func TestEmailEventRuleFailed(t *testing.T) {
 
 	err := validEmailSetup().TriggerEmail(alert, func(e *EmailNotifier, doc bytes.Buffer) error {
 		content := string(doc.Bytes())
-		assert.True(t, strings.Index(content, "[mysql]") > 0, "email does not contain expected content")
-		assert.True(t, strings.Index(content, "memory(rss)") > 0, "email does not contain expected content")
+		assert.True(t, strings.Index(content, "[mysql]") > 0, "email does not contain expected content: "+content)
+		assert.True(t, strings.Index(content, "memory(rss)") > 0, "email does not contain expected content: "+content)
 		return nil
 	})
 	assert.Nil(t, err)

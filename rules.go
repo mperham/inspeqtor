@@ -36,22 +36,22 @@ func (o RuleState) String() string {
 
 type Rule struct {
 	Entity           Checkable
-	metricFamily     string
-	metricName       string
-	op               Operator
-	displayThreshold string
-	threshold        int64
-	currentValue     int64
-	cycleCount       int
-	trippedCount     int
-	state            RuleState
-	actions          []Action
+	MetricFamily     string
+	MetricName       string
+	Op               Operator
+	DisplayThreshold string
+	Threshold        int64
+	CurrentValue     int64
+	CycleCount       int
+	TrippedCount     int
+	State            RuleState
+	Actions          []Action
 }
 
-func (r *Rule) MetricName() string {
-	s := r.metricFamily
-	if r.metricName != "" {
-		s += "(" + r.metricName + ")"
+func (r *Rule) Metric() string {
+	s := r.MetricFamily
+	if r.MetricName != "" {
+		s += "(" + r.MetricName + ")"
 	}
 	return s
 }
@@ -61,35 +61,23 @@ func (r *Rule) EntityName() string {
 }
 
 func (r *Rule) DisplayState() string {
-	if r.state == Triggered {
+	if r.State == Triggered {
 		return "!"
 	} else {
 		return ""
 	}
 }
 
-func (r *Rule) DisplayThreshold() string {
-	return r.displayThreshold
+func (r *Rule) FetchLatestMetricValue() int64 {
+	return r.Entity.Metrics().Get(r.MetricFamily, r.MetricName)
 }
 
-func (r *Rule) Threshold() int64 {
-	return r.threshold
-}
-
-func (r *Rule) CurrentValue() int64 {
-	return r.Entity.Metrics().Get(r.metricFamily, r.metricName)
-}
-
-func (r *Rule) DisplayCurrentValue() string {
-	return r.Entity.Metrics().Display(r.metricFamily, r.metricName)
-}
-
-func (r *Rule) Op() string {
-	return r.op.String()
+func (r *Rule) FetchDisplayCurrentValue() string {
+	return r.Entity.Metrics().Display(r.MetricFamily, r.MetricName)
 }
 
 func (r *Rule) Reset() {
-	r.trippedCount = 0
+	r.TrippedCount = 0
 }
 
 /*
@@ -105,27 +93,27 @@ func (r *Rule) Reset() {
  Recovered - rule is currently Triggered but threshold was not breached this time
 */
 func (rule *Rule) Check() *Event {
-	rule.currentValue = rule.Entity.Metrics().Get(rule.metricFamily, rule.metricName)
-	if rule.currentValue == -1 {
+	rule.CurrentValue = rule.FetchLatestMetricValue()
+	if rule.CurrentValue == -1 {
 		return nil
 	}
 
 	tripped := false
 
-	switch rule.op {
+	switch rule.Op {
 	case LT:
-		tripped = rule.currentValue < rule.threshold
+		tripped = rule.CurrentValue < rule.Threshold
 	case GT:
-		tripped = rule.currentValue > rule.threshold
+		tripped = rule.CurrentValue > rule.Threshold
 	}
 
 	if tripped {
-		rule.trippedCount = rule.trippedCount + 1
+		rule.TrippedCount = rule.TrippedCount + 1
 	} else {
-		rule.trippedCount = 0
+		rule.TrippedCount = 0
 	}
 
-	return stateMachine[rule.state](rule, tripped)
+	return stateMachine[rule.State](rule, tripped)
 }
 
 type stateHandler func(*Rule, bool) *Event
@@ -139,22 +127,22 @@ var (
 )
 
 func okHandler(rule *Rule, tripped bool) *Event {
-	if tripped && rule.trippedCount == rule.cycleCount {
-		util.Warn("%s[%s] triggered.  Current value = %d", rule.EntityName(), rule.MetricName(), rule.currentValue)
-		rule.state = Triggered
+	if tripped && rule.TrippedCount == rule.CycleCount {
+		util.Warn("%s[%s] triggered.  Current value = %d", rule.EntityName(), rule.Metric(), rule.CurrentValue)
+		rule.State = Triggered
 		return &Event{RuleFailed, rule.Entity, rule}
 	} else if tripped {
-		util.Debug("%s[%s] tripped. Current: %d, Threshold: %d", rule.EntityName(), rule.MetricName(), rule.currentValue, rule.threshold)
+		util.Debug("%s[%s] tripped. Current: %d, Threshold: %d", rule.EntityName(), rule.Metric(), rule.CurrentValue, rule.Threshold)
 	}
 	return nil
 }
 
 func recoveredHandler(rule *Rule, tripped bool) *Event {
-	if tripped && rule.trippedCount == rule.cycleCount {
-		util.Warn("%s[%s] flapped.  Current value = %d", rule.EntityName(), rule.MetricName(), rule.currentValue)
-		rule.state = Triggered
+	if tripped && rule.TrippedCount == rule.CycleCount {
+		util.Warn("%s[%s] flapped.  Current value = %d", rule.EntityName(), rule.Metric(), rule.CurrentValue)
+		rule.State = Triggered
 	} else {
-		rule.state = Ok
+		rule.State = Ok
 		return &Event{RuleRecovered, rule.Entity, rule}
 	}
 	return nil
@@ -162,11 +150,11 @@ func recoveredHandler(rule *Rule, tripped bool) *Event {
 
 func triggeredHandler(rule *Rule, tripped bool) *Event {
 	if !tripped {
-		util.Info("%s[%s] recovered.", rule.EntityName(), rule.MetricName())
-		rule.state = Recovered
+		util.Info("%s[%s] recovered.", rule.EntityName(), rule.Metric())
+		rule.State = Recovered
 		return nil
 	} else {
-		util.Debug("%s[%s] still triggered. Current: %d, Threshold: %d", rule.EntityName(), rule.MetricName(), rule.currentValue, rule.threshold)
+		util.Debug("%s[%s] still triggered. Current: %d, Threshold: %d", rule.EntityName(), rule.Metric(), rule.CurrentValue, rule.Threshold)
 	}
 	return nil
 }

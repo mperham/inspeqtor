@@ -224,7 +224,7 @@ func (i *Inspeqtor) verify(host *Host, services []*Service) []*Event {
 
 func (i *Inspeqtor) triggerActions(alerts []*Event) error {
 	for _, alert := range alerts {
-		for _, action := range alert.Rule.actions {
+		for _, action := range alert.Rule.Actions {
 			err := action.Trigger(alert)
 			if err != nil {
 				util.Warn("Error triggering action: %s", err.Error())
@@ -300,7 +300,7 @@ func (i *Inspeqtor) handleRuleEvent(etype EventType, check Checkable, rule *Rule
 	util.Warn("%s %s", etype, check.Name())
 
 	evt := Event{etype, check, rule}
-	for _, action := range rule.actions {
+	for _, action := range rule.Actions {
 		err := action.Trigger(&evt)
 		if err != nil {
 			util.Warn("%s", err)

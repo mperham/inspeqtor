@@ -133,7 +133,7 @@ func TestEventRuleRecovers(t *testing.T) {
 	assert.Equal(t, RuleFailed, act.Latest().Type)
 
 	// recovery takes 2 cycles so we don't flap unnecessarily
-	rule.threshold = 1
+	rule.Threshold = 1
 	i.collectService(svc, func(_ *Service) {})
 	events = i.verify(nil, []*Service{svc})
 	assert.Equal(t, 0, len(events))
