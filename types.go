@@ -55,7 +55,7 @@ type Service struct {
 }
 
 func (s *Service) Capture(path string) error {
-	return metrics.CaptureProcess(s.Metrics(), path, s.Process.Pid)
+	return metrics.CollectProcess(s.Metrics(), path, s.Process.Pid)
 }
 
 /*
@@ -66,7 +66,7 @@ type Host struct {
 }
 
 func (h *Host) Capture(path string) error {
-	return metrics.CollectHostMetrics(h.Metrics(), path)
+	return metrics.CollectHost(h.Metrics(), path)
 }
 
 type Checkable interface {

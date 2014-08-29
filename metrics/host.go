@@ -52,7 +52,7 @@ func NewHostStore() *Storage {
 	return store
 }
 
-func CollectHostMetrics(store *Storage, path string) error {
+func CollectHost(store *Storage, path string) error {
 	var err error
 
 	err = collectLoadAverage(path, store)

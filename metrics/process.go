@@ -30,7 +30,7 @@ func NewProcessStore(values ...interface{}) *Storage {
 	return store
 }
 
-func CaptureProcess(store *Storage, rootPath string, pid int) error {
+func CollectProcess(store *Storage, rootPath string, pid int) error {
 	var err error
 
 	ok, err := util.FileExists(rootPath)

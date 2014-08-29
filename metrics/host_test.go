@@ -8,7 +8,7 @@ import (
 func TestCollectHostMetrics(t *testing.T) {
 	t.Parallel()
 	store := NewHostStore()
-	err := CollectHostMetrics(store, "proc")
+	err := CollectHost(store, "proc")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -23,7 +23,7 @@ func TestCollectHostMetrics(t *testing.T) {
 	assert.Equal(t, store.Get("load", "15"), 5)
 	assert.Equal(t, store.Get("swap", ""), 2)
 
-	err = CollectHostMetrics(store, "proc2")
+	err = CollectHost(store, "proc2")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -51,7 +51,7 @@ func TestCollectHostMetrics(t *testing.T) {
 func TestCollectRealHostMetrics(t *testing.T) {
 	t.Parallel()
 	store := NewHostStore()
-	err := CollectHostMetrics(store, "/proc")
+	err := CollectHost(store, "/proc")
 	if err != nil {
 		t.Fatal(err)
 	}
