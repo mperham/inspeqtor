@@ -1,8 +1,8 @@
 To: {{.Config.To}} <{{.Config.To}}>
 From: {{.Config.From}} <{{.Config.From}}>
-Subject: [{{.Rule.EntityName}}] {{.Rule.Metric}} has recovered
+Subject: {{.Target}} {{.Rule.Metric}} has recovered
 
-[{{.Rule.EntityName}}] {{.Rule.Metric}} has recovered.
+{{.Target}} {{.Rule.Metric}} has recovered.
 
 Your Pal,
 Inspeqtor

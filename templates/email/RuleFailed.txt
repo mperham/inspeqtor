@@ -1,5 +1,5 @@
 To: {{.Config.To}} <{{.Config.To}}>
 From: {{.Config.From}} <{{.Config.From}}>
-Subject: [{{.Rule.EntityName}}] {{.Rule.Metric}} has failed its check
+Subject: {{.Target}} {{.Rule.Metric}} has failed its check
 
-{{.Rule.Metric}} is {{.Rule.Op}} than {{.Rule.DisplayThreshold}} for the {{.Rule.EntityName}} service.
+{{.Rule.Metric}} is {{.Rule.Op}} than {{.Rule.DisplayThreshold}} for {{.Target}}

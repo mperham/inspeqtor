@@ -2,6 +2,7 @@ package inspeqtor
 
 import (
 	"fmt"
+	"os"
 )
 
 /*
@@ -12,34 +13,21 @@ import (
  * Rule failed check
  * Rule has recovered
 */
-type EventType uint8
+type EventType string
 
 const (
-	ProcessDoesNotExist EventType = iota
-	ProcessExists
-	RuleFailed
-	RuleRecovered
+	ProcessDoesNotExist EventType = "ProcessDoesNotExist"
+	ProcessExists       EventType = "ProcessExists"
+	RuleFailed          EventType = "RuleFailed"
+	RuleRecovered       EventType = "RuleRecovered"
 )
 
 var (
 	Events = []EventType{ProcessDoesNotExist, ProcessExists, RuleFailed, RuleRecovered}
 )
 
-// Go question: is there a way to automate / DRY up
-// this boilerplate?
 func (s EventType) String() string {
-	switch s {
-	case ProcessDoesNotExist:
-		return "ProcessDoesNotExist"
-	case ProcessExists:
-		return "ProcessExists"
-	case RuleFailed:
-		return "RuleFailed"
-	case RuleRecovered:
-		return "RuleRecovered"
-	default:
-		return fmt.Sprintf("Oops: %d", s)
-	}
+	return string(s)
 }
 
 type Event struct {
@@ -50,4 +38,23 @@ type Event struct {
 
 func (e *Event) Service() *Service {
 	return e.Checkable.(*Service)
+}
+
+func (e *Event) Hostname() string {
+	hostname, err := os.Hostname()
+	if err != nil {
+		return err.Error()
+	}
+	return hostname
+}
+
+func (e *Event) Target() string {
+	switch x := e.Checkable.(type) {
+	case *Service:
+		return fmt.Sprintf("%s[%s]", e.Hostname(), x.Name())
+	case *Host:
+		return fmt.Sprintf("%s", x.Name())
+	default:
+		return fmt.Sprintf("Unknown: %s", e.Checkable)
+	}
 }
