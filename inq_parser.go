@@ -75,7 +75,7 @@ func convertHost(global *ConfigFile, inqhost *ast.HostCheck) (*Host, error) {
 		return nil, err
 	}
 
-	storage := metrics.NewHostStore()
+	storage := metrics.NewHostStore(global.Top.CycleTime)
 	h := &Host{&Entity{hostname, nil, storage, inqhost.Parameters}}
 	rules := make([]*Rule, len(inqhost.Rules))
 	for idx, rule := range inqhost.Rules {

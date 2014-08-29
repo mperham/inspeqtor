@@ -15,8 +15,8 @@ import (
 Parses the global inspeqtor configuration in /etc/inspeqtor/inspeqtor.conf.
 */
 type GlobalConfig struct {
-	CycleTime    uint16
-	DeployLength uint16
+	CycleTime    uint
+	DeployLength uint
 }
 
 var Defaults = GlobalConfig{15, 300}
@@ -98,13 +98,13 @@ func ParseGlobal(rootDir string) (*ConfigFile, error) {
 	}
 }
 
-func parseValue(ast ast.Config, store *uint16, name string, def int) {
+func parseValue(ast ast.Config, store *uint, name string, def uint) {
 	if val, has := ast.Variables[name]; has {
-		ival, err := strconv.Atoi(val)
+		ival, err := strconv.ParseUint(val, 10, 32)
 		if err != nil {
 			util.Warn("Invalid %s: %d", name, val)
-			ival = def
+			ival = uint64(def)
 		}
-		*store = uint16(ival)
+		*store = uint(ival)
 	}
 }

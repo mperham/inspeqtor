@@ -9,15 +9,12 @@ import (
 	"strings"
 )
 
-const (
-	cycle_ticks float64 = CLK_TCK * 15
-)
-
 var (
-	meminfoParser  = regexp.MustCompile("([^:]+):\\s+(\\d+)")
-	swapRegexp     = regexp.MustCompile("= (\\d+\\.\\d{2}[A-Z])(.*)")
-	tickPercentage = func(cur, prev int64) int64 {
-		return int64((float64(cur-prev) / cycle_ticks) * 100)
+	cycleTicks     float64 = CLK_TCK * 15
+	meminfoParser          = regexp.MustCompile("([^:]+):\\s+(\\d+)")
+	swapRegexp             = regexp.MustCompile("= (\\d+\\.\\d{2}[A-Z])(.*)")
+	tickPercentage         = func(cur, prev int64) int64 {
+		return int64((float64(cur-prev) / cycleTicks) * 100)
 	}
 	multiplyBy100 = func(val int64) int64 {
 		return val * 100
@@ -33,7 +30,9 @@ var (
 	}
 )
 
-func NewHostStore() *Storage {
+func NewHostStore(cycleSeconds uint) *Storage {
+	cycleTicks = float64(cycleSeconds * CLK_TCK)
+
 	store := &Storage{
 		map[string]*family{},
 	}

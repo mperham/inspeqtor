@@ -35,7 +35,7 @@ func (e *Entity) Metrics() *metrics.Storage {
 }
 
 func NewHost() *Host {
-	return &Host{&Entity{"localhost", nil, metrics.NewHostStore(), nil}}
+	return &Host{&Entity{"localhost", nil, metrics.NewHostStore(15), nil}}
 }
 
 func NewService(name string) *Service {
