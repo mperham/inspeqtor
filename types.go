@@ -54,6 +54,10 @@ type Service struct {
 	Manager      services.InitSystem
 }
 
+func (s *Service) Capture(path string) error {
+	return metrics.CaptureProcess(s.Metrics(), path, s.Process.Pid)
+}
+
 /*
  Host is the local machine.
 */
@@ -61,10 +65,15 @@ type Host struct {
 	*Entity
 }
 
+func (h *Host) Capture(path string) error {
+	return metrics.CollectHostMetrics(h.Metrics(), path)
+}
+
 type Checkable interface {
 	Name() string
 	Owner() string
 	Metrics() *metrics.Storage
+	Capture(string) error
 }
 
 // A Service is Restartable, Host is not.

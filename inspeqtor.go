@@ -2,7 +2,6 @@ package inspeqtor
 
 import (
 	"errors"
-	"inspeqtor/metrics"
 	"inspeqtor/services"
 	"inspeqtor/util"
 	"net"
@@ -236,7 +235,7 @@ func (i *Inspeqtor) triggerActions(alerts []*Event) error {
 
 func (i *Inspeqtor) collectHost(completeCallback func()) {
 	defer completeCallback()
-	err := metrics.CollectHostMetrics(i.Host.Metrics(), "/proc")
+	err := i.Host.Capture("/proc")
 	if err != nil {
 		util.Warn("Error collecting host metrics: %s", err.Error())
 	}
@@ -339,7 +338,7 @@ func (i *Inspeqtor) collectService(svc *Service, completeCallback func(*Service)
 	}
 
 	if svc.Process.Status == services.Up {
-		merr := metrics.CaptureProcess(svc.Metrics(), "/proc", svc.Process.Pid)
+		merr := svc.Capture("/proc")
 		if merr != nil {
 			err := syscall.Kill(svc.Process.Pid, syscall.Signal(0))
 			if err != nil {
