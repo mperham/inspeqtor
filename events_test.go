@@ -24,7 +24,7 @@ func TestEventProcessDisappears(t *testing.T) {
 
 	assert.Equal(t, 0, act.Size())
 	svc := &Service{&Entity{"foo", nil, nil, nil}, act, &services.ProcessStatus{99, services.Up}, init}
-	i.collectService(svc, func(_ *Service) {})
+	i.collectService(svc, func(_ Checkable) {})
 	assert.Equal(t, services.Down, svc.Process.Status)
 	assert.Equal(t, 0, svc.Process.Pid)
 	assert.Equal(t, 1, act.Size())
@@ -43,7 +43,7 @@ func TestEventProcessAppears(t *testing.T) {
 
 	assert.Equal(t, 0, act.Size())
 	svc := &Service{&Entity{"foo", nil, metrics.NewProcessStore(), nil}, act, &services.ProcessStatus{0, services.Down}, init}
-	i.collectService(svc, func(_ *Service) {})
+	i.collectService(svc, func(_ Checkable) {})
 	assert.Equal(t, 1, act.Size())
 	assert.Equal(t, services.Up, svc.Process.Status)
 	assert.Equal(t, os.Getpid(), svc.Process.Pid)
@@ -103,12 +103,12 @@ func TestEventRuleFails(t *testing.T) {
 	svc.rules = []*Rule{rule}
 
 	// first collection should trip but not trigger since rule requires 2 cycles
-	i.collectService(svc, func(_ *Service) {})
+	i.collectService(svc, func(_ Checkable) {})
 	events := i.verify(nil, []*Service{svc})
 	assert.Equal(t, 0, len(events))
 	assert.Equal(t, 0, act.Size())
 
-	i.collectService(svc, func(_ *Service) {})
+	i.collectService(svc, func(_ Checkable) {})
 	events = i.verify(nil, []*Service{svc})
 	assert.Equal(t, 1, len(events))
 	assert.Equal(t, 1, act.Size())
@@ -126,7 +126,7 @@ func TestEventRuleRecovers(t *testing.T) {
 	rule := &Rule{svc, "memory", "rss", LT, "100m", 100 * 1024 * 1024, 0, 1, 0, Ok, []Action{act}}
 	svc.rules = []*Rule{rule}
 
-	i.collectService(svc, func(_ *Service) {})
+	i.collectService(svc, func(_ Checkable) {})
 	events := i.verify(nil, []*Service{svc})
 	assert.Equal(t, 1, len(events))
 	assert.Equal(t, 1, act.Size())
@@ -134,11 +134,11 @@ func TestEventRuleRecovers(t *testing.T) {
 
 	// recovery takes 2 cycles so we don't flap unnecessarily
 	rule.Threshold = 1
-	i.collectService(svc, func(_ *Service) {})
+	i.collectService(svc, func(_ Checkable) {})
 	events = i.verify(nil, []*Service{svc})
 	assert.Equal(t, 0, len(events))
 
-	i.collectService(svc, func(_ *Service) {})
+	i.collectService(svc, func(_ Checkable) {})
 	events = i.verify(nil, []*Service{svc})
 	assert.Equal(t, 1, len(events))
 	assert.Equal(t, 2, act.Size())
