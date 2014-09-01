@@ -176,7 +176,7 @@ func (i *Inspeqtor) collect() {
 		barrier.Done()
 	})
 	for _, svc := range i.Services {
-		go i.collectService(svc, func(svc *Service) {
+		go i.collectService(svc, func(svc Checkable) {
 			barrier.Done()
 		})
 	}
@@ -319,7 +319,7 @@ Each cycle we need to:
 3. run rules
 4. trigger any necessary actions
 */
-func (i *Inspeqtor) collectService(svc *Service, completeCallback func(*Service)) {
+func (i *Inspeqtor) collectService(svc *Service, completeCallback func(Checkable)) {
 	defer completeCallback(svc)
 
 	if svc.Manager == nil {
