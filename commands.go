@@ -75,7 +75,7 @@ func currentInfo(i *Inspeqtor, resp io.Writer) {
 
 	for _, svc := range i.Services {
 		io.WriteString(resp, "\n")
-		io.WriteString(resp, fmt.Sprintf("Service: %s [%s]\n", svc.Name(), svc.Process))
+		io.WriteString(resp, fmt.Sprintf("Service: %s\n", svc))
 
 		for _, rule := range svc.Rules() {
 			io.WriteString(resp, fmt.Sprintf("  %-1s %-20s %-15s %s\n", rule.DisplayState(), rule.Metric(), rule.FetchDisplayCurrentValue(), rule.DisplayThreshold))

@@ -16,7 +16,7 @@ import (
 /*
 Parses the host- and service-specific rules in /etc/inspeqtor/conf.d/*.inq
 */
-func ParseInq(global *ConfigFile, confDir string) (*Host, []*Service, error) {
+func ParseInq(global *ConfigFile, confDir string) (*Host, []Checkable, error) {
 	util.Debug("Parsing config in " + confDir)
 	files, err := filepath.Glob(confDir + "/*.inq")
 	if err != nil {
@@ -24,7 +24,7 @@ func ParseInq(global *ConfigFile, confDir string) (*Host, []*Service, error) {
 	}
 
 	var host *Host
-	var checks []*Service
+	var checks []Checkable
 
 	for _, filename := range files {
 		util.DebugDebug("Parsing " + filename)

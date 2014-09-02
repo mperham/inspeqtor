@@ -23,7 +23,7 @@ type Inspeqtor struct {
 
 	ServiceManagers []services.InitSystem
 	Host            *Host
-	Services        []*Service
+	Services        []Checkable
 	GlobalConfig    *ConfigFile
 	Socket          net.Listener
 	SilenceUntil    time.Time
@@ -88,7 +88,7 @@ func (i *Inspeqtor) Parse() error {
 	util.DebugDebug("Config: %+v", config)
 	util.DebugDebug("Host: %+v", host)
 	for _, val := range services {
-		util.DebugDebug("Service: %+v", *val)
+		util.DebugDebug("Service: %+v", val)
 	}
 	return nil
 }
@@ -144,7 +144,7 @@ func exit(i *Inspeqtor) {
 func (i *Inspeqtor) runLoop() {
 	util.DebugDebug("Resolving services")
 	for _, svc := range i.Services {
-		i.resolveService(svc)
+		svc.Resolve(i.ServiceManagers)
 	}
 
 	i.scanSystem()
@@ -162,21 +162,23 @@ func (i *Inspeqtor) silenced() bool {
 }
 
 func (i *Inspeqtor) scanSystem() {
-	i.collect()
-	i.verify(i.Host, i.Services)
+	// "Trust, but verify"
+	// https://en.wikipedia.org/wiki/Trust%2C_but_verify
+	i.trust()
+	i.verify()
 }
 
-func (i *Inspeqtor) collect() {
+func (i *Inspeqtor) trust() {
 	start := time.Now()
 	var barrier sync.WaitGroup
 	barrier.Add(1)
 	barrier.Add(len(i.Services))
 
-	go i.collectHost(func() {
+	go i.Host.Collect(func(_ Checkable) {
 		barrier.Done()
 	})
 	for _, svc := range i.Services {
-		go i.collectService(svc, func(svc Checkable) {
+		go svc.Collect(func(_ Checkable) {
 			barrier.Done()
 		})
 	}
@@ -184,98 +186,30 @@ func (i *Inspeqtor) collect() {
 	util.Debug("Collection complete in " + time.Now().Sub(start).String())
 }
 
-func (i *Inspeqtor) verify(host *Host, services []*Service) []*Event {
-	eventsToTrigger := []*Event{}
-	checker := func(rule *Rule) {
-		if i.silenced() {
-			// We are silenced until some point in the future.
-			// We don't want to check rules (as a deploy might use
-			// enough resources to trip a threshold) or trigger
-			// any actions
+func (i *Inspeqtor) verify() {
+	if i.silenced() {
+		// We are silenced until some point in the future.
+		// We don't want to check rules (as a deploy might use
+		// enough resources to trip a threshold) or trigger
+		// any actions
+		for _, rule := range i.Host.Rules() {
 			rule.Reset()
-		} else {
-			event := rule.Check()
-			if event != nil {
-				eventsToTrigger = append(eventsToTrigger, event)
+		}
+		for _, svc := range i.Services {
+			for _, rule := range svc.Rules() {
+				rule.Reset()
 			}
 		}
-	}
-
-	if host != nil {
-		for _, rule := range host.Rules() {
-			checker(rule)
+	} else {
+		i.Host.Verify()
+		for _, svc := range i.Services {
+			svc.Verify()
 		}
-	}
-
-	for _, svc := range services {
-		for _, rule := range svc.Rules() {
-			checker(rule)
-		}
-	}
-
-	/*
-	   We now have a set of rules which have failed.  We need to trigger
-	   the actions for each.
-	*/
-	i.triggerActions(eventsToTrigger)
-	return eventsToTrigger
-}
-
-func (i *Inspeqtor) triggerActions(alerts []*Event) error {
-	for _, alert := range alerts {
-		for _, action := range alert.Rule.Actions {
-			err := action.Trigger(alert)
-			if err != nil {
-				util.Warn("Error triggering action: %s", err.Error())
-			}
-		}
-	}
-	return nil
-}
-
-func (i *Inspeqtor) collectHost(completeCallback func()) {
-	defer completeCallback()
-	err := i.Host.Capture("/proc")
-	if err != nil {
-		util.Warn("Error collecting host metrics: %s", err.Error())
 	}
 }
 
 /*
-Resolve each defined service to its managing init system.  Called only
-at startup, this is what maps services to init and fires ProcessDoesNotExist events.
-*/
-func (i *Inspeqtor) resolveService(svc *Service) {
-	for _, sm := range i.ServiceManagers {
-		// TODO There's a bizarre race condition here. Figure out
-		// why this is necessary.  We shouldn't be multi-threaded yet.
-		if sm == nil {
-			continue
-		}
-
-		ps, err := sm.LookupService(svc.Name())
-		if err != nil {
-			serr := err.(*services.ServiceError)
-			if serr.Err == services.ErrServiceNotFound {
-				util.Debug(sm.Name() + " doesn't have " + svc.Name())
-				continue
-			}
-			util.Warn(err.Error())
-			return
-		}
-		util.Info("Found %s/%s with status %s", sm.Name(), svc.Name(), ps)
-		svc.Manager = sm
-		svc.Transition(ps, func(et EventType) {
-			i.handleProcessEvent(et, svc)
-		})
-		break
-	}
-	if svc.Manager == nil {
-		util.Warn("Could not find service %s, did you misspell it?", svc.Name())
-	}
-}
-
-func (i *Inspeqtor) handleProcessEvent(etype EventType, svc *Service) {
+func (i *Inspeqtor) handleProcessEvent(etype EventType, svc Checkable) {
 	if i.silenced() {
 		util.Debug("SILENCED %s %s", etype, svc.Name())
 		return
@@ -284,7 +218,7 @@ func (i *Inspeqtor) handleProcessEvent(etype EventType, svc *Service) {
 	util.Warn("%s %s", etype, svc.Name())
 
 	evt := Event{etype, svc, nil}
-	err := svc.EventHandler.Trigger(&evt)
+	err := svc.Trigger(&evt)
 	if err != nil {
 		util.Warn("%s", err)
 	}
@@ -306,54 +240,7 @@ func (i *Inspeqtor) handleRuleEvent(etype EventType, check Checkable, rule *Rule
 		}
 	}
 }
-
-/*
-Called for each service each cycle, in parallel.  This
-method must be thread-safe.  Since this method executes
-in a goroutine, errors must be handled/logged here and
-not just returned.
-
-Each cycle we need to:
-1. verify service is Up and running.
-2. capture process metrics
-3. run rules
-4. trigger any necessary actions
 */
-func (i *Inspeqtor) collectService(svc *Service, completeCallback func(Checkable)) {
-	defer completeCallback(svc)
-
-	if svc.Manager == nil {
-		// Couldn't resolve it when we started up so we can't collect it.
-		return
-	}
-	if svc.Process.Status != services.Up {
-		status, err := svc.Manager.LookupService(svc.Name())
-		if err != nil {
-			util.Warn("%s", err)
-		} else {
-			svc.Transition(status, func(et EventType) {
-				i.handleProcessEvent(et, svc)
-			})
-		}
-	}
-
-	if svc.Process.Status == services.Up {
-		merr := svc.Capture("/proc")
-		if merr != nil {
-			err := syscall.Kill(svc.Process.Pid, syscall.Signal(0))
-			if err != nil {
-				util.Info("Service %s with process %d does not exist: %s", svc.Name(), svc.Process.Pid, err)
-				svc.Transition(&services.ProcessStatus{0, services.Down}, func(et EventType) {
-					i.handleProcessEvent(et, svc)
-				})
-			} else {
-				util.Warn("Error capturing metrics for process %d: %s", svc.Process.Pid, merr)
-			}
-		}
-	}
-	return
-}
-
 func (i *Inspeqtor) TestNotifications() {
 	for _, route := range i.GlobalConfig.AlertRoutes {
 		nm := route.Name
