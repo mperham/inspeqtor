@@ -30,11 +30,18 @@ var (
 	}
 )
 
-func NewHostStore(cycleSeconds uint) *Storage {
-	cycleTicks = float64(cycleSeconds * CLK_TCK)
+type hostStorage struct {
+	*storage
+	cycleTicks float64
+	path       string
+}
 
-	store := &Storage{
-		map[string]*family{},
+func NewHostStore(path string, cycleSeconds uint) Store {
+
+	store := &hostStorage{
+		&storage{map[string]*family{}},
+		float64(cycleSeconds * CLK_TCK),
+		path,
 	}
 
 	store.declareGauge("swap", "", nil, displayPercent)
@@ -51,23 +58,23 @@ func NewHostStore(cycleSeconds uint) *Storage {
 	return store
 }
 
-func CollectHost(store *Storage, path string) error {
+func (hs *hostStorage) Collect(_ int) error {
 	var err error
 
-	err = collectLoadAverage(path, store)
+	err = hs.collectLoadAverage()
 	if err != nil {
 		return err
 	}
-	err = collectMemory(path, store)
+	err = hs.collectMemory()
 	if err != nil {
 		return err
 	}
-	err = collectCpu(path, store)
+	err = hs.collectCpu()
 	if err != nil {
 		return err
 	}
 
-	err = collectDisk("", store)
+	err = hs.collectDisk("")
 	if err != nil {
 		return err
 	}
@@ -75,14 +82,14 @@ func CollectHost(store *Storage, path string) error {
 	return nil
 }
 
-func collectMemory(path string, store *Storage) error {
-	ok, err := util.FileExists(path + "/meminfo")
+func (hs *hostStorage) collectMemory() error {
+	ok, err := util.FileExists(hs.path + "/meminfo")
 	if err != nil {
 		return err
 	}
 
 	if ok {
-		contentBytes, err := ioutil.ReadFile(path + "/meminfo")
+		contentBytes, err := ioutil.ReadFile(hs.path + "/meminfo")
 		if err != nil {
 			return err
 		}
@@ -110,11 +117,11 @@ func collectMemory(path string, store *Storage) error {
 		free := memMetrics["SwapFree"]
 		total := memMetrics["SwapTotal"]
 		if free == 0 {
-			store.save("swap", "", 100)
+			hs.save("swap", "", 100)
 		} else if free == total {
-			store.save("swap", "", 0)
+			hs.save("swap", "", 0)
 		} else {
-			store.save("swap", "", int64(100-int8(100*(float64(free)/float64(total)))))
+			hs.save("swap", "", int64(100-int8(100*(float64(free)/float64(total)))))
 		}
 	} else {
 		cmd := exec.Command("sysctl", "-n", "vm.swapusage")
@@ -147,9 +154,9 @@ func collectMemory(path string, store *Storage) error {
 		t := normalizeSwap(tot, rune(total[len(total)-1]))
 		u := normalizeSwap(usd, rune(used[len(used)-1]))
 		if t == 0 {
-			store.save("swap", "", 100)
+			hs.save("swap", "", 100)
 		} else {
-			store.save("swap", "", int64(100*(u/t)))
+			hs.save("swap", "", int64(100*(u/t)))
 		}
 	}
 
@@ -172,17 +179,17 @@ func normalizeSwap(val float64, size rune) float64 {
 	}
 }
 
-func collectLoadAverage(path string, store *Storage) error {
+func (hs *hostStorage) collectLoadAverage() error {
 	// TODO make this a one-time check so we don't incur the overhead
 	// on every cycle.
-	ok, err := util.FileExists(path + "/loadavg")
+	ok, err := util.FileExists(hs.path + "/loadavg")
 	if err != nil {
 		return err
 	}
 
 	var loadavgString string
 	if ok {
-		contentBytes, err := ioutil.ReadFile(path + "/loadavg")
+		contentBytes, err := ioutil.ReadFile(hs.path + "/loadavg")
 		if err != nil {
 			return err
 		}
@@ -214,20 +221,20 @@ func collectLoadAverage(path string, store *Storage) error {
 		return err
 	}
 
-	store.save("load", "1", int64(load1*100))
-	store.save("load", "5", int64(load5*100))
-	store.save("load", "15", int64(load15*100))
+	hs.save("load", "1", int64(load1*100))
+	hs.save("load", "5", int64(load5*100))
+	hs.save("load", "15", int64(load15*100))
 	return nil
 }
 
-func collectCpu(path string, store *Storage) error {
-	ok, err := util.FileExists(path + "/stat")
+func (hs *hostStorage) collectCpu() error {
+	ok, err := util.FileExists(hs.path + "/stat")
 	if err != nil {
 		return err
 	}
 
 	if ok {
-		contents, err := ioutil.ReadFile(path + "/stat")
+		contents, err := ioutil.ReadFile(hs.path + "/stat")
 		if err != nil {
 			return err
 		}
@@ -247,16 +254,16 @@ func collectCpu(path string, store *Storage) error {
 
 		// These are the five I can envision writing rules against.
 		// Open an issue if you want access to the other values.
-		store.save("cpu", "", total)
-		store.save("cpu", "user", user)
-		store.save("cpu", "system", system)
-		store.save("cpu", "iowait", iowait)
-		store.save("cpu", "steal", steal)
+		hs.save("cpu", "", total)
+		hs.save("cpu", "user", user)
+		hs.save("cpu", "system", system)
+		hs.save("cpu", "iowait", iowait)
+		hs.save("cpu", "steal", steal)
 	}
 	return nil
 }
 
-func collectDisk(path string, store *Storage) error {
+func (hs *hostStorage) collectDisk(path string) error {
 	var lines []string
 
 	if path == "" {
@@ -302,7 +309,7 @@ func collectDisk(path string, store *Storage) error {
 	}
 
 	for name, used := range usage {
-		store.saveType("disk", name, used, Gauge)
+		hs.saveType("disk", name, used, Gauge)
 	}
 	return nil
 }

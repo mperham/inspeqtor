@@ -13,9 +13,15 @@ var (
 	timeRegexp = regexp.MustCompile("\\A(\\d+):(\\d\\d).(\\d\\d)\\z")
 )
 
-func NewProcessStore(values ...interface{}) *Storage {
-	store := &Storage{
-		map[string]*family{},
+type processStorage struct {
+	*storage
+	path string
+}
+
+func NewProcessStore(path string, values ...interface{}) Store {
+	store := &processStorage{
+		&storage{map[string]*family{}},
+		path,
 	}
 
 	store.declareGauge("memory", "rss", nil, displayInMB)
@@ -30,10 +36,10 @@ func NewProcessStore(values ...interface{}) *Storage {
 	return store
 }
 
-func CollectProcess(store *Storage, rootPath string, pid int) error {
+func (ps *processStorage) Collect(pid int) error {
 	var err error
 
-	ok, err := util.FileExists(rootPath)
+	ok, err := util.FileExists(ps.path)
 	if err != nil {
 		return err
 	}
@@ -41,17 +47,17 @@ func CollectProcess(store *Storage, rootPath string, pid int) error {
 	if !ok {
 		// we don't have the /proc filesystem, e.g. darwin or freebsd
 		// use `ps` output instead.
-		err = capturePs(store, pid)
+		err = ps.capturePs(pid)
 		if err != nil {
 			return err
 		}
 	} else {
-		err = captureVm(store, rootPath, pid)
+		err = ps.captureVm(pid)
 		if err != nil {
 			return err
 		}
 
-		err = captureCpu(store, rootPath, pid)
+		err = ps.captureCpu(pid)
 		if err != nil {
 			return err
 		}
@@ -63,7 +69,7 @@ func CollectProcess(store *Storage, rootPath string, pid int) error {
 /*
  * So many hacks in this.  OSX support can be seen as "bad" at best.
  */
-func capturePs(store *Storage, pid int) error {
+func (ps *processStorage) capturePs(pid int) error {
 	cmd := exec.Command("ps", "So", "rss,vsz,time,utime", "-p", strconv.Itoa(pid))
 	sout, err := cmd.CombinedOutput()
 	if err != nil {
@@ -81,12 +87,12 @@ func capturePs(store *Storage, pid int) error {
 		return err
 	}
 
-	store.save("memory", "rss", 1024*val)
+	ps.save("memory", "rss", 1024*val)
 	val, err = strconv.ParseInt(fields[1], 10, 64)
 	if err != nil {
 		return err
 	}
-	store.save("memory", "vsz", 1024*val)
+	ps.save("memory", "vsz", 1024*val)
 
 	times := timeRegexp.FindStringSubmatch(fields[2])
 	if times == nil {
@@ -110,14 +116,14 @@ func capturePs(store *Storage, pid int) error {
 
 	uticks := min*60*100 + sec*100 + cs
 
-	store.save("cpu", "user", int64(uticks))
-	store.save("cpu", "system", int64(ticks-uticks))
+	ps.save("cpu", "user", int64(uticks))
+	ps.save("cpu", "system", int64(ticks-uticks))
 
 	return nil
 }
 
-func captureCpu(store *Storage, rootPath string, pid int) error {
-	dir := rootPath + "/" + strconv.Itoa(int(pid))
+func (ps *processStorage) captureCpu(pid int) error {
+	dir := ps.path + "/" + strconv.Itoa(int(pid))
 	data, err := ioutil.ReadFile(dir + "/stat")
 	if err != nil {
 		return err
@@ -145,17 +151,17 @@ func captureCpu(store *Storage, rootPath string, pid int) error {
 		if err != nil {
 			return err
 		}
-		store.save("cpu", "user", utime)
-		store.save("cpu", "system", stime)
-		store.save("cpu", "total_user", cutime)
-		store.save("cpu", "total_system", cstime)
+		ps.save("cpu", "user", utime)
+		ps.save("cpu", "system", stime)
+		ps.save("cpu", "total_user", cutime)
+		ps.save("cpu", "total_system", cstime)
 	}
 
 	return nil
 }
 
-func captureVm(store *Storage, rootPath string, pid int) error {
-	dir := rootPath + "/" + strconv.Itoa(int(pid))
+func (ps *processStorage) captureVm(pid int) error {
+	dir := ps.path + "/" + strconv.Itoa(int(pid))
 	data, err := ioutil.ReadFile(dir + "/status")
 	if err != nil {
 		return err
@@ -174,13 +180,13 @@ func captureVm(store *Storage, rootPath string, pid int) error {
 				if err != nil {
 					return err
 				}
-				store.save("memory", "rss", 1024*val)
+				ps.save("memory", "rss", 1024*val)
 			case "VmSize:":
 				val, err := strconv.ParseInt(items[1], 10, 64)
 				if err != nil {
 					return err
 				}
-				store.save("memory", "vsz", 1024*val)
+				ps.save("memory", "vsz", 1024*val)
 			}
 		}
 

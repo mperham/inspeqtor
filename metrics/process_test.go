@@ -8,8 +8,8 @@ import (
 
 func TestNonexistentProcessCollect(t *testing.T) {
 	t.Parallel()
-	store := NewProcessStore()
-	err := CollectProcess(store, "proc", 100)
+	store := NewProcessStore("proc")
+	err := store.Collect(100)
 	if err == nil {
 		t.Error("Expected process 100 to not exist")
 	}
@@ -18,8 +18,8 @@ func TestNonexistentProcessCollect(t *testing.T) {
 // doesn't have real CPU numbers
 func TestBasicProcess(t *testing.T) {
 	t.Parallel()
-	store := NewProcessStore()
-	err := CollectProcess(store, "proc", 9051)
+	store := NewProcessStore("proc")
+	err := store.Collect(9051)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -30,7 +30,8 @@ func TestBasicProcess(t *testing.T) {
 	assert.Equal(t, 0, store.Get("cpu", "total_user"))
 	assert.Equal(t, 0, store.Get("cpu", "total_system"))
 
-	err = CollectProcess(store, "proc2", 9051)
+	store.(*processStorage).path = "proc2"
+	err = store.Collect(9051)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -46,8 +47,8 @@ func TestBasicProcess(t *testing.T) {
 // has real stats, no children
 func TestMysqlProcess(t *testing.T) {
 	t.Parallel()
-	store := NewProcessStore()
-	err := CollectProcess(store, "proc", 14190)
+	store := NewProcessStore("proc")
+	err := store.Collect(14190)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -58,7 +59,8 @@ func TestMysqlProcess(t *testing.T) {
 	assert.Equal(t, 0, store.Get("cpu", "total_user"))
 	assert.Equal(t, 0, store.Get("cpu", "total_system"))
 
-	err = CollectProcess(store, "proc2", 14190)
+	store.(*processStorage).path = "proc2"
+	err = store.Collect(14190)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -73,8 +75,8 @@ func TestMysqlProcess(t *testing.T) {
 // has real stats, child processes
 func TestApacheProcess(t *testing.T) {
 	t.Parallel()
-	store := NewProcessStore()
-	err := CollectProcess(store, "proc", 3589)
+	store := NewProcessStore("proc")
+	err := store.Collect(3589)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -85,7 +87,8 @@ func TestApacheProcess(t *testing.T) {
 	assert.Equal(t, 0, store.Get("cpu", "total_user"))
 	assert.Equal(t, 0, store.Get("cpu", "total_system"))
 
-	err = CollectProcess(store, "proc2", 3589)
+	store.(*processStorage).path = "proc2"
+	err = store.Collect(3589)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -100,13 +103,13 @@ func TestApacheProcess(t *testing.T) {
 // verify our own process stats
 func TestRealProcess(t *testing.T) {
 	t.Parallel()
-	store := NewProcessStore()
-	err := CollectProcess(store, "/etc/proc", os.Getpid())
+	store := NewProcessStore("/etc/proc")
+	err := store.Collect(os.Getpid())
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	err = CollectProcess(store, "/etc/proc", os.Getpid())
+	err = store.Collect(os.Getpid())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -118,7 +121,7 @@ func TestRealProcess(t *testing.T) {
 // verify we can't capture a non-existent process for real
 func TestNonexistentProcess(t *testing.T) {
 	t.Parallel()
-	store := NewProcessStore()
-	err := CollectProcess(store, "/etc/proc", -1)
+	store := NewProcessStore("/etc/proc")
+	err := store.Collect(-1)
 	assert.Error(t, err)
 }

@@ -24,32 +24,42 @@ var (
 	SLOTS = 3600 / 15
 )
 
-type Storage struct {
+type Store interface {
+	Get(family string, name string) int64
+	Display(family string, name string) string
+	PrepareRule(family string, name string, threshold int64) (int64, error)
+	Collect(pid int) error
+}
+
+type storage struct {
 	tree map[string]*family
 }
 
-func (store *Storage) Get(family string, name string) int64 {
+func (store *storage) Get(family string, name string) int64 {
 	metric, _ := store.find(family, name)
 	return metric.get()
 }
 
-func (store *Storage) Display(family string, name string) string {
+func (store *storage) Display(family string, name string) string {
 	metric, _ := store.find(family, name)
 	return metric.display()
 }
 
-func (store *Storage) PrepareRule(family string, name string, threshold int64) (int64, error) {
+func (store *storage) PrepareRule(family string, name string, threshold int64) (int64, error) {
 	metric, err := store.find(family, name)
 	if err != nil {
 		return 0, err
 	}
+	if metric == nil {
+		return threshold, nil
+	}
 	return metric.prepare(threshold), nil
 }
 
-func (store *Storage) find(family, name string) (metric, error) {
+func (store *storage) find(family, name string) (metric, error) {
 	fam := store.tree[family]
 	if fam == nil {
-		return nil, errors.New("No such metric family: " + family)
+		return nil, nil
 	}
 
 	metric := fam.metrics[name]
@@ -175,7 +185,7 @@ func (c *counter) get() int64 {
 	}
 }
 
-func (store *Storage) fill(values ...interface{}) {
+func (store *storage) fill(values ...interface{}) {
 	fam := values[0].(string)
 	name := values[1].(string)
 	for _, val := range values[2:] {
@@ -183,11 +193,11 @@ func (store *Storage) fill(values ...interface{}) {
 	}
 }
 
-func (store *Storage) declareDynamicFamily(familyName string) {
+func (store *storage) declareDynamicFamily(familyName string) {
 	store.tree[familyName] = &family{familyName, true, map[string]metric{}}
 }
 
-func (store *Storage) declareGauge(familyName string, name string, prep prepareFunc, display displayFunc) {
+func (store *storage) declareGauge(familyName string, name string, prep prepareFunc, display displayFunc) {
 	fam := store.tree[familyName]
 	if fam == nil {
 		store.tree[familyName] = &family{familyName, false, map[string]metric{}}
@@ -201,7 +211,7 @@ func (store *Storage) declareGauge(familyName string, name string, prep prepareF
 	}
 }
 
-func (store *Storage) declareCounter(familyName string, name string, xform transformFunc, display displayFunc) {
+func (store *storage) declareCounter(familyName string, name string, xform transformFunc, display displayFunc) {
 	fam := store.tree[familyName]
 	if fam == nil {
 		store.tree[familyName] = &family{familyName, false, map[string]metric{}}
@@ -215,7 +225,7 @@ func (store *Storage) declareCounter(familyName string, name string, xform trans
 	}
 }
 
-func (store *Storage) save(family string, name string, value int64) {
+func (store *storage) save(family string, name string, value int64) {
 	m := store.tree[family].metrics[name]
 	if m == nil {
 		panic("No such metric: " + displayName(family, name))
@@ -223,7 +233,7 @@ func (store *Storage) save(family string, name string, value int64) {
 	m.put(value)
 }
 
-func (store *Storage) saveType(family string, name string, value int64, t metricType) {
+func (store *storage) saveType(family string, name string, value int64, t metricType) {
 	fam := store.tree[family]
 	met := fam.metrics[name]
 	if met == nil && fam.allowDynamic {

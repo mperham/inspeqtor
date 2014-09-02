@@ -75,7 +75,7 @@ func convertHost(global *ConfigFile, inqhost *ast.HostCheck) (*Host, error) {
 		return nil, err
 	}
 
-	storage := metrics.NewHostStore(global.Top.CycleTime)
+	storage := metrics.NewHostStore("/proc", global.Top.CycleTime)
 	h := &Host{&Entity{hostname, nil, storage, inqhost.Parameters}}
 	rules := make([]*Rule, len(inqhost.Rules))
 	for idx, rule := range inqhost.Rules {
@@ -143,7 +143,7 @@ func convertAction(global *ConfigFile, check Checkable, name string, team string
 
 func convertService(global *ConfigFile, inqsvc *ast.ProcessCheck) (*Service, error) {
 	rules := make([]*Rule, len(inqsvc.Rules))
-	storage := metrics.NewProcessStore()
+	storage := metrics.NewProcessStore("/proc")
 
 	svc := &Service{&Entity{inqsvc.Name, nil, storage, inqsvc.Parameters}, nil, services.NewStatus(), nil}
 

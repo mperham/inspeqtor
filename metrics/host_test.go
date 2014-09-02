@@ -7,8 +7,8 @@ import (
 
 func TestCollectHost(t *testing.T) {
 	t.Parallel()
-	store := NewHostStore(15)
-	err := CollectHost(store, "proc")
+	store := NewHostStore("proc", 15)
+	err := store.Collect(0)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -23,7 +23,8 @@ func TestCollectHost(t *testing.T) {
 	assert.Equal(t, store.Get("load", "15"), 5)
 	assert.Equal(t, store.Get("swap", ""), 2)
 
-	err = CollectHost(store, "proc2")
+	store.(*hostStorage).path = "proc2"
+	err = store.Collect(0)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -50,8 +51,8 @@ func TestCollectHost(t *testing.T) {
 
 func TestCollectRealHostMetrics(t *testing.T) {
 	t.Parallel()
-	store := NewHostStore(15)
-	err := CollectHost(store, "/proc")
+	store := NewHostStore("/proc", 15)
+	err := store.Collect(0)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -64,8 +65,8 @@ func TestCollectRealHostMetrics(t *testing.T) {
 
 func TestCollectDiskMetrics(t *testing.T) {
 	t.Parallel()
-	store := NewHostStore(15)
-	err := collectDisk("fixtures/df.linux.txt", store)
+	store := NewHostStore("", 15).(*hostStorage)
+	err := store.collectDisk("fixtures/df.linux.txt")
 	if err != nil {
 		t.Error(err)
 	}
@@ -76,8 +77,8 @@ func TestCollectDiskMetrics(t *testing.T) {
 		t.Error("Unexpected results: %v", store.Get("disk", "/old"))
 	}
 
-	store = NewHostStore(15)
-	err = collectDisk("fixtures/df.darwin.txt", store)
+	store = NewHostStore("", 15).(*hostStorage)
+	err = store.collectDisk("fixtures/df.darwin.txt")
 	if err != nil {
 		t.Error(err)
 	}
@@ -85,8 +86,8 @@ func TestCollectDiskMetrics(t *testing.T) {
 		t.Error("Unexpected results: %v", store.Get("disk", "/"))
 	}
 
-	store = NewHostStore(15)
-	err = collectDisk("", store)
+	store = NewHostStore("", 15).(*hostStorage)
+	err = store.collectDisk("")
 	if err != nil {
 		t.Error(err)
 	}

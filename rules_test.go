@@ -12,7 +12,7 @@ const (
 
 func TestRulesCheck(t *testing.T) {
 	t.Parallel()
-	svc := Service{&Entity{"mysql", nil, metrics.NewProcessStore(), nil}, nil, nil, nil}
+	svc := Service{&Entity{"mysql", nil, metrics.NewProcessStore("/proc"), nil}, nil, nil, nil}
 	rule := &Rule{&svc, "memory", "rss", LT, "64m", 64 * MB, 0, 2, 0, Ok, nil}
 
 	// no data in the buffer
@@ -21,20 +21,20 @@ func TestRulesCheck(t *testing.T) {
 	assert.Nil(t, result)
 
 	// Walk thru a series of cycles to verify state transitions
-	svc.metrics = metrics.NewProcessStore("memory", "rss", 65*MB)
+	svc.metrics = metrics.NewProcessStore("/proc", "memory", "rss", 65*MB)
 	result = rule.Check()
 	assert.Nil(t, result)
 	assert.Equal(t, 65*MB, rule.CurrentValue)
 	assert.Equal(t, Ok, rule.State)
 
-	svc.metrics = metrics.NewProcessStore("memory", "rss", 63*MB)
+	svc.metrics = metrics.NewProcessStore("/proc", "memory", "rss", 63*MB)
 	result = rule.Check()
 	assert.Nil(t, result)
 	assert.Equal(t, 1, rule.TrippedCount)
 	assert.Equal(t, 63*MB, rule.CurrentValue)
 	assert.Equal(t, Ok, rule.State)
 
-	svc.metrics = metrics.NewProcessStore("memory", "rss", 62*MB)
+	svc.metrics = metrics.NewProcessStore("/proc", "memory", "rss", 62*MB)
 	result = rule.Check()
 	assert.NotNil(t, result)
 	assert.Equal(t, result.Type, RuleFailed)
@@ -42,20 +42,20 @@ func TestRulesCheck(t *testing.T) {
 	assert.Equal(t, 62*MB, rule.CurrentValue)
 	assert.Equal(t, Triggered, rule.State)
 
-	svc.metrics = metrics.NewProcessStore("memory", "rss", 62*MB)
+	svc.metrics = metrics.NewProcessStore("/proc", "memory", "rss", 62*MB)
 	result = rule.Check()
 	assert.Nil(t, result)
 	assert.Equal(t, 3, rule.TrippedCount)
 	assert.Equal(t, 62*MB, rule.CurrentValue)
 	assert.Equal(t, Triggered, rule.State)
 
-	svc.metrics = metrics.NewProcessStore("memory", "rss", 65*MB)
+	svc.metrics = metrics.NewProcessStore("/proc", "memory", "rss", 65*MB)
 	result = rule.Check()
 	assert.Nil(t, result)
 	assert.Equal(t, 65*MB, rule.CurrentValue)
 	assert.Equal(t, Recovered, rule.State)
 
-	svc.metrics = metrics.NewProcessStore("memory", "rss", 66*MB)
+	svc.metrics = metrics.NewProcessStore("/proc", "memory", "rss", 66*MB)
 	result = rule.Check()
 	assert.NotNil(t, result)
 	assert.Equal(t, result.Type, RuleRecovered)

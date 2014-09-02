@@ -13,7 +13,7 @@ import (
 type Entity struct {
 	name       string
 	rules      []*Rule
-	metrics    *metrics.Storage
+	metrics    metrics.Store
 	parameters map[string]string
 }
 
@@ -37,16 +37,16 @@ func (e *Entity) Owner() string {
 	return e.Parameter("owner")
 }
 
-func (e *Entity) Metrics() *metrics.Storage {
+func (e *Entity) Metrics() metrics.Store {
 	return e.metrics
 }
 
 func NewHost() *Host {
-	return &Host{&Entity{"localhost", nil, metrics.NewHostStore(15), nil}}
+	return &Host{&Entity{"localhost", nil, metrics.NewHostStore("/proc", 15), nil}}
 }
 
 func NewService(name string) *Service {
-	return &Service{&Entity{name, nil, metrics.NewProcessStore(), nil}, nil, services.NewStatus(), nil}
+	return &Service{&Entity{name, nil, metrics.NewProcessStore("/proc"), nil}, nil, services.NewStatus(), nil}
 }
 
 /*
@@ -59,10 +59,6 @@ type Service struct {
 	EventHandler Action
 	Process      *services.ProcessStatus
 	Manager      services.InitSystem
-}
-
-func (s *Service) Capture(path string) error {
-	return metrics.CollectProcess(s.Metrics(), path, s.Process.Pid)
 }
 
 /*
@@ -78,20 +74,16 @@ func (h *Host) Resolve(_ []services.InitSystem) error {
 
 func (h *Host) Collect(completeCallback func(Checkable)) {
 	defer completeCallback(h)
-	err := h.Capture("/proc")
+	err := h.Metrics().Collect(0)
 	if err != nil {
 		util.Warn("Error collecting host metrics: %s", err.Error())
 	}
 }
 
-func (h *Host) Capture(path string) error {
-	return metrics.CollectHost(h.Metrics(), path)
-}
-
 type Checkable interface {
 	Name() string
 	Owner() string
-	Metrics() *metrics.Storage
+	Metrics() metrics.Store
 	Resolve([]services.InitSystem) error
 	Rules() []*Rule
 	Verify() []*Event
@@ -134,7 +126,7 @@ func (svc *Service) Collect(completeCallback func(Checkable)) {
 	}
 
 	if svc.Process.Status == services.Up {
-		merr := svc.Capture("/proc")
+		merr := svc.Metrics().Collect(svc.Process.Pid)
 		if merr != nil {
 			err := syscall.Kill(svc.Process.Pid, syscall.Signal(0))
 			if err != nil {
