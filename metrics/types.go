@@ -29,6 +29,10 @@ type Store interface {
 	Display(family string, name string) string
 	PrepareRule(family string, name string, threshold int64) (int64, error)
 	Collect(pid int) error
+
+	Save(family, name string, value int64)
+	DeclareCounter(family, name string, xform transformFunc, display displayFunc)
+	DeclareGauge(family, name string, prep prepareFunc, display displayFunc)
 }
 
 type storage struct {
@@ -189,7 +193,7 @@ func (store *storage) fill(values ...interface{}) {
 	fam := values[0].(string)
 	name := values[1].(string)
 	for _, val := range values[2:] {
-		store.save(fam, name, int64(val.(int)))
+		store.Save(fam, name, int64(val.(int)))
 	}
 }
 
@@ -197,7 +201,7 @@ func (store *storage) declareDynamicFamily(familyName string) {
 	store.tree[familyName] = &family{familyName, true, map[string]metric{}}
 }
 
-func (store *storage) declareGauge(familyName string, name string, prep prepareFunc, display displayFunc) {
+func (store *storage) DeclareGauge(familyName string, name string, prep prepareFunc, display displayFunc) {
 	fam := store.tree[familyName]
 	if fam == nil {
 		store.tree[familyName] = &family{familyName, false, map[string]metric{}}
@@ -211,7 +215,7 @@ func (store *storage) declareGauge(familyName string, name string, prep prepareF
 	}
 }
 
-func (store *storage) declareCounter(familyName string, name string, xform transformFunc, display displayFunc) {
+func (store *storage) DeclareCounter(familyName string, name string, xform transformFunc, display displayFunc) {
 	fam := store.tree[familyName]
 	if fam == nil {
 		store.tree[familyName] = &family{familyName, false, map[string]metric{}}
@@ -225,7 +229,7 @@ func (store *storage) declareCounter(familyName string, name string, xform trans
 	}
 }
 
-func (store *storage) save(family string, name string, value int64) {
+func (store *storage) Save(family string, name string, value int64) {
 	m := store.tree[family].metrics[name]
 	if m == nil {
 		panic("No such metric: " + displayName(family, name))
@@ -240,9 +244,9 @@ func (store *storage) saveType(family string, name string, value int64, t metric
 		// declare metrics for disk metrics where the name
 		// is dynamic based on the mount point
 		if t == Gauge {
-			store.declareGauge(family, name, nil, displayPercent)
+			store.DeclareGauge(family, name, nil, displayPercent)
 		} else {
-			store.declareCounter(family, name, nil, nil)
+			store.DeclareCounter(family, name, nil, nil)
 		}
 		met = store.tree[family].metrics[name]
 	}

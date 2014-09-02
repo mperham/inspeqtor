@@ -44,17 +44,17 @@ func NewHostStore(path string, cycleSeconds uint) Store {
 		path,
 	}
 
-	store.declareGauge("swap", "", nil, displayPercent)
-	store.declareGauge("load", "1", multiplyBy100, displayLoad)
-	store.declareGauge("load", "5", multiplyBy100, displayLoad)
-	store.declareGauge("load", "15", multiplyBy100, displayLoad)
-	store.declareCounter("cpu", "", tickPercentage, displayPercent)
-	store.declareCounter("cpu", "user", tickPercentage, displayPercent)
-	store.declareCounter("cpu", "system", tickPercentage, displayPercent)
-	store.declareCounter("cpu", "iowait", tickPercentage, displayPercent)
-	store.declareCounter("cpu", "steal", tickPercentage, displayPercent)
+	store.DeclareGauge("swap", "", nil, displayPercent)
+	store.DeclareGauge("load", "1", multiplyBy100, displayLoad)
+	store.DeclareGauge("load", "5", multiplyBy100, displayLoad)
+	store.DeclareGauge("load", "15", multiplyBy100, displayLoad)
+	store.DeclareCounter("cpu", "", tickPercentage, displayPercent)
+	store.DeclareCounter("cpu", "user", tickPercentage, displayPercent)
+	store.DeclareCounter("cpu", "system", tickPercentage, displayPercent)
+	store.DeclareCounter("cpu", "iowait", tickPercentage, displayPercent)
+	store.DeclareCounter("cpu", "steal", tickPercentage, displayPercent)
 	store.declareDynamicFamily("disk")
-	store.declareGauge("disk", "/", nil, displayPercent)
+	store.DeclareGauge("disk", "/", nil, displayPercent)
 	return store
 }
 
@@ -117,11 +117,11 @@ func (hs *hostStorage) collectMemory() error {
 		free := memMetrics["SwapFree"]
 		total := memMetrics["SwapTotal"]
 		if free == 0 {
-			hs.save("swap", "", 100)
+			hs.Save("swap", "", 100)
 		} else if free == total {
-			hs.save("swap", "", 0)
+			hs.Save("swap", "", 0)
 		} else {
-			hs.save("swap", "", int64(100-int8(100*(float64(free)/float64(total)))))
+			hs.Save("swap", "", int64(100-int8(100*(float64(free)/float64(total)))))
 		}
 	} else {
 		cmd := exec.Command("sysctl", "-n", "vm.swapusage")
@@ -154,9 +154,9 @@ func (hs *hostStorage) collectMemory() error {
 		t := normalizeSwap(tot, rune(total[len(total)-1]))
 		u := normalizeSwap(usd, rune(used[len(used)-1]))
 		if t == 0 {
-			hs.save("swap", "", 100)
+			hs.Save("swap", "", 100)
 		} else {
-			hs.save("swap", "", int64(100*(u/t)))
+			hs.Save("swap", "", int64(100*(u/t)))
 		}
 	}
 
@@ -221,9 +221,9 @@ func (hs *hostStorage) collectLoadAverage() error {
 		return err
 	}
 
-	hs.save("load", "1", int64(load1*100))
-	hs.save("load", "5", int64(load5*100))
-	hs.save("load", "15", int64(load15*100))
+	hs.Save("load", "1", int64(load1*100))
+	hs.Save("load", "5", int64(load5*100))
+	hs.Save("load", "15", int64(load15*100))
 	return nil
 }
 
@@ -254,11 +254,11 @@ func (hs *hostStorage) collectCpu() error {
 
 		// These are the five I can envision writing rules against.
 		// Open an issue if you want access to the other values.
-		hs.save("cpu", "", total)
-		hs.save("cpu", "user", user)
-		hs.save("cpu", "system", system)
-		hs.save("cpu", "iowait", iowait)
-		hs.save("cpu", "steal", steal)
+		hs.Save("cpu", "", total)
+		hs.Save("cpu", "user", user)
+		hs.Save("cpu", "system", system)
+		hs.Save("cpu", "iowait", iowait)
+		hs.Save("cpu", "steal", steal)
 	}
 	return nil
 }

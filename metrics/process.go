@@ -24,12 +24,12 @@ func NewProcessStore(path string, values ...interface{}) Store {
 		path,
 	}
 
-	store.declareGauge("memory", "rss", nil, displayInMB)
-	store.declareGauge("memory", "vsz", nil, displayInMB)
-	store.declareCounter("cpu", "user", tickPercentage, displayPercent)
-	store.declareCounter("cpu", "system", tickPercentage, displayPercent)
-	store.declareCounter("cpu", "total_user", tickPercentage, displayPercent)
-	store.declareCounter("cpu", "total_system", tickPercentage, displayPercent)
+	store.DeclareGauge("memory", "rss", nil, displayInMB)
+	store.DeclareGauge("memory", "vsz", nil, displayInMB)
+	store.DeclareCounter("cpu", "user", tickPercentage, displayPercent)
+	store.DeclareCounter("cpu", "system", tickPercentage, displayPercent)
+	store.DeclareCounter("cpu", "total_user", tickPercentage, displayPercent)
+	store.DeclareCounter("cpu", "total_system", tickPercentage, displayPercent)
 	if len(values) > 0 {
 		store.fill(values...)
 	}
@@ -87,12 +87,12 @@ func (ps *processStorage) capturePs(pid int) error {
 		return err
 	}
 
-	ps.save("memory", "rss", 1024*val)
+	ps.Save("memory", "rss", 1024*val)
 	val, err = strconv.ParseInt(fields[1], 10, 64)
 	if err != nil {
 		return err
 	}
-	ps.save("memory", "vsz", 1024*val)
+	ps.Save("memory", "vsz", 1024*val)
 
 	times := timeRegexp.FindStringSubmatch(fields[2])
 	if times == nil {
@@ -116,8 +116,8 @@ func (ps *processStorage) capturePs(pid int) error {
 
 	uticks := min*60*100 + sec*100 + cs
 
-	ps.save("cpu", "user", int64(uticks))
-	ps.save("cpu", "system", int64(ticks-uticks))
+	ps.Save("cpu", "user", int64(uticks))
+	ps.Save("cpu", "system", int64(ticks-uticks))
 
 	return nil
 }
@@ -151,10 +151,10 @@ func (ps *processStorage) captureCpu(pid int) error {
 		if err != nil {
 			return err
 		}
-		ps.save("cpu", "user", utime)
-		ps.save("cpu", "system", stime)
-		ps.save("cpu", "total_user", cutime)
-		ps.save("cpu", "total_system", cstime)
+		ps.Save("cpu", "user", utime)
+		ps.Save("cpu", "system", stime)
+		ps.Save("cpu", "total_user", cutime)
+		ps.Save("cpu", "total_system", cstime)
 	}
 
 	return nil
@@ -180,13 +180,13 @@ func (ps *processStorage) captureVm(pid int) error {
 				if err != nil {
 					return err
 				}
-				ps.save("memory", "rss", 1024*val)
+				ps.Save("memory", "rss", 1024*val)
 			case "VmSize:":
 				val, err := strconv.ParseInt(items[1], 10, 64)
 				if err != nil {
 					return err
 				}
-				ps.save("memory", "vsz", 1024*val)
+				ps.Save("memory", "vsz", 1024*val)
 			}
 		}
 

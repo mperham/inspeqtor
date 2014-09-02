@@ -61,6 +61,10 @@ type Service struct {
 	Manager      services.InitSystem
 }
 
+func (s *Service) SetMetrics(newStore metrics.Store) {
+	s.metrics = newStore
+}
+
 /*
  Host is the local machine.
 */
