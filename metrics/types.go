@@ -24,6 +24,17 @@ var (
 	SLOTS = 3600 / 15
 )
 
+type Type uint8
+
+const (
+	Counter Type = iota
+	Gauge
+)
+
+type PrepareFunc func(int64) int64
+type TransformFunc func(int64, int64) int64
+type DisplayFunc func(int64) string
+
 type Store interface {
 	Get(family string, name string) int64
 	Display(family string, name string) string
@@ -31,8 +42,8 @@ type Store interface {
 	Collect(pid int) error
 
 	Save(family, name string, value int64)
-	DeclareCounter(family, name string, xform transformFunc, display displayFunc)
-	DeclareGauge(family, name string, prep prepareFunc, display displayFunc)
+	DeclareCounter(family, name string, xform TransformFunc, display DisplayFunc)
+	DeclareGauge(family, name string, prep PrepareFunc, display DisplayFunc)
 }
 
 type storage struct {
@@ -89,17 +100,6 @@ type family struct {
 
 // private
 
-type metricType uint8
-
-const (
-	Counter metricType = iota
-	Gauge
-)
-
-type prepareFunc func(int64) int64
-type transformFunc func(int64, int64) int64
-type displayFunc func(int64) string
-
 type metric interface {
 	put(val int64)
 	get() int64
@@ -116,14 +116,14 @@ type metric interface {
 
 type gauge struct {
 	buf           *util.RingBuffer
-	prepThreshold prepareFunc
-	forDisplay    displayFunc
+	prepThreshold PrepareFunc
+	forDisplay    DisplayFunc
 }
 
 type counter struct {
 	buf        *util.RingBuffer
-	transform  transformFunc
-	forDisplay displayFunc
+	transform  TransformFunc
+	forDisplay DisplayFunc
 }
 
 func (g *gauge) prepare(val int64) int64 {
@@ -201,7 +201,7 @@ func (store *storage) declareDynamicFamily(familyName string) {
 	store.tree[familyName] = &family{familyName, true, map[string]metric{}}
 }
 
-func (store *storage) DeclareGauge(familyName string, name string, prep prepareFunc, display displayFunc) {
+func (store *storage) DeclareGauge(familyName string, name string, prep PrepareFunc, display DisplayFunc) {
 	fam := store.tree[familyName]
 	if fam == nil {
 		store.tree[familyName] = &family{familyName, false, map[string]metric{}}
@@ -215,7 +215,7 @@ func (store *storage) DeclareGauge(familyName string, name string, prep prepareF
 	}
 }
 
-func (store *storage) DeclareCounter(familyName string, name string, xform transformFunc, display displayFunc) {
+func (store *storage) DeclareCounter(familyName string, name string, xform TransformFunc, display DisplayFunc) {
 	fam := store.tree[familyName]
 	if fam == nil {
 		store.tree[familyName] = &family{familyName, false, map[string]metric{}}
@@ -237,7 +237,7 @@ func (store *storage) Save(family string, name string, value int64) {
 	m.put(value)
 }
 
-func (store *storage) saveType(family string, name string, value int64, t metricType) {
+func (store *storage) saveType(family string, name string, value int64, t Type) {
 	fam := store.tree[family]
 	met := fam.metrics[name]
 	if met == nil && fam.allowDynamic {
