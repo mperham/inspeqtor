@@ -3,3 +3,9 @@ From: {{.Config.From}} <{{.Config.From}}>
 Subject: {{.Target}} {{.Rule.Metric}} has failed its check
 
 {{.Rule.Metric}} is {{.Rule.Op}} than {{.Rule.DisplayThreshold}} for {{.Target}}
+
+Current:   {{.Rule.FetchDisplayCurrentValue}}
+Threshold: {{.Rule.DisplayThreshold}}
+
+Your Pal,
+Inspeqtor

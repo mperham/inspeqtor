@@ -2,4 +2,7 @@ To: {{.Config.To}} <{{.Config.To}}>
 From: {{.Config.From}} <{{.Config.From}}>
 Subject: {{.Target}} does not exist.
 
-Inspeqtor can't locate a process for the {{.Checkable.Name}} service on {{.Hostname}}.
+I can't locate a process for the {{.Checkable.Name}} service on {{.Hostname}}.
+
+Your Pal,
+Inspeqtor

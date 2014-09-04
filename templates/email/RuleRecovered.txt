@@ -4,5 +4,8 @@ Subject: {{.Target}} {{.Rule.Metric}} has recovered
 
 {{.Target}} {{.Rule.Metric}} has recovered.
 
+Current:   {{.Rule.FetchDisplayCurrentValue}}
+Threshold: {{.Rule.DisplayThreshold}}
+
 Your Pal,
 Inspeqtor
