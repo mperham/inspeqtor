@@ -2,6 +2,7 @@ package cli
 
 import (
 	"flag"
+	"inspeqtor"
 	"inspeqtor/util"
 	"log"
 	"os"
@@ -32,10 +33,10 @@ func SetupLogging() {
 	log.SetFlags(0)
 }
 
-func ParseArguments(name string, version string) CmdOptions {
+func ParseArguments() CmdOptions {
 	defaults := CmdOptions{false, false, "/etc/inspeqtor", "info", "/var/run/inspeqtor.sock"}
 
-	log.Println(name, version)
+	log.Println(inspeqtor.Name, inspeqtor.VERSION)
 	log.Println("Copyright © 2014 Contributed Systems LLC")
 	log.Println("Licensed under the GNU Public License Version 3")
 	log.Println("")
