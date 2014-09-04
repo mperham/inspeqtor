@@ -135,7 +135,7 @@ func TestEmailEventRuleRecovered(t *testing.T) {
 func validRuleEvent(etype EventType) *Event {
 	svc := &Service{&Entity{"mysql", nil, metrics.NewProcessStore("/proc"), nil}, nil, &services.ProcessStatus{100, services.Up}, nil}
 	return &Event{
-		etype, svc, &Rule{svc, "memory", "rss", GT, "64m", 64 * 1024 * 1024, 0, 1, 0, Ok, nil},
+		etype, svc, &Rule{svc, "memory", "rss", GT, "64m", 64 * 1024 * 1024, 0, 1, 0, Ok, []Action{mockAction()}},
 	}
 }
 
@@ -147,4 +147,25 @@ func validProcessEvent(etype EventType) *Event {
 func validEmailSetup() *EmailNotifier {
 	return &EmailNotifier{
 		"mike", "fuzzbucket", "smtp.gmail.com", "mike@example.org", "mperham@gmail.com"}
+}
+
+type TestAction struct {
+	events []Event
+}
+
+func (t *TestAction) Latest() Event {
+	return t.events[len(t.events)-1]
+}
+
+func (t *TestAction) Size() int {
+	return len(t.events)
+}
+
+func (t *TestAction) Trigger(e *Event) error {
+	t.events = append(t.events, *e)
+	return nil
+}
+
+func mockAction() *TestAction {
+	return &TestAction{}
 }

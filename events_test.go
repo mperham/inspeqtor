@@ -126,24 +126,3 @@ func TestEventRuleRecovers(t *testing.T) {
 	assert.Equal(t, 2, act.Size())
 	assert.Equal(t, RuleRecovered, act.Latest().Type)
 }
-
-type TestAction struct {
-	events []Event
-}
-
-func (t *TestAction) Latest() Event {
-	return t.events[len(t.events)-1]
-}
-
-func (t *TestAction) Size() int {
-	return len(t.events)
-}
-
-func (t *TestAction) Trigger(e *Event) error {
-	t.events = append(t.events, *e)
-	return nil
-}
-
-func mockAction() *TestAction {
-	return &TestAction{}
-}

@@ -2,6 +2,7 @@ package inspeqtor
 
 import (
 	"inspeqtor/util"
+	"reflect"
 )
 
 type Operator uint8
@@ -46,6 +47,16 @@ type Rule struct {
 	TrippedCount     int
 	State            RuleState
 	Actions          []Action
+}
+
+func (r *Rule) Consequence() string {
+	for _, a := range r.Actions {
+		// So clean!
+		if reflect.ValueOf(a).Elem().Type().Name() == "Restarter" {
+			return ", restarting"
+		}
+	}
+	return ""
 }
 
 func (r *Rule) Trigger(e *Event) {

@@ -1,6 +1,6 @@
 To: {{.Config.To}} <{{.Config.To}}>
 From: {{.Config.From}} <{{.Config.From}}>
-Subject: {{.Target}} {{.Rule.Metric}} has failed its check
+Subject: {{.Target}} {{.Rule.Metric}} has failed its check{{.Rule.Consequence}}
 
 {{.Rule.Metric}} is {{.Rule.Op}} than {{.Rule.DisplayThreshold}} for {{.Target}}
 
