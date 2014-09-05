@@ -51,8 +51,7 @@ Preamble
 ;
 
 Checktype
- : "process"        << $0, nil >>
- | "service"        << $0, nil >>
+ : "service"        << $0, nil >>
 ;
 
 ActionList
