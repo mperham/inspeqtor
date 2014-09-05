@@ -3,6 +3,7 @@ package metrics
 import (
 	"errors"
 	"inspeqtor/util"
+	"sort"
 	"strconv"
 )
 
@@ -41,6 +42,9 @@ type Store interface {
 	PrepareRule(family string, name string, threshold int64) (int64, error)
 	Collect(pid int) error
 
+	Families() []string
+	Metrics(family string) []string
+
 	Save(family, name string, value int64)
 	DeclareCounter(family, name string, xform TransformFunc, display DisplayFunc)
 	DeclareGauge(family, name string, prep PrepareFunc, display DisplayFunc)
@@ -48,6 +52,24 @@ type Store interface {
 
 type storage struct {
 	tree map[string]*family
+}
+
+func (store *storage) Families() []string {
+	families := []string{}
+	for k, _ := range store.tree {
+		families = append(families, k)
+	}
+	sort.Strings(families)
+	return families
+}
+
+func (store *storage) Metrics(family string) []string {
+	met := []string{}
+	for k, _ := range store.tree[family].metrics {
+		met = append(met, k)
+	}
+	sort.Strings(met)
+	return met
 }
 
 func (store *storage) Get(family string, name string) int64 {
