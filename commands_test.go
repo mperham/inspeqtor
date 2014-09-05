@@ -97,12 +97,11 @@ func TestInfo(t *testing.T) {
 	t.Parallel()
 	i, err := New("_", "")
 
-	outbuf := make([]byte, 0)
-	resp := bytes.NewBuffer(outbuf)
+	var resp bytes.Buffer
 
 	assert.Nil(t, err)
 	proc := CommandHandlers['i']
-	proc(i, resp)
+	proc(i, &resp)
 
 	line, err := resp.ReadString('\n')
 	assert.Nil(t, err)

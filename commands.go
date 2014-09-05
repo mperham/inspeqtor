@@ -69,16 +69,44 @@ func currentInfo(i *Inspeqtor, resp io.Writer) {
 	io.WriteString(resp, "\n")
 
 	io.WriteString(resp, fmt.Sprintf("Host: %s\n", i.Host.Name()))
-	for _, rule := range i.Host.Rules() {
-		io.WriteString(resp, fmt.Sprintf("  %-1s %-30s %-15s %s\n", rule.DisplayState(), rule.Metric(), rule.FetchDisplayCurrentValue(), rule.DisplayThreshold))
+	store := i.Host.Metrics()
+	for _, fam := range store.Families() {
+		for _, met := range store.Metrics(fam) {
+			name := fam + "(" + met + ")"
+			var rule *Rule
+			for _, r := range i.Host.Rules() {
+				if r.Metric() == name {
+					rule = r
+				}
+			}
+			if rule != nil {
+				io.WriteString(resp, fmt.Sprintf("  %-1s %-30s %-15s %s\n", rule.DisplayState(), name, store.Display(fam, met), rule.DisplayThreshold))
+			} else {
+				io.WriteString(resp, fmt.Sprintf("    %-30s %-15s\n", name, store.Display(fam, met)))
+			}
+		}
 	}
 
 	for _, svc := range i.Services {
 		io.WriteString(resp, "\n")
 		io.WriteString(resp, fmt.Sprintf("Service: %s\n", svc))
 
-		for _, rule := range svc.Rules() {
-			io.WriteString(resp, fmt.Sprintf("  %-1s %-30s %-15s %s\n", rule.DisplayState(), rule.Metric(), rule.FetchDisplayCurrentValue(), rule.DisplayThreshold))
+		store := svc.Metrics()
+		for _, fam := range store.Families() {
+			for _, met := range store.Metrics(fam) {
+				name := fam + "(" + met + ")"
+				var rule *Rule
+				for _, r := range svc.Rules() {
+					if r.Metric() == name {
+						rule = r
+					}
+				}
+				if rule != nil {
+					io.WriteString(resp, fmt.Sprintf("  %-1s %-30s %-15s %s\n", rule.DisplayState(), name, store.Display(fam, met), rule.DisplayThreshold))
+				} else {
+					io.WriteString(resp, fmt.Sprintf("    %-30s %-15s\n", name, store.Display(fam, met)))
+				}
+			}
 		}
 	}
 }
