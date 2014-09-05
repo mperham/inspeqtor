@@ -44,9 +44,11 @@ func TestBasicServiceParsing(t *testing.T) {
 	check := obj.(*ast.ProcessCheck)
 	assert.Equal(t, check.Name, "memcached")
 	assert.Equal(t, len(check.Rules), 2)
-	assert.Equal(t, len(check.Parameters), 2)
+	assert.Equal(t, len(check.Parameters), 4)
 	assert.Equal(t, check.Parameters["owner"], "dev")
 	assert.Equal(t, check.Parameters["foo"], "bar")
+	assert.Equal(t, check.Parameters["endpoint"], "/foo")
+	assert.Equal(t, check.Parameters["quoted"], "whoa sp\"aces")
 	assert.Equal(t, check.Rules[0].Actions[1].Name, "alert")
 	assert.Equal(t, check.Rules[0].Actions[1].Team, "ops")
 }

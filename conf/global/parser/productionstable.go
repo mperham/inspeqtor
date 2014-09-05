@@ -30,23 +30,23 @@ var productionsTable = ProdTab {
 		},
 	},
 	ProdTabEntry{
-		String: `Config : SetStatement	<< ast.Config{X[0].(map[string]string), []ast.Route{}}, nil >>`,
+		String: `Config : SetStatement	<< ast.NewConfig(X[0].(map[string]string), nil) >>`,
 		Id: "Config",
 		NTType: 1,
 		Index: 1,
 		NumSymbols: 1,
 		ReduceFunc: func(X []Attrib) (Attrib, error) {
-			return ast.Config{X[0].(map[string]string), []ast.Route{}}, nil
+			return ast.NewConfig(X[0].(map[string]string), nil)
 		},
 	},
 	ProdTabEntry{
-		String: `Config : RouteStatement	<< ast.Config{map[string]string{}, []ast.Route{X[0].(ast.Route)}}, nil >>`,
+		String: `Config : RouteStatement	<< ast.NewConfig(map[string]string{}, X[0]) >>`,
 		Id: "Config",
 		NTType: 1,
 		Index: 2,
 		NumSymbols: 1,
 		ReduceFunc: func(X []Attrib) (Attrib, error) {
-			return ast.Config{map[string]string{}, []ast.Route{X[0].(ast.Route)}}, nil
+			return ast.NewConfig(map[string]string{}, X[0])
 		},
 	},
 	ProdTabEntry{
@@ -90,33 +90,33 @@ var productionsTable = ProdTab {
 		},
 	},
 	ProdTabEntry{
-		String: `ChannelParameters : value value	<< ast.AppendPair(X[0], X[1], map[string]string{}), nil >>`,
+		String: `ChannelParameters : value value	<< ast.AppendPair(X[0], X[1], map[string]string{}) >>`,
 		Id: "ChannelParameters",
 		NTType: 3,
 		Index: 7,
 		NumSymbols: 2,
 		ReduceFunc: func(X []Attrib) (Attrib, error) {
-			return ast.AppendPair(X[0], X[1], map[string]string{}), nil
+			return ast.AppendPair(X[0], X[1], map[string]string{})
 		},
 	},
 	ProdTabEntry{
-		String: `ChannelParameters : value value "," ChannelParameters	<< ast.AppendPair(X[0], X[1], X[3]), nil >>`,
+		String: `ChannelParameters : value value "," ChannelParameters	<< ast.AppendPair(X[0], X[1], X[3]) >>`,
 		Id: "ChannelParameters",
 		NTType: 3,
 		Index: 8,
 		NumSymbols: 4,
 		ReduceFunc: func(X []Attrib) (Attrib, error) {
-			return ast.AppendPair(X[0], X[1], X[3]), nil
+			return ast.AppendPair(X[0], X[1], X[3])
 		},
 	},
 	ProdTabEntry{
-		String: `SetStatement : "set" value value	<< ast.AppendPair(X[1], X[2], map[string]string{}), nil >>`,
+		String: `SetStatement : "set" value value	<< ast.AppendPair(X[1], X[2], map[string]string{}) >>`,
 		Id: "SetStatement",
 		NTType: 4,
 		Index: 9,
 		NumSymbols: 3,
 		ReduceFunc: func(X []Attrib) (Attrib, error) {
-			return ast.AppendPair(X[1], X[2], map[string]string{}), nil
+			return ast.AppendPair(X[1], X[2], map[string]string{})
 		},
 	},
 	

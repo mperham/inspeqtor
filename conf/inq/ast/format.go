@@ -62,6 +62,16 @@ func AddAction(name interface{}, t interface{}) (Action, error) {
 func AddParam(key interface{}, val interface{}, hash interface{}) (map[string]string, error) {
 	k := string(key.(*token.Token).Lit)
 	v := string(val.(*token.Token).Lit)
+
+	// remove quotes from quoted strings
+	if v[0] == '"' {
+		val, err := strconv.Unquote(v)
+		if err != nil {
+			return nil, err
+		}
+		v = val
+	}
+
 	var h map[string]string
 
 	if hash == nil {
@@ -116,9 +126,14 @@ func Metric(family interface{}, name interface{}) (*RuleMetric, error) {
 
 func HumanAmount(digits interface{}) (*Amount, error) {
 	str := string(digits.(*token.Token).Lit)
+	amt, err := strconv.ParseInt(str, 10, 64)
+	if err == nil {
+		return &Amount{str, amt}, nil
+	}
+
 	sizecode := str[len(str)-1:]
 	val := str[0 : len(str)-1]
-	amt, err := strconv.ParseInt(val, 10, 64)
+	amt, err = strconv.ParseInt(val, 10, 64)
 	if err != nil {
 		return nil, err
 	}

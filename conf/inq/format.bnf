@@ -14,10 +14,16 @@ _idchar : _letter | _digit | '_' | '-' | '.' | '/';
 _sizecode : 'k' | 'm' | 'g' | 't' | 'p' | '%';
 
 _uint : _digit {_digit};
-uint_lit : _uint;
-sized_uint_lit : _uint _sizecode;
 
-name : _idchar {_idchar} ;
+_anything	: 'A'-'Z' | 'a'-'z' | '0'-'9'
+		| '!' | '#' | '$' | '%' | '&' | '\'' | '*' | '+' | '-' | '/'
+		| '=' | '?' | '^' | '_' | '`' | '{' | '|' | '}' | '~' | '.' | '@'
+		| '\u0100'-'\U0010FFFF';
+_atom : _anything {_anything} ;
+_quotedpair : '\\' . ;
+_quotedstring : '"' (_quotedpair | .) {_quotedpair | .} '"' ;
+name : (_atom | _quotedstring) ;
+
 operator : '>' | '<';
 
 << import "inspeqtor/conf/inq/ast" >>
@@ -73,11 +79,11 @@ Parameters
   | name name                     << ast.AddParam($0, $1, nil) >>;
 
 IntAmount
-  : uint_lit            << ast.ToInt64($0) >>;
+  : name            << ast.ToInt64($0) >>;
 
 HumanAmount
-  : sized_uint_lit      << ast.HumanAmount($0) >>
-  | uint_lit            << ast.ToInt64($0) >>;
+  : name      << ast.HumanAmount($0) >>
+  ;
 
 // Metrics are named like "family(name)", e.g. memory(rss), cpu(user)
 // or mysql(questions).
@@ -91,7 +97,7 @@ HumanAmount
 Metric
   : name                    << ast.Metric($0, nil) >>
   | name "(" name ")"       << ast.Metric($0, $2) >>
-  | name "(" uint_lit ")"       << ast.Metric($0, $2) >>;
+  ;
 
 Rule
   : "if" Metric operator HumanAmount "then" ActionList  << ast.NewRule($1, $2, $3, $5, &ast.Amount{"1",1}), nil >>
