@@ -47,8 +47,8 @@ const (
 )
 
 type ServiceError struct {
-	Name string
 	Init string
+	Name string
 	Err  error
 }
 

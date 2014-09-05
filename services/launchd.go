@@ -44,21 +44,21 @@ func (l *Launchd) Name() string {
 	return "launchd"
 }
 
-func (l *Launchd) resolvePlist(serviceName string) (string, error) {
+func (l *Launchd) resolvePlist(serviceName string) string {
 	for _, path := range l.dirs {
 		candidate := fmt.Sprintf("%s/%s.plist", path, serviceName)
 		_, err := os.Lstat(candidate)
 		if err == nil {
-			return candidate, nil
+			return candidate
 		}
 	}
-	return "", errors.New("Could not find a plist for " + serviceName)
+	return ""
 }
 
 func (l *Launchd) Restart(serviceName string) error {
-	path, err := l.resolvePlist(serviceName)
-	if err != nil {
-		return &ServiceError{l.Name(), serviceName, err}
+	path := l.resolvePlist(serviceName)
+	if path == "" {
+		return &ServiceError{l.Name(), serviceName, ErrServiceNotFound}
 	}
 
 	cmd := exec.Command("launchctl", "unload", path)
@@ -108,6 +108,11 @@ func (l *Launchd) LookupService(serviceName string) (*ProcessStatus, error) {
 
 			return &ProcessStatus{int(pid), Up}, nil
 		}
+	}
+
+	path := l.resolvePlist(serviceName)
+	if path != "" {
+		return &ProcessStatus{0, Down}, nil
 	}
 
 	return nil, &ServiceError{l.Name(), serviceName, ErrServiceNotFound}
