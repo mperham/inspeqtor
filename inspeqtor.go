@@ -2,6 +2,7 @@ package inspeqtor
 
 import (
 	"errors"
+	"inspeqtor/metrics"
 	"inspeqtor/services"
 	"inspeqtor/util"
 	"net"
@@ -34,7 +35,7 @@ func New(dir string, socketpath string) (*Inspeqtor, error) {
 		SocketPath:   socketpath,
 		StartedAt:    time.Now(),
 		SilenceUntil: time.Now(),
-		Host:         &Host{&Entity{name: "localhost"}},
+		Host:         &Host{&Entity{name: "localhost", metrics: metrics.NewMockStore()}},
 		GlobalConfig: &ConfigFile{Defaults, map[string]*AlertRoute{}}}
 	return i, nil
 }
@@ -94,6 +95,10 @@ func (i *Inspeqtor) Parse() error {
 	return nil
 }
 
+func HandleSignal(sig os.Signal, handler func(*Inspeqtor)) {
+	SignalHandlers[sig] = handler
+}
+
 // private
 
 func (i *Inspeqtor) openSocket(path string) error {
@@ -107,10 +112,6 @@ func (i *Inspeqtor) openSocket(path string) error {
 	}
 	i.Socket = socket
 	return nil
-}
-
-func HandleSignal(sig os.Signal, handler func(*Inspeqtor)) {
-	SignalHandlers[sig] = handler
 }
 
 func handleSignals(i *Inspeqtor) {
@@ -165,11 +166,11 @@ func (i *Inspeqtor) silenced() bool {
 func (i *Inspeqtor) scanSystem() {
 	// "Trust, but verify"
 	// https://en.wikipedia.org/wiki/Trust%2C_but_verify
-	i.trust()
+	i.scan()
 	i.verify()
 }
 
-func (i *Inspeqtor) trust() {
+func (i *Inspeqtor) scan() {
 	start := time.Now()
 	var barrier sync.WaitGroup
 	barrier.Add(1)
