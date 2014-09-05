@@ -46,7 +46,8 @@ var (
 		Term:         exit,
 		os.Interrupt: exit,
 	}
-	Name string = "Inspeqtor"
+	Name      string = "Inspeqtor"
+	Licensing string = "Licensed under the GNU Public License 3.0"
 )
 
 func (i *Inspeqtor) Start() {

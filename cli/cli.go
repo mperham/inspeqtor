@@ -38,10 +38,10 @@ func ParseArguments() CmdOptions {
 
 	log.Println(inspeqtor.Name, inspeqtor.VERSION)
 	log.Println("Copyright © 2014 Contributed Systems LLC")
-	log.Println("Licensed under the GNU Public License Version 3")
-	log.Println("")
 
 	if SalesPitch != nil {
+		log.Println(inspeqtor.Licensing)
+		log.Println("")
 		SalesPitch()
 	}
 
