@@ -145,8 +145,29 @@ func (svc *Service) Collect(completeCallback func(Checkable)) {
 	}
 }
 
-func (s *Entity) Verify() []*Event {
+func (s *Host) Verify() []*Event {
 	events := []*Event{}
+	for _, r := range s.Rules() {
+		evt := r.Check()
+		if evt != nil {
+			events = append(events, evt)
+			for _, a := range r.Actions {
+				a.Trigger(evt)
+			}
+		}
+	}
+	return events
+}
+
+func (s *Service) Verify() []*Event {
+	events := []*Event{}
+
+	if s.Process.Status != services.Up {
+		// we probably shouldn't verify anything that isn't actually Up
+		util.Debug("%s is %s", s.Name(), s.Process.Status)
+		return events
+	}
+
 	for _, r := range s.Rules() {
 		evt := r.Check()
 		if evt != nil {
@@ -211,6 +232,11 @@ func (svc *Service) Resolve(mgrs []services.InitSystem) error {
 func (s *Service) Transition(ps *services.ProcessStatus, emitter func(EventType)) {
 	oldst := s.Process.Status
 	s.Process = ps
+
+	if oldst == ps.Status {
+		// don't fire PDNE events every cycle
+		return
+	}
 
 	switch ps.Status {
 	case services.Up:
