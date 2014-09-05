@@ -25,7 +25,6 @@ func NewProcessStore(path string, values ...interface{}) Store {
 	}
 
 	store.DeclareGauge("memory", "rss", nil, displayInMB)
-	store.DeclareGauge("memory", "vsz", nil, displayInMB)
 	store.DeclareCounter("cpu", "user", tickPercentage, displayPercent)
 	store.DeclareCounter("cpu", "system", tickPercentage, displayPercent)
 	store.DeclareCounter("cpu", "total_user", tickPercentage, displayPercent)
@@ -70,7 +69,7 @@ func (ps *processStorage) Collect(pid int) error {
  * So many hacks in this.  OSX support can be seen as "bad" at best.
  */
 func (ps *processStorage) capturePs(pid int) error {
-	cmd := exec.Command("ps", "So", "rss,vsz,time,utime", "-p", strconv.Itoa(pid))
+	cmd := exec.Command("ps", "So", "rss,time,utime", "-p", strconv.Itoa(pid))
 	sout, err := cmd.CombinedOutput()
 	if err != nil {
 		return err
@@ -88,13 +87,8 @@ func (ps *processStorage) capturePs(pid int) error {
 	}
 
 	ps.Save("memory", "rss", 1024*val)
-	val, err = strconv.ParseInt(fields[1], 10, 64)
-	if err != nil {
-		return err
-	}
-	ps.Save("memory", "vsz", 1024*val)
 
-	times := timeRegexp.FindStringSubmatch(fields[2])
+	times := timeRegexp.FindStringSubmatch(fields[1])
 	if times == nil {
 		util.Debug("Unable to parse CPU time in " + lines[1])
 		return nil
@@ -105,7 +99,7 @@ func (ps *processStorage) capturePs(pid int) error {
 
 	ticks := min*60*100 + sec*100 + cs
 
-	times = timeRegexp.FindStringSubmatch(fields[3])
+	times = timeRegexp.FindStringSubmatch(fields[2])
 	if times == nil {
 		util.Debug("Unable to parse User time in " + lines[1])
 		return nil
@@ -181,12 +175,6 @@ func (ps *processStorage) captureVm(pid int) error {
 					return err
 				}
 				ps.Save("memory", "rss", 1024*val)
-			case "VmSize:":
-				val, err := strconv.ParseInt(items[1], 10, 64)
-				if err != nil {
-					return err
-				}
-				ps.Save("memory", "vsz", 1024*val)
 			}
 		}
 
