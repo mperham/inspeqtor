@@ -42,6 +42,17 @@ Non-Unix platforms, e.g. Windows, aren't supported at this time.
 inspeqtor has no third-party dependencies.  It uses about 5-10MB of RAM at runtime.
 
 
+## Upgrade
+
+[Inspeqtor Pro](http://contribsys.com/inspeqtor) is the commercial version of Inspeqtor and offers more
+features, official support and a non-GPL license:
+
+* Monitor legacy sysvinit services with PID files
+* Monitor daemon-specific metrics (e.g. redis, memcached, mysql, nginx...)
+* Send alerts to team chat rooms
+
+See the [wiki documentation](https://github.com/mperham/inspeqtor/wiki#inspeqtor-pro) for in-depth documentation around each Pro feature.
+
 ## License
 
 Licensed under GPLv3.
