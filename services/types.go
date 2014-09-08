@@ -84,6 +84,9 @@ var (
 		func() (InitSystem, error) {
 			return detectRunit("/")
 		},
+		func() (InitSystem, error) {
+			return detectSystemd("/etc/systemd")
+		},
 	}
 )
 
