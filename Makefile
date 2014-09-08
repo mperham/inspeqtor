@@ -14,7 +14,13 @@ BASENAME=$(NAME)_$(VERSION)-$(ITERATION)
 
 all: test
 
-# go get github.com/jteeuwen/go-bindata/...
+prepare:
+	#wget https://storage.googleapis.com/golang/go1.3.1.linux-amd64.tar.gz
+	#tar -C /usr/local -xzf go1.3.1.linux-amd64.tar.gz
+	go get github.com/stretchr/testify/...
+	go get github.com/jteeuwen/go-bindata/...
+	@echo Now you should be ready to run "make"
+
 test:
 	@go-bindata -pkg inspeqtor -o templates.go templates/...
 	@go test -parallel 4 ./... | grep -v "no test files"

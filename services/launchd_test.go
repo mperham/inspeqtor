@@ -2,10 +2,15 @@ package services
 
 import (
 	"github.com/stretchr/testify/assert"
+	"inspeqtor/util"
 	"testing"
 )
 
 func TestLaunchd(t *testing.T) {
+	if !util.Darwin() {
+		t.Skip("FIXME - OSX only")
+		return
+	}
 	t.Parallel()
 	l, err := detectLaunchd("darwin/")
 	assert.Nil(t, err)
