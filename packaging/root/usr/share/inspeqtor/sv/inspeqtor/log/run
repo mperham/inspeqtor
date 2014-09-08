@@ -1,2 +1,2 @@
 #!/bin/sh
-exec svlogd /var/log/inspeqtor
+exec logger -t inspeqtor

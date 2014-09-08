@@ -3,7 +3,7 @@
 #
 # .inq files represent a thing to monitor and verify.
 # Inspeqtor MUST, at minimum, have a "check host" recipe.
-# system.inq is the naming convention for checking the
+# host.inq is the naming convention for checking the
 # host itself.
 #
 check host

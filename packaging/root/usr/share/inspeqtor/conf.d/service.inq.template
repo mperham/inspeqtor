@@ -14,8 +14,8 @@
 # In launchd:
 #   ~/Library/LaunchAgents/<name>.plist
 #
-# Note that Inspeqtor explicitly does not support /etc/init.d; this
-# is a conscious decision: init.d is terrible.  You shouldn't need
+# Note that Inspeqtor explicitly does not support traditional /etc/init.d;
+# this is a conscious decision: sysvinit is terrible.  You shouldn't need
 # a 50-100 bash script just to start/stop your daemon.  Learn to use
 # the modern init systems above and you'll never go back.  I strongly
 # recommend runit - it has a wonderfully simple, Unix design - and

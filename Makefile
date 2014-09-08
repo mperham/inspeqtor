@@ -50,7 +50,6 @@ build_deb: build
 	# gem install fpm
 	fpm -s dir -t deb -n $(NAME) -v $(VERSION) -p packaging/output \
 		--deb-priority optional --category admin \
-		--config-files /var/log/$(NAME) \
 		--deb-compression bzip2 \
 	 	--after-install packaging/debian/postinst \
 	 	--before-remove packaging/debian/prerm \
