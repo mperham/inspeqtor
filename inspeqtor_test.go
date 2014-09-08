@@ -22,7 +22,7 @@ func TestCreateSocket(t *testing.T) {
 	err = i.Parse()
 	assert.Nil(t, err)
 
-	err = i.openSocket("tmp.sock")
+	err = i.openSocket("/tmp/tmp.sock")
 	assert.Nil(t, err)
 	assert.NotNil(t, i.Socket)
 	defer i.Socket.Close()

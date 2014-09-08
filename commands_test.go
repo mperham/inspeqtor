@@ -18,17 +18,17 @@ func TestAcceptSocket(t *testing.T) {
 	err = i.Parse()
 	assert.Nil(t, err)
 
-	err = i.openSocket("tmp.sock")
+	err = i.openSocket("/tmp/tmp.sock")
 	assert.Nil(t, err)
 	defer i.Socket.Close()
 
 	go func() {
-		conn, err := net.Dial("unix", "tmp.sock")
+		conn, err := net.Dial("unix", "/tmp/tmp.sock")
 		assert.Nil(t, err)
 		conn.Write([]byte("start deploy"))
 		conn.Close()
 
-		conn, err = net.Dial("unix", "tmp.sock")
+		conn, err = net.Dial("unix", "/tmp/tmp.sock")
 		assert.Nil(t, err)
 		conn.Write([]byte("finish deploy"))
 		conn.Close()
