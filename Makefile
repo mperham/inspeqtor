@@ -43,6 +43,10 @@ deploy: clean build_deb
 	scp packaging/output/$(BASENAME)_amd64.deb $(PRODUCTION):~
 	ssh $(PRODUCTION) 'sudo dpkg -i $(BASENAME)_amd64.deb && sudo ./fix && sudo sv restart inspeqtor'
 
+cover:
+	go test -cover -coverprofile cover.out
+	go tool cover -html=cover.out
+
 build_rpm: build
 	# gem install fpm
 	# brew install rpm

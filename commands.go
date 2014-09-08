@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"inspeqtor/util"
 	"io"
+	"strings"
 	"time"
 )
 
@@ -31,17 +32,18 @@ func (i *Inspeqtor) acceptCommand() {
 		return
 	}
 	defer c.Close()
+	c.SetDeadline(time.Now().Add(2 * time.Second))
 
 	reader := bufio.NewReader(c)
 	line, err := reader.ReadString('\n')
-	if len(line) == 0 && err != nil {
-		util.Info(err.Error())
+	if err != nil {
+		util.Info("Did not receive a command line in time: %s", err.Error())
 	}
 
 	firstChar := []rune(line)[0]
 	funk := CommandHandlers[firstChar]
 	if funk == nil {
-		util.Warn("Unknown command: " + line)
+		util.Warn("Unknown command: %s", strings.TrimSpace(line))
 		io.WriteString(c, "Unknown command: "+line)
 		return
 	}

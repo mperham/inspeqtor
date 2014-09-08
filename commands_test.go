@@ -4,6 +4,9 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/stretchr/testify/assert"
+	"inspeqtor/metrics"
+	"inspeqtor/services"
+	"io"
 	"net"
 	"regexp"
 	"testing"
@@ -25,13 +28,23 @@ func TestAcceptSocket(t *testing.T) {
 	go func() {
 		conn, err := net.Dial("unix", "/tmp/tmp.sock")
 		assert.Nil(t, err)
-		conn.Write([]byte("start deploy"))
+		conn.Write([]byte("start deploy\n"))
 		conn.Close()
 
 		conn, err = net.Dial("unix", "/tmp/tmp.sock")
 		assert.Nil(t, err)
-		conn.Write([]byte("finish deploy"))
+		conn.Write([]byte("finish deploy\n"))
 		conn.Close()
+
+		conn, err = net.Dial("unix", "/tmp/tmp.sock")
+		assert.Nil(t, err)
+		conn.Write([]byte("?\n"))
+		buf := make([]byte, 10)
+		_, err = io.ReadFull(conn, buf)
+		assert.Nil(t, err)
+		conn.Close()
+
+		assert.Equal(t, "Unknown command: ?\n", string(buf))
 	}()
 
 	assert.False(t, i.silenced())
@@ -39,6 +52,7 @@ func TestAcceptSocket(t *testing.T) {
 	assert.True(t, i.silenced())
 	i.acceptCommand()
 	assert.False(t, i.silenced())
+	i.acceptCommand()
 }
 
 func TestStartDeploy(t *testing.T) {
@@ -96,6 +110,9 @@ func TestTheLove(t *testing.T) {
 func TestInfo(t *testing.T) {
 	t.Parallel()
 	i, err := New("_", "")
+	i.Services = []Checkable{
+		&Service{&Entity{"foo", nil, metrics.NewProcessStore("/proc", 15), nil}, nil, &services.ProcessStatus{99, services.Up}, nil},
+	}
 
 	var resp bytes.Buffer
 
