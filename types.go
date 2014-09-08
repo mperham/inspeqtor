@@ -46,7 +46,7 @@ func NewHost() *Host {
 }
 
 func NewService(name string) *Service {
-	return &Service{&Entity{name, nil, metrics.NewProcessStore("/proc"), nil}, nil, services.NewStatus(), nil}
+	return &Service{&Entity{name, nil, metrics.NewProcessStore("/proc", 15), nil}, nil, services.NewStatus(), nil}
 }
 
 /*

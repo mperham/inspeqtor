@@ -3,6 +3,7 @@ package metrics
 import (
 	"errors"
 	"inspeqtor/util"
+	"regexp"
 	"sort"
 	"strconv"
 )
@@ -32,6 +33,23 @@ const (
 	Gauge
 )
 
+var (
+	meminfoParser = regexp.MustCompile("([^:]+):\\s+(\\d+)")
+	swapRegexp    = regexp.MustCompile("= (\\d+\\.\\d{2}[A-Z])(.*)")
+	multiplyBy100 = func(val int64) int64 {
+		return val * 100
+	}
+	displayLoad = func(val int64) string {
+		return strconv.FormatFloat(float64(val)/100, 'f', 2, 64)
+	}
+	displayPercent = func(val int64) string {
+		return strconv.Itoa(int(val)) + "%"
+	}
+	displayInMB = func(val int64) string {
+		return strconv.FormatFloat(float64(val)/(1024*1024), 'f', 2, 64) + "m"
+	}
+)
+
 type PrepareFunc func(int64) int64
 type TransformFunc func(int64, int64) int64
 type DisplayFunc func(int64) string
@@ -48,6 +66,10 @@ type Store interface {
 	Save(family, name string, value int64)
 	DeclareCounter(family, name string, xform TransformFunc, display DisplayFunc)
 	DeclareGauge(family, name string, prep PrepareFunc, display DisplayFunc)
+}
+
+type Loadable interface {
+	Load(values ...interface{})
 }
 
 type storage struct {

@@ -4,30 +4,8 @@ import (
 	"inspeqtor/util"
 	"io/ioutil"
 	"os/exec"
-	"regexp"
 	"strconv"
 	"strings"
-)
-
-var (
-	cycleTicks     float64 = CLK_TCK * 15
-	meminfoParser          = regexp.MustCompile("([^:]+):\\s+(\\d+)")
-	swapRegexp             = regexp.MustCompile("= (\\d+\\.\\d{2}[A-Z])(.*)")
-	tickPercentage         = func(cur, prev int64) int64 {
-		return int64((float64(cur-prev) / cycleTicks) * 100)
-	}
-	multiplyBy100 = func(val int64) int64 {
-		return val * 100
-	}
-	displayLoad = func(val int64) string {
-		return strconv.FormatFloat(float64(val)/100, 'f', 2, 64)
-	}
-	displayPercent = func(val int64) string {
-		return strconv.Itoa(int(val)) + "%"
-	}
-	displayInMB = func(val int64) string {
-		return strconv.FormatFloat(float64(val)/(1024*1024), 'f', 2, 64) + "m"
-	}
 )
 
 type hostStorage struct {
@@ -42,6 +20,10 @@ func NewHostStore(path string, cycleSeconds uint) Store {
 		&storage{map[string]*family{}},
 		float64(cycleSeconds * CLK_TCK),
 		path,
+	}
+
+	tickPercentage := func(cur, prev int64) int64 {
+		return int64((float64(cur-prev) / float64(cycleSeconds*CLK_TCK)) * 100)
 	}
 
 	store.DeclareGauge("swap", "", nil, displayPercent)

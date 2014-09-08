@@ -18,10 +18,14 @@ type processStorage struct {
 	path string
 }
 
-func NewProcessStore(path string, values ...interface{}) Store {
+func NewProcessStore(path string, cycleSeconds uint) Store {
 	store := &processStorage{
 		&storage{map[string]*family{}},
 		path,
+	}
+
+	tickPercentage := func(cur, prev int64) int64 {
+		return int64((float64(cur-prev) / float64(cycleSeconds*CLK_TCK)) * 100)
 	}
 
 	store.DeclareGauge("memory", "rss", nil, displayInMB)
@@ -29,10 +33,13 @@ func NewProcessStore(path string, values ...interface{}) Store {
 	store.DeclareCounter("cpu", "system", tickPercentage, displayPercent)
 	store.DeclareCounter("cpu", "total_user", tickPercentage, displayPercent)
 	store.DeclareCounter("cpu", "total_system", tickPercentage, displayPercent)
-	if len(values) > 0 {
-		store.fill(values...)
-	}
 	return store
+}
+
+func (ps *processStorage) Load(values ...interface{}) {
+	if len(values) > 0 {
+		ps.fill(values...)
+	}
 }
 
 func (ps *processStorage) Collect(pid int) error {

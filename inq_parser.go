@@ -143,7 +143,7 @@ func convertAction(global *ConfigFile, check Checkable, name string, team string
 
 func convertService(global *ConfigFile, inqsvc *ast.ProcessCheck) (*Service, error) {
 	rules := make([]*Rule, len(inqsvc.Rules))
-	storage := metrics.NewProcessStore("/proc")
+	storage := metrics.NewProcessStore("/proc", global.Top.CycleTime)
 
 	svc := &Service{&Entity{inqsvc.Name, nil, storage, inqsvc.Parameters}, nil, services.NewStatus(), nil}
 
