@@ -72,7 +72,10 @@ func currentInfo(i *Inspeqtor, resp io.Writer) {
 	store := i.Host.Metrics()
 	for _, fam := range store.Families() {
 		for _, met := range store.Metrics(fam) {
-			name := fam + "(" + met + ")"
+			name := fam
+			if met != "" {
+				name = name + "(" + met + ")"
+			}
 			var rule *Rule
 			for _, r := range i.Host.Rules() {
 				if r.Metric() == name {
@@ -94,7 +97,10 @@ func currentInfo(i *Inspeqtor, resp io.Writer) {
 		store := svc.Metrics()
 		for _, fam := range store.Families() {
 			for _, met := range store.Metrics(fam) {
-				name := fam + "(" + met + ")"
+				name := fam
+				if met != "" {
+					name = name + "(" + met + ")"
+				}
 				var rule *Rule
 				for _, r := range svc.Rules() {
 					if r.Metric() == name {
