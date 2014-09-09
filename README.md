@@ -16,7 +16,7 @@ What it does:
 What it doesn't:
 
 * monitor arbitrary processes, services must be init-managed
-* have *any* runtime or 3rd party dependencies at all, not even libc.
+* have *any* runtime dependencies at all, not even libc.
 
 
 ## Installation
