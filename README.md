@@ -1,4 +1,4 @@
-# inspeqtor
+# Inspeqtor
 
 Next generation host and process monitoring for server applications.  Inspired
 by a decade of using monit but a complete rethink of what's necessary for modern
@@ -49,6 +49,6 @@ Licensed under GPLv3.
 
 # Author
 
-inspeqtor is written by [Mike Perham](http://twitter.com/mperham) of [Contributed Systems](http://contribsys.com).  We build awesome open source-based infrastructure to help you build awesome apps.
+Inspeqtor is written by [Mike Perham](http://twitter.com/mperham) of [Contributed Systems](http://contribsys.com).  We build awesome open source-based infrastructure to help you build awesome apps.
 
 We also develop [Sidekiq](http://sidekiq.org) and sell [Sidekiq Pro](http://sidekiq.org/pro), the best Ruby background job processing system.
