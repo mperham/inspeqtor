@@ -2,9 +2,11 @@ package inspeqtor
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"inspeqtor/util"
 	"io"
+	"net"
 	"strings"
 	"time"
 )
@@ -25,10 +27,25 @@ var (
 	}
 )
 
+func (i *Inspeqtor) openSocket(path string) error {
+	if i.Socket != nil {
+		return errors.New("Socket is already open!")
+	}
+
+	socket, err := net.Listen("unix", path)
+	if err != nil {
+		return err
+	}
+	i.Socket = socket
+	return nil
+}
+
 func (i *Inspeqtor) acceptCommand() {
 	c, err := i.Socket.Accept()
 	if err != nil {
-		util.Warn("Unix socket shutdown: %s", err.Error())
+		if i.Valid {
+			util.Warn("Unix socket shutdown: %s", err.Error())
+		}
 		return
 	}
 	defer c.Close()

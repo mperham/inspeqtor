@@ -27,6 +27,11 @@ func main() {
 	} else if options.TestAlertRoutes {
 		ins.TestAlertRoutes()
 	} else {
+		// Fire up the Inspeqtor singleton
 		ins.Start()
+
+		// Install the global signal handlers
+		// This method never returns.
+		inspeqtor.HandleSignals()
 	}
 }
