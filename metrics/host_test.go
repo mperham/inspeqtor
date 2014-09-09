@@ -49,7 +49,19 @@ func TestCollectHost(t *testing.T) {
 
 	assert.Equal(t, store.Get("swap", ""), 2)
 	assert.Equal(t, store.Display("swap", ""), "2%")
+}
 
+func TestPrepareRule(t *testing.T) {
+	t.Parallel()
+	store := NewHostStore("/proc", 15)
+
+	val, err := store.PrepareRule("load", "1", 10)
+	assert.Nil(t, err)
+	assert.Equal(t, val, 1000)
+
+	val, err = store.PrepareRule("swap", "", 10)
+	assert.Nil(t, err)
+	assert.Equal(t, val, 10)
 }
 
 func TestCollectRealHostMetrics(t *testing.T) {

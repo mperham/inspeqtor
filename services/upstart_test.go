@@ -17,6 +17,7 @@ func TestDetectUpstart(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, 14190, st.Pid)
 	assert.Equal(t, Up, st.Status)
+	assert.Equal(t, st.String(), "Up/14190")
 
 	// conf exists, but job is invalid
 	upstart.dummyOutput = "initctl: Unknown job: foo"

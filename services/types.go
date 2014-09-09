@@ -12,38 +12,25 @@ type ProcessStatus struct {
 }
 
 func NewStatus() *ProcessStatus {
-	return &ProcessStatus{}
+	return &ProcessStatus{0, Unknown}
 }
 
 func (s *ProcessStatus) String() string {
 	return fmt.Sprintf("%s/%d", s.Status, s.Pid)
 }
 
-type Status uint8
+type Status string
 
 func (s Status) String() string {
-	switch s {
-	case Unknown:
-		return "Unknown"
-	case Down:
-		return "Down"
-	case Starting:
-		return "Starting"
-	case Up:
-		return "Up"
-	case Stopping:
-		return "Stopping"
-	default:
-		return fmt.Sprintf("Oops: %d", s)
-	}
+	return string(s)
 }
 
 const (
-	Unknown Status = iota
-	Down
-	Starting
-	Up
-	Stopping
+	Unknown  Status = "Unknown"
+	Down            = "Down"
+	Starting        = "Starting"
+	Up              = "Up"
+	Stopping        = "Stopping"
 )
 
 type ServiceError struct {
