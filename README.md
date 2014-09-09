@@ -1,7 +1,7 @@
 # inspeqtor
 
-Next generation monitoring for server applications.  Inspired by a decade of
-using monit but a complete rethink of what's necessary for modern server
+Next generation host and process monitoring for server applications.  Inspired
+by a decade of using monit but a complete rethink of what's necessary for modern
 applications.
 
 What it does:
