@@ -27,3 +27,14 @@ func TestCreateSocket(t *testing.T) {
 	assert.NotNil(t, i.Socket)
 	defer i.Socket.Close()
 }
+
+func TestTestNotifications(t *testing.T) {
+	i, err := New("test", "")
+	assert.Nil(t, err)
+
+	err = i.Parse()
+	assert.Nil(t, err)
+
+	badCount := i.TestNotifications()
+	assert.Equal(t, badCount, 1)
+}

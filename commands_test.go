@@ -39,7 +39,7 @@ func TestAcceptSocket(t *testing.T) {
 		conn, err = net.Dial("unix", "/tmp/tmp.sock")
 		assert.Nil(t, err)
 		conn.Write([]byte("?\n"))
-		buf := make([]byte, 10)
+		buf := make([]byte, 19)
 		_, err = io.ReadFull(conn, buf)
 		assert.Nil(t, err)
 		conn.Close()

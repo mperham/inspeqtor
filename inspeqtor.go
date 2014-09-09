@@ -210,55 +210,27 @@ func (i *Inspeqtor) verify() {
 	}
 }
 
-/*
-func (i *Inspeqtor) handleProcessEvent(etype EventType, svc Checkable) {
-	if i.silenced() {
-		util.Debug("SILENCED %s %s", etype, svc.Name())
-		return
-	}
-
-	util.Warn("%s %s", etype, svc.Name())
-
-	evt := Event{etype, svc, nil}
-	err := svc.Trigger(&evt)
-	if err != nil {
-		util.Warn("%s", err)
-	}
-}
-
-func (i *Inspeqtor) handleRuleEvent(etype EventType, check Checkable, rule *Rule) {
-	if i.silenced() {
-		util.Debug("SILENCED %s %s", etype, check.Name())
-		return
-	}
-
-	util.Warn("%s %s", etype, check.Name())
-
-	evt := Event{etype, check, rule}
-	for _, action := range rule.Actions {
-		err := action.Trigger(&evt)
-		if err != nil {
-			util.Warn("%s", err)
-		}
-	}
-}
-*/
-func (i *Inspeqtor) TestNotifications() {
+func (i *Inspeqtor) TestNotifications() int {
+	bad := 0
+	util.Info("Testing alert routes")
 	for _, route := range i.GlobalConfig.AlertRoutes {
 		nm := route.Name
 		if nm == "" {
 			nm = "default"
 		}
-		util.Info("Creating notification for %s/%s", route.Channel, nm)
+		util.Debug("Creating notification for %s/%s", route.Channel, nm)
 		notifier, err := Actions["alert"](i.Host, route)
 		if err != nil {
+			bad += 1
 			util.Warn("Error creating %s/%s route: %s", route.Channel, nm, err.Error())
 			continue
 		}
-		util.Info("Triggering notification for %s/%s", route.Channel, nm)
+		util.Debug("Triggering notification for %s/%s", route.Channel, nm)
 		err = notifier.Trigger(&Event{RuleFailed, i.Host, i.Host.Rules()[0]})
 		if err != nil {
+			bad += 1
 			util.Warn("Error firing %s/%s route: %s", route.Channel, nm, err.Error())
 		}
 	}
+	return bad
 }

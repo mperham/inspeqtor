@@ -126,3 +126,10 @@ func TestEventRuleRecovers(t *testing.T) {
 	assert.Equal(t, 2, act.Size())
 	assert.Equal(t, RuleRecovered, act.Latest().Type)
 }
+
+func TestDontVerifyDownServices(t *testing.T) {
+	svc := NewService("foo")
+	assert.NotEqual(t, svc.Process.Status, services.Up)
+	events := svc.Verify()
+	assert.Equal(t, events, []*Event{})
+}
