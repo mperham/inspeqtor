@@ -9,11 +9,11 @@ import (
 )
 
 type CmdOptions struct {
-	TestConfig        bool
-	TestNotifications bool
-	ConfigDirectory   string
-	LogLevel          string
-	SocketPath        string
+	TestConfig      bool
+	TestAlertRoutes bool
+	ConfigDirectory string
+	LogLevel        string
+	SocketPath      string
 }
 
 var (
@@ -46,8 +46,8 @@ func ParseArguments() CmdOptions {
 	}
 
 	flag.Usage = help
-	flag.BoolVar(&defaults.TestConfig, "t", false, "Verify configuration and exit")
-	flag.BoolVar(&defaults.TestNotifications, "tn", false, "Verify notifications and exit")
+	flag.BoolVar(&defaults.TestConfig, "tc", false, "Verify configuration and exit")
+	flag.BoolVar(&defaults.TestAlertRoutes, "ta", false, "Verify alert routes and exit")
 	flag.StringVar(&defaults.LogLevel, "l", "info", "Logging level (warn, info, debug, verbose)")
 
 	// undocumented on purpose, for testing only
@@ -69,6 +69,6 @@ func ParseArguments() CmdOptions {
 
 func help() {
 	log.Println("-l [level]\tSet logging level (warn, info, debug, verbose), default: info")
-	log.Println("-t\t\tVerify configuration and exit")
-	log.Println("-tn\t\tVerify notifications and exit")
+	log.Println("-tc\t\tVerify configuration and exit")
+	log.Println("-ta\t\tVerify alert routes and exit")
 }

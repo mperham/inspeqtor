@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	VERSION = "1.0.0"
+	VERSION = "0.5.0"
 )
 
 type Inspeqtor struct {
@@ -210,7 +210,7 @@ func (i *Inspeqtor) verify() {
 	}
 }
 
-func (i *Inspeqtor) TestNotifications() int {
+func (i *Inspeqtor) TestAlertRoutes() int {
 	bad := 0
 	util.Info("Testing alert routes")
 	for _, route := range i.GlobalConfig.AlertRoutes {

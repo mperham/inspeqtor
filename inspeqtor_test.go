@@ -28,13 +28,13 @@ func TestCreateSocket(t *testing.T) {
 	defer i.Socket.Close()
 }
 
-func TestTestNotifications(t *testing.T) {
+func TestTestAlertRoutes(t *testing.T) {
 	i, err := New("test", "")
 	assert.Nil(t, err)
 
 	err = i.Parse()
 	assert.Nil(t, err)
 
-	badCount := i.TestNotifications()
+	badCount := i.TestAlertRoutes()
 	assert.Equal(t, badCount, 1)
 }
