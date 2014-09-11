@@ -1,2 +1,0 @@
-#!/bin/sh
-exec /usr/bin/inspeqtor -c /etc/inspeqtor

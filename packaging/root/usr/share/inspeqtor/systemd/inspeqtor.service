@@ -1,0 +1,16 @@
+#
+# systemd unit file for CentOS 7, Ubuntu 15+
+#
+[Unit]
+Description=Easy host and process monitoring
+After=syslog.target network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/inspeqtor -c /etc/inspeqtor -s /var/run/inspeqtor.sock
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=inspeqtor
+
+[Install]
+WantedBy=multi-user.target

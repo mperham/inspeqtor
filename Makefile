@@ -37,7 +37,7 @@ real:
 	go run cmd/main.go -l debug -s i.sock -c realtest
 
 # TODO add build_rpm when working
-package: clean build_deb
+package: clean build_deb build_rpm
 
 deploy: clean build_deb
 	scp packaging/output/$(BASENAME)_amd64.deb $(PRODUCTION):~
@@ -51,8 +51,14 @@ build_rpm: build
 	# gem install fpm
 	# brew install rpm
 	fpm -s dir -t rpm -n $(NAME) -v $(VERSION) -p packaging/output \
-		--config-files /etc/$(NAME) --config-files /var/log/$(NAME) \
-		--rpm-compression bzip2 --rpm-os linux -a x86_64 \
+		--rpm-compression bzip2 --rpm-os linux \
+	 	--after-install packaging/postinst \
+	 	--before-remove packaging/prerm \
+		--after-remove packaging/postrm \
+		--description "Modern host and process monitoring" \
+		-m "Contributed Systems LLC <oss@contribsys.com>" \
+		--iteration $(ITERATION) --license "GPL 3.0" \
+		--vendor "Contributed Systems" -a amd64 \
 		$(NAME)=/usr/bin/$(NAME) \
 		packaging/root/=/
 
@@ -61,14 +67,14 @@ build_deb: build
 	fpm -s dir -t deb -n $(NAME) -v $(VERSION) -p packaging/output \
 		--deb-priority optional --category admin \
 		--deb-compression bzip2 \
-	 	--after-install packaging/debian/postinst \
-	 	--before-remove packaging/debian/prerm \
-		--after-remove packaging/debian/postrm \
+	 	--after-install packaging/postinst \
+	 	--before-remove packaging/prerm \
+		--after-remove packaging/postrm \
 		--url http://contribsys.com/$(NAME) \
-		--description "Modern service and host monitoring" \
+		--description "Modern host and process monitoring" \
 		-m "Contributed Systems LLC <oss@contribsys.com>" \
 		--iteration $(ITERATION) --license "GPL 3.0" \
-		--vendor "Contributed Systems" -d "runit" -a amd64 \
+		--vendor "Contributed Systems" -a amd64 \
 	 	$(NAME)=/usr/bin/$(NAME) \
 		packaging/root/=/
 
