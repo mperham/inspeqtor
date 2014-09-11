@@ -46,11 +46,12 @@ func ParseArguments() CmdOptions {
 	}
 
 	flag.Usage = help
-	flag.BoolVar(&defaults.TestConfig, "tc", false, "Verify configuration and exit")
-	flag.BoolVar(&defaults.TestAlertRoutes, "ta", false, "Verify alert routes and exit")
+	flag.BoolVar(&defaults.TestConfig, "tc", false, "Test configuration and exit")
+	flag.BoolVar(&defaults.TestAlertRoutes, "ta", false, "Test alert routes and exit")
 	flag.StringVar(&defaults.LogLevel, "l", "info", "Logging level (warn, info, debug, verbose)")
 
-	// undocumented on purpose, for testing only
+	// undocumented on purpose, for testing only, we don't want people changing these
+	// if possible
 	flag.StringVar(&defaults.SocketPath, "s", "/var/run/inspeqtor.sock", "")
 	flag.StringVar(&defaults.ConfigDirectory, "c", "/etc/inspeqtor", "")
 	helpPtr := flag.Bool("help", false, "You're looking at it")
@@ -69,6 +70,7 @@ func ParseArguments() CmdOptions {
 
 func help() {
 	log.Println("-l [level]\tSet logging level (warn, info, debug, verbose), default: info")
-	log.Println("-tc\t\tVerify configuration and exit")
-	log.Println("-ta\t\tVerify alert routes and exit")
+	log.Println("-tc\t\tTest configuration and exit")
+	log.Println("-ta\t\tTest alert routes and exit")
+	log.Println("-h\t\tThis help screen")
 }

@@ -2,8 +2,6 @@
 set -e
 
 if [ -e /etc/systemd/system/inspeqtor.service ]; then
-    systemctl stop inspeqtor || true
-fi
-if [ -e /etc/init/inspeqtor.conf ]; then
-    initctl stop inspeqtor || true
+  systemctl --no-reload disable inspeqtor || :
+  systemctl stop inspeqtor || :
 fi

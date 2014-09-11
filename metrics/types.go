@@ -96,6 +96,10 @@ func (store *storage) Metrics(family string) []string {
 
 func (store *storage) Get(family string, name string) int64 {
 	metric, _ := store.find(family, name)
+	if metric == nil {
+		util.Warn("BUG: Metric %s(%s) does not exist", family, name)
+		return 0
+	}
 	return metric.get()
 }
 

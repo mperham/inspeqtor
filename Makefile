@@ -34,14 +34,29 @@ clean:
 	mkdir packaging/output
 
 real:
+	# Place real configuration with passwords, etc in "realtest".
+	# git will ignore that directory and you can integration test
+	# Inspeqtor just by running "make real"
 	go run cmd/main.go -l debug -s i.sock -c realtest
 
 # TODO add build_rpm when working
 package: clean build_deb build_rpm
 
-deploy: clean build_deb
-	scp packaging/output/$(BASENAME)_amd64.deb $(PRODUCTION):~
-	ssh $(PRODUCTION) 'sudo dpkg -i $(BASENAME)_amd64.deb && sudo ./fix && sudo sv restart inspeqtor'
+purge_deb:
+	ssh -t $(DEB_PRODUCTION) 'sudo apt-get purge -y $(NAME) && sudo rm -f /etc/inspeqtor' || true
+
+purge_rpm:
+	ssh -t $(RPM_PRODUCTION) 'sudo rpm -e $(NAME) && sudo rm -f /etc/inspeqtor' || true
+
+deploy_deb: clean build_deb purge_deb
+	scp packaging/output/*.deb $(DEB_PRODUCTION):~
+	ssh $(DEB_PRODUCTION) 'sudo rm -f /etc/inspeqtor && sudo dpkg -i $(NAME)_$(VERSION)-$(ITERATION)_amd64.deb && sudo ./fix && sudo restart $(NAME)'
+
+deploy_rpm: clean build_rpm purge_rpm
+	scp packaging/output/*.rpm $(RPM_PRODUCTION):~
+	ssh -t $(RPM_PRODUCTION) 'sudo rm -f /etc/inspeqtor && sudo yum install -y $(NAME)-$(VERSION)-$(ITERATION).x86_64.rpm && sudo ./fix'
+
+deploy: deploy_deb deploy_rpm
 
 cover:
 	go test -cover -coverprofile cover.out
@@ -58,7 +73,7 @@ build_rpm: build
 		--description "Modern host and process monitoring" \
 		-m "Contributed Systems LLC <oss@contribsys.com>" \
 		--iteration $(ITERATION) --license "GPL 3.0" \
-		--vendor "Contributed Systems" -a amd64 \
+		--vendor "Contributed Systems" -d nc -a amd64 \
 		$(NAME)=/usr/bin/$(NAME) \
 		packaging/root/=/
 
@@ -74,7 +89,7 @@ build_deb: build
 		--description "Modern host and process monitoring" \
 		-m "Contributed Systems LLC <oss@contribsys.com>" \
 		--iteration $(ITERATION) --license "GPL 3.0" \
-		--vendor "Contributed Systems" -a amd64 \
+		--vendor "Contributed Systems" -d nc -a amd64 \
 	 	$(NAME)=/usr/bin/$(NAME) \
 		packaging/root/=/
 

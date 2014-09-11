@@ -1,3 +1,3 @@
 #!/bin/sh
 set -o errexit
-echo "$@" | nc -DvU ${INSPEQTOR_SOCK:-/var/run/inspeqtor.sock}
+echo "$@" | nc -U ${INSPEQTOR_SOCK:-/var/run/inspeqtor.sock}

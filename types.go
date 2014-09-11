@@ -164,7 +164,7 @@ func (s *Service) Verify() []*Event {
 
 	if s.Process.Status != services.Up {
 		// we probably shouldn't verify anything that isn't actually Up
-		util.Debug("%s is %s", s.Name(), s.Process.Status)
+		util.Debug("%s is %s, skipping...", s.Name(), s.Process.Status)
 		return events
 	}
 

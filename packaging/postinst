@@ -7,7 +7,7 @@ if [ ! -d /etc/inspeqtor ]; then
 fi
 
 if [ ! -d /etc/inspeqtor/conf.d ]; then
-  cp -r /usr/share/inspeqtor/conf.d /etc/inspeqtor
+  cp -r /usr/share/inspeqtor/conf.d /etc/inspeqtor/conf.d
 
   # on Ubuntu, allow any adms to edit inqs
   if ! chown -R root:adm /etc/inspeqtor/conf.d ; then
@@ -25,14 +25,10 @@ CMD="sudo restart inspeqtor"
 if [ -d /etc/init ]; then
   # upstart
   cp -r /usr/share/inspeqtor/init/inspeqtor.conf /etc/init/inspeqtor.conf
-  initctl restart inspeqtor
-else if [ -d /etc/systemd ]; then
+  initctl restart inspeqtor > /dev/null || :
+elif [ -d /etc/systemd ]; then
   CMD="sudo systemctl restart inspeqtor"
-  # systemd
   cp -r /usr/share/inspeqtor/systemd/inspeqtor.service /usr/lib/systemd/system/inspeqtor.service
-  if [ ! -e /etc/systemd/system/inspeqtor.service ]; then
-    ln -s /usr/lib/systemd/system/inspeqtor.service /etc/systemd/system/inspeqtor.service
-  fi
 
   systemctl daemon-reload
   systemctl enable inspeqtor
@@ -52,7 +48,5 @@ Thank you for installing Inspeqtor!
 
 TXT
 
-cat <<TXT
-Please configure your alert settings in /etc/inspeqtor/inspeqtor.conf and
-then restart Inspeqtor with '$CMD'.
-TXT
+echo Please configure your alert settings in /etc/inspeqtor/inspeqtor.conf and then restart Inspeqtor with \"$CMD\".
+exit 0
