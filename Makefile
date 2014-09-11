@@ -73,7 +73,7 @@ build_rpm: build
 		--description "Modern host and process monitoring" \
 		-m "Contributed Systems LLC <oss@contribsys.com>" \
 		--iteration $(ITERATION) --license "GPL 3.0" \
-		--vendor "Contributed Systems" -d nc -a amd64 \
+		--vendor "Contributed Systems" -a amd64 \
 		$(NAME)=/usr/bin/$(NAME) \
 		packaging/root/=/
 
@@ -89,7 +89,7 @@ build_deb: build
 		--description "Modern host and process monitoring" \
 		-m "Contributed Systems LLC <oss@contribsys.com>" \
 		--iteration $(ITERATION) --license "GPL 3.0" \
-		--vendor "Contributed Systems" -d nc -a amd64 \
+		--vendor "Contributed Systems" -a amd64 \
 	 	$(NAME)=/usr/bin/$(NAME) \
 		packaging/root/=/
 
