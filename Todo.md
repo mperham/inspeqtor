@@ -3,8 +3,6 @@
 # Non-blockers
 
 - Better config parser error handling?
-- Better key/value parsing, allow quoted values so they can contain whitespace
-- Implement systemd support
 
 # Packaging
 
