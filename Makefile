@@ -50,13 +50,14 @@ purge_rpm:
 
 deploy_deb: clean build_deb purge_deb
 	scp packaging/output/*.deb $(DEB_PRODUCTION):~
-	ssh $(DEB_PRODUCTION) 'sudo rm -f /etc/inspeqtor && sudo dpkg -i $(NAME)_$(VERSION)-$(ITERATION)_amd64.deb && sudo ./fix && sudo restart $(NAME)'
+	ssh $(DEB_PRODUCTION) 'sudo rm -f /etc/inspeqtor && sudo dpkg -i $(NAME)_$(VERSION)-$(ITERATION)_amd64.deb && sudo ./fix && sudo restart $(NAME) || true'
 
 deploy_rpm: clean build_rpm purge_rpm
 	scp packaging/output/*.rpm $(RPM_PRODUCTION):~
 	ssh -t $(RPM_PRODUCTION) 'sudo rm -f /etc/inspeqtor && sudo yum install -y $(NAME)-$(VERSION)-$(ITERATION).x86_64.rpm && sudo ./fix'
 
 deploy: deploy_deb deploy_rpm
+purge: purge_deb purge_rpm
 
 cover:
 	go test -cover -coverprofile cover.out
@@ -82,6 +83,7 @@ build_deb: build
 	fpm -s dir -t deb -n $(NAME) -v $(VERSION) -p packaging/output \
 		--deb-priority optional --category admin \
 		--deb-compression bzip2 \
+		--deb-upstart packaging/inspeqtor \
 	 	--after-install packaging/postinst \
 	 	--before-remove packaging/prerm \
 		--after-remove packaging/postrm \
