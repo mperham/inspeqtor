@@ -62,7 +62,7 @@ func ParseInq(global *ConfigFile, confDir string) (*Host, []Checkable, error) {
 	}
 
 	if host == nil {
-		return nil, nil, errors.New("No " + confDir + "/system.inq file found for host monitoring")
+		return nil, nil, errors.New("No " + confDir + "/host.inq file found for host monitoring")
 	}
 
 	return host, checks, nil

@@ -17,8 +17,10 @@ type CmdOptions struct {
 }
 
 var (
-	SalesPitch = func() {
-		log.Println("Want more? Upgrade to Inspeqtor Pro for more features and official support.")
+	StartupInfo = func() {
+		log.Println(inspeqtor.Licensing)
+		log.Println("")
+		log.Println("Want more? Upgrade to Inspeqtor Pro for more features and support.")
 		log.Println("See http://contribsys.com/inspeqtor for details.")
 		log.Println("")
 	}
@@ -39,10 +41,8 @@ func ParseArguments() CmdOptions {
 	log.Println(inspeqtor.Name, inspeqtor.VERSION)
 	log.Println("Copyright © 2014 Contributed Systems LLC")
 
-	if SalesPitch != nil {
-		log.Println(inspeqtor.Licensing)
-		log.Println("")
-		SalesPitch()
+	if StartupInfo != nil {
+		StartupInfo()
 	}
 
 	flag.Usage = help
@@ -56,10 +56,15 @@ func ParseArguments() CmdOptions {
 	flag.StringVar(&defaults.ConfigDirectory, "c", "/etc/inspeqtor", "")
 	helpPtr := flag.Bool("help", false, "You're looking at it")
 	help2Ptr := flag.Bool("h", false, "You're looking at it")
+	versionPtr := flag.Bool("v", false, "Show version")
 	flag.Parse()
 
 	if *helpPtr || *help2Ptr {
 		help()
+		os.Exit(0)
+	}
+
+	if *versionPtr {
 		os.Exit(0)
 	}
 
@@ -72,5 +77,6 @@ func help() {
 	log.Println("-l [level]\tSet logging level (warn, info, debug, verbose), default: info")
 	log.Println("-tc\t\tTest configuration and exit")
 	log.Println("-ta\t\tTest alert routes and exit")
+	log.Println("-v\t\tShow version and license information")
 	log.Println("-h\t\tThis help screen")
 }
