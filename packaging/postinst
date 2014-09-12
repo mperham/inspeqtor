@@ -21,14 +21,22 @@ if [ ! -f /etc/inspeqtor/inspeqtor.conf ]; then
   chmod 600 /etc/inspeqtor/inspeqtor.conf
 fi
 
-CMD="sudo start inspeqtor"
-if [ ! -d /etc/systemd ]; then
-  CMD="sudo systemctl start inspeqtor"
-  cp -r /usr/share/inspeqtor/systemd/inspeqtor.service /usr/lib/systemd/system/inspeqtor.service
+# prefer systemd
+CMD="sudo systemctl start inspeqtor"
+if which systemctl > /dev/null; then
+  echo "Using systemd to control Inspeqtor"
+  cp /usr/share/inspeqtor/systemd/inspeqtor.service /lib/systemd/system/inspeqtor.service
 
   systemctl daemon-reload
   systemctl enable inspeqtor
   systemctl restart inspeqtor
+elif [ -d /etc/init ]; then
+  echo "Using upstart to control Inspeqtor"
+  CMD="sudo start inspeqtor"
+  cp -r /usr/share/inspeqtor/init/inspeqtor.conf /etc/init/inspeqtor.conf
+else
+  echo "Couldn't find systemd or upstart to control Inspeqtor, cannot proceed."
+  exit 1
 fi
 
 cat <<"TXT"

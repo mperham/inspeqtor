@@ -9,3 +9,4 @@ rm -f /var/run/inspeqtor.sock
 rm -f /etc/init/inspeqtor.conf
 rm -f /etc/systemd/system/inspeqtor.service
 rm -f /usr/lib/systemd/system/inspeqtor.service
+rm -f /lib/systemd/system/inspeqtor.service
