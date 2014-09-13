@@ -8,7 +8,7 @@ if [ ! -x /bin/nc ] && [ ! -x /usr/bin/nc ]; then
   # Some OS's ship with nc in the base, others don't.
   # What a crock.
   echo Could not find a working netcat in /bin/nc or /usr/bin/nc.
-  echo Please install your operating system\'s \'netcat\' package
+  echo Please install your operating system\'s \'netcat\' or \'nc\' package
 else
   echo "$@" | nc -U ${INSPEQTOR_SOCK:-/var/run/inspeqtor.sock}
 fi
