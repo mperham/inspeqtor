@@ -2,7 +2,7 @@ NAME=inspeqtor
 VERSION=0.0.2
 
 # when fixing packaging bugs but not changing the binary, we increment this number
-ITERATION=1
+ITERATION=2
 BASENAME=$(NAME)_$(VERSION)-$(ITERATION)
 
 # Include the secret API key which is needed to upload releases to bintray
@@ -95,13 +95,17 @@ build_deb: build
 		packaging/root/=/
 
 upload:	clean package
-	curl \
-		-T packaging/output/$(BASENAME)_amd64.deb \
-		-umperham:${BINTRAY_API_KEY} \
-		"https://api.bintray.com/content/contribsys/releases-deb/$(NAME)/${VERSION}/$(BASENAME)_amd64.deb;publish=1"
-	curl \
-		-X POST -H "X-GPG-PASSPHRASE: $(PASSPHRASE)" \
-		-umperham:${BINTRAY_API_KEY} \
-		"https://api.bintray.com/gpg/contribsys/releases-deb/$(NAME)/versions/${VERSION}"
+	package_cloud push contribsys/inspeqtor/ubuntu/precise packaging/output/$(NAME)_$(VERSION)-$(ITERATION)_amd64.deb
+	package_cloud push contribsys/inspeqtor/ubuntu/trusty packaging/output/$(NAME)_$(VERSION)-$(ITERATION)_amd64.deb
+	package_cloud push contribsys/inspeqtor/el/7 packaging/output/$(NAME)-$(VERSION)-$(ITERATION).x86_64.rpm
+	package_cloud push contribsys/inspeqtor/el/6 packaging/output/$(NAME)-$(VERSION)-$(ITERATION).x86_64.rpm
+	#curl \
+		#-T packaging/output/$(BASENAME)_amd64.deb \
+		#-umperham:${BINTRAY_API_KEY} \
+		#"https://api.bintray.com/content/contribsys/releases-deb/$(NAME)/${VERSION}/$(BASENAME)_amd64.deb;publish=1"
+	#curl \
+		#-X POST -H "X-GPG-PASSPHRASE: $(PASSPHRASE)" \
+		#-umperham:${BINTRAY_API_KEY} \
+		#"https://api.bintray.com/gpg/contribsys/releases-deb/$(NAME)/versions/${VERSION}"
 
 .PHONY: all clean test build package upload
