@@ -93,7 +93,7 @@ func buildEmailNotifier(check Checkable, config map[string]string) (Action, erro
 }
 
 func buildGmailNotifier(check Checkable, params map[string]string) (Action, error) {
-	params["hostname"] = "smtp.gmail.com"
+	params["smtp_server"] = "smtp.gmail.com"
 	return buildEmailNotifier(check, params)
 }
 
@@ -160,15 +160,15 @@ func (e *EmailNotifier) setup(hash map[string]string) error {
 	if !ok {
 		return errors.New("You must have a password configured to send email")
 	}
-	host, ok := hash["hostname"]
+	host, ok := hash["smtp_server"]
 	if !ok {
-		return errors.New("You must have a 'hostname' parameter pointing to your SMTP server")
+		return errors.New("You must have a 'smtp_server' parameter pointing to your SMTP server")
 	}
-	to, ok := hash["email"]
+	to, ok := hash["to_email"]
 	if !ok {
-		return errors.New("You are missing the 'email' parameter, needed to specify a To address for your alert emails")
+		return errors.New("You are missing the 'to_email' parameter, needed to specify a To address for your alert emails")
 	}
-	from, ok := hash["from"]
+	from, ok := hash["from_email"]
 	if !ok {
 		from = "inspeqtor@example.com"
 	} else {

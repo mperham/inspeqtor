@@ -24,6 +24,6 @@ func TestBasicParsing(t *testing.T) {
 	assert.Equal(t, "15", config.Variables["cycle_time"])
 	assert.Equal(t, 3, len(config.Routes))
 	assert.Equal(t, "b!l$a%rgh^fazz\"", config.Routes["analytics"].Config["password"])
-	assert.Equal(t, "smtp.example.com:587", config.Routes["analytics"].Config["server"])
+	assert.Equal(t, "smtp.example.com", config.Routes["analytics"].Config["smtp_server"])
 	log.Printf("%+v", config)
 }

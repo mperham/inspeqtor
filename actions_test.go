@@ -44,7 +44,7 @@ func TestGmailNotifier(t *testing.T) {
 	action, err := makeAction("alert", "gmail", map[string]string{
 		"username": "mike",
 		"password": "fuzzbucket",
-		"email":    "mike@example.org",
+		"to_email": "mike@example.org",
 	})
 	assert.Nil(t, err)
 	assert.NotNil(t, action)
@@ -53,10 +53,10 @@ func TestGmailNotifier(t *testing.T) {
 func TestEmailNotifier(t *testing.T) {
 	t.Parallel()
 	action, err := makeAction("alert", "email", map[string]string{
-		"username": "mike",
-		"password": "fuzzbucket",
-		"hostname": "smtp.example.com",
-		"email":    "mike@example.org",
+		"username":    "mike",
+		"password":    "fuzzbucket",
+		"smtp_server": "smtp.example.com",
+		"to_email":    "mike@example.org",
 	})
 	assert.Nil(t, err)
 	assert.NotNil(t, action)
@@ -74,7 +74,7 @@ func TestMissingEmailNotifier(t *testing.T) {
 	action, err := makeAction("alert", "email", map[string]string{
 		"username": "mike",
 		"password": "fuzzbucket",
-		"email":    "mike@example.org",
+		"to_email": "mike@example.org",
 	})
 	assert.NotNil(t, err)
 	assert.Nil(t, action)
