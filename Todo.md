@@ -1,10 +1,13 @@
 # Blockers
 
+- Public binary distribution via packagecloud.io
+
 # Non-blockers
 
 - Better config parser error handling?
+- More integration tests
+- Anyone want to provide a real man page?
 
-# Packaging
+# Post-1.0
 
-- Support RPM binaries, get build_rpm working in Makefile
-- Provide a real man page
+- Monitor cron jobs
