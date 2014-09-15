@@ -1,8 +1,8 @@
 #
-# systemd unit file for CentOS 7, Ubuntu 15+
+# systemd unit file for CentOS 7, Ubuntu bleeding edge
 #
 [Unit]
-Description=Easy host and process monitoring
+Description=Modern host and process monitoring
 After=syslog.target network.target
 
 [Service]

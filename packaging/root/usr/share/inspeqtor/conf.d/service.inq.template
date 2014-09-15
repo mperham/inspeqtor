@@ -33,7 +33,7 @@ check service mysql
   #
   # Services can have an owner.  Any alerts for that service
   # will route to that owner, see inspeqtor.conf for setting up owners.
-  # This line is totally optional.
+  # This line is optional.
   #
   with owner ops
 
@@ -46,6 +46,7 @@ check service mysql
   #
   # The Ops team may own the database but we'll assume excessive CPU use
   # is due to the Analytics team running inefficient SQL queries on the
-  # machine so notify them directly.
+  # machine so notify them directly.  Since a cycle defaults to 15 seconds,
+  # this rule triggers if there's excessive CPU usage for more than 30 seconds.
   #
   if cpu(user) > 90% for 2 cycles then alert analytics
