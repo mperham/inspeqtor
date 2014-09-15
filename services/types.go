@@ -30,7 +30,6 @@ const (
 	Down            = "Down"
 	Starting        = "Starting"
 	Up              = "Up"
-	Stopping        = "Stopping"
 )
 
 type ServiceError struct {

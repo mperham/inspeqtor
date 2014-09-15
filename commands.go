@@ -7,6 +7,7 @@ import (
 	"inspeqtor/util"
 	"io"
 	"net"
+	"os"
 	"strings"
 	"time"
 )
@@ -84,7 +85,7 @@ func finishDeploy(i *Inspeqtor, resp io.Writer) {
 
 func currentInfo(i *Inspeqtor, resp io.Writer) {
 	io.WriteString(resp, fmt.Sprintf(
-		"%s %s, uptime: %s\n", Name, VERSION, time.Now().Sub(i.StartedAt).String()))
+		"%s %s, uptime: %s, pid: %d\n", Name, VERSION, time.Now().Sub(i.StartedAt).String(), os.Getpid()))
 	io.WriteString(resp, "\n")
 
 	io.WriteString(resp, fmt.Sprintf("Host: %s\n", i.Host.Name()))

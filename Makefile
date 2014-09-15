@@ -29,7 +29,7 @@ build: test
 	@GOOS=linux GOARCH=amd64 go build -o $(NAME) cmd/main.go
 
 clean:
-	rm -f main $(NAME)
+	rm -f main $(NAME) templates.go
 	rm -rf packaging/output
 	mkdir packaging/output
 
