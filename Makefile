@@ -1,8 +1,8 @@
 NAME=inspeqtor
-VERSION=0.0.2
+VERSION=0.5.0
 
 # when fixing packaging bugs but not changing the binary, we increment this number
-ITERATION=2
+ITERATION=1
 BASENAME=$(NAME)_$(VERSION)-$(ITERATION)
 
 # Include the secret API key which is needed to upload releases to bintray
