@@ -1,11 +1,12 @@
 # Inspeqtor
 
-**This software is still under active development.  Don't expect
-full-featured, polished software just yet.**
+**This software is still under active development.  More features to
+come!  Don't expect fully polished software just yet.**
 
-Next generation host and process monitoring for server applications.  Inspired
-by a decade of using monit but a complete rethink of what's necessary for modern
-applications.
+Inspeqtor is the watchdog for your server applications.  Use it to monitor
+metrics from all the moving parts in your application and alert you when something
+goes wrong.  It understands the application deployment workflow so it
+won't bark while you deploy.
 
 What it does:
 
@@ -18,7 +19,7 @@ What it does:
 
 What it doesn't:
 
-* monitor arbitrary processes, services must be init-managed
+* monitor or control arbitrary processes, services must be init-managed
 * have *any* runtime dependencies at all, not even libc.
 
 
