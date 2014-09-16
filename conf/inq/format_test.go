@@ -49,8 +49,7 @@ func TestBasicServiceParsing(t *testing.T) {
 	assert.Equal(t, check.Parameters["foo"], "bar")
 	assert.Equal(t, check.Parameters["endpoint"], "/foo")
 	assert.Equal(t, check.Parameters["quoted"], "whoa sp\"aces")
-	assert.Equal(t, check.Rules[0].Actions[1].Name, "alert")
-	assert.Equal(t, check.Rules[0].Actions[1].Team, "ops")
+	assert.Equal(t, check.Rules[0].Actions[1].Name(), "alert")
 }
 
 func TestBasicHostParsing(t *testing.T) {

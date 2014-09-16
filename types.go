@@ -33,10 +33,6 @@ func (e *Entity) Parameters() map[string]string {
 	return e.parameters
 }
 
-func (e *Entity) Owner() string {
-	return e.Parameter("owner")
-}
-
 func (e *Entity) Metrics() metrics.Store {
 	return e.metrics
 }
@@ -86,7 +82,7 @@ func (h *Host) Collect(completeCallback func(Checkable)) {
 
 type Checkable interface {
 	Name() string
-	Owner() string
+	Parameter(string) string
 	Metrics() metrics.Store
 	Resolve([]services.InitSystem) error
 	Rules() []*Rule

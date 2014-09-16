@@ -32,15 +32,26 @@ type Rule struct {
 	CycleCount int
 }
 
-type Action struct {
-	Name string
-	Team string
+type Action interface {
+	Name() string
 }
+
+type SimpleAction struct {
+	ActionName string
+}
+
+func (s *SimpleAction) Name() string { return s.ActionName }
 
 type Amount struct {
 	Raw    string
 	Parsed int64
 }
+
+var (
+	CreateAction = func(props ...string) (Action, error) {
+		return &SimpleAction{props[0]}, nil
+	}
+)
 
 func AppendAction(action interface{}, list interface{}) ([]Action, error) {
 	lst := list.([]Action)
@@ -48,15 +59,12 @@ func AppendAction(action interface{}, list interface{}) ([]Action, error) {
 	return lst, nil
 }
 
-func AddAction(name interface{}, t interface{}) (Action, error) {
-	team := ""
-	if t != nil {
-		team = string(t.(*token.Token).Lit)
+func AddAction(name interface{}, arg interface{}) (Action, error) {
+	argStr := ""
+	if arg != nil {
+		argStr = string(arg.(*token.Token).Lit)
 	}
-	return Action{
-		string(name.(*token.Token).Lit),
-		team,
-	}, nil
+	return CreateAction(string(name.(*token.Token).Lit), argStr)
 }
 
 func AddParam(key interface{}, val interface{}, hash interface{}) (map[string]string, error) {

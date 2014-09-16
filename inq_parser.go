@@ -46,13 +46,13 @@ func ParseInq(global *ConfigFile, confDir string) (*Host, []Checkable, error) {
 			if host != nil {
 				panic("Found more than one \"check host\" configuration in " + confDir)
 			}
-			host, err = convertHost(global, obj.(*ast.HostCheck))
+			host, err = BuildHost(global, obj.(*ast.HostCheck))
 			if err != nil {
 				return nil, nil, err
 			}
 			util.DebugDebug("Host: %+v", *host)
 		case *ast.ProcessCheck:
-			svc, err := convertService(global, obj.(*ast.ProcessCheck))
+			svc, err := BuildService(global, obj.(*ast.ProcessCheck))
 			if err != nil {
 				return nil, nil, err
 			}
@@ -68,6 +68,13 @@ func ParseInq(global *ConfigFile, confDir string) (*Host, []Checkable, error) {
 	return host, checks, nil
 }
 
+var (
+	BuildHost    = convertHost
+	BuildService = convertService
+	BuildRule    = convertRule
+	BuildAction  = convertAction
+)
+
 // GACK, so ugly
 func convertHost(global *ConfigFile, inqhost *ast.HostCheck) (*Host, error) {
 	hostname, err := os.Hostname()
@@ -79,7 +86,7 @@ func convertHost(global *ConfigFile, inqhost *ast.HostCheck) (*Host, error) {
 	h := &Host{&Entity{hostname, nil, storage, inqhost.Parameters}}
 	rules := make([]*Rule, len(inqhost.Rules))
 	for idx, rule := range inqhost.Rules {
-		rule, err := convertRule(global, h, rule)
+		rule, err := BuildRule(global, h, rule)
 		util.DebugDebug("Rule: %+v", rule)
 		if err != nil {
 			return nil, err
@@ -108,7 +115,7 @@ func convertRule(global *ConfigFile, check Checkable, inqrule ast.Rule) (*Rule, 
 
 	actions := make([]Action, 0)
 	for _, action := range inqrule.Actions {
-		act, err := convertAction(global, check, action.Name, action.Team)
+		act, err := BuildAction(global, check, action)
 		if err != nil {
 			return nil, err
 		}
@@ -119,20 +126,12 @@ func convertRule(global *ConfigFile, check Checkable, inqrule ast.Rule) (*Rule, 
 		op, inqrule.Threshold.Raw, threshold, 0, inqrule.CycleCount, 0, Ok, actions}, nil
 }
 
-func convertAction(global *ConfigFile, check Checkable, name string, team string) (Action, error) {
-	switch name {
+func convertAction(global *ConfigFile, check Checkable, action ast.Action) (Action, error) {
+	switch action.Name() {
 	case "alert":
-		owner := team
-		if owner == "" {
-			owner = check.Owner()
-		}
-
-		route := global.AlertRoutes[owner]
-		if owner == "" && route == nil {
-			return nil, errors.New("No default alert route configured!")
-		}
+		route := global.AlertRoutes[""]
 		if route == nil {
-			return nil, errors.New("No such alert route: " + owner)
+			return nil, errors.New("No alert route configured!")
 		}
 		return Actions["alert"](check, route)
 	case "restart":
@@ -147,7 +146,7 @@ func convertService(global *ConfigFile, inqsvc *ast.ProcessCheck) (*Service, err
 
 	svc := &Service{&Entity{inqsvc.Name, nil, storage, inqsvc.Parameters}, nil, services.NewStatus(), nil}
 
-	action, err := convertAction(global, svc, "alert", inqsvc.Parameters["owner"])
+	action, err := BuildAction(global, svc, &ast.SimpleAction{"alert"})
 	if err != nil {
 		return nil, err
 	}
