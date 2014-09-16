@@ -35,7 +35,7 @@ Examples:
 check service mysql
   if memory(rss) > 6g for 2 cycles then alert
 
-check service redis
+check service redis with port 6379
   if memory(rss) > 1g for 2 cycles then alert
   if cpu(user) > 95% for 2 cycles then alert
 

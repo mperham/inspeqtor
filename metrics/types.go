@@ -20,9 +20,8 @@ const (
 	  systems with multiple CPUs/cores can use more than 100% CPU.
 	*/
 	CLK_TCK = 100
-)
 
-var (
+	// all metric ring buffers will store one hour of metric history
 	SLOTS = 3600 / 15
 )
 
@@ -50,8 +49,15 @@ var (
 	}
 )
 
+// prepare converts the rule threshold value in the inq file into a value that can
+// be compared directly to the collected metric value.  Used by load(*)
 type PrepareFunc func(int64) int64
+
+// transform the raw collected data into something we can compare.  Used by cpu(*)
+// to transform raw ticks into a percentage.
 type TransformFunc func(int64, int64) int64
+
+// Convert the raw metric value into something displayable to the user.
 type DisplayFunc func(int64) string
 
 type Store interface {
@@ -97,6 +103,8 @@ func (store *storage) Metrics(family string) []string {
 func (store *storage) Get(family string, name string) int64 {
 	metric, _ := store.find(family, name)
 	if metric == nil {
+		// This can happen when using an Inspeqtor Pro .inq file
+		// with Inspeqtor, since metrics like mysql(Queries) won't exist.
 		util.Warn("BUG: Metric %s(%s) does not exist", family, name)
 		return 0
 	}
