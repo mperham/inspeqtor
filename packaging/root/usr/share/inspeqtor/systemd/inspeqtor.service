@@ -5,12 +5,17 @@
 Description=Modern host and process monitoring
 After=syslog.target network.target
 
+# http://0pointer.de/public/systemd-man/systemd.service.html
+# http://0pointer.de/public/systemd-man/systemd.exec.html
 [Service]
 Type=simple
 ExecStart=/usr/bin/inspeqtor -c /etc/inspeqtor -s /var/run/inspeqtor.sock
+ExecReload=/bin/kill -HUP $MAINPID
 StandardOutput=syslog
 StandardError=syslog
 SyslogIdentifier=inspeqtor
+RestartSec=1
+Restart=on-failure
 
 [Install]
 WantedBy=multi-user.target
