@@ -7,6 +7,7 @@
 - Better config parser error handling?
 - More integration tests
 - Anyone want to provide a real man page?
+- Add proper file-based targets for Makefile
 
 # Post-1.0
 

@@ -1,12 +1,13 @@
 NAME=inspeqtor
 VERSION=0.5.0
 
-# when fixing packaging bugs but not changing the binary, we increment this number
+# when fixing packaging bugs but not changing the binary, we increment ITERATION
 ITERATION=1
 BASENAME=$(NAME)_$(VERSION)-$(ITERATION)
 
-# Include the secret API key which is needed to upload releases to bintray
-# Also you can set PRODUCTION to a Debian hostname you want Inspeqtor deployed to.
+# contains various secret or machine-specific variables.
+# DEB_PRODUCTION: hostname of a debian-based machine
+# RPM_PRODUCTION: hostname of a redhat-based machine
 -include .local.sh
 
 # TODO I'd love some help making this a proper Makefile
@@ -36,10 +37,9 @@ clean:
 real:
 	# Place real configuration with passwords, etc in "realtest".
 	# git will ignore that directory and you can integration test
-	# Inspeqtor just by running "make real"
+	# Inspeqtor on your local machine just by running "make real"
 	go run cmd/main.go -l debug -s i.sock -c realtest
 
-# TODO add build_rpm when working
 package: clean build_deb build_rpm
 
 purge_deb:
@@ -99,13 +99,5 @@ upload:	clean package
 	package_cloud push contribsys/inspeqtor/ubuntu/trusty packaging/output/$(NAME)_$(VERSION)-$(ITERATION)_amd64.deb
 	package_cloud push contribsys/inspeqtor/el/7 packaging/output/$(NAME)-$(VERSION)-$(ITERATION).x86_64.rpm
 	package_cloud push contribsys/inspeqtor/el/6 packaging/output/$(NAME)-$(VERSION)-$(ITERATION).x86_64.rpm
-	#curl \
-		#-T packaging/output/$(BASENAME)_amd64.deb \
-		#-umperham:${BINTRAY_API_KEY} \
-		#"https://api.bintray.com/content/contribsys/releases-deb/$(NAME)/${VERSION}/$(BASENAME)_amd64.deb;publish=1"
-	#curl \
-		#-X POST -H "X-GPG-PASSPHRASE: $(PASSPHRASE)" \
-		#-umperham:${BINTRAY_API_KEY} \
-		#"https://api.bintray.com/gpg/contribsys/releases-deb/$(NAME)/versions/${VERSION}"
 
 .PHONY: all clean test build package upload
