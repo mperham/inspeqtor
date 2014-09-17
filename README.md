@@ -13,6 +13,7 @@ What it does:
 * Monitor upstart-, runit-, systemd- or launchd-managed services
 * Monitor process memory and CPU usage
 * Monitor host CPU, load, swap and disk usage
+* Monitor daemon-specific metrics (e.g. redis, memcached, mysql, nginx...)
 * Alert if processes disappear or change PID
 * Alert if processes or host goes over defined RAM or CPU utilization
 * Signal deploy start/stop to silence alerts during deploy
@@ -39,7 +40,7 @@ Linux 3.0+.  It will run on OS X.  FreeBSD is untested.  It uses about 5-10MB of
 features, official support and a non-GPL license:
 
 * Monitor legacy sysvinit services with PID files
-* Monitor daemon-specific metrics (e.g. redis, memcached, mysql, nginx...)
+* Route alerts to different teams or individuals
 * Send alerts to Slack or other team chat rooms
 
 See the [wiki documentation](https://github.com/mperham/inspeqtor/wiki#inspeqtor-pro) for
