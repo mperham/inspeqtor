@@ -26,17 +26,17 @@ func NewHostStore(path string, cycleSeconds uint) Store {
 		return int64((float64(cur-prev) / float64(cycleSeconds*CLK_TCK)) * 100)
 	}
 
-	store.DeclareGauge("swap", "", nil, displayPercent)
+	store.DeclareGauge("swap", "", nil, DisplayPercent)
 	store.DeclareGauge("load", "1", multiplyBy100, displayLoad)
 	store.DeclareGauge("load", "5", multiplyBy100, displayLoad)
 	store.DeclareGauge("load", "15", multiplyBy100, displayLoad)
-	store.DeclareCounter("cpu", "", tickPercentage, displayPercent)
-	store.DeclareCounter("cpu", "user", tickPercentage, displayPercent)
-	store.DeclareCounter("cpu", "system", tickPercentage, displayPercent)
-	store.DeclareCounter("cpu", "iowait", tickPercentage, displayPercent)
-	store.DeclareCounter("cpu", "steal", tickPercentage, displayPercent)
+	store.DeclareCounter("cpu", "", tickPercentage, DisplayPercent)
+	store.DeclareCounter("cpu", "user", tickPercentage, DisplayPercent)
+	store.DeclareCounter("cpu", "system", tickPercentage, DisplayPercent)
+	store.DeclareCounter("cpu", "iowait", tickPercentage, DisplayPercent)
+	store.DeclareCounter("cpu", "steal", tickPercentage, DisplayPercent)
 	store.declareDynamicFamily("disk")
-	store.DeclareGauge("disk", "/", nil, displayPercent)
+	store.DeclareGauge("disk", "/", nil, DisplayPercent)
 	return store
 }
 

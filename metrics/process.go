@@ -28,11 +28,11 @@ func NewProcessStore(path string, cycleSeconds uint) Store {
 		return int64((float64(cur-prev) / float64(cycleSeconds*CLK_TCK)) * 100)
 	}
 
-	store.DeclareGauge("memory", "rss", nil, displayInMB)
-	store.DeclareCounter("cpu", "user", tickPercentage, displayPercent)
-	store.DeclareCounter("cpu", "system", tickPercentage, displayPercent)
-	store.DeclareCounter("cpu", "total_user", tickPercentage, displayPercent)
-	store.DeclareCounter("cpu", "total_system", tickPercentage, displayPercent)
+	store.DeclareGauge("memory", "rss", nil, DisplayInMB)
+	store.DeclareCounter("cpu", "user", tickPercentage, DisplayPercent)
+	store.DeclareCounter("cpu", "system", tickPercentage, DisplayPercent)
+	store.DeclareCounter("cpu", "total_user", tickPercentage, DisplayPercent)
+	store.DeclareCounter("cpu", "total_system", tickPercentage, DisplayPercent)
 	return store
 }
 

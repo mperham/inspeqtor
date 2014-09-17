@@ -41,10 +41,10 @@ var (
 	displayLoad = func(val int64) string {
 		return strconv.FormatFloat(float64(val)/100, 'f', 2, 64)
 	}
-	displayPercent = func(val int64) string {
+	DisplayPercent = func(val int64) string {
 		return strconv.Itoa(int(val)) + "%"
 	}
-	displayInMB = func(val int64) string {
+	DisplayInMB = func(val int64) string {
 		return strconv.FormatFloat(float64(val)/(1024*1024), 'f', 2, 64) + "m"
 	}
 )
@@ -300,7 +300,7 @@ func (store *storage) saveType(family string, name string, value int64, t Type) 
 		// declare metrics for disk metrics where the name
 		// is dynamic based on the mount point
 		if t == Gauge {
-			store.DeclareGauge(family, name, nil, displayPercent)
+			store.DeclareGauge(family, name, nil, DisplayPercent)
 		} else {
 			store.DeclareCounter(family, name, nil, nil)
 		}
