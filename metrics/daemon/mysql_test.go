@@ -8,11 +8,11 @@ import (
 
 func TestBadMysqlConfig(t *testing.T) {
 	t.Parallel()
-	src, err := sources["mysql"](map[string]string{"port": "885u"})
+	src, err := Sources["mysql"](map[string]string{"port": "885u"})
 	assert.Nil(t, src)
 	assert.NotNil(t, err)
 
-	src, err = sources["mysql"](map[string]string{"socket": "/foo/bar.sock", "password": "fuzzy"})
+	src, err = Sources["mysql"](map[string]string{"socket": "/foo/bar.sock", "password": "fuzzy"})
 	assert.Nil(t, err)
 	assert.NotNil(t, src)
 }
@@ -67,7 +67,7 @@ func TestRealMysqlConnection(t *testing.T) {
 }
 
 func mysqlSource(metrics ...string) *MysqlSource {
-	src, err := sources["mysql"](map[string]string{})
+	src, err := Sources["mysql"](map[string]string{})
 	if err != nil {
 		panic(err)
 	}

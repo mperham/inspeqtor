@@ -7,11 +7,11 @@ import (
 
 func TestBadRedisConfig(t *testing.T) {
 	t.Parallel()
-	src, err := sources["redis"](map[string]string{"port": "885u"})
+	src, err := Sources["redis"](map[string]string{"port": "885u"})
 	assert.Nil(t, src)
 	assert.NotNil(t, err)
 
-	src, err = sources["redis"](map[string]string{"socket": "/foo/bar.sock", "password": "fuzzy"})
+	src, err = Sources["redis"](map[string]string{"socket": "/foo/bar.sock", "password": "fuzzy"})
 	assert.Nil(t, err)
 	assert.NotNil(t, src)
 }
@@ -53,7 +53,7 @@ func TestRealRedisConnection(t *testing.T) {
 }
 
 func redisSource(metrics []string) *RedisSource {
-	src, err := sources["redis"](map[string]string{})
+	src, err := Sources["redis"](map[string]string{})
 	if err != nil {
 		panic(err)
 	}

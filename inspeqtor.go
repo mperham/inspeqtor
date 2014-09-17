@@ -2,6 +2,7 @@ package inspeqtor
 
 import (
 	"inspeqtor/metrics"
+	"inspeqtor/metrics/daemon"
 	"inspeqtor/services"
 	"inspeqtor/util"
 	"net"
@@ -95,6 +96,13 @@ func (i *Inspeqtor) Parse() error {
 	for _, val := range services {
 		util.DebugDebug("Service: %+v", val)
 	}
+
+	for _, s := range i.Services {
+		err := wrapService(s.(*Service))
+		if err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
@@ -117,6 +125,34 @@ func HandleSignals() {
 }
 
 // private
+
+func wrapService(s *Service) error {
+	var store *daemon.Store
+
+	for _, r := range s.Rules() {
+		funk := daemon.Sources[r.MetricFamily]
+		if funk != nil {
+			if store == nil {
+				source, err := funk(s.Parameters())
+				if err != nil {
+					return err
+				}
+				util.Info("Activating %s-specific metrics", r.MetricFamily)
+				store = daemon.NewStore(s.Metrics(), source)
+				s.SetMetrics(store)
+			}
+			util.Debug("Watching %s(%s)", r.MetricFamily, r.MetricName)
+			store.Watch(r.MetricName)
+		}
+	}
+	if store != nil {
+		err := daemon.Prepare(store)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
 
 func reload(i *Inspeqtor) {
 	util.Info(Name + " reloading")

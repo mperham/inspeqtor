@@ -8,11 +8,11 @@ import (
 
 func TestBadNginxConfig(t *testing.T) {
 	t.Parallel()
-	src, err := sources["nginx"](map[string]string{"port": "885u"})
+	src, err := Sources["nginx"](map[string]string{"port": "885u"})
 	assert.Nil(t, src)
 	assert.NotNil(t, err)
 
-	src, err = sources["nginx"](map[string]string{"port": "8080"})
+	src, err = Sources["nginx"](map[string]string{"port": "8080"})
 	assert.Nil(t, err)
 	assert.NotNil(t, src)
 }
@@ -49,7 +49,7 @@ func TestRealNginxConnection(t *testing.T) {
 }
 
 func testNginxSource(metrics []string) *nginxSource {
-	src, err := sources["nginx"](map[string]string{})
+	src, err := Sources["nginx"](map[string]string{})
 	if err != nil {
 		panic(err)
 	}

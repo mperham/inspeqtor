@@ -1,7 +1,6 @@
 package daemon
 
 import (
-	"inspeqtor"
 	"inspeqtor/metrics"
 	"inspeqtor/util"
 	"io/ioutil"
@@ -16,7 +15,7 @@ import (
    if redis(latest_fork_usec) > 10000 then alert ops
 */
 
-type collectorBuilder func(map[string]string) (DaemonCollector, error)
+type collectorBuilder func(map[string]string) (Collector, error)
 type metricMap map[string]int64
 type executor func(string, []string, []byte) ([]byte, error)
 type metric struct {
@@ -33,7 +32,7 @@ type funcWrapper struct {
 var (
 	c                                   = metrics.Counter
 	g                                   = metrics.Gauge
-	sources map[string]collectorBuilder = map[string]collectorBuilder{
+	Sources map[string]collectorBuilder = map[string]collectorBuilder{
 		"redis":     buildRedisSource,
 		"mysql":     buildMysqlSource,
 		"memcached": buildMemcachedSource,
@@ -42,12 +41,20 @@ var (
 	inMB = metrics.DisplayInMB
 )
 
-type DaemonStore struct {
-	metrics.Store
-	DaemonSpecific DaemonCollector
+func NewStore(store metrics.Store, ds Collector) *Store {
+	return &Store{store, ds}
 }
 
-func (ds *DaemonStore) Watch(metricName string) {
+type Store struct {
+	metrics.Store
+	DaemonSpecific Collector
+}
+
+func Prepare(ds *Store) error {
+	return ds.DaemonSpecific.Prepare(execCmd)
+}
+
+func (ds *Store) Watch(metricName string) {
 	valid := ds.DaemonSpecific.ValidMetrics()
 	for _, m := range valid {
 		if m.name == metricName {
@@ -66,7 +73,7 @@ func (ds *DaemonStore) Watch(metricName string) {
 	ds.DaemonSpecific.Watch(metricName)
 }
 
-func (ds *DaemonStore) Collect(pid int) error {
+func (ds *Store) Collect(pid int) error {
 	err := ds.Store.Collect(pid)
 	if err != nil {
 		return err
@@ -82,35 +89,7 @@ func (ds *DaemonStore) Collect(pid int) error {
 	return nil
 }
 
-func WrapService(s *inspeqtor.Service) error {
-	var store *DaemonStore
-
-	for _, r := range s.Rules() {
-		funk := sources[r.MetricFamily]
-		if funk != nil {
-			if store == nil {
-				source, err := funk(s.Parameters())
-				if err != nil {
-					return err
-				}
-				util.Info("Activating %s-specific metrics", r.MetricFamily)
-				store = &DaemonStore{s.Metrics(), source}
-				s.SetMetrics(store)
-			}
-			util.Debug("Watching %s(%s)", r.MetricFamily, r.MetricName)
-			store.Watch(r.MetricName)
-		}
-	}
-	if store != nil {
-		err := store.DaemonSpecific.Prepare(execCmd)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-type DaemonCollector interface {
+type Collector interface {
 	Name() string
 	// return a hash of metric:value pairs
 	Capture() (metricMap, error)

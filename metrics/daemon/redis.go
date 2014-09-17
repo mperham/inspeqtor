@@ -92,7 +92,7 @@ func (rs *RedisSource) buildArgs() []string {
 	return rs.args
 }
 
-func buildRedisSource(params map[string]string) (DaemonCollector, error) {
+func buildRedisSource(params map[string]string) (Collector, error) {
 	rs := &RedisSource{"localhost", "6379", "", "", map[string]bool{}, nil}
 	for k, v := range params {
 		switch k {

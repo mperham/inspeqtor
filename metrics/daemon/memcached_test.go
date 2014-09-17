@@ -7,11 +7,11 @@ import (
 
 func TestBadMemcachedConfig(t *testing.T) {
 	t.Parallel()
-	src, err := sources["memcached"](map[string]string{"port": "885u"})
+	src, err := Sources["memcached"](map[string]string{"port": "885u"})
 	assert.Nil(t, src)
 	assert.NotNil(t, err)
 
-	src, err = sources["memcached"](map[string]string{"port": "22122"})
+	src, err = Sources["memcached"](map[string]string{"port": "22122"})
 	assert.Nil(t, err)
 	assert.NotNil(t, src)
 }
@@ -46,7 +46,7 @@ func TestRealMemcachedConnection(t *testing.T) {
 }
 
 func memcachedSource(metrics []string) *MemcachedSource {
-	src, err := sources["memcached"](map[string]string{})
+	src, err := Sources["memcached"](map[string]string{})
 	if err != nil {
 		panic(err)
 	}

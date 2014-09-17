@@ -166,7 +166,7 @@ func (rs *MysqlSource) buildArgs() []string {
 	return args
 }
 
-func buildMysqlSource(params map[string]string) (DaemonCollector, error) {
+func buildMysqlSource(params map[string]string) (Collector, error) {
 	rs := &MysqlSource{"localhost", "3306", "/tmp/mysql.sock", "root", "", map[string]bool{}, false}
 	for k, v := range params {
 		switch k {

@@ -68,7 +68,7 @@ func (rs *MemcachedSource) runCli(funk executor) (metricMap, error) {
 	return values, nil
 }
 
-func buildMemcachedSource(params map[string]string) (DaemonCollector, error) {
+func buildMemcachedSource(params map[string]string) (Collector, error) {
 	rs := &MemcachedSource{"localhost", "11211", map[string]bool{}, nil}
 	for k, v := range params {
 		switch k {

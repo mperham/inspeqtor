@@ -105,7 +105,7 @@ func (rs *nginxSource) runCli() (metricMap, error) {
 	return values, nil
 }
 
-func buildNginxSource(params map[string]string) (DaemonCollector, error) {
+func buildNginxSource(params map[string]string) (Collector, error) {
 	rs := &nginxSource{"localhost", "80", "/status", map[string]bool{}, nil, defaultClient}
 	for k, v := range params {
 		switch k {
