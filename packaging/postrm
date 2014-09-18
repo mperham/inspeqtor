@@ -2,6 +2,8 @@
 
 set -e
 
+# https://www.debian.org/doc/debian-policy/ch-maintainerscripts.html
+# https://docs.fedoraproject.org/en-US/Fedora_Draft_Documentation/0.1/html/RPM_Guide/ch09s04s05.html
 if [ "$1" = "purge" ]; then
     rm -rf /etc/inspeqtor
 fi
