@@ -65,27 +65,43 @@ func SetLogLevel(level string) {
 
 // Uh oh, not good but not worthy of process death
 func Warn(msg string, args ...interface{}) {
-	log.Printf(preamble('W')+msg+"\n", args...)
+	if len(args) > 0 {
+		log.Printf(preamble('W')+msg+"\n", args...)
+	} else {
+		log.Println(preamble('W') + msg)
+	}
 }
 
 // Typical logging output, the default level
 func Info(msg string, args ...interface{}) {
 	if LogInfo {
-		log.Printf(preamble('I')+msg+"\n", args...)
+		if len(args) > 0 {
+			log.Printf(preamble('I')+msg+"\n", args...)
+		} else {
+			log.Println(preamble('I') + msg)
+		}
 	}
 }
 
 // -l debug: Verbosity level which helps track down production issues
 func Debug(msg string, args ...interface{}) {
 	if LogDebug {
-		log.Printf(preamble('D')+msg+"\n", args...)
+		if len(args) > 0 {
+			log.Printf(preamble('D')+msg+"\n", args...)
+		} else {
+			log.Println(preamble('D') + msg)
+		}
 	}
 }
 
 // -l verbose: Very verbose for development purposes
 func DebugDebug(msg string, args ...interface{}) {
 	if LogVerbose {
-		log.Printf(preamble('V')+msg+"\n", args...)
+		if len(args) > 0 {
+			log.Printf(preamble('V')+msg+"\n", args...)
+		} else {
+			log.Println(preamble('V') + msg)
+		}
 	}
 }
 
