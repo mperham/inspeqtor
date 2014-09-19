@@ -13,3 +13,4 @@
 # Post-1.0
 
 - Monitor cron jobs
+- Opt-in daily digest email?
