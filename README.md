@@ -12,10 +12,10 @@ What it does:
 
 * Monitor systemd-, upstart-, runit- or launchd-managed services
 * Monitor process memory and CPU usage
-* Monitor host CPU, load, swap and disk usage
 * Monitor daemon-specific metrics (e.g. redis, memcached, mysql, nginx...)
-* Alert if processes disappear or change PID
-* Alert if processes or host goes over defined RAM or CPU utilization
+* Monitor and alert based on host CPU, load, swap and disk usage
+* Alert or restart a process if a rule threshold is breached
+* Alert if a process disappears or changes PID
 * Signal deploy start/stop to silence alerts during deploy
 
 What it doesn't:
