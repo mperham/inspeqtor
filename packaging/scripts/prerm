@@ -1,0 +1,19 @@
+#!/bin/sh
+set -e
+
+if which systemctl >/dev/null ; then
+  if [ $1 -ge 1 ] ; then
+    ;
+  else
+    echo Stopping and disabling systemd service
+    systemctl stop inspeqtor || :
+    systemctl disable inspeqtor || :
+  fi
+fi
+
+if [ -e /etc/init/inspeqtor.conf ]; then
+  if [ $1 -eq 0 ] ; then
+    echo Stopping and disabling Upstart service
+    initctl stop inspeqtor || :
+  fi
+fi

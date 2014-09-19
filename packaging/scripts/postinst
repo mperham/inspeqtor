@@ -27,9 +27,9 @@ if which systemctl > /dev/null; then
   echo "Using systemd to control Inspeqtor"
   cp /usr/share/inspeqtor/systemd/inspeqtor.service /lib/systemd/system/inspeqtor.service
 
-  systemctl daemon-reload
-  systemctl enable inspeqtor
-  systemctl start inspeqtor
+  systemctl daemon-reload || :
+  systemctl enable inspeqtor || :
+  systemctl start inspeqtor || :
 elif [ -d /etc/init ]; then
   echo "Using upstart to control Inspeqtor"
   CMD="sudo restart inspeqtor"

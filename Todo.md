@@ -4,6 +4,7 @@
 
 # Non-blockers
 
+- The packaging pre/post scripts are brittle and hard to test.
 - Better config parser error handling?
 - More integration tests
 - Anyone want to provide a real man page?

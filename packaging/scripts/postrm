@@ -1,0 +1,28 @@
+#!/bin/sh
+
+set -e
+
+# https://www.debian.org/doc/debian-policy/ch-maintainerscripts.html
+# https://docs.fedoraproject.org/en-US/Fedora_Draft_Documentation/0.1/html/RPM_Guide/ch09s04s05.html
+
+echo "Cleaning up inspeqtor files"
+rm -f /var/run/inspeqtor.sock
+rm -f /etc/init/inspeqtor.conf
+
+# so horrible
+if which systemctl > /dev/null; then
+  systemctl daemon-reload || :
+  if [ $1 -ge 1 ] ; then
+    # Package upgrade, not uninstall
+    systemctl try-restart inspeqtor || :
+  else
+    rm -f /usr/lib/systemd/system/inspeqtor.service
+    rm -f /lib/systemd/system/inspeqtor.service
+    systemctl daemon-reload || :
+  fi
+fi
+
+if [ "$1" = "purge" ] ; then
+  echo "Purging inspeqtor configuration"
+  rm -rf /etc/inspeqtor
+fi
