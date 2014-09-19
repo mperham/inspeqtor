@@ -36,6 +36,7 @@ elif [ -d /etc/init ]; then
   cp -r /usr/share/inspeqtor/init/inspeqtor.conf /etc/init/inspeqtor.conf
 else
   echo "Couldn't find systemd or upstart to control Inspeqtor, cannot proceed."
+  echo "Open an issue and tell us about your system."
   exit 1
 fi
 
