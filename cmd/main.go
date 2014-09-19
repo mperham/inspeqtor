@@ -1,9 +1,9 @@
 package main
 
 import (
-	"inspeqtor"
-	"inspeqtor/cli"
-	"inspeqtor/util"
+	"github.com/mperham/inspeqtor"
+	"github.com/mperham/inspeqtor/cli"
+	"github.com/mperham/inspeqtor/util"
 	"log"
 	"os"
 )

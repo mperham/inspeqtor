@@ -2,9 +2,9 @@ package inspeqtor
 
 import (
 	"bytes"
+	"github.com/mperham/inspeqtor/metrics"
+	"github.com/mperham/inspeqtor/services"
 	"github.com/stretchr/testify/assert"
-	"inspeqtor/metrics"
-	"inspeqtor/services"
 	"strings"
 	"testing"
 )

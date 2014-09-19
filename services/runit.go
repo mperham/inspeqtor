@@ -12,7 +12,7 @@ package services
 
 import (
 	"errors"
-	"inspeqtor/util"
+	"github.com/mperham/inspeqtor/util"
 	"io/ioutil"
 	"os/exec"
 	"path/filepath"

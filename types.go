@@ -3,9 +3,9 @@ package inspeqtor
 import (
 	"errors"
 	"fmt"
-	"inspeqtor/metrics"
-	"inspeqtor/services"
-	"inspeqtor/util"
+	"github.com/mperham/inspeqtor/metrics"
+	"github.com/mperham/inspeqtor/services"
+	"github.com/mperham/inspeqtor/util"
 	"syscall"
 )
 

@@ -4,11 +4,11 @@ package lexer
 import (
 	
 	// "fmt"
-	// "inspeqtor/conf/inq/util"
+	// "github.com/mperham/inspeqtor/conf/inq/util"
 	
 	"io/ioutil"
 	"unicode/utf8"
-	"inspeqtor/conf/inq/token"
+	"github.com/mperham/inspeqtor/conf/inq/token"
 )
 
 const(

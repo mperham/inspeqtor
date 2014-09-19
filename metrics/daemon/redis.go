@@ -2,7 +2,7 @@ package daemon
 
 import (
 	"errors"
-	"inspeqtor/util"
+	"github.com/mperham/inspeqtor/util"
 	"strconv"
 	"strings"
 )

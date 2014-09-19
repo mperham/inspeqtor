@@ -1,10 +1,10 @@
 package inspeqtor
 
 import (
-	"inspeqtor/metrics"
-	"inspeqtor/metrics/daemon"
-	"inspeqtor/services"
-	"inspeqtor/util"
+	"github.com/mperham/inspeqtor/metrics"
+	"github.com/mperham/inspeqtor/metrics/daemon"
+	"github.com/mperham/inspeqtor/services"
+	"github.com/mperham/inspeqtor/util"
 	"net"
 	"os"
 	"os/signal"

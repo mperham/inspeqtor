@@ -3,7 +3,7 @@ package lexer
 
 import(
 	"fmt"
-	"inspeqtor/conf/global/token"
+	"github.com/mperham/inspeqtor/conf/global/token"
 )
 
 type ActionTable [NumStates] ActionRow

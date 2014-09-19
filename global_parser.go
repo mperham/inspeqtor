@@ -3,10 +3,10 @@ package inspeqtor
 import (
 	"errors"
 	"fmt"
-	"inspeqtor/conf/global/ast"
-	"inspeqtor/conf/global/lexer"
-	"inspeqtor/conf/global/parser"
-	"inspeqtor/util"
+	"github.com/mperham/inspeqtor/conf/global/ast"
+	"github.com/mperham/inspeqtor/conf/global/lexer"
+	"github.com/mperham/inspeqtor/conf/global/parser"
+	"github.com/mperham/inspeqtor/util"
 	"io/ioutil"
 	"strconv"
 )

@@ -1,8 +1,8 @@
 package services
 
 import (
+	"github.com/mperham/inspeqtor/util"
 	"github.com/stretchr/testify/assert"
-	"inspeqtor/util"
 	"testing"
 )
 

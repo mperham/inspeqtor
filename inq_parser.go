@@ -2,12 +2,12 @@ package inspeqtor
 
 import (
 	"errors"
-	"inspeqtor/conf/inq/ast"
-	"inspeqtor/conf/inq/lexer"
-	"inspeqtor/conf/inq/parser"
-	"inspeqtor/metrics"
-	"inspeqtor/services"
-	"inspeqtor/util"
+	"github.com/mperham/inspeqtor/conf/inq/ast"
+	"github.com/mperham/inspeqtor/conf/inq/lexer"
+	"github.com/mperham/inspeqtor/conf/inq/parser"
+	"github.com/mperham/inspeqtor/metrics"
+	"github.com/mperham/inspeqtor/services"
+	"github.com/mperham/inspeqtor/util"
 	"io/ioutil"
 	"os"
 	"path/filepath"

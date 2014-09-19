@@ -3,7 +3,7 @@ package services
 import (
 	"errors"
 	"fmt"
-	"inspeqtor/util"
+	"github.com/mperham/inspeqtor/util"
 	"os"
 	"os/exec"
 	"os/user"

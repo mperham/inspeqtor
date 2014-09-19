@@ -1,8 +1,8 @@
 package daemon
 
 import (
-	"inspeqtor/metrics"
-	"inspeqtor/util"
+	"github.com/mperham/inspeqtor/metrics"
+	"github.com/mperham/inspeqtor/util"
 	"io/ioutil"
 	"os/exec"
 )

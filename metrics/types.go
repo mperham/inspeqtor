@@ -2,7 +2,7 @@ package metrics
 
 import (
 	"errors"
-	"inspeqtor/util"
+	"github.com/mperham/inspeqtor/util"
 	"regexp"
 	"sort"
 	"strconv"

@@ -1,7 +1,7 @@
 package inspeqtor
 
 import (
-	"inspeqtor/util"
+	"github.com/mperham/inspeqtor/util"
 	"reflect"
 )
 

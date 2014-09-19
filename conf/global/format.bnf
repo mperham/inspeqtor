@@ -18,7 +18,7 @@ _quotedpair : '\\' . ;
 _quotedstring : '"' (_quotedpair | .) {_quotedpair | .} '"' ;
 value : (_atom | _quotedstring) ;
 
-<< import "inspeqtor/conf/global/ast" >>
+<< import "github.com/mperham/inspeqtor/conf/global/ast" >>
 
 Config
   : SetStatement                  << ast.NewConfig($0.(map[string]string), nil) >>

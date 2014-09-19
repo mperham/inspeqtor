@@ -1,10 +1,10 @@
 package inq
 
 import (
+	"github.com/mperham/inspeqtor/conf/inq/ast"
+	"github.com/mperham/inspeqtor/conf/inq/lexer"
+	"github.com/mperham/inspeqtor/conf/inq/parser"
 	"github.com/stretchr/testify/assert"
-	"inspeqtor/conf/inq/ast"
-	"inspeqtor/conf/inq/lexer"
-	"inspeqtor/conf/inq/parser"
 	"io/ioutil"
 	"testing"
 )

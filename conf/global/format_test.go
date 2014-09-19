@@ -1,10 +1,10 @@
 package global
 
 import (
+	"github.com/mperham/inspeqtor/conf/global/ast"
+	"github.com/mperham/inspeqtor/conf/global/lexer"
+	"github.com/mperham/inspeqtor/conf/global/parser"
 	"github.com/stretchr/testify/assert"
-	"inspeqtor/conf/global/ast"
-	"inspeqtor/conf/global/lexer"
-	"inspeqtor/conf/global/parser"
 	"io/ioutil"
 	"log"
 	"testing"

@@ -1,7 +1,7 @@
 package metrics
 
 import (
-	"inspeqtor/util"
+	"github.com/mperham/inspeqtor/util"
 	"io/ioutil"
 	"os/exec"
 	"strconv"

@@ -1,8 +1,8 @@
 package inspeqtor
 
 import (
+	"github.com/mperham/inspeqtor/metrics"
 	"github.com/stretchr/testify/assert"
-	"inspeqtor/metrics"
 	"testing"
 )
 

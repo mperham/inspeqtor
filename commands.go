@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
-	"inspeqtor/util"
+	"github.com/mperham/inspeqtor/util"
 	"io"
 	"net"
 	"os"
