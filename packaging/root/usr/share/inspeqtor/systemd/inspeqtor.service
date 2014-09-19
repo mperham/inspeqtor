@@ -2,7 +2,7 @@
 # systemd unit file for CentOS 7, Ubuntu bleeding edge
 #
 [Unit]
-Description=Modern host and process monitoring
+Description=Application infrastructure monitoring
 After=syslog.target network.target
 
 # http://0pointer.de/public/systemd-man/systemd.service.html

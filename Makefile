@@ -79,7 +79,7 @@ build_rpm: build
 	 	--after-install packaging/postinst \
 	 	--before-remove packaging/prerm \
 		--after-remove packaging/postrm \
-		--description "Modern host and process monitoring" \
+		--description "Application infrastructure monitoring" \
 		-m "Contributed Systems LLC <oss@contribsys.com>" \
 		--iteration $(ITERATION) --license "GPL 3.0" \
 		--vendor "Contributed Systems" -a amd64 \
@@ -95,7 +95,7 @@ build_deb: build
 	 	--before-remove packaging/prerm \
 		--after-remove packaging/postrm \
 		--url http://contribsys.com/$(NAME) \
-		--description "Modern host and process monitoring" \
+		--description "Application infrastructure monitoring" \
 		-m "Contributed Systems LLC <oss@contribsys.com>" \
 		--iteration $(ITERATION) --license "GPL 3.0" \
 		--vendor "Contributed Systems" -a amd64 \
