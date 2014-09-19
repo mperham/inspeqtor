@@ -6,11 +6,11 @@ come!  Don't expect fully polished software just yet.**
 Inspeqtor is the watchdog for your server applications.  Use it to monitor
 metrics from all the moving parts in your application and alert you when something
 goes wrong.  It understands the application deployment workflow so it
-won't bark while you deploy.
+won't bother you during a deploy.
 
 What it does:
 
-* Monitor upstart-, runit-, systemd- or launchd-managed services
+* Monitor systemd-, upstart-, runit- or launchd-managed services
 * Monitor process memory and CPU usage
 * Monitor host CPU, load, swap and disk usage
 * Monitor daemon-specific metrics (e.g. redis, memcached, mysql, nginx...)
@@ -39,7 +39,7 @@ Linux 3.0+.  It will run on OS X.  FreeBSD is untested.  It uses about 5-10MB of
 [Inspeqtor Pro](http://contribsys.com/inspeqtor) is the commercial version of Inspeqtor and offers more
 features, official support and a non-GPL license:
 
-* Monitor legacy sysvinit services with PID files
+* Monitor legacy /etc/init.d services with PID files
 * Route alerts to different teams or individuals
 * Send alerts to Slack or other team chat rooms
 
