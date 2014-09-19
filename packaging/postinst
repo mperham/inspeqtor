@@ -22,18 +22,19 @@ if [ ! -f /etc/inspeqtor/inspeqtor.conf ]; then
 fi
 
 # prefer systemd
-CMD="sudo systemctl start inspeqtor"
+CMD="sudo systemctl restart inspeqtor"
 if which systemctl > /dev/null; then
   echo "Using systemd to control Inspeqtor"
   cp /usr/share/inspeqtor/systemd/inspeqtor.service /lib/systemd/system/inspeqtor.service
 
   systemctl daemon-reload
   systemctl enable inspeqtor
-  systemctl restart inspeqtor
+  systemctl start inspeqtor
 elif [ -d /etc/init ]; then
   echo "Using upstart to control Inspeqtor"
-  CMD="sudo start inspeqtor"
+  CMD="sudo restart inspeqtor"
   cp -r /usr/share/inspeqtor/init/inspeqtor.conf /etc/init/inspeqtor.conf
+  initctl start inspeqtor
 else
   echo "Couldn't find systemd or upstart to control Inspeqtor, cannot proceed."
   echo "Open an issue and tell us about your system."
@@ -53,5 +54,5 @@ Thank you for installing Inspeqtor!
 
 TXT
 
-echo Please configure your alert settings in /etc/inspeqtor/inspeqtor.conf and then start Inspeqtor with \"$CMD\".
+echo Please configure your alert settings in /etc/inspeqtor/inspeqtor.conf and then restart Inspeqtor with \"$CMD\".
 exit 0
