@@ -76,9 +76,9 @@ build_rpm: build
 	# brew install rpm
 	fpm -s dir -t rpm -n $(NAME) -v $(VERSION) -p packaging/output \
 		--rpm-compression bzip2 --rpm-os linux \
-	 	--after-install packaging/postinst \
-	 	--before-remove packaging/prerm \
-		--after-remove packaging/postrm \
+	 	--after-install packaging/scripts/postinst.rpm.systemd \
+	 	--before-remove packaging/scripts/prerm.rpm.systemd \
+		--after-remove packaging/scripts/postrm.rpm.systemd \
 		--description "Application infrastructure monitoring" \
 		-m "Contributed Systems LLC <oss@contribsys.com>" \
 		--iteration $(ITERATION) --license "GPL 3.0" \
@@ -91,9 +91,9 @@ build_deb: build
 	fpm -s dir -t deb -n $(NAME) -v $(VERSION) -p packaging/output \
 		--deb-priority optional --category admin \
 		--deb-compression bzip2 \
-	 	--after-install packaging/postinst \
-	 	--before-remove packaging/prerm \
-		--after-remove packaging/postrm \
+	 	--after-install packaging/scripts/postinst.deb.upstart \
+	 	--before-remove packaging/scripts/prerm.deb.upstart \
+		--after-remove packaging/scripts/postrm.deb.upstart \
 		--url http://contribsys.com/$(NAME) \
 		--description "Application infrastructure monitoring" \
 		-m "Contributed Systems LLC <oss@contribsys.com>" \
@@ -106,6 +106,6 @@ upload:	clean package
 	package_cloud push contribsys/inspeqtor/ubuntu/precise packaging/output/$(NAME)_$(VERSION)-$(ITERATION)_amd64.deb
 	package_cloud push contribsys/inspeqtor/ubuntu/trusty packaging/output/$(NAME)_$(VERSION)-$(ITERATION)_amd64.deb
 	package_cloud push contribsys/inspeqtor/el/7 packaging/output/$(NAME)-$(VERSION)-$(ITERATION).x86_64.rpm
-	package_cloud push contribsys/inspeqtor/el/6 packaging/output/$(NAME)-$(VERSION)-$(ITERATION).x86_64.rpm
+#	package_cloud push contribsys/inspeqtor/el/6 packaging/output/$(NAME)-$(VERSION)-$(ITERATION).x86_64.rpm
 
 .PHONY: all clean test build package upload

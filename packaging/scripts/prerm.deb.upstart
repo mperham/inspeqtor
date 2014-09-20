@@ -1,0 +1,5 @@
+#!/bin/sh
+set -e
+
+echo Stopping and disabling Upstart service
+initctl stop inspeqtor || :

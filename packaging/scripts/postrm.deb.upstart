@@ -1,0 +1,13 @@
+#!/bin/sh
+
+set -e
+
+# https://www.debian.org/doc/debian-policy/ch-maintainerscripts.html
+
+echo "Cleaning up inspeqtor files"
+rm -f /etc/init/inspeqtor.conf
+
+if [ "$1" = "purge" ] ; then
+  echo "Purging inspeqtor configuration"
+  rm -rf /etc/inspeqtor
+fi
