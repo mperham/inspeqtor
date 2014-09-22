@@ -249,7 +249,7 @@ func (hs *hostStorage) collectDisk(path string) error {
 	var lines []string
 
 	if path == "" {
-		cmd := exec.Command("df")
+		cmd := exec.Command("df", "-P")
 		sout, err := cmd.CombinedOutput()
 		if err != nil {
 			return err
