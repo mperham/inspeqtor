@@ -24,7 +24,10 @@ fi
 if [ -d /etc/init ]; then
   echo "Using upstart to control Inspeqtor"
   cp -r /usr/share/inspeqtor/init/inspeqtor.conf /etc/init/inspeqtor.conf
-  initctl start inspeqtor
+  if [ "$1" = 1 ] ; then
+    # first time install, upgrades are restarted in postrm
+    initctl start inspeqtor || :
+  fi
 else
   echo "Couldn't find upstart to control Inspeqtor, cannot proceed."
   echo "Open an issue and tell us about your system."

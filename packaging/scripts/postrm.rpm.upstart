@@ -4,9 +4,10 @@ set -e
 
 # https://docs.fedoraproject.org/en-US/Fedora_Draft_Documentation/0.1/html/RPM_Guide/ch09s04s05.html
 
-if [ $1 -ge 1 ] ; then
+if [ "$1" -ge 1 ]; then
   # Package upgrade, not uninstall
-  systemctl try-restart inspeqtor || :
+  echo Restarting inspeqtor
+  initctl restart inspeqtor || :
 else
   rm -f /etc/init/inspeqtor.conf
 fi
