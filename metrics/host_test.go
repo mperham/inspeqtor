@@ -18,9 +18,9 @@ func TestCollectHost(t *testing.T) {
 	assert.Equal(t, store.Get("cpu", "system"), 0)
 	assert.Equal(t, store.Get("cpu", "iowait"), 0)
 	assert.Equal(t, store.Get("cpu", "steal"), 0)
-	assert.Equal(t, store.Get("load", "1"), 2)
-	assert.Equal(t, store.Get("load", "5"), 3)
-	assert.Equal(t, store.Get("load", "15"), 5)
+	assert.Equal(t, store.Get("load", "1"), 0.02)
+	assert.Equal(t, store.Get("load", "5"), 0.03)
+	assert.Equal(t, store.Get("load", "15"), 0.05)
 	assert.Equal(t, store.Get("swap", ""), 2)
 
 	assert.Equal(t, []string{"cpu", "disk", "load", "swap"}, store.Families())
@@ -31,37 +31,24 @@ func TestCollectHost(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.Equal(t, store.Get("cpu", ""), 147)
-	assert.Equal(t, store.Get("cpu", "user"), 66)
-	assert.Equal(t, store.Get("cpu", "system"), 40)
-	assert.Equal(t, store.Get("cpu", "iowait"), 20)
-	assert.Equal(t, store.Get("cpu", "steal"), 20)
-	assert.Equal(t, store.Display("cpu", "user"), "66%")
-	assert.Equal(t, store.Display("cpu", "system"), "40%")
-	assert.Equal(t, store.Display("cpu", "iowait"), "20%")
-	assert.Equal(t, store.Display("cpu", "steal"), "20%")
-	assert.Equal(t, store.Get("load", "1"), 2)
-	assert.Equal(t, store.Get("load", "5"), 3)
-	assert.Equal(t, store.Get("load", "15"), 5)
+	assert.InDelta(t, store.Get("cpu", ""), 147, 1)
+	assert.InDelta(t, store.Get("cpu", "user"), 66, 1)
+	assert.InDelta(t, store.Get("cpu", "system"), 40, 1)
+	assert.InDelta(t, store.Get("cpu", "iowait"), 20, 1)
+	assert.InDelta(t, store.Get("cpu", "steal"), 20, 1)
+	assert.Equal(t, store.Display("cpu", "user"), "66.7%")
+	assert.Equal(t, store.Display("cpu", "system"), "40.1%")
+	assert.Equal(t, store.Display("cpu", "iowait"), "20.2%")
+	assert.Equal(t, store.Display("cpu", "steal"), "20.3%")
+	assert.InDelta(t, store.Get("load", "1"), 0.02, 0.01)
+	assert.InDelta(t, store.Get("load", "5"), 0.03, 0.01)
+	assert.InDelta(t, store.Get("load", "15"), 0.05, 0.01)
 	assert.Equal(t, store.Display("load", "1"), "0.02")
 	assert.Equal(t, store.Display("load", "5"), "0.03")
 	assert.Equal(t, store.Display("load", "15"), "0.05")
 
 	assert.Equal(t, store.Get("swap", ""), 2)
-	assert.Equal(t, store.Display("swap", ""), "2%")
-}
-
-func TestPrepareRule(t *testing.T) {
-	t.Parallel()
-	store := NewHostStore("/proc", 15)
-
-	val, err := store.PrepareRule("load", "1", 10)
-	assert.Nil(t, err)
-	assert.Equal(t, val, 1000)
-
-	val, err = store.PrepareRule("swap", "", 10)
-	assert.Nil(t, err)
-	assert.Equal(t, val, 10)
+	assert.Equal(t, store.Display("swap", ""), "2.0%")
 }
 
 func TestCollectRealHostMetrics(t *testing.T) {

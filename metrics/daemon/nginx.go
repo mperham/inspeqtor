@@ -77,7 +77,7 @@ func (rs *nginxSource) runCli() (metricMap, error) {
 		return nil, errors.New("Unknown nginx status output")
 	}
 
-	values := map[string]int64{}
+	values := map[string]float64{}
 	results := digits.FindAllStringSubmatch(string(sout), 7)
 	if results == nil || len(results) != 7 {
 		return nil, errors.New("Unknown nginx input")
@@ -91,7 +91,7 @@ func (rs *nginxSource) runCli() (metricMap, error) {
 		if err != nil {
 			return nil, err
 		}
-		values[met.name] = val
+		values[met.name] = float64(val)
 	}
 
 	if len(rs.metrics) > len(values) {

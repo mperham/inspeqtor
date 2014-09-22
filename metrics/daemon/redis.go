@@ -43,7 +43,7 @@ func (rs *RedisSource) runCli(funk executor) (metricMap, error) {
 		return nil, err
 	}
 
-	values := map[string]int64{}
+	values := map[string]float64{}
 
 	for _, line := range lines {
 		if line == "" || line[0] == '#' {
@@ -55,7 +55,7 @@ func (rs *RedisSource) runCli(funk executor) (metricMap, error) {
 			if err != nil {
 				return nil, errors.New("Invalid metric input for '" + line + "': " + err.Error())
 			}
-			values[parts[0]] = val
+			values[parts[0]] = float64(val)
 		}
 	}
 
@@ -119,10 +119,10 @@ var (
 		metric{"client_longest_output_list", g, nil},
 		metric{"client_biggest_input_buf", g, nil},
 		metric{"blocked_clients", g, nil},
-		metric{"used_memory", g, &funcWrapper{nil, inMB, nil}},
-		metric{"used_memory_rss", g, &funcWrapper{nil, inMB, nil}},
-		metric{"used_memory_peak", g, &funcWrapper{nil, inMB, nil}},
-		metric{"used_memory_lua", g, &funcWrapper{nil, inMB, nil}},
+		metric{"used_memory", g, &funcWrapper{inMB, nil}},
+		metric{"used_memory_rss", g, &funcWrapper{inMB, nil}},
+		metric{"used_memory_peak", g, &funcWrapper{inMB, nil}},
+		metric{"used_memory_lua", g, &funcWrapper{inMB, nil}},
 		metric{"rdb_changes_since_last_save", g, nil},
 		metric{"rdb_last_bgsave_time_sec", g, nil},
 		metric{"rdb_current_bgsave_time_sec", g, nil},
@@ -144,6 +144,6 @@ var (
 		metric{"latest_fork_usec", g, nil},
 		metric{"master_last_io_seconds_ago", g, nil},
 		metric{"connected_slaves", g, nil},
-		metric{"repl_backlog_size", g, &funcWrapper{nil, inMB, nil}},
+		metric{"repl_backlog_size", g, &funcWrapper{inMB, nil}},
 	}
 )

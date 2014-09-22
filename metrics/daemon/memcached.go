@@ -41,7 +41,7 @@ func (rs *MemcachedSource) runCli(funk executor) (metricMap, error) {
 		return nil, err
 	}
 
-	values := map[string]int64{}
+	values := map[string]float64{}
 
 	for _, line := range lines {
 		if line == "" || line[0] != 'S' {
@@ -49,7 +49,7 @@ func (rs *MemcachedSource) runCli(funk executor) (metricMap, error) {
 		}
 		parts := strings.Fields(line)
 		if rs.metrics[parts[1]] {
-			val, err := strconv.ParseInt(parts[2], 10, 64)
+			val, err := strconv.ParseFloat(parts[2], 64)
 			if err != nil {
 				return nil, errors.New("Invalid metric input for '" + line + "': " + err.Error())
 			}
@@ -108,8 +108,8 @@ var (
 		metric{"touch_misses", c, nil},
 		metric{"auth_cmds", c, nil},
 		metric{"auth_errors", c, nil},
-		metric{"bytes_read", c, &funcWrapper{nil, inMB, nil}},
-		metric{"bytes_written", c, &funcWrapper{nil, inMB, nil}},
+		metric{"bytes_read", c, &funcWrapper{inMB, nil}},
+		metric{"bytes_written", c, &funcWrapper{inMB, nil}},
 		metric{"threads", g, nil},
 		metric{"malloc_fails", c, nil},
 		metric{"bytes", g, nil},

@@ -108,11 +108,6 @@ func convertRule(global *ConfigFile, check Checkable, inqrule ast.Rule) (*Rule, 
 		return nil, errors.New("Unknown operator: " + inqrule.Operator)
 	}
 
-	threshold, err := check.Metrics().PrepareRule(inqrule.Metric.Family, inqrule.Metric.Name, inqrule.Threshold.Parsed)
-	if err != nil {
-		return nil, err
-	}
-
 	actions := make([]Action, 0)
 	for _, action := range inqrule.Actions {
 		act, err := BuildAction(global, check, action)
@@ -123,7 +118,7 @@ func convertRule(global *ConfigFile, check Checkable, inqrule ast.Rule) (*Rule, 
 	}
 
 	return &Rule{check, inqrule.Metric.Family, inqrule.Metric.Name,
-		op, inqrule.Threshold.Raw, threshold, 0, inqrule.CycleCount, 0, Ok, actions}, nil
+		op, inqrule.Threshold.Raw, float64(inqrule.Threshold.Parsed), 0, inqrule.CycleCount, 0, Ok, actions}, nil
 }
 
 func convertAction(global *ConfigFile, check Checkable, action ast.Action) (Action, error) {

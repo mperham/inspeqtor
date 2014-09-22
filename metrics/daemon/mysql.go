@@ -88,7 +88,7 @@ func (rs *MysqlSource) runRepl(values metricMap, funk executor) (metricMap, erro
 				if err != nil {
 					return nil, errors.New("Invalid metric input for '" + line + "': " + err.Error())
 				}
-				values["Seconds_Behind_Master"] = val
+				values["Seconds_Behind_Master"] = float64(val)
 			}
 		}
 	}
@@ -105,7 +105,7 @@ func (rs *MysqlSource) runStatus(funk executor) (metricMap, error) {
 		return nil, err
 	}
 
-	values := map[string]int64{}
+	values := map[string]float64{}
 
 	for _, line := range lines {
 		if line == "" || line[0] == '#' {
@@ -117,7 +117,7 @@ func (rs *MysqlSource) runStatus(funk executor) (metricMap, error) {
 			if err != nil {
 				return nil, errors.New("Invalid metric input for '" + line + "': " + err.Error())
 			}
-			values[parts[0]] = val
+			values[parts[0]] = float64(val)
 		}
 	}
 
@@ -196,8 +196,8 @@ var (
 	mysqlMetrics []metric = []metric{
 		metric{"Aborted_clients", c, nil},
 		metric{"Aborted_connects", c, nil},
-		metric{"Bytes_received", c, &funcWrapper{nil, inMB, nil}},
-		metric{"Bytes_sent", c, &funcWrapper{nil, inMB, nil}},
+		metric{"Bytes_received", c, &funcWrapper{inMB, nil}},
+		metric{"Bytes_sent", c, &funcWrapper{inMB, nil}},
 		metric{"Com_delete", c, nil},
 		metric{"Com_delete_multi", c, nil},
 		metric{"Com_insert", c, nil},
@@ -207,7 +207,7 @@ var (
 		metric{"Com_update_multi", c, nil},
 		metric{"Connections", c, nil},
 		metric{"Innodb_buffer_pool_pages_data", g, nil},
-		metric{"Innodb_buffer_pool_bytes_data", g, &funcWrapper{nil, inMB, nil}},
+		metric{"Innodb_buffer_pool_bytes_data", g, &funcWrapper{inMB, nil}},
 		metric{"Innodb_buffer_pool_pages_free", g, nil},
 		metric{"Innodb_buffer_pool_pages_total", g, nil},
 		metric{"Innodb_buffer_pool_reads", c, nil},
@@ -234,7 +234,7 @@ var (
 		metric{"Opened_tables", c, nil},
 		metric{"Prepared_stmt_count", g, nil},
 		metric{"Qcache_free_blocks", g, nil},
-		metric{"Qcache_free_memory", g, &funcWrapper{nil, inMB, nil}},
+		metric{"Qcache_free_memory", g, &funcWrapper{inMB, nil}},
 		metric{"Qcache_hits", c, nil},
 		metric{"Qcache_inserts", c, nil},
 		metric{"Qcache_lowmem_prunes", c, nil},

@@ -35,43 +35,38 @@ const (
 var (
 	meminfoParser = regexp.MustCompile("([^:]+):\\s+(\\d+)")
 	swapRegexp    = regexp.MustCompile("= (\\d+\\.\\d{2}[A-Z])(.*)")
-	multiplyBy100 = func(val int64) int64 {
+	multiplyBy100 = func(val float64) float64 {
 		return val * 100
 	}
-	displayLoad = func(val int64) string {
-		return strconv.FormatFloat(float64(val)/100, 'f', 2, 64)
+	displayLoad = func(val float64) string {
+		return strconv.FormatFloat(val, 'f', 2, 64)
 	}
-	DisplayPercent = func(val int64) string {
-		return strconv.Itoa(int(val)) + "%"
+	DisplayPercent = func(val float64) string {
+		return strconv.FormatFloat(val, 'f', 1, 64) + "%"
 	}
-	DisplayInMB = func(val int64) string {
-		return strconv.FormatFloat(float64(val)/(1024*1024), 'f', 2, 64) + "m"
+	DisplayInMB = func(val float64) string {
+		return strconv.FormatFloat(val/(1024*1024), 'f', 2, 64) + "m"
 	}
 )
 
-// prepare converts the rule threshold value in the inq file into a value that can
-// be compared directly to the collected metric value.  Used by load(*)
-type PrepareFunc func(int64) int64
-
 // transform the raw collected data into something we can compare.  Used by cpu(*)
 // to transform raw ticks into a percentage.
-type TransformFunc func(int64, int64) int64
+type TransformFunc func(float64, float64) float64
 
 // Convert the raw metric value into something displayable to the user.
-type DisplayFunc func(int64) string
+type DisplayFunc func(float64) string
 
 type Store interface {
-	Get(family string, name string) int64
+	Get(family string, name string) float64
 	Display(family string, name string) string
-	PrepareRule(family string, name string, threshold int64) (int64, error)
 	Collect(pid int) error
 
 	Families() []string
 	Metrics(family string) []string
 
-	Save(family, name string, value int64)
+	Save(family, name string, value float64)
 	DeclareCounter(family, name string, xform TransformFunc, display DisplayFunc)
-	DeclareGauge(family, name string, prep PrepareFunc, display DisplayFunc)
+	DeclareGauge(family, name string, display DisplayFunc)
 }
 
 type Loadable interface {
@@ -100,7 +95,7 @@ func (store *storage) Metrics(family string) []string {
 	return met
 }
 
-func (store *storage) Get(family string, name string) int64 {
+func (store *storage) Get(family string, name string) float64 {
 	metric, _ := store.find(family, name)
 	if metric == nil {
 		// This can happen when using an Inspeqtor Pro .inq file
@@ -114,17 +109,6 @@ func (store *storage) Get(family string, name string) int64 {
 func (store *storage) Display(family string, name string) string {
 	metric, _ := store.find(family, name)
 	return metric.display()
-}
-
-func (store *storage) PrepareRule(family string, name string, threshold int64) (int64, error) {
-	metric, err := store.find(family, name)
-	if err != nil {
-		return 0, err
-	}
-	if metric == nil {
-		return threshold, nil
-	}
-	return metric.prepare(threshold), nil
 }
 
 func (store *storage) find(family, name string) (metric, error) {
@@ -157,23 +141,14 @@ type family struct {
 // private
 
 type metric interface {
-	put(val int64)
-	get() int64
+	put(val float64)
+	get() float64
 	display() string
-
-	// Prepare is called on a rule threshold to ensure it's in the
-	// same format as the collected metric values.
-	// For example, load average is expressed as 1.55 but internally
-	// stored as 155 since all metrics are int64.  We "prepare" a rule
-	// threshold of 10 by multiplying it by 100 so the actual threshold
-	// internally is 1000.
-	prepare(threshold int64) int64
 }
 
 type gauge struct {
-	buf           *util.RingBuffer
-	prepThreshold PrepareFunc
-	forDisplay    DisplayFunc
+	buf        *util.RingBuffer
+	forDisplay DisplayFunc
 }
 
 type counter struct {
@@ -182,32 +157,20 @@ type counter struct {
 	forDisplay DisplayFunc
 }
 
-func (g *gauge) prepare(val int64) int64 {
-	if g.prepThreshold != nil {
-		return g.prepThreshold(val)
-	} else {
-		return val
-	}
-}
-
-func (c *counter) prepare(val int64) int64 {
-	return val
-}
-
-func (g *gauge) put(val int64) {
+func (g *gauge) put(val float64) {
 	g.buf.Add(val)
 }
 
-func (c *counter) put(val int64) {
+func (c *counter) put(val float64) {
 	c.buf.Add(val)
 }
 
-func (g *gauge) get() int64 {
+func (g *gauge) get() float64 {
 	cur := g.buf.At(0)
 	if cur == nil {
 		return -1
 	}
-	return cur.(int64)
+	return cur.(float64)
 }
 
 func (g *gauge) display() string {
@@ -215,7 +178,7 @@ func (g *gauge) display() string {
 	if g.forDisplay != nil {
 		return g.forDisplay(val)
 	} else {
-		return strconv.FormatInt(val, 10)
+		return strconv.FormatFloat(val, 'f', 1, 64)
 	}
 }
 
@@ -224,7 +187,7 @@ func (c *counter) display() string {
 	if c.forDisplay != nil {
 		return c.forDisplay(val)
 	} else {
-		return strconv.FormatInt(val, 10)
+		return strconv.FormatFloat(val, 'f', 1, 64)
 	}
 }
 
@@ -232,16 +195,16 @@ func (c *counter) display() string {
  * Counter values should be monotonically increasing.
  * The value of a counter is actually the difference between two values.
  */
-func (c *counter) get() int64 {
+func (c *counter) get() float64 {
 	cur := c.buf.At(0)
 	prev := c.buf.At(-1)
 	if cur == nil || prev == nil {
 		return 0
 	}
 	if c.transform != nil {
-		return c.transform(cur.(int64), prev.(int64))
+		return c.transform(cur.(float64), prev.(float64))
 	} else {
-		return cur.(int64) - prev.(int64)
+		return cur.(float64) - prev.(float64)
 	}
 }
 
@@ -249,7 +212,7 @@ func (store *storage) fill(values ...interface{}) {
 	fam := values[0].(string)
 	name := values[1].(string)
 	for _, val := range values[2:] {
-		store.Save(fam, name, int64(val.(int)))
+		store.Save(fam, name, float64(val.(int)))
 	}
 }
 
@@ -257,7 +220,7 @@ func (store *storage) declareDynamicFamily(familyName string) {
 	store.tree[familyName] = &family{familyName, true, map[string]metric{}}
 }
 
-func (store *storage) DeclareGauge(familyName string, name string, prep PrepareFunc, display DisplayFunc) {
+func (store *storage) DeclareGauge(familyName string, name string, display DisplayFunc) {
 	fam := store.tree[familyName]
 	if fam == nil {
 		store.tree[familyName] = &family{familyName, false, map[string]metric{}}
@@ -266,7 +229,7 @@ func (store *storage) DeclareGauge(familyName string, name string, prep PrepareF
 
 	data := fam.metrics[name]
 	if data == nil {
-		fam.metrics[name] = &gauge{util.NewRingBuffer(SLOTS), prep, display}
+		fam.metrics[name] = &gauge{util.NewRingBuffer(SLOTS), display}
 		data = fam.metrics[name]
 	}
 }
@@ -285,7 +248,7 @@ func (store *storage) DeclareCounter(familyName string, name string, xform Trans
 	}
 }
 
-func (store *storage) Save(family string, name string, value int64) {
+func (store *storage) Save(family string, name string, value float64) {
 	m := store.tree[family].metrics[name]
 	if m == nil {
 		panic("No such metric: " + displayName(family, name))
@@ -293,14 +256,14 @@ func (store *storage) Save(family string, name string, value int64) {
 	m.put(value)
 }
 
-func (store *storage) saveType(family string, name string, value int64, t Type) {
+func (store *storage) saveType(family string, name string, value float64, t Type) {
 	fam := store.tree[family]
 	met := fam.metrics[name]
 	if met == nil && fam.allowDynamic {
 		// declare metrics for disk metrics where the name
 		// is dynamic based on the mount point
 		if t == Gauge {
-			store.DeclareGauge(family, name, nil, DisplayPercent)
+			store.DeclareGauge(family, name, DisplayPercent)
 		} else {
 			store.DeclareCounter(family, name, nil, nil)
 		}

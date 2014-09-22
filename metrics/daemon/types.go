@@ -16,7 +16,7 @@ import (
 */
 
 type collectorBuilder func(map[string]string) (Collector, error)
-type metricMap map[string]int64
+type metricMap map[string]float64
 type executor func(string, []string, []byte) ([]byte, error)
 type metric struct {
 	name  string
@@ -24,7 +24,6 @@ type metric struct {
 	funks *funcWrapper
 }
 type funcWrapper struct {
-	prep  metrics.PrepareFunc
 	disp  metrics.DisplayFunc
 	xform metrics.TransformFunc
 }
@@ -66,7 +65,7 @@ func (ds *Store) Watch(metricName string) {
 			if m.mtype == metrics.Counter {
 				ds.Store.DeclareCounter(ds.DaemonSpecific.Name(), metricName, nil, dispFunk)
 			} else {
-				ds.Store.DeclareGauge(ds.DaemonSpecific.Name(), metricName, nil, dispFunk)
+				ds.Store.DeclareGauge(ds.DaemonSpecific.Name(), metricName, dispFunk)
 			}
 		}
 	}

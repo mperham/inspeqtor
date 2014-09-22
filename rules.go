@@ -41,8 +41,8 @@ type Rule struct {
 	MetricName       string
 	Op               Operator
 	DisplayThreshold string
-	Threshold        int64
-	CurrentValue     int64
+	Threshold        float64
+	CurrentValue     float64
 	CycleCount       int
 	TrippedCount     int
 	State            RuleState
@@ -88,7 +88,7 @@ func (r *Rule) DisplayState() string {
 	}
 }
 
-func (r *Rule) FetchLatestMetricValue() int64 {
+func (r *Rule) FetchLatestMetricValue() float64 {
 	return r.Entity.Metrics().Get(r.MetricFamily, r.MetricName)
 }
 
@@ -148,18 +148,18 @@ var (
 
 func okHandler(rule *Rule, tripped bool) *Event {
 	if tripped && rule.TrippedCount == rule.CycleCount {
-		util.Warn("%s[%s] triggered.  Current value = %d", rule.EntityName(), rule.Metric(), rule.CurrentValue)
+		util.Warn("%s[%s] triggered.  Current value = %.1f", rule.EntityName(), rule.Metric(), rule.CurrentValue)
 		rule.State = Triggered
 		return &Event{RuleFailed, rule.Entity, rule}
 	} else if tripped {
-		util.Debug("%s[%s] tripped. Current: %d, Threshold: %d", rule.EntityName(), rule.Metric(), rule.CurrentValue, rule.Threshold)
+		util.Debug("%s[%s] tripped. Current: %.1f, Threshold: %.1f", rule.EntityName(), rule.Metric(), rule.CurrentValue, rule.Threshold)
 	}
 	return nil
 }
 
 func recoveredHandler(rule *Rule, tripped bool) *Event {
 	if tripped && rule.TrippedCount == rule.CycleCount {
-		util.Warn("%s[%s] flapped.  Current value = %d", rule.EntityName(), rule.Metric(), rule.CurrentValue)
+		util.Warn("%s[%s] flapped.  Current value = %.1f", rule.EntityName(), rule.Metric(), rule.CurrentValue)
 		rule.State = Triggered
 	} else {
 		rule.State = Ok
@@ -174,7 +174,7 @@ func triggeredHandler(rule *Rule, tripped bool) *Event {
 		rule.State = Recovered
 		return nil
 	} else {
-		util.Debug("%s[%s] still triggered. Current: %d, Threshold: %d", rule.EntityName(), rule.Metric(), rule.CurrentValue, rule.Threshold)
+		util.Debug("%s[%s] still triggered. Current: %.1f, Threshold: %.1f", rule.EntityName(), rule.Metric(), rule.CurrentValue, rule.Threshold)
 	}
 	return nil
 }

@@ -22,21 +22,21 @@ func NewHostStore(path string, cycleSeconds uint) Store {
 		path,
 	}
 
-	tickPercentage := func(cur, prev int64) int64 {
-		return int64((float64(cur-prev) / float64(cycleSeconds*CLK_TCK)) * 100)
+	tickPercentage := func(cur, prev float64) float64 {
+		return float64((float64(cur-prev) / float64(cycleSeconds*CLK_TCK)) * 100)
 	}
 
-	store.DeclareGauge("swap", "", nil, DisplayPercent)
-	store.DeclareGauge("load", "1", multiplyBy100, displayLoad)
-	store.DeclareGauge("load", "5", multiplyBy100, displayLoad)
-	store.DeclareGauge("load", "15", multiplyBy100, displayLoad)
+	store.DeclareGauge("swap", "", DisplayPercent)
+	store.DeclareGauge("load", "1", displayLoad)
+	store.DeclareGauge("load", "5", displayLoad)
+	store.DeclareGauge("load", "15", displayLoad)
 	store.DeclareCounter("cpu", "", tickPercentage, DisplayPercent)
 	store.DeclareCounter("cpu", "user", tickPercentage, DisplayPercent)
 	store.DeclareCounter("cpu", "system", tickPercentage, DisplayPercent)
 	store.DeclareCounter("cpu", "iowait", tickPercentage, DisplayPercent)
 	store.DeclareCounter("cpu", "steal", tickPercentage, DisplayPercent)
 	store.declareDynamicFamily("disk")
-	store.DeclareGauge("disk", "/", nil, DisplayPercent)
+	store.DeclareGauge("disk", "/", DisplayPercent)
 	return store
 }
 
@@ -77,7 +77,7 @@ func (hs *hostStorage) collectMemory() error {
 		}
 		lines := strings.Split(string(contentBytes), "\n")
 
-		memMetrics := make(map[string]int64)
+		memMetrics := make(map[string]float64)
 		for _, line := range lines {
 			if line == "" {
 				continue
@@ -93,7 +93,7 @@ func (hs *hostStorage) collectMemory() error {
 				util.Warn("Unexpected input: " + results[2] + " in " + line)
 				return err
 			}
-			memMetrics[results[1]] = val
+			memMetrics[results[1]] = float64(val)
 		}
 
 		free := memMetrics["SwapFree"]
@@ -103,7 +103,7 @@ func (hs *hostStorage) collectMemory() error {
 		} else if free == total {
 			hs.Save("swap", "", 0)
 		} else {
-			hs.Save("swap", "", int64(100-int8(100*(float64(free)/float64(total)))))
+			hs.Save("swap", "", float64(100-int8(100*(float64(free)/float64(total)))))
 		}
 	} else {
 		cmd := exec.Command("sysctl", "-n", "vm.swapusage")
@@ -138,7 +138,7 @@ func (hs *hostStorage) collectMemory() error {
 		if t == 0 {
 			hs.Save("swap", "", 100)
 		} else {
-			hs.Save("swap", "", int64(100*(u/t)))
+			hs.Save("swap", "", float64(100*(u/t)))
 		}
 	}
 
@@ -203,9 +203,9 @@ func (hs *hostStorage) collectLoadAverage() error {
 		return err
 	}
 
-	hs.Save("load", "1", int64(load1*100))
-	hs.Save("load", "5", int64(load5*100))
-	hs.Save("load", "15", int64(load15*100))
+	hs.Save("load", "1", load1)
+	hs.Save("load", "5", load5)
+	hs.Save("load", "15", load15)
 	return nil
 }
 
@@ -236,11 +236,11 @@ func (hs *hostStorage) collectCpu() error {
 
 		// These are the five I can envision writing rules against.
 		// Open an issue if you want access to the other values.
-		hs.Save("cpu", "", total)
-		hs.Save("cpu", "user", user)
-		hs.Save("cpu", "system", system)
-		hs.Save("cpu", "iowait", iowait)
-		hs.Save("cpu", "steal", steal)
+		hs.Save("cpu", "", float64(total))
+		hs.Save("cpu", "user", float64(user))
+		hs.Save("cpu", "system", float64(system))
+		hs.Save("cpu", "iowait", float64(iowait))
+		hs.Save("cpu", "steal", float64(steal))
 	}
 	return nil
 }
@@ -269,7 +269,7 @@ func (hs *hostStorage) collectDisk(path string) error {
 		}
 	}
 
-	usage := map[string]int64{}
+	usage := map[string]float64{}
 
 	for _, line := range lines {
 		if line[0] == '/' {
@@ -284,7 +284,7 @@ func (hs *hostStorage) collectDisk(path string) error {
 				if err != nil {
 					util.Debug("Cannot parse df output: " + line)
 				}
-				usage[items[len(items)-1]] = val
+				usage[items[len(items)-1]] = float64(val)
 			}
 
 		}

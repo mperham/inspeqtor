@@ -24,11 +24,11 @@ func NewProcessStore(path string, cycleSeconds uint) Store {
 		path,
 	}
 
-	tickPercentage := func(cur, prev int64) int64 {
-		return int64((float64(cur-prev) / float64(cycleSeconds*CLK_TCK)) * 100)
+	tickPercentage := func(cur, prev float64) float64 {
+		return float64(((cur - prev) / float64(cycleSeconds*CLK_TCK)) * 100)
 	}
 
-	store.DeclareGauge("memory", "rss", nil, DisplayInMB)
+	store.DeclareGauge("memory", "rss", DisplayInMB)
 	store.DeclareCounter("cpu", "user", tickPercentage, DisplayPercent)
 	store.DeclareCounter("cpu", "system", tickPercentage, DisplayPercent)
 	store.DeclareCounter("cpu", "total_user", tickPercentage, DisplayPercent)
@@ -93,7 +93,7 @@ func (ps *processStorage) capturePs(pid int) error {
 		return err
 	}
 
-	ps.Save("memory", "rss", 1024*val)
+	ps.Save("memory", "rss", float64(1024*val))
 
 	times := timeRegexp.FindStringSubmatch(fields[1])
 	if times == nil {
@@ -117,8 +117,8 @@ func (ps *processStorage) capturePs(pid int) error {
 
 	uticks := min*60*100 + sec*100 + cs
 
-	ps.Save("cpu", "user", int64(uticks))
-	ps.Save("cpu", "system", int64(ticks-uticks))
+	ps.Save("cpu", "user", float64(uticks))
+	ps.Save("cpu", "system", float64(ticks-uticks))
 
 	return nil
 }
@@ -152,10 +152,10 @@ func (ps *processStorage) captureCpu(pid int) error {
 		if err != nil {
 			return err
 		}
-		ps.Save("cpu", "user", utime)
-		ps.Save("cpu", "system", stime)
-		ps.Save("cpu", "total_user", cutime)
-		ps.Save("cpu", "total_system", cstime)
+		ps.Save("cpu", "user", float64(utime))
+		ps.Save("cpu", "system", float64(stime))
+		ps.Save("cpu", "total_user", float64(cutime))
+		ps.Save("cpu", "total_system", float64(cstime))
 	}
 
 	return nil
@@ -181,7 +181,7 @@ func (ps *processStorage) captureVm(pid int) error {
 				if err != nil {
 					return err
 				}
-				ps.Save("memory", "rss", 1024*val)
+				ps.Save("memory", "rss", float64(1024*val))
 			}
 		}
 
