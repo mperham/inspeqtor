@@ -57,11 +57,11 @@ deploy_rpm: clean build_rpm purge_rpm
 	scp packaging/output/systemd/*.rpm $(RPM_PRODUCTION):~
 	ssh -t $(RPM_PRODUCTION) 'sudo rm -f /etc/inspeqtor && sudo yum install -q -y $(NAME)-$(VERSION)-$(ITERATION).x86_64.rpm && sudo ./fix && sudo systemctl restart inspeqtor'
 
-upgrade_deb: clean build_deb
+update_deb: clean build_deb
 	scp packaging/output/upstart/*.deb $(DEB_PRODUCTION):~
 	ssh $(DEB_PRODUCTION) 'sudo dpkg -i $(NAME)_$(VERSION)-$(ITERATION)_amd64.deb'
 
-upgrade_rpm: clean build_rpm
+update_rpm: clean build_rpm
 	scp packaging/output/systemd/*.rpm $(RPM_PRODUCTION):~
 	ssh -t $(RPM_PRODUCTION) 'sudo yum install -q -y $(NAME)-$(VERSION)-$(ITERATION).x86_64.rpm'
 
