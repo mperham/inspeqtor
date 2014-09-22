@@ -32,7 +32,8 @@ build: test
 clean:
 	rm -f main $(NAME) templates.go
 	rm -rf packaging/output
-	mkdir packaging/output
+	mkdir -p packaging/output/upstart
+	mkdir -p packaging/output/systemd
 
 real:
 	# Place real configuration with passwords, etc in "realtest".
@@ -49,19 +50,19 @@ purge_rpm:
 	ssh -t $(RPM_PRODUCTION) 'sudo rpm -e $(NAME) && sudo rm -f /etc/inspeqtor' || true
 
 deploy_deb: clean build_deb purge_deb
-	scp packaging/output/*.deb $(DEB_PRODUCTION):~
+	scp packaging/output/upstart/*.deb $(DEB_PRODUCTION):~
 	ssh $(DEB_PRODUCTION) 'sudo rm -f /etc/inspeqtor && sudo dpkg -i $(NAME)_$(VERSION)-$(ITERATION)_amd64.deb && sudo ./fix && sudo restart $(NAME) || true'
 
 deploy_rpm: clean build_rpm purge_rpm
-	scp packaging/output/*.rpm $(RPM_PRODUCTION):~
+	scp packaging/output/systemd/*.rpm $(RPM_PRODUCTION):~
 	ssh -t $(RPM_PRODUCTION) 'sudo rm -f /etc/inspeqtor && sudo yum install -q -y $(NAME)-$(VERSION)-$(ITERATION).x86_64.rpm && sudo ./fix && sudo systemctl restart inspeqtor'
 
 upgrade_deb: clean build_deb
-	scp packaging/output/*.deb $(DEB_PRODUCTION):~
+	scp packaging/output/upstart/*.deb $(DEB_PRODUCTION):~
 	ssh $(DEB_PRODUCTION) 'sudo dpkg -i $(NAME)_$(VERSION)-$(ITERATION)_amd64.deb'
 
 upgrade_rpm: clean build_rpm
-	scp packaging/output/*.rpm $(RPM_PRODUCTION):~
+	scp packaging/output/systemd/*.rpm $(RPM_PRODUCTION):~
 	ssh -t $(RPM_PRODUCTION) 'sudo yum install -q -y $(NAME)-$(VERSION)-$(ITERATION).x86_64.rpm'
 
 deploy: deploy_deb deploy_rpm
@@ -71,10 +72,28 @@ cover:
 	go test -cover -coverprofile cover.out
 	go tool cover -html=cover.out
 
-build_rpm: build
+build_rpm: build_rpm_upstart build_rpm_systemd
+build_deb: build_deb_upstart
+
+build_rpm_upstart: build
 	# gem install fpm
 	# brew install rpm
-	fpm -s dir -t rpm -n $(NAME) -v $(VERSION) -p packaging/output \
+	fpm -s dir -t rpm -n $(NAME) -v $(VERSION) -p packaging/output/upstart \
+		--rpm-compression bzip2 --rpm-os linux \
+	 	--after-install packaging/scripts/postinst.rpm.upstart \
+	 	--before-remove packaging/scripts/prerm.rpm.upstart \
+		--after-remove packaging/scripts/postrm.rpm.upstart \
+		--description "Application infrastructure monitoring" \
+		-m "Contributed Systems LLC <oss@contribsys.com>" \
+		--iteration $(ITERATION) --license "GPL 3.0" \
+		--vendor "Contributed Systems" -a amd64 \
+		$(NAME)=/usr/bin/$(NAME) \
+		packaging/root/=/
+
+build_rpm_systemd: build
+	# gem install fpm
+	# brew install rpm
+	fpm -s dir -t rpm -n $(NAME) -v $(VERSION) -p packaging/output/systemd \
 		--rpm-compression bzip2 --rpm-os linux \
 	 	--after-install packaging/scripts/postinst.rpm.systemd \
 	 	--before-remove packaging/scripts/prerm.rpm.systemd \
@@ -86,9 +105,10 @@ build_rpm: build
 		$(NAME)=/usr/bin/$(NAME) \
 		packaging/root/=/
 
-build_deb: build
+# TODO build_deb_systemd
+build_deb_upstart: build
 	# gem install fpm
-	fpm -s dir -t deb -n $(NAME) -v $(VERSION) -p packaging/output \
+	fpm -s dir -t deb -n $(NAME) -v $(VERSION) -p packaging/output/upstart \
 		--deb-priority optional --category admin \
 		--deb-compression bzip2 \
 	 	--after-install packaging/scripts/postinst.deb.upstart \
@@ -103,9 +123,9 @@ build_deb: build
 		packaging/root/=/
 
 upload:	clean package
-	package_cloud push contribsys/inspeqtor/ubuntu/precise packaging/output/$(NAME)_$(VERSION)-$(ITERATION)_amd64.deb
-	package_cloud push contribsys/inspeqtor/ubuntu/trusty packaging/output/$(NAME)_$(VERSION)-$(ITERATION)_amd64.deb
-	package_cloud push contribsys/inspeqtor/el/7 packaging/output/$(NAME)-$(VERSION)-$(ITERATION).x86_64.rpm
-#	package_cloud push contribsys/inspeqtor/el/6 packaging/output/$(NAME)-$(VERSION)-$(ITERATION).x86_64.rpm
+	package_cloud push contribsys/inspeqtor/ubuntu/precise packaging/output/upstart/$(NAME)_$(VERSION)-$(ITERATION)_amd64.deb
+	package_cloud push contribsys/inspeqtor/ubuntu/trusty packaging/output/upstart/$(NAME)_$(VERSION)-$(ITERATION)_amd64.deb
+	package_cloud push contribsys/inspeqtor/el/7 packaging/output/systemd/$(NAME)-$(VERSION)-$(ITERATION).x86_64.rpm
+	package_cloud push contribsys/inspeqtor/el/6 packaging/output/upstart/$(NAME)-$(VERSION)-$(ITERATION).x86_64.rpm
 
 .PHONY: all clean test build package upload
