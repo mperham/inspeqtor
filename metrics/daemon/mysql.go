@@ -44,6 +44,9 @@ func (rs *MysqlSource) Prepare(funk executor) error {
 	args = append(args, "-e")
 	args = append(args, "show status like 'Slave_running'")
 	sout, err := funk("mysql", args, nil)
+	if err != nil {
+		return err
+	}
 	lines, err := util.ReadLines(sout)
 	if err != nil {
 		return err

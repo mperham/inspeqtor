@@ -52,7 +52,7 @@ func TestRealMysqlConnection(t *testing.T) {
 	t.Parallel()
 	rs := mysqlSource("Connections", "Seconds_Behind_Master")
 	err := rs.Prepare(execCmd)
-	assert.NotNil(t, err)
+	assert.NotNil(t, err, "This test will fail if you don't have mysql installed")
 	assert.True(t, strings.Contains(err.Error(), "slave not running"))
 
 	rs = mysqlSource()
