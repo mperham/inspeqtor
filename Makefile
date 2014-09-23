@@ -6,8 +6,8 @@ ITERATION=1
 BASENAME=$(NAME)_$(VERSION)-$(ITERATION)
 
 # contains various secret or machine-specific variables.
-# DEB_PRODUCTION: hostname of a debian-based machine
-# RPM_PRODUCTION: hostname of a redhat-based machine
+# DEB_PRODUCTION: hostname of a debian-based upstart machine (e.g. Ubuntu {12,14}.04 LTS)
+# RPM_PRODUCTION: hostname of a redhat-based systemd machine (e.g. CentOS 7)
 -include .local.sh
 
 # TODO I'd love some help making this a proper Makefile
@@ -17,7 +17,7 @@ all: test
 
 prepare:
 	#wget https://storage.googleapis.com/golang/go1.3.1.linux-amd64.tar.gz
-	#tar -C /usr/local -xzf go1.3.1.linux-amd64.tar.gz
+	#sudo tar -C /usr/local -xzf go1.3.1.linux-amd64.tar.gz
 	go get github.com/stretchr/testify/...
 	go get github.com/jteeuwen/go-bindata/...
 	@echo Now you should be ready to run "make"
@@ -27,10 +27,10 @@ test:
 	@go test -parallel 4 ./... | grep -v "no test files"
 
 build: test
-	@GOOS=linux GOARCH=amd64 go build -o $(NAME) cmd/main.go
+	@GOOS=linux GOARCH=amd64 go build -o inspeqtor cmd/main.go
 
 clean:
-	rm -f main $(NAME) templates.go
+	rm -f main inspeqtor templates.go
 	rm -rf packaging/output
 	mkdir -p packaging/output/upstart
 	mkdir -p packaging/output/systemd
@@ -51,7 +51,7 @@ purge_rpm:
 
 deploy_deb: clean build_deb purge_deb
 	scp packaging/output/upstart/*.deb $(DEB_PRODUCTION):~
-	ssh $(DEB_PRODUCTION) 'sudo rm -f /etc/inspeqtor && sudo dpkg -i $(NAME)_$(VERSION)-$(ITERATION)_amd64.deb && sudo ./fix && sudo restart $(NAME) || true'
+	ssh $(DEB_PRODUCTION) 'sudo rm -f /etc/inspeqtor && sudo dpkg -i $(NAME)_$(VERSION)-$(ITERATION)_amd64.deb && sudo ./fix && sudo restart inspeqtor || true'
 
 deploy_rpm: clean build_rpm purge_rpm
 	scp packaging/output/systemd/*.rpm $(RPM_PRODUCTION):~
@@ -83,11 +83,12 @@ build_rpm_upstart: build
 	 	--after-install packaging/scripts/postinst.rpm.upstart \
 	 	--before-remove packaging/scripts/prerm.rpm.upstart \
 		--after-remove packaging/scripts/postrm.rpm.upstart \
+		--url http://contribsys.com/inspeqtor \
 		--description "Application infrastructure monitoring" \
 		-m "Contributed Systems LLC <oss@contribsys.com>" \
 		--iteration $(ITERATION) --license "GPL 3.0" \
 		--vendor "Contributed Systems" -a amd64 \
-		$(NAME)=/usr/bin/$(NAME) \
+		inspeqtor=/usr/bin/inspeqtor \
 		packaging/root/=/
 
 build_rpm_systemd: build
@@ -98,11 +99,12 @@ build_rpm_systemd: build
 	 	--after-install packaging/scripts/postinst.rpm.systemd \
 	 	--before-remove packaging/scripts/prerm.rpm.systemd \
 		--after-remove packaging/scripts/postrm.rpm.systemd \
+		--url http://contribsys.com/inspeqtor \
 		--description "Application infrastructure monitoring" \
 		-m "Contributed Systems LLC <oss@contribsys.com>" \
 		--iteration $(ITERATION) --license "GPL 3.0" \
 		--vendor "Contributed Systems" -a amd64 \
-		$(NAME)=/usr/bin/$(NAME) \
+		inspeqtor=/usr/bin/inspeqtor \
 		packaging/root/=/
 
 # TODO build_deb_systemd
@@ -114,12 +116,12 @@ build_deb_upstart: build
 	 	--after-install packaging/scripts/postinst.deb.upstart \
 	 	--before-remove packaging/scripts/prerm.deb.upstart \
 		--after-remove packaging/scripts/postrm.deb.upstart \
-		--url http://contribsys.com/$(NAME) \
+		--url http://contribsys.com/inspeqtor \
 		--description "Application infrastructure monitoring" \
 		-m "Contributed Systems LLC <oss@contribsys.com>" \
 		--iteration $(ITERATION) --license "GPL 3.0" \
 		--vendor "Contributed Systems" -a amd64 \
-	 	$(NAME)=/usr/bin/$(NAME) \
+		inspeqtor=/usr/bin/inspeqtor \
 		packaging/root/=/
 
 upload:	clean package
