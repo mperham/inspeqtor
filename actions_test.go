@@ -150,10 +150,13 @@ func validEmailSetup() *EmailNotifier {
 }
 
 type TestAction struct {
-	events []Event
+	events []*Event
 }
 
-func (t *TestAction) Latest() Event {
+func (t *TestAction) Latest() *Event {
+	if len(t.events) == 0 {
+		return nil
+	}
 	return t.events[len(t.events)-1]
 }
 
@@ -162,7 +165,7 @@ func (t *TestAction) Size() int {
 }
 
 func (t *TestAction) Trigger(e *Event) error {
-	t.events = append(t.events, *e)
+	t.events = append(t.events, e)
 	return nil
 }
 

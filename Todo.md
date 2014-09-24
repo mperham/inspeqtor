@@ -1,7 +1,6 @@
 # Blockers
 
 - Pro distribution
-- Add silenced event testing
 
 # Non-blockers
 

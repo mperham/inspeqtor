@@ -28,6 +28,22 @@ func TestEventProcessDisappears(t *testing.T) {
 	assert.Equal(t, ProcessDoesNotExist, act.Latest().Type)
 }
 
+func TestEventProcessDisappearsDuringDeploy(t *testing.T) {
+	t.Parallel()
+
+	init := services.MockInit()
+	init.CurrentStatus = &services.ProcessStatus{0, services.Down}
+	act := mockAction()
+
+	assert.Equal(t, 0, act.Size())
+	svc := &Service{&Entity{"foo", nil, metrics.NewProcessStore("/proc", 15), nil}, act, &services.ProcessStatus{99, services.Up}, init}
+	svc.Collect(true, func(_ Checkable) {})
+	assert.Equal(t, services.Down, svc.Process.Status)
+	assert.Equal(t, 0, svc.Process.Pid)
+	assert.Equal(t, 0, act.Size())
+	assert.Nil(t, act.Latest())
+}
+
 func TestEventProcessAppears(t *testing.T) {
 	t.Parallel()
 
@@ -38,10 +54,26 @@ func TestEventProcessAppears(t *testing.T) {
 	assert.Equal(t, 0, act.Size())
 	svc := &Service{&Entity{"foo", nil, metrics.NewProcessStore("/proc", 15), nil}, act, &services.ProcessStatus{0, services.Down}, init}
 	svc.Collect(false, func(_ Checkable) {})
-	assert.Equal(t, 1, act.Size())
 	assert.Equal(t, services.Up, svc.Process.Status)
 	assert.Equal(t, os.Getpid(), svc.Process.Pid)
+	assert.Equal(t, 1, act.Size())
 	assert.Equal(t, ProcessExists, act.Latest().Type)
+}
+
+func TestEventProcessAppearsDuringDeploy(t *testing.T) {
+	t.Parallel()
+
+	init := services.MockInit()
+	init.CurrentStatus = &services.ProcessStatus{os.Getpid(), services.Up}
+	act := mockAction()
+
+	assert.Equal(t, 0, act.Size())
+	svc := &Service{&Entity{"foo", nil, metrics.NewProcessStore("/proc", 15), nil}, act, &services.ProcessStatus{0, services.Down}, init}
+	svc.Collect(true, func(_ Checkable) {})
+	assert.Equal(t, services.Up, svc.Process.Status)
+	assert.Equal(t, os.Getpid(), svc.Process.Pid)
+	assert.Equal(t, 0, act.Size())
+	assert.Nil(t, act.Latest())
 }
 
 func TestEventProcessDneAtStartup(t *testing.T) {
