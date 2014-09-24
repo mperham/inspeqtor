@@ -72,7 +72,7 @@ func (h *Host) Resolve(_ []services.InitSystem) error {
 	return nil
 }
 
-func (h *Host) Collect(completeCallback func(Checkable)) {
+func (h *Host) Collect(silenced bool, completeCallback func(Checkable)) {
 	defer completeCallback(h)
 	err := h.Metrics().Collect(0)
 	if err != nil {
@@ -87,7 +87,7 @@ type Checkable interface {
 	Resolve([]services.InitSystem) error
 	Rules() []*Rule
 	Verify() []*Event
-	Collect(func(Checkable))
+	Collect(bool, func(Checkable))
 }
 
 // A Service is Restartable, Host is not.
@@ -107,7 +107,7 @@ type Restartable interface {
   3. run rules
   4. trigger any necessary actions
 */
-func (svc *Service) Collect(completeCallback func(Checkable)) {
+func (svc *Service) Collect(silenced bool, completeCallback func(Checkable)) {
 	defer completeCallback(svc)
 
 	if svc.Manager == nil {
@@ -120,7 +120,9 @@ func (svc *Service) Collect(completeCallback func(Checkable)) {
 			util.Warn("%s", err)
 		} else {
 			svc.Transition(status, func(et EventType) {
-				svc.EventHandler.Trigger(&Event{et, svc, nil})
+				if !silenced {
+					svc.EventHandler.Trigger(&Event{et, svc, nil})
+				}
 			})
 		}
 	}
@@ -132,7 +134,9 @@ func (svc *Service) Collect(completeCallback func(Checkable)) {
 			if err != nil {
 				util.Info("Service %s with process %d does not exist: %s", svc.Name(), svc.Process.Pid, err)
 				svc.Transition(&services.ProcessStatus{0, services.Down}, func(et EventType) {
-					svc.EventHandler.Trigger(&Event{et, svc, nil})
+					if !silenced {
+						svc.EventHandler.Trigger(&Event{et, svc, nil})
+					}
 				})
 			} else {
 				util.Warn("Error capturing metrics for process %d: %s", svc.Process.Pid, merr)

@@ -1,6 +1,7 @@
 # Blockers
 
-- Public binary distribution via packagecloud.io
+- Pro distribution
+- Add silenced event testing
 
 # Non-blockers
 

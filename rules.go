@@ -59,15 +59,6 @@ func (r *Rule) Consequence() string {
 	return ""
 }
 
-func (r *Rule) Trigger(e *Event) {
-	for _, a := range r.Actions {
-		err := a.Trigger(e)
-		if err != nil {
-			util.Warn("Error firing action: %s", err)
-		}
-	}
-}
-
 func (r *Rule) Metric() string {
 	s := r.MetricFamily
 	if r.MetricName != "" {

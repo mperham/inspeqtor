@@ -233,11 +233,11 @@ func (i *Inspeqtor) scan() {
 	barrier.Add(1)
 	barrier.Add(len(i.Services))
 
-	go i.Host.Collect(func(_ Checkable) {
+	go i.Host.Collect(i.silenced(), func(_ Checkable) {
 		barrier.Done()
 	})
 	for _, svc := range i.Services {
-		go svc.Collect(func(_ Checkable) {
+		go svc.Collect(i.silenced(), func(_ Checkable) {
 			barrier.Done()
 		})
 	}
