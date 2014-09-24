@@ -41,7 +41,10 @@ real:
 	# Inspeqtor on your local machine just by running "make real"
 	go run cmd/main.go -l debug -s i.sock -c realtest
 
-package: clean build_deb build_rpm
+package: clean version_check build_deb build_rpm
+
+version_check:
+	@grep -q $(VERSION) inspeqtor.go || (echo VERSIONS OUT OF SYNC && false)
 
 purge_deb:
 	ssh -t $(DEB_PRODUCTION) 'sudo apt-get purge -y $(NAME) && sudo rm -f /etc/inspeqtor' || true
@@ -124,7 +127,7 @@ build_deb_upstart: build
 		inspeqtor=/usr/bin/inspeqtor \
 		packaging/root/=/
 
-upload:	clean package
+upload:	package
 	package_cloud push contribsys/inspeqtor/ubuntu/precise packaging/output/upstart/$(NAME)_$(VERSION)-$(ITERATION)_amd64.deb
 	package_cloud push contribsys/inspeqtor/ubuntu/trusty packaging/output/upstart/$(NAME)_$(VERSION)-$(ITERATION)_amd64.deb
 	package_cloud push contribsys/inspeqtor/el/7 packaging/output/systemd/$(NAME)-$(VERSION)-$(ITERATION).x86_64.rpm
