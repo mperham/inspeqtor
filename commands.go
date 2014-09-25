@@ -17,7 +17,7 @@ import (
  * via its command socket.
  */
 
-type commandFunc func(*Inspeqtor, io.Writer)
+type commandFunc func(*Inspeqtor, []string, io.Writer)
 
 var (
 	CommandHandlers = map[rune]commandFunc{
@@ -58,7 +58,8 @@ func (i *Inspeqtor) acceptCommand() {
 		util.Info("Did not receive a command line in time: %s", err.Error())
 	}
 
-	firstChar := []rune(line)[0]
+	fields := strings.Fields(line)
+	firstChar := []rune(fields[0])[0]
 	funk := CommandHandlers[firstChar]
 	if funk == nil {
 		util.Warn("Unknown command: %s", strings.TrimSpace(line))
@@ -66,10 +67,10 @@ func (i *Inspeqtor) acceptCommand() {
 		return
 	}
 
-	funk(i, c)
+	funk(i, fields[1:], c)
 }
 
-func startDeploy(i *Inspeqtor, resp io.Writer) {
+func startDeploy(i *Inspeqtor, args []string, resp io.Writer) {
 	length := time.Duration(i.GlobalConfig.Top.DeployLength) * time.Second
 	i.SilenceUntil = time.Now().Add(length)
 
@@ -77,13 +78,13 @@ func startDeploy(i *Inspeqtor, resp io.Writer) {
 	io.WriteString(resp, "Starting deploy, now silenced\n")
 }
 
-func finishDeploy(i *Inspeqtor, resp io.Writer) {
+func finishDeploy(i *Inspeqtor, args []string, resp io.Writer) {
 	i.SilenceUntil = time.Now()
 	util.Info("Finished deploy")
 	io.WriteString(resp, "Finished deploy, volume turned to 11\n")
 }
 
-func currentInfo(i *Inspeqtor, resp io.Writer) {
+func currentInfo(i *Inspeqtor, args []string, resp io.Writer) {
 	io.WriteString(resp, fmt.Sprintf(
 		"%s %s, uptime: %s, pid: %d\n", Name, VERSION, time.Now().Sub(i.StartedAt).String(), os.Getpid()))
 	io.WriteString(resp, "\n")
@@ -137,6 +138,6 @@ func currentInfo(i *Inspeqtor, resp io.Writer) {
 	}
 }
 
-func heart(i *Inspeqtor, resp io.Writer) {
+func heart(i *Inspeqtor, args []string, resp io.Writer) {
 	io.WriteString(resp, "Awwww, I love you too.\n")
 }

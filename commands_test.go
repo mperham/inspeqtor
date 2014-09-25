@@ -65,7 +65,7 @@ func TestStartDeploy(t *testing.T) {
 
 	assert.Nil(t, err)
 	proc := CommandHandlers['s']
-	proc(i, resp)
+	proc(i, []string{}, resp)
 
 	assert.True(t, i.SilenceUntil.After(time.Now()))
 	assert.True(t, i.silenced())
@@ -83,7 +83,7 @@ func TestFinishDeploy(t *testing.T) {
 
 	assert.Nil(t, err)
 	proc := CommandHandlers['f']
-	proc(i, resp)
+	proc(i, []string{}, resp)
 
 	assert.True(t, i.SilenceUntil.Before(time.Now()))
 	output, err := resp.ReadString('\n')
@@ -100,7 +100,7 @@ func TestTheLove(t *testing.T) {
 
 	assert.Nil(t, err)
 	proc := CommandHandlers['♡']
-	proc(i, resp)
+	proc(i, []string{}, resp)
 
 	output, err := resp.ReadString('\n')
 	assert.Nil(t, err)
@@ -118,7 +118,7 @@ func TestInfo(t *testing.T) {
 
 	assert.Nil(t, err)
 	proc := CommandHandlers['i']
-	proc(i, &resp)
+	proc(i, []string{}, &resp)
 
 	line, err := resp.ReadString('\n')
 	assert.Nil(t, err)
