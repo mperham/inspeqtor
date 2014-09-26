@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/mperham/inspeqtor/metrics"
 	"github.com/mperham/inspeqtor/services"
+	"github.com/mperham/inspeqtor/util"
 	"github.com/stretchr/testify/assert"
 	"io"
 	"net"
@@ -64,7 +65,7 @@ func TestStartDeploy(t *testing.T) {
 	resp := bytes.NewBuffer(outbuf)
 
 	assert.Nil(t, err)
-	proc := CommandHandlers['s']
+	proc := CommandHandlers["start"]
 	proc(i, []string{}, resp)
 
 	assert.True(t, i.SilenceUntil.After(time.Now()))
@@ -82,7 +83,7 @@ func TestFinishDeploy(t *testing.T) {
 	resp := bytes.NewBuffer(outbuf)
 
 	assert.Nil(t, err)
-	proc := CommandHandlers['f']
+	proc := CommandHandlers["finish"]
 	proc(i, []string{}, resp)
 
 	assert.True(t, i.SilenceUntil.Before(time.Now()))
@@ -99,7 +100,7 @@ func TestTheLove(t *testing.T) {
 	resp := bytes.NewBuffer(outbuf)
 
 	assert.Nil(t, err)
-	proc := CommandHandlers['♡']
+	proc := CommandHandlers["♡"]
 	proc(i, []string{}, resp)
 
 	output, err := resp.ReadString('\n')
@@ -107,7 +108,7 @@ func TestTheLove(t *testing.T) {
 	assert.Equal(t, "Awwww, I love you too.\n", output)
 }
 
-func TestInfo(t *testing.T) {
+func TestStatus(t *testing.T) {
 	t.Parallel()
 	i, err := New("_", "")
 	i.Services = []Checkable{
@@ -117,7 +118,7 @@ func TestInfo(t *testing.T) {
 	var resp bytes.Buffer
 
 	assert.Nil(t, err)
-	proc := CommandHandlers['i']
+	proc := CommandHandlers["status"]
 	proc(i, []string{}, &resp)
 
 	line, err := resp.ReadString('\n')
@@ -126,4 +127,22 @@ func TestInfo(t *testing.T) {
 	idxs := regexp.MustCompile(fmt.Sprintf("\\AInspeqtor %s, uptime: ", VERSION)).FindStringIndex(line)
 	assert.NotNil(t, idxs)
 	assert.Equal(t, 0, idxs[0])
+}
+
+func TestSparkline(t *testing.T) {
+	t.Parallel()
+
+	i, err := New("_", "")
+	assert.Nil(t, err)
+
+	output := buildSparkline(i.Host, "memory(rss)", func(family, name string) *util.RingBuffer {
+		buf := util.NewRingBuffer(120)
+		for i := 0; i < 100; i++ {
+			buf.Add(float64(i))
+		}
+		return buf
+	})
+
+	expected := "localhost memory(rss) min: 0.00 max: 99.00 avg: 49.50\n▁▁▁▁▁▁▁▁▁▁▁▁▁▂▂▂▂▂▂▂▂▂▂▂▂▃▃▃▃▃▃▃▃▃▃▃▃▃▄▄▄▄▄▄▄▄▄▄▄▄▅▅▅▅▅▅▅▅▅▅▅▅▆▆▆▆▆▆▆▆▆▆▆▆▆▇▇▇▇▇▇▇▇▇▇▇▇█████████████\n"
+	assert.Equal(t, output, expected)
 }

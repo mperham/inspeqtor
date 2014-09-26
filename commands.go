@@ -2,8 +2,10 @@ package inspeqtor
 
 import (
 	"bufio"
+	"bytes"
 	"errors"
 	"fmt"
+	"github.com/mperham/inspeqtor/metrics"
 	"github.com/mperham/inspeqtor/util"
 	"io"
 	"net"
@@ -20,11 +22,12 @@ import (
 type commandFunc func(*Inspeqtor, []string, io.Writer)
 
 var (
-	CommandHandlers = map[rune]commandFunc{
-		's': startDeploy,
-		'f': finishDeploy,
-		'i': currentInfo,
-		'♡': heart,
+	CommandHandlers = map[string]commandFunc{
+		"start":  startDeploy,
+		"finish": finishDeploy,
+		"status": currentStatus,
+		"spark":  sparkline,
+		"♡":      heart,
 	}
 )
 
@@ -59,8 +62,7 @@ func (i *Inspeqtor) acceptCommand() {
 	}
 
 	fields := strings.Fields(line)
-	firstChar := []rune(fields[0])[0]
-	funk := CommandHandlers[firstChar]
+	funk := CommandHandlers[fields[0]]
 	if funk == nil {
 		util.Warn("Unknown command: %s", strings.TrimSpace(line))
 		io.WriteString(c, "Unknown command: "+line)
@@ -84,7 +86,31 @@ func finishDeploy(i *Inspeqtor, args []string, resp io.Writer) {
 	io.WriteString(resp, "Finished deploy, volume turned to 11\n")
 }
 
-func currentInfo(i *Inspeqtor, args []string, resp io.Writer) {
+func sparkline(i *Inspeqtor, args []string, resp io.Writer) {
+	targetName := args[0]
+	var target Checkable
+
+	if targetName == "host" {
+		target = i.Host
+	} else {
+		for _, s := range i.Services {
+			if s.Name() == targetName {
+				target = s
+			}
+		}
+		if target == nil {
+			io.WriteString(resp, "Invalid target: "+targetName)
+			return
+		}
+	}
+
+	output := buildSparkline(target, args[1], func(family, name string) *util.RingBuffer {
+		return target.Metrics().(metrics.History).Buffer(family, name)
+	})
+	io.WriteString(resp, output)
+}
+
+func currentStatus(i *Inspeqtor, args []string, resp io.Writer) {
 	io.WriteString(resp, fmt.Sprintf(
 		"%s %s, uptime: %s, pid: %d\n", Name, VERSION, time.Now().Sub(i.StartedAt).String(), os.Getpid()))
 	io.WriteString(resp, "\n")
@@ -140,4 +166,49 @@ func currentInfo(i *Inspeqtor, args []string, resp io.Writer) {
 
 func heart(i *Inspeqtor, args []string, resp io.Writer) {
 	io.WriteString(resp, "Awwww, I love you too.\n")
+}
+
+func buildSparkline(target Checkable, metric string, buf func(string, string) *util.RingBuffer) string {
+	fields := strings.Split(metric, "(")
+	family := fields[0]
+	name := ""
+	if len(fields) > 1 {
+		name = fields[1]
+		name = name[0 : len(name)-1]
+	}
+
+	buff := buf(family, name)
+	values := buff.Export()
+
+	var min, max, sum, avg float64
+	for _, val := range values {
+		if min > val {
+			min = val
+		}
+		if max < val {
+			max = val
+		}
+		sum += val
+	}
+	if len(values) > 0 {
+		avg = sum / float64(len(values))
+	}
+
+	var resp bytes.Buffer
+
+	resp.WriteString(fmt.Sprintf("%s %s min: %.2f max: %.2f avg: %.2f\n", target.Name(), metric, min, max, avg))
+	runes := []string{"▁", "▂", "▃", "▄", "▅", "▆", "▇", "█"}
+	tick := (max - min) / 8
+
+	for _, x := range values {
+		diff := int((x - min) / tick)
+		if diff > 7 {
+			diff = 7
+		}
+
+		resp.WriteString(runes[diff])
+	}
+
+	resp.WriteString("\n")
+	return string(resp.Bytes())
 }

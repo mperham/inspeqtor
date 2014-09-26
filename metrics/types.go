@@ -73,8 +73,26 @@ type Loadable interface {
 	Load(values ...interface{})
 }
 
+type History interface {
+	Buffer(family, name string) *util.RingBuffer
+}
+
 type storage struct {
 	tree map[string]*family
+}
+
+func (store *storage) Buffer(family, name string) *util.RingBuffer {
+	f := store.tree[family]
+	if f == nil {
+		return nil
+	}
+
+	m := f.metrics[name]
+	if m == nil {
+		return nil
+	}
+
+	return m.buffer()
 }
 
 func (store *storage) Families() []string {
@@ -144,6 +162,7 @@ type metric interface {
 	put(val float64)
 	get() float64
 	display() string
+	buffer() *util.RingBuffer
 }
 
 type gauge struct {
@@ -157,6 +176,14 @@ type counter struct {
 	forDisplay DisplayFunc
 }
 
+func (g *gauge) buffer() *util.RingBuffer {
+	return g.buf
+}
+
+func (c *counter) buffer() *util.RingBuffer {
+	return c.buf
+}
+
 func (g *gauge) put(val float64) {
 	g.buf.Add(val)
 }
@@ -166,11 +193,11 @@ func (c *counter) put(val float64) {
 }
 
 func (g *gauge) get() float64 {
-	cur := g.buf.At(0)
-	if cur == nil {
+	val := g.buf.At(0)
+	if val == nil {
 		return -1
 	}
-	return cur.(float64)
+	return *val
 }
 
 func (g *gauge) display() string {
@@ -202,9 +229,9 @@ func (c *counter) get() float64 {
 		return 0
 	}
 	if c.transform != nil {
-		return c.transform(cur.(float64), prev.(float64))
+		return c.transform(*cur, *prev)
 	} else {
-		return cur.(float64) - prev.(float64)
+		return *cur - *prev
 	}
 }
 

@@ -1,6 +1,7 @@
 package util
 
 import (
+	"sort"
 	"sync"
 )
 
@@ -11,7 +12,7 @@ import (
   Older items will be overwritten and garbage collected in time.
 */
 type RingBuffer struct {
-	values []interface{}
+	values []*float64
 	oldest int
 	mu     sync.Mutex
 }
@@ -21,7 +22,7 @@ type RingBuffer struct {
 */
 func NewRingBuffer(size int) *RingBuffer {
 	return &RingBuffer{
-		make([]interface{}, size), 0, sync.Mutex{},
+		make([]*float64, size), 0, sync.Mutex{},
 	}
 }
 
@@ -29,16 +30,12 @@ func NewRingBuffer(size int) *RingBuffer {
   Add the given element to the buffer.  Method will
   panic if the caller tries to store nil.
 */
-func (buf *RingBuffer) Add(elem interface{}) {
-	if elem == nil {
-		panic("Attempting to store a nil value")
-	}
-
+func (buf *RingBuffer) Add(elem float64) {
 	buf.mu.Lock()
 	defer buf.mu.Unlock()
 
 	idx := buf.oldest
-	buf.values[idx] = elem
+	buf.values[idx] = &elem
 
 	buf.oldest = idx + 1
 	if buf.oldest >= len(buf.values) {
@@ -53,7 +50,7 @@ func (buf *RingBuffer) Add(elem interface{}) {
   Returns nil if the slot in the buffer has not been filled
   yet.
 */
-func (buf *RingBuffer) At(idx int) interface{} {
+func (buf *RingBuffer) At(idx int) *float64 {
 	buf.mu.Lock()
 	defer buf.mu.Unlock()
 
@@ -62,4 +59,37 @@ func (buf *RingBuffer) At(idx int) interface{} {
 		latest = len(buf.values) + latest
 	}
 	return buf.values[latest]
+}
+
+// Export the set of values in the Ring Buffer, where the latest value
+// will be last in the array.  If the Buffer was not full, 0 will be exported.
+func (buf *RingBuffer) Export() []float64 {
+	buf.mu.Lock()
+	defer buf.mu.Unlock()
+
+	length := len(buf.values)
+	data := make([]float64, length)
+
+	idx := 0
+	for i := buf.oldest; i < len(buf.values); i++ {
+		v := buf.values[i]
+		if v != nil {
+			data[idx] = *v
+			idx += 1
+		}
+	}
+
+	for i := 0; i < buf.oldest; i++ {
+		v := buf.values[i]
+		if v != nil {
+			data[idx] = *v
+			idx += 1
+		}
+	}
+
+	sort.Reverse(sort.Float64Slice(data))
+	shrink := make([]float64, idx)
+	copy(shrink, data)
+
+	return shrink
 }
