@@ -243,7 +243,7 @@ func (hs *hostStorage) collectCpu() error {
 		hs.Save("cpu", "steal", float64(steal))
 	} else {
 		// TODO
-		util.Info("Cannot collect host metrics, not implemented on this platform")
+		util.Info("Cannot collect host CPU metrics, not implemented on this platform")
 	}
 	return nil
 }
