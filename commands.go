@@ -85,30 +85,6 @@ func finishDeploy(i *Inspeqtor, args []string, resp io.Writer) {
 	io.WriteString(resp, "Finished deploy, volume turned to 11\n")
 }
 
-func sparkline(i *Inspeqtor, args []string, resp io.Writer) {
-	targetName := args[0]
-	var target Checkable
-
-	if targetName == "host" {
-		target = i.Host
-	} else {
-		for _, s := range i.Services {
-			if s.Name() == targetName {
-				target = s
-			}
-		}
-		if target == nil {
-			io.WriteString(resp, "Invalid target: "+targetName)
-			return
-		}
-	}
-
-	output := buildSparkline(target, args[1], func(family, name string) displayable {
-		return target.Metrics().Metric(family, name)
-	})
-	io.WriteString(resp, output)
-}
-
 func currentStatus(i *Inspeqtor, args []string, resp io.Writer) {
 	io.WriteString(resp, fmt.Sprintf(
 		"%s %s, uptime: %s, pid: %d\n", Name, VERSION, time.Now().Sub(i.StartedAt).String(), os.Getpid()))
@@ -176,16 +152,44 @@ type displayable interface {
 	Size() int
 }
 
-func buildSparkline(target Checkable, metric string, buf func(string, string) displayable) string {
-	fields := strings.Split(metric, "(")
-	family := fields[0]
-	name := ""
-	if len(fields) > 1 {
-		name = fields[1]
-		name = name[0 : len(name)-1]
+func sparkline(i *Inspeqtor, args []string, resp io.Writer) {
+	if len(args) < 2 {
+		io.WriteString(resp, "show [target] [metric]\n")
+		return
 	}
 
+	targetName := args[0]
+	var target Checkable
+
+	if targetName == "host" {
+		target = i.Host
+	} else {
+		for _, s := range i.Services {
+			if s.Name() == targetName {
+				target = s
+			}
+		}
+	}
+
+	if target == nil {
+		io.WriteString(resp, fmt.Sprintf("Invalid target: %s\n", targetName))
+		return
+	}
+
+	output := buildSparkline(target, args[1], func(family, name string) displayable {
+		return target.Metrics().Metric(family, name)
+	})
+	io.WriteString(resp, output)
+}
+
+func buildSparkline(target Checkable, metric string, buf func(string, string) displayable) string {
+	family, name := parseMetric(metric)
+
 	buff := buf(family, name)
+	if buff == nil {
+		return fmt.Sprintf("Unknown metric: %s\n", metric)
+	}
+
 	sz := buff.Size()
 	values := make([]float64, sz)
 
@@ -241,4 +245,27 @@ func buildSparkline(target Checkable, metric string, buf func(string, string) di
 
 	resp.WriteString("\n")
 	return string(resp.Bytes())
+}
+
+func parseMetric(metric string) (string, string) {
+	if strings.Index(metric, ":") > 0 {
+		fields := strings.Split(metric, ":")
+		family := fields[0]
+		name := ""
+		if len(fields) > 1 {
+			name = fields[1]
+		}
+		return family, name
+	} else if strings.Index(metric, "(") > 0 {
+		fields := strings.Split(metric, "(")
+		family := fields[0]
+		name := ""
+		if len(fields) > 1 {
+			name = fields[1]
+			name = name[0 : len(name)-1]
+		}
+		return family, name
+	} else {
+		return metric, ""
+	}
 }

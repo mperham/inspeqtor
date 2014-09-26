@@ -137,20 +137,50 @@ func (*mockDisplayable) Displayable(val float64) string {
 	return fmt.Sprintf("%.2fm", val)
 }
 
+func TestMetricParse(t *testing.T) {
+	t.Parallel()
+
+	var f, n string
+	f, n = parseMetric("memory(rss)")
+	assert.Equal(t, f, "memory")
+	assert.Equal(t, n, "rss")
+	f, n = parseMetric("memory:rss")
+	assert.Equal(t, f, "memory")
+	assert.Equal(t, n, "rss")
+	f, n = parseMetric("cpu")
+	assert.Equal(t, f, "cpu")
+	assert.Equal(t, n, "")
+}
+
 func TestSparkline(t *testing.T) {
 	t.Parallel()
 
 	i, err := New("_", "")
 	assert.Nil(t, err)
 
+	buf := util.NewRingBuffer(120)
+	for i := 0; i < 100; i++ {
+		buf.Add(float64(i))
+	}
+	src := &mockDisplayable{buf}
+
 	output := buildSparkline(i.Host, "memory(rss)", func(family, name string) displayable {
-		buf := util.NewRingBuffer(120)
-		for i := 0; i < 100; i++ {
-			buf.Add(float64(i))
-		}
-		return &mockDisplayable{buf}
+		return src
 	})
 
 	expected := "localhost memory(rss) min: 0.00m max: 99.00m avg: 49.50m\n▁▁▁▁▁▁▁▁▁▁▁▁▁▂▂▂▂▂▂▂▂▂▂▂▂▃▃▃▃▃▃▃▃▃▃▃▃▃▄▄▄▄▄▄▄▄▄▄▄▄▅▅▅▅▅▅▅▅▅▅▅▅▆▆▆▆▆▆▆▆▆▆▆▆▆▇▇▇▇▇▇▇▇▇▇▇▇█████████████\n"
 	assert.Equal(t, output, expected)
+
+	// alternate, CLI friendy metric naming format
+	expected = "localhost memory:rss min: 0.00m max: 99.00m avg: 49.50m\n▁▁▁▁▁▁▁▁▁▁▁▁▁▂▂▂▂▂▂▂▂▂▂▂▂▃▃▃▃▃▃▃▃▃▃▃▃▃▄▄▄▄▄▄▄▄▄▄▄▄▅▅▅▅▅▅▅▅▅▅▅▅▆▆▆▆▆▆▆▆▆▆▆▆▆▇▇▇▇▇▇▇▇▇▇▇▇█████████████\n"
+	output = buildSparkline(i.Host, "memory:rss", func(family, name string) displayable {
+		return src
+	})
+	assert.Equal(t, output, expected)
+
+	// invalid metric
+	output = buildSparkline(i.Host, "memory:xxx", func(family, name string) displayable {
+		return nil
+	})
+	assert.Equal(t, output, "Unknown metric: memory:xxx\n")
 }
