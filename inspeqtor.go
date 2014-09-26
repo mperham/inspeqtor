@@ -65,13 +65,24 @@ func (i *Inspeqtor) Start() {
 
 	go func() {
 		for {
-			i.acceptCommand()
+			i.safelyAccept()
 		}
 	}()
 
 	go i.runLoop()
 
 	singleton = i
+}
+
+func (i *Inspeqtor) safelyAccept() {
+	defer func() {
+		if err := recover(); err != nil {
+			// TODO Is there a way to print out the backtrace of the goroutine where it crashed?
+			util.Warn("Command crashed:\n%s", err)
+		}
+	}()
+
+	i.acceptCommand()
 }
 
 func (i *Inspeqtor) Parse() error {
