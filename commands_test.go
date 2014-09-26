@@ -129,20 +129,28 @@ func TestStatus(t *testing.T) {
 	assert.Equal(t, 0, idxs[0])
 }
 
+type mockDisplayable struct {
+	*util.RingBuffer
+}
+
+func (*mockDisplayable) Displayable(val float64) string {
+	return fmt.Sprintf("%.2fm", val)
+}
+
 func TestSparkline(t *testing.T) {
 	t.Parallel()
 
 	i, err := New("_", "")
 	assert.Nil(t, err)
 
-	output := buildSparkline(i.Host, "memory(rss)", func(family, name string) *util.RingBuffer {
+	output := buildSparkline(i.Host, "memory(rss)", func(family, name string) displayable {
 		buf := util.NewRingBuffer(120)
 		for i := 0; i < 100; i++ {
 			buf.Add(float64(i))
 		}
-		return buf
+		return &mockDisplayable{buf}
 	})
 
-	expected := "localhost memory(rss) min: 0.00 max: 99.00 avg: 49.50\n▁▁▁▁▁▁▁▁▁▁▁▁▁▂▂▂▂▂▂▂▂▂▂▂▂▃▃▃▃▃▃▃▃▃▃▃▃▃▄▄▄▄▄▄▄▄▄▄▄▄▅▅▅▅▅▅▅▅▅▅▅▅▆▆▆▆▆▆▆▆▆▆▆▆▆▇▇▇▇▇▇▇▇▇▇▇▇█████████████\n"
+	expected := "localhost memory(rss) min: 0.00m max: 99.00m avg: 49.50m\n▁▁▁▁▁▁▁▁▁▁▁▁▁▂▂▂▂▂▂▂▂▂▂▂▂▃▃▃▃▃▃▃▃▃▃▃▃▃▄▄▄▄▄▄▄▄▄▄▄▄▅▅▅▅▅▅▅▅▅▅▅▅▆▆▆▆▆▆▆▆▆▆▆▆▆▇▇▇▇▇▇▇▇▇▇▇▇█████████████\n"
 	assert.Equal(t, output, expected)
 }

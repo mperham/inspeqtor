@@ -24,7 +24,7 @@ func TestCollectHost(t *testing.T) {
 	assert.Equal(t, store.Get("swap", ""), 2)
 
 	assert.Equal(t, []string{"cpu", "disk", "load", "swap"}, store.Families())
-	assert.Equal(t, []string{"", "iowait", "steal", "system", "user"}, store.Metrics(store.Families()[0]))
+	assert.Equal(t, []string{"", "iowait", "steal", "system", "user"}, store.MetricNames(store.Families()[0]))
 
 	store.(*hostStorage).path = "proc2"
 	err = store.Collect(0)

@@ -241,6 +241,9 @@ func (hs *hostStorage) collectCpu() error {
 		hs.Save("cpu", "system", float64(system))
 		hs.Save("cpu", "iowait", float64(iowait))
 		hs.Save("cpu", "steal", float64(steal))
+	} else {
+		// TODO
+		util.Info("Cannot collect host metrics, not implemented on this platform")
 	}
 	return nil
 }

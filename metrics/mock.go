@@ -1,9 +1,5 @@
 package metrics
 
-import (
-	"github.com/mperham/inspeqtor/util"
-)
-
 func NewMockStore() Store {
 	return &mockStore{}
 }
@@ -23,7 +19,7 @@ func (*mockStore) Collect(pid int) error {
 func (*mockStore) Families() []string {
 	return []string{"cpu"}
 }
-func (*mockStore) Metrics(family string) []string {
+func (*mockStore) MetricNames(family string) []string {
 	return []string{"user"}
 }
 
@@ -33,6 +29,6 @@ func (*mockStore) DeclareCounter(family, name string, xform TransformFunc, displ
 }
 func (*mockStore) DeclareGauge(family, name string, display DisplayFunc) {
 }
-func (*mockStore) Buffer(family, name string) *util.RingBuffer {
-	return util.NewRingBuffer(0)
+func (*mockStore) Metric(family, name string) Metric {
+	return &gauge{}
 }

@@ -20,9 +20,9 @@ type RingBuffer struct {
 /*
   Return a RingBuffer with the given capacity.
 */
-func NewRingBuffer(size int) *RingBuffer {
+func NewRingBuffer(capacity int) *RingBuffer {
 	return &RingBuffer{
-		make([]*float64, size), 0, sync.Mutex{},
+		make([]*float64, capacity), 0, sync.Mutex{},
 	}
 }
 
@@ -59,6 +59,24 @@ func (buf *RingBuffer) At(idx int) *float64 {
 		latest = len(buf.values) + latest
 	}
 	return buf.values[latest]
+}
+
+func (buf *RingBuffer) Size() int {
+	buf.mu.Lock()
+	defer buf.mu.Unlock()
+
+	var count int
+	for _, x := range buf.values {
+		if x != nil {
+			count += 1
+		}
+	}
+
+	return count
+}
+
+func (buf *RingBuffer) Capacity() int {
+	return cap(buf.values)
 }
 
 // Export the set of values in the Ring Buffer, where the latest value

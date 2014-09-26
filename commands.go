@@ -103,8 +103,8 @@ func sparkline(i *Inspeqtor, args []string, resp io.Writer) {
 		}
 	}
 
-	output := buildSparkline(target, args[1], func(family, name string) *util.RingBuffer {
-		return target.Metrics().Buffer(family, name)
+	output := buildSparkline(target, args[1], func(family, name string) displayable {
+		return target.Metrics().Metric(family, name)
 	})
 	io.WriteString(resp, output)
 }
@@ -117,7 +117,7 @@ func currentStatus(i *Inspeqtor, args []string, resp io.Writer) {
 	io.WriteString(resp, fmt.Sprintf("Host: %s\n", i.Host.Name()))
 	store := i.Host.Metrics()
 	for _, fam := range store.Families() {
-		for _, met := range store.Metrics(fam) {
+		for _, met := range store.MetricNames(fam) {
 			name := fam
 			if met != "" {
 				name = name + "(" + met + ")"
@@ -142,7 +142,7 @@ func currentStatus(i *Inspeqtor, args []string, resp io.Writer) {
 
 		store := svc.Metrics()
 		for _, fam := range store.Families() {
-			for _, met := range store.Metrics(fam) {
+			for _, met := range store.MetricNames(fam) {
 				name := fam
 				if met != "" {
 					name = name + "(" + met + ")"
@@ -167,7 +167,16 @@ func heart(i *Inspeqtor, args []string, resp io.Writer) {
 	io.WriteString(resp, "Awwww, I love you too.\n")
 }
 
-func buildSparkline(target Checkable, metric string, buf func(string, string) *util.RingBuffer) string {
+// Beautiful, love this Go feature where you
+// can slice out only the methods you need for simplicity
+// of testing...
+type displayable interface {
+	At(int) *float64
+	Displayable(float64) string
+	Size() int
+}
+
+func buildSparkline(target Checkable, metric string, buf func(string, string) displayable) string {
 	fields := strings.Split(metric, "(")
 	family := fields[0]
 	name := ""
@@ -177,7 +186,23 @@ func buildSparkline(target Checkable, metric string, buf func(string, string) *u
 	}
 
 	buff := buf(family, name)
-	values := buff.Export()
+	sz := buff.Size()
+	values := make([]float64, sz)
+
+	for i := 0; i > -sz; i-- {
+		v := buff.At(i)
+		if v == nil {
+			util.Warn("BUG: Nil data in ring buffer: %d %d", sz, i)
+			return "Inspeqtor bug, error building graph\n"
+		}
+		values[-i] = *v
+	}
+
+	// does not work for some reason, SO to the rescue!
+	//sort.Reverse(sort.Float64Slice(values))
+	for i, j := 0, len(values)-1; i < j; i, j = i+1, j-1 {
+		values[i], values[j] = values[j], values[i]
+	}
 
 	var min, max, sum, avg float64
 	for _, val := range values {
@@ -195,7 +220,13 @@ func buildSparkline(target Checkable, metric string, buf func(string, string) *u
 
 	var resp bytes.Buffer
 
-	resp.WriteString(fmt.Sprintf("%s %s min: %.2f max: %.2f avg: %.2f\n", target.Name(), metric, min, max, avg))
+	resp.WriteString(fmt.Sprintf("%s %s min: %s max: %s avg: %s\n",
+		target.Name(),
+		metric,
+		buff.Displayable(min),
+		buff.Displayable(max),
+		buff.Displayable(avg)))
+
 	runes := []string{"▁", "▂", "▃", "▄", "▅", "▆", "▇", "█"}
 	tick := (max - min) / 8
 

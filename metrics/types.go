@@ -62,12 +62,12 @@ type Store interface {
 	Collect(pid int) error
 
 	Families() []string
-	Metrics(family string) []string
+	MetricNames(family string) []string
 
 	Save(family, name string, value float64)
 	DeclareCounter(family, name string, xform TransformFunc, display DisplayFunc)
 	DeclareGauge(family, name string, display DisplayFunc)
-	Buffer(family, name string) *util.RingBuffer
+	Metric(family, name string) Metric
 }
 
 type Loadable interface {
@@ -78,18 +78,17 @@ type storage struct {
 	tree map[string]*family
 }
 
-func (store *storage) Buffer(family, name string) *util.RingBuffer {
+func (store *storage) Metric(family, name string) Metric {
 	f := store.tree[family]
 	if f == nil {
 		return nil
 	}
 
-	m := f.metrics[name]
-	if m == nil {
+	x, ok := f.metrics[name]
+	if !ok {
 		return nil
 	}
-
-	return m.buffer()
+	return x
 }
 
 func (store *storage) Families() []string {
@@ -101,7 +100,7 @@ func (store *storage) Families() []string {
 	return families
 }
 
-func (store *storage) Metrics(family string) []string {
+func (store *storage) MetricNames(family string) []string {
 	met := []string{}
 	for k, _ := range store.tree[family].metrics {
 		met = append(met, k)
@@ -118,15 +117,15 @@ func (store *storage) Get(family string, name string) float64 {
 		util.Warn("BUG: Metric %s(%s) does not exist", family, name)
 		return 0
 	}
-	return metric.get()
+	return metric.Get()
 }
 
 func (store *storage) Display(family string, name string) string {
 	metric, _ := store.find(family, name)
-	return metric.display()
+	return metric.Display()
 }
 
-func (store *storage) find(family, name string) (metric, error) {
+func (store *storage) find(family, name string) (Metric, error) {
 	fam := store.tree[family]
 	if fam == nil {
 		return nil, nil
@@ -150,16 +149,21 @@ func displayName(family, name string) string {
 type family struct {
 	name         string
 	allowDynamic bool
-	metrics      map[string]metric
+	metrics      map[string]Metric
 }
 
 // private
 
-type metric interface {
-	put(val float64)
-	get() float64
-	display() string
-	buffer() *util.RingBuffer
+type Metric interface {
+	// Used for current value
+	Put(val float64)
+	Get() float64
+	Display() string
+
+	// Used for History ('show')
+	At(int) *float64
+	Displayable(float64) string
+	Size() int
 }
 
 type gauge struct {
@@ -173,32 +177,44 @@ type counter struct {
 	forDisplay DisplayFunc
 }
 
-func (g *gauge) buffer() *util.RingBuffer {
-	return g.buf
+func (g *gauge) Size() int {
+	return g.buf.Size()
 }
 
-func (c *counter) buffer() *util.RingBuffer {
-	return c.buf
+func (c *counter) Size() int {
+	sz := c.buf.Size() - 1
+	if sz < 0 {
+		return 0
+	}
+	return sz
 }
 
-func (g *gauge) put(val float64) {
+func (g *gauge) Put(val float64) {
 	g.buf.Add(val)
 }
 
-func (c *counter) put(val float64) {
+func (c *counter) Put(val float64) {
 	c.buf.Add(val)
 }
 
-func (g *gauge) get() float64 {
-	val := g.buf.At(0)
-	if val == nil {
+func (g *gauge) Get() float64 {
+	v := g.At(0)
+	if v == nil {
 		return -1
 	}
-	return *val
+	return *v
 }
 
-func (g *gauge) display() string {
-	val := g.get()
+func (g *gauge) At(idx int) *float64 {
+	return g.buf.At(idx)
+}
+
+func (g *gauge) Display() string {
+	val := g.Get()
+	return g.Displayable(val)
+}
+
+func (g *gauge) Displayable(val float64) string {
 	if g.forDisplay != nil {
 		return g.forDisplay(val)
 	} else {
@@ -206,8 +222,12 @@ func (g *gauge) display() string {
 	}
 }
 
-func (c *counter) display() string {
-	val := c.get()
+func (c *counter) Display() string {
+	val := c.Get()
+	return c.Displayable(val)
+}
+
+func (c *counter) Displayable(val float64) string {
 	if c.forDisplay != nil {
 		return c.forDisplay(val)
 	} else {
@@ -219,17 +239,27 @@ func (c *counter) display() string {
  * Counter values should be monotonically increasing.
  * The value of a counter is actually the difference between two values.
  */
-func (c *counter) get() float64 {
-	cur := c.buf.At(0)
-	prev := c.buf.At(-1)
-	if cur == nil || prev == nil {
+func (c *counter) Get() float64 {
+	v := c.At(0)
+	if v == nil {
 		return 0
 	}
-	if c.transform != nil {
-		return c.transform(*cur, *prev)
-	} else {
-		return *cur - *prev
+	return *v
+}
+
+func (c *counter) At(idx int) *float64 {
+	cur := c.buf.At(idx)
+	prev := c.buf.At(idx - 1)
+	if cur == nil || prev == nil {
+		return nil
 	}
+	var x float64
+	if c.transform != nil {
+		x = c.transform(*cur, *prev)
+	} else {
+		x = *cur - *prev
+	}
+	return &x
 }
 
 func (store *storage) fill(values ...interface{}) {
@@ -241,13 +271,13 @@ func (store *storage) fill(values ...interface{}) {
 }
 
 func (store *storage) declareDynamicFamily(familyName string) {
-	store.tree[familyName] = &family{familyName, true, map[string]metric{}}
+	store.tree[familyName] = &family{familyName, true, map[string]Metric{}}
 }
 
 func (store *storage) DeclareGauge(familyName string, name string, display DisplayFunc) {
 	fam := store.tree[familyName]
 	if fam == nil {
-		store.tree[familyName] = &family{familyName, false, map[string]metric{}}
+		store.tree[familyName] = &family{familyName, false, map[string]Metric{}}
 		fam = store.tree[familyName]
 	}
 
@@ -261,7 +291,7 @@ func (store *storage) DeclareGauge(familyName string, name string, display Displ
 func (store *storage) DeclareCounter(familyName string, name string, xform TransformFunc, display DisplayFunc) {
 	fam := store.tree[familyName]
 	if fam == nil {
-		store.tree[familyName] = &family{familyName, false, map[string]metric{}}
+		store.tree[familyName] = &family{familyName, false, map[string]Metric{}}
 		fam = store.tree[familyName]
 	}
 
@@ -277,7 +307,7 @@ func (store *storage) Save(family string, name string, value float64) {
 	if m == nil {
 		panic("No such metric: " + displayName(family, name))
 	}
-	m.put(value)
+	m.Put(value)
 }
 
 func (store *storage) saveType(family string, name string, value float64, t Type) {
@@ -293,5 +323,5 @@ func (store *storage) saveType(family string, name string, value float64, t Type
 		}
 		met = store.tree[family].metrics[name]
 	}
-	met.put(value)
+	met.Put(value)
 }
