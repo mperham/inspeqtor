@@ -67,14 +67,11 @@ type Store interface {
 	Save(family, name string, value float64)
 	DeclareCounter(family, name string, xform TransformFunc, display DisplayFunc)
 	DeclareGauge(family, name string, display DisplayFunc)
+	Buffer(family, name string) *util.RingBuffer
 }
 
 type Loadable interface {
 	Load(values ...interface{})
-}
-
-type History interface {
-	Buffer(family, name string) *util.RingBuffer
 }
 
 type storage struct {

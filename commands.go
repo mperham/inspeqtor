@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/mperham/inspeqtor/metrics"
 	"github.com/mperham/inspeqtor/util"
 	"io"
 	"net"
@@ -105,7 +104,7 @@ func sparkline(i *Inspeqtor, args []string, resp io.Writer) {
 	}
 
 	output := buildSparkline(target, args[1], func(family, name string) *util.RingBuffer {
-		return target.Metrics().(metrics.History).Buffer(family, name)
+		return target.Metrics().Buffer(family, name)
 	})
 	io.WriteString(resp, output)
 }
