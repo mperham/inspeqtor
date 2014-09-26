@@ -26,7 +26,7 @@ var (
 		"start":  startDeploy,
 		"finish": finishDeploy,
 		"status": currentStatus,
-		"spark":  sparkline,
+		"show":   sparkline,
 		"♡":      heart,
 	}
 )
