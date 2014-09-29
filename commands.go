@@ -121,7 +121,7 @@ func currentStatus(i *Inspeqtor, args []string, resp io.Writer) {
 			for _, met := range store.MetricNames(fam) {
 				name := fam
 				if met != "" {
-					name = name + "(" + met + ")"
+					name = name + ":" + met
 				}
 				var rule *Rule
 				for _, r := range svc.Rules() {
