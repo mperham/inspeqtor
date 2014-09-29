@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/mperham/inspeqtor/util"
 	"io"
+	"math"
 	"net"
 	"os"
 	"strings"
@@ -209,6 +210,8 @@ func buildSparkline(target Checkable, metric string, buf func(string, string) di
 	}
 
 	var min, max, sum, avg float64
+	min = math.MaxFloat64
+
 	for _, val := range values {
 		if min > val {
 			min = val

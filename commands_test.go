@@ -159,20 +159,20 @@ func TestSparkline(t *testing.T) {
 	assert.Nil(t, err)
 
 	buf := util.NewRingBuffer(120)
-	for i := 0; i < 100; i++ {
+	for i := 1; i <= 100; i++ {
 		buf.Add(float64(i))
 	}
 	src := &mockDisplayable{buf}
 
-	output := buildSparkline(i.Host, "memory(rss)", func(family, name string) displayable {
+	output := buildSparkline(i.Host, "memory:rss", func(family, name string) displayable {
 		return src
 	})
 
-	expected := "localhost memory(rss) min: 0.00m max: 99.00m avg: 49.50m\n▁▁▁▁▁▁▁▁▁▁▁▁▁▂▂▂▂▂▂▂▂▂▂▂▂▃▃▃▃▃▃▃▃▃▃▃▃▃▄▄▄▄▄▄▄▄▄▄▄▄▅▅▅▅▅▅▅▅▅▅▅▅▆▆▆▆▆▆▆▆▆▆▆▆▆▇▇▇▇▇▇▇▇▇▇▇▇█████████████\n"
+	expected := "localhost memory:rss min: 1.00m max: 100.00m avg: 50.50m\n▁▁▁▁▁▁▁▁▁▁▁▁▁▂▂▂▂▂▂▂▂▂▂▂▂▃▃▃▃▃▃▃▃▃▃▃▃▃▄▄▄▄▄▄▄▄▄▄▄▄▅▅▅▅▅▅▅▅▅▅▅▅▆▆▆▆▆▆▆▆▆▆▆▆▆▇▇▇▇▇▇▇▇▇▇▇▇█████████████\n"
 	assert.Equal(t, output, expected)
 
 	// alternate, CLI friendy metric naming format
-	expected = "localhost memory:rss min: 0.00m max: 99.00m avg: 49.50m\n▁▁▁▁▁▁▁▁▁▁▁▁▁▂▂▂▂▂▂▂▂▂▂▂▂▃▃▃▃▃▃▃▃▃▃▃▃▃▄▄▄▄▄▄▄▄▄▄▄▄▅▅▅▅▅▅▅▅▅▅▅▅▆▆▆▆▆▆▆▆▆▆▆▆▆▇▇▇▇▇▇▇▇▇▇▇▇█████████████\n"
+	expected = "localhost memory:rss min: 1.00m max: 100.00m avg: 50.50m\n▁▁▁▁▁▁▁▁▁▁▁▁▁▂▂▂▂▂▂▂▂▂▂▂▂▃▃▃▃▃▃▃▃▃▃▃▃▃▄▄▄▄▄▄▄▄▄▄▄▄▅▅▅▅▅▅▅▅▅▅▅▅▆▆▆▆▆▆▆▆▆▆▆▆▆▇▇▇▇▇▇▇▇▇▇▇▇█████████████\n"
 	output = buildSparkline(i.Host, "memory:rss", func(family, name string) displayable {
 		return src
 	})
