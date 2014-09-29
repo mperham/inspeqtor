@@ -239,6 +239,9 @@ func buildSparkline(target Checkable, metric string, buf func(string, string) di
 		if diff > 7 {
 			diff = 7
 		}
+		if diff < 0 {
+			diff = 0
+		}
 
 		resp.WriteString(runes[diff])
 	}
