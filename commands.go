@@ -105,9 +105,9 @@ func currentStatus(i *Inspeqtor, args []string, resp io.Writer) {
 				}
 			}
 			if rule != nil {
-				io.WriteString(resp, fmt.Sprintf("  %-1s %-35s %-15s %s\n", rule.DisplayState(), name, store.Display(fam, met), rule.DisplayThreshold))
+				io.WriteString(resp, fmt.Sprintf("%-1s %-35s %-15s %s\n", rule.DisplayState(), name, store.Display(fam, met), rule.DisplayThreshold))
 			} else {
-				io.WriteString(resp, fmt.Sprintf("    %-35s %-15s\n", name, store.Display(fam, met)))
+				io.WriteString(resp, fmt.Sprintf("  %-35s %-15s\n", name, store.Display(fam, met)))
 			}
 		}
 	}
@@ -130,9 +130,9 @@ func currentStatus(i *Inspeqtor, args []string, resp io.Writer) {
 					}
 				}
 				if rule != nil {
-					io.WriteString(resp, fmt.Sprintf("  %-1s %-35s %-15s %s\n", rule.DisplayState(), name, store.Display(fam, met), rule.DisplayThreshold))
+					io.WriteString(resp, fmt.Sprintf("%-1s %-35s %-15s %s\n", rule.DisplayState(), name, store.Display(fam, met), rule.DisplayThreshold))
 				} else {
-					io.WriteString(resp, fmt.Sprintf("    %-35s %-15s\n", name, store.Display(fam, met)))
+					io.WriteString(resp, fmt.Sprintf("  %-35s %-15s\n", name, store.Display(fam, met)))
 				}
 			}
 		}
