@@ -200,10 +200,20 @@ var productionsTable = ProdTab {
 		},
 	},
 	ProdTabEntry{
-		String: `Metric : name "(" name ")"	<< ast.Metric(X[0], X[2]) >>`,
+		String: `Metric : name ":" name	<< ast.Metric(X[0], X[2]) >>`,
 		Id: "Metric",
 		NTType: 10,
 		Index: 18,
+		NumSymbols: 3,
+		ReduceFunc: func(X []Attrib) (Attrib, error) {
+			return ast.Metric(X[0], X[2])
+		},
+	},
+	ProdTabEntry{
+		String: `Metric : name "(" name ")"	<< ast.Metric(X[0], X[2]) >>`,
+		Id: "Metric",
+		NTType: 10,
+		Index: 19,
 		NumSymbols: 4,
 		ReduceFunc: func(X []Attrib) (Attrib, error) {
 			return ast.Metric(X[0], X[2])
@@ -213,7 +223,7 @@ var productionsTable = ProdTab {
 		String: `Rule : "if" Metric operator HumanAmount "then" ActionList	<< ast.NewRule(X[1], X[2], X[3], X[5], &ast.Amount{"1",1}), nil >>`,
 		Id: "Rule",
 		NTType: 11,
-		Index: 19,
+		Index: 20,
 		NumSymbols: 6,
 		ReduceFunc: func(X []Attrib) (Attrib, error) {
 			return ast.NewRule(X[1], X[2], X[3], X[5], &ast.Amount{"1",1}), nil
@@ -223,7 +233,7 @@ var productionsTable = ProdTab {
 		String: `Rule : "if" Metric operator HumanAmount "for" IntAmount "cycles" "then" ActionList	<< ast.NewRule(X[1], X[2], X[3], X[8], X[5]), nil >>`,
 		Id: "Rule",
 		NTType: 11,
-		Index: 20,
+		Index: 21,
 		NumSymbols: 9,
 		ReduceFunc: func(X []Attrib) (Attrib, error) {
 			return ast.NewRule(X[1], X[2], X[3], X[8], X[5]), nil
@@ -233,7 +243,7 @@ var productionsTable = ProdTab {
 		String: `RuleList : Rule	<< ast.NewRuleList(X[0]), nil >>`,
 		Id: "RuleList",
 		NTType: 12,
-		Index: 21,
+		Index: 22,
 		NumSymbols: 1,
 		ReduceFunc: func(X []Attrib) (Attrib, error) {
 			return ast.NewRuleList(X[0]), nil
@@ -243,7 +253,7 @@ var productionsTable = ProdTab {
 		String: `RuleList : RuleList Rule	<< ast.AppendRule(X[0], X[1]), nil >>`,
 		Id: "RuleList",
 		NTType: 12,
-		Index: 22,
+		Index: 23,
 		NumSymbols: 2,
 		ReduceFunc: func(X []Attrib) (Attrib, error) {
 			return ast.AppendRule(X[0], X[1]), nil

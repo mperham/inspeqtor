@@ -85,17 +85,18 @@ HumanAmount
   : name      << ast.HumanAmount($0) >>
   ;
 
-// Metrics are named like "family(name)", e.g. memory(rss), cpu(user)
-// or mysql(questions).
+// Metrics are named like "family:name", e.g. memory:rss, cpu:user
+// or mysql:Questions.
 //
 // Name is optional to allow English-like naming for special metrics
 // like "swap" that are just a single number, otherwise we'd have to
-// force awkward naming like "swap(usage)".
+// force awkward naming like "swap:usage".
 //
 // Allow metric names to begin with numbers so we can support
-// metrics like "load(1)".
+// metrics like "load:1".
 Metric
   : name                    << ast.Metric($0, nil) >>
+  | name ":" name           << ast.Metric($0, $2) >>
   | name "(" name ")"       << ast.Metric($0, $2) >>
   ;
 

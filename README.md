@@ -1,11 +1,10 @@
 # Inspeqtor
 
-**This software is still under active development.  More features to
-come!  Don't expect fully polished software just yet.**
+**This software is still under active development and should be considered beta quality**
 
-Inspeqtor is the watchdog for your server applications.  Use it to monitor
-metrics from all the moving parts in your application and alert you when something
-goes wrong.  It understands the application deployment workflow so it
+Inspeqtor monitors your application infrastructure.  It gathers and verifies key metrics
+from all the moving parts in your application and alerts you when something
+looks wrong.  It understands the application deployment workflow so it
 won't bother you during a deploy.
 
 What it does:

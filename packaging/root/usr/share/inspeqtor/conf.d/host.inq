@@ -22,13 +22,13 @@ check host
   # multi-threaded process which is designed to use many cores, e.g.
   # many Java applications.
   #
-  if cpu(user) > 95% for 4 cycles then alert
+  if cpu:user > 95% for 4 cycles then alert
 
   #
   # Running out of disk space will not make you look good to the boss.
   # Alert if the root partition is running out of space.
   #
   # You can add any mount point, e.g.
-  #    if disk(/backups) > 90% then alert
+  #    if disk:/backups > 90% then alert
   #
-  if disk(/) > 90% then alert
+  if disk:/ > 90% then alert

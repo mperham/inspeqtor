@@ -453,7 +453,7 @@ var gotoTab = gotoTable{
 		-1, // ParameterList
 		-1, // Parameters
 		-1, // IntAmount
-		28, // HumanAmount
+		-1, // HumanAmount
 		-1, // Metric
 		-1, // Rule
 		-1, // RuleList
@@ -469,9 +469,9 @@ var gotoTab = gotoTable{
 		-1, // ActionList
 		-1, // Action
 		-1, // ParameterList
-		29, // Parameters
+		-1, // Parameters
 		-1, // IntAmount
-		-1, // HumanAmount
+		30, // HumanAmount
 		-1, // Metric
 		-1, // Rule
 		-1, // RuleList
@@ -487,7 +487,7 @@ var gotoTab = gotoTable{
 		-1, // ActionList
 		-1, // Action
 		-1, // ParameterList
-		-1, // Parameters
+		31, // Parameters
 		-1, // IntAmount
 		-1, // HumanAmount
 		-1, // Metric
@@ -574,8 +574,8 @@ var gotoTab = gotoTable{
 		-1, // Check
 		-1, // Preamble
 		-1, // Checktype
-		33, // ActionList
-		34, // Action
+		-1, // ActionList
+		-1, // Action
 		-1, // ParameterList
 		-1, // Parameters
 		-1, // IntAmount
@@ -596,7 +596,7 @@ var gotoTab = gotoTable{
 		-1, // Action
 		-1, // ParameterList
 		-1, // Parameters
-		38, // IntAmount
+		-1, // IntAmount
 		-1, // HumanAmount
 		-1, // Metric
 		-1, // Rule
@@ -610,8 +610,8 @@ var gotoTab = gotoTable{
 		-1, // Check
 		-1, // Preamble
 		-1, // Checktype
-		-1, // ActionList
-		-1, // Action
+		35, // ActionList
+		36, // Action
 		-1, // ParameterList
 		-1, // Parameters
 		-1, // IntAmount
@@ -632,7 +632,7 @@ var gotoTab = gotoTable{
 		-1, // Action
 		-1, // ParameterList
 		-1, // Parameters
-		-1, // IntAmount
+		40, // IntAmount
 		-1, // HumanAmount
 		-1, // Metric
 		-1, // Rule
@@ -718,8 +718,8 @@ var gotoTab = gotoTable{
 		-1, // Check
 		-1, // Preamble
 		-1, // Checktype
-		42, // ActionList
-		34, // Action
+		-1, // ActionList
+		-1, // Action
 		-1, // ParameterList
 		-1, // Parameters
 		-1, // IntAmount
@@ -754,8 +754,8 @@ var gotoTab = gotoTable{
 		-1, // Check
 		-1, // Preamble
 		-1, // Checktype
-		-1, // ActionList
-		-1, // Action
+		44, // ActionList
+		36, // Action
 		-1, // ParameterList
 		-1, // Parameters
 		-1, // IntAmount
@@ -790,8 +790,8 @@ var gotoTab = gotoTable{
 		-1, // Check
 		-1, // Preamble
 		-1, // Checktype
-		44, // ActionList
-		34, // Action
+		-1, // ActionList
+		-1, // Action
 		-1, // ParameterList
 		-1, // Parameters
 		-1, // IntAmount
@@ -803,6 +803,42 @@ var gotoTab = gotoTable{
 
 	},
 	gotoRow{ // S44
+		
+		-1, // S'
+		-1, // Check
+		-1, // Preamble
+		-1, // Checktype
+		-1, // ActionList
+		-1, // Action
+		-1, // ParameterList
+		-1, // Parameters
+		-1, // IntAmount
+		-1, // HumanAmount
+		-1, // Metric
+		-1, // Rule
+		-1, // RuleList
+		
+
+	},
+	gotoRow{ // S45
+		
+		-1, // S'
+		-1, // Check
+		-1, // Preamble
+		-1, // Checktype
+		46, // ActionList
+		36, // Action
+		-1, // ParameterList
+		-1, // Parameters
+		-1, // IntAmount
+		-1, // HumanAmount
+		-1, // Metric
+		-1, // Rule
+		-1, // RuleList
+		
+
+	},
+	gotoRow{ // S46
 		
 		-1, // S'
 		-1, // Check

@@ -7,6 +7,8 @@
 # Inspeqtor knows how to monitor services for each major init system,
 # as long as you give the exact name of that service.
 #
+# In systemd:
+#   /usr/lib/systemd/system/<name>.service
 # In upstart:
 #   /etc/init/<name>.conf
 # In runit:
@@ -17,11 +19,7 @@
 # Note that Inspeqtor explicitly does not support traditional /etc/init.d;
 # this is a conscious decision: sysvinit is terrible.  You shouldn't need
 # a 50-100 bash script just to start/stop your daemon.  Learn to use
-# the modern init systems above and you'll never go back.  I strongly
-# recommend runit - it has a wonderfully simple, Unix design - and
-# it's what Inspeqtor depends on to manage itself.
-#
-# http://www.mikeperham.com/2014/07/07/use-runit/
+# the modern init systems above and you'll never go back.
 #
 
 #
@@ -30,23 +28,28 @@
 # You'll want to rename this file to mysql.inq to match.
 #
 check service mysql
+
   #
-  # Services can have an owner.  Any alerts for that service
-  # will route to that owner, see inspeqtor.conf for setting up owners.
-  # This line is optional.
+  # if you want to monitor daemon-specific metrics, you'll need
+  # to tell Inspeqtor how to connect to the daemon.
+  # See https://github.com/mperham/inspeqtor/wiki/Daemon-Specific-Metrics
   #
-  with owner ops
+  #with username root, socket /var/run/mysqld/mysqld.sock
 
   #
   # Add any specific metrics you want to verify.
   # Any alerts will go to ops since they are the owner.
   #
-  if memory(rss) > 2g then alert
+  if memory:rss > 2g then alert
 
   #
-  # The Ops team may own the database but we'll assume excessive CPU use
-  # is due to the Analytics team running inefficient SQL queries on the
-  # machine so notify them directly.  Since a cycle defaults to 15 seconds,
-  # this rule triggers if there's excessive CPU usage for more than 30 seconds.
+  # Since a cycle defaults to 15 seconds, this rule triggers if
+  # there's excessive CPU usage for more than 30 seconds.
   #
-  if cpu(user) > 90% for 2 cycles then alert analytics
+  if cpu:user > 90% for 2 cycles then alert
+
+  #
+  # Alert if there's an unexpected burst of queries to the database.
+  # This is an example of a Daemon-Specific Metric.
+  #
+  #if mysql:Queries > 1000 for 2 cycles then alert

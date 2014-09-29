@@ -62,7 +62,7 @@ func (r *Rule) Consequence() string {
 func (r *Rule) Metric() string {
 	s := r.MetricFamily
 	if r.MetricName != "" {
-		s += "(" + r.MetricName + ")"
+		s += ":" + r.MetricName
 	}
 	return s
 }
