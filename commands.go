@@ -227,7 +227,7 @@ func buildSparkline(target Checkable, metric string, buf func(string, string) di
 
 	var resp bytes.Buffer
 
-	resp.WriteString(fmt.Sprintf("%s %s min: %s max: %s avg: %s\n",
+	resp.WriteString(fmt.Sprintf("%s %s min %s max %s avg %s\n",
 		target.Name(),
 		metric,
 		buff.Displayable(min),
