@@ -54,7 +54,7 @@ func (u *Upstart) Restart(serviceName string) error {
 	if len(u.dummyOutput) != 0 {
 		sout = []byte(u.dummyOutput)
 	} else {
-		cmd := exec.Command("restart", serviceName)
+		cmd := exec.Command("initctl", "restart", serviceName)
 		sout, err = cmd.CombinedOutput()
 		if err != nil {
 			return &ServiceError{u.Name(), serviceName, err}
@@ -82,7 +82,7 @@ func (u *Upstart) LookupService(serviceName string) (*ProcessStatus, error) {
 	if len(u.dummyOutput) != 0 {
 		sout = []byte(u.dummyOutput)
 	} else {
-		cmd := exec.Command("status", serviceName)
+		cmd := exec.Command("initctl", "status", serviceName)
 		sout, err = cmd.CombinedOutput()
 		if err != nil {
 			return nil, &ServiceError{u.Name(), serviceName, err}
