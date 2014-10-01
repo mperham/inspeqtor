@@ -41,6 +41,7 @@ features, official support and a non-GPL license:
 * Monitor legacy /etc/init.d services with PID files
 * Route alerts to different teams or individuals
 * Send alerts to Slack or other team chat rooms
+* More to come...
 
 To buy, go to the [homepage](http://contribsys.com/inspeqtor) and select
 the right plan for your organization.
