@@ -35,12 +35,15 @@ Linux 3.0+.  It will run on OS X.  FreeBSD is untested.  It uses about 5-10MB of
 
 ## Upgrade
 
-[Inspeqtor Pro](http://contribsys.com/inspeqtor) is the commercial version of Inspeqtor and offers more
+[Inspeqtor Pro](http://contribsys.com/inspeqtor) is the commercial upgrade for Inspeqtor and offers more
 features, official support and a non-GPL license:
 
 * Monitor legacy /etc/init.d services with PID files
 * Route alerts to different teams or individuals
 * Send alerts to Slack or other team chat rooms
+
+To buy, go to the [homepage](http://contribsys.com/inspeqtor) and select
+the right plan for your organization.
 
 See the [wiki documentation](https://github.com/mperham/inspeqtor/wiki#inspeqtor-pro) for
 in-depth documentation around each Pro feature.
