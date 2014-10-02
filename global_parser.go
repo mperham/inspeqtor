@@ -1,18 +1,18 @@
-package inspeqtor
+package redacted
 
 import (
 	"errors"
 	"fmt"
-	"github.com/mperham/inspeqtor/conf/global/ast"
-	"github.com/mperham/inspeqtor/conf/global/lexer"
-	"github.com/mperham/inspeqtor/conf/global/parser"
-	"github.com/mperham/inspeqtor/util"
+	"github.com/mperham/redacted/conf/global/ast"
+	"github.com/mperham/redacted/conf/global/lexer"
+	"github.com/mperham/redacted/conf/global/parser"
+	"github.com/mperham/redacted/util"
 	"io/ioutil"
 	"strconv"
 )
 
 /*
-Parses the global inspeqtor configuration in /etc/inspeqtor/inspeqtor.conf.
+Parses the global redacted configuration in /etc/redacted/redacted.conf.
 */
 type GlobalConfig struct {
 	CycleTime    uint
@@ -49,7 +49,7 @@ type ConfigFile struct {
 }
 
 func ParseGlobal(rootDir string) (*ConfigFile, error) {
-	path := rootDir + "/inspeqtor.conf"
+	path := rootDir + "/redacted.conf"
 	exists, err := util.FileExists(path)
 	if err != nil {
 		return nil, err

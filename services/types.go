@@ -3,7 +3,7 @@ package services
 import (
 	"errors"
 	"fmt"
-	"github.com/mperham/inspeqtor/util"
+	"github.com/mperham/redacted/util"
 )
 
 type ProcessStatus struct {
@@ -92,7 +92,7 @@ func Detect() []InitSystem {
 	}
 
 	if len(inits) == 0 {
-		util.Warn("No init system detected.  Inspeqtor cannot control any services!")
+		util.Warn("No init system detected.  Redacted cannot control any services!")
 	}
 
 	return inits

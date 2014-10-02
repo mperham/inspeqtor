@@ -1,10 +1,10 @@
 # NOTE this file should be renamed to <name>.inq where name is explained below.
 #
-# Inspeqtor is designed to monitor a host and the services running
+# Redacted is designed to monitor a host and the services running
 # on that host. Services must be controlled by your OS's init system:
 # upstart, systemd, launchd or runit.
 #
-# Inspeqtor knows how to monitor services for each major init system,
+# Redacted knows how to monitor services for each major init system,
 # as long as you give the exact name of that service.
 #
 # In systemd:
@@ -16,7 +16,7 @@
 # In launchd:
 #   ~/Library/LaunchAgents/<name>.plist
 #
-# Note that Inspeqtor explicitly does not support traditional /etc/init.d;
+# Note that Redacted explicitly does not support traditional /etc/init.d;
 # this is a conscious decision: sysvinit is terrible.  You shouldn't need
 # a 50-100 bash script just to start/stop your daemon.  Learn to use
 # the modern init systems above and you'll never go back.
@@ -31,8 +31,8 @@ check service mysql
 
   #
   # if you want to monitor daemon-specific metrics, you'll need
-  # to tell Inspeqtor how to connect to the daemon.
-  # See https://github.com/mperham/inspeqtor/wiki/Daemon-Specific-Metrics
+  # to tell Redacted how to connect to the daemon.
+  # See https://github.com/mperham/redacted/wiki/Daemon-Specific-Metrics
   #
   #with username root, socket /var/run/mysqld/mysqld.sock
 

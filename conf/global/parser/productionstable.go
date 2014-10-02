@@ -1,7 +1,7 @@
 
 package parser
 
-import "github.com/mperham/inspeqtor/conf/global/ast"
+import "github.com/mperham/redacted/conf/global/ast"
 
 type (
 	//TODO: change type and variable names to be consistent with other tables

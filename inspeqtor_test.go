@@ -1,11 +1,11 @@
-package inspeqtor
+package redacted
 
 import (
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
-func TestInspeqtorParse(t *testing.T) {
+func TestRedactedParse(t *testing.T) {
 	t.Parallel()
 	i, err := New("test", "")
 	assert.Nil(t, err)

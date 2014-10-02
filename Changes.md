@@ -1,6 +1,6 @@
-# Inspeqtor Changelog
+# Redacted Changelog
 
-Inspeqtor is brand new software; it very likely has bugs and
+Redacted is brand new software; it very likely has bugs and
 should only be used by the adventurous.  Try it out and let us know
 how we can improve it for you.
 

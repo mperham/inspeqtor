@@ -2,7 +2,7 @@ package services
 
 import (
 	"errors"
-	"github.com/mperham/inspeqtor/util"
+	"github.com/mperham/redacted/util"
 	"os/exec"
 	"path/filepath"
 	"strconv"

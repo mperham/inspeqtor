@@ -1,7 +1,7 @@
-package inspeqtor
+package redacted
 
 import (
-	"github.com/mperham/inspeqtor/util"
+	"github.com/mperham/redacted/util"
 	"reflect"
 )
 

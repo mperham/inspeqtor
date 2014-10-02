@@ -1,10 +1,10 @@
-package inspeqtor
+package redacted
 
 import (
-	"github.com/mperham/inspeqtor/metrics"
-	"github.com/mperham/inspeqtor/metrics/daemon"
-	"github.com/mperham/inspeqtor/services"
-	"github.com/mperham/inspeqtor/util"
+	"github.com/mperham/redacted/metrics"
+	"github.com/mperham/redacted/metrics/daemon"
+	"github.com/mperham/redacted/services"
+	"github.com/mperham/redacted/util"
 	"net"
 	"os"
 	"os/signal"
@@ -17,7 +17,7 @@ const (
 	VERSION = "0.5.0"
 )
 
-type Inspeqtor struct {
+type Redacted struct {
 	RootDir    string
 	SocketPath string
 	StartedAt  time.Time
@@ -31,8 +31,8 @@ type Inspeqtor struct {
 	Valid           bool
 }
 
-func New(dir string, socketpath string) (*Inspeqtor, error) {
-	i := &Inspeqtor{RootDir: dir,
+func New(dir string, socketpath string) (*Redacted, error) {
+	i := &Redacted{RootDir: dir,
 		SocketPath:   socketpath,
 		StartedAt:    time.Now(),
 		SilenceUntil: time.Now(),
@@ -46,17 +46,17 @@ var (
 	Term os.Signal = syscall.SIGTERM
 	Hup  os.Signal = syscall.SIGHUP
 
-	SignalHandlers = map[os.Signal]func(*Inspeqtor){
+	SignalHandlers = map[os.Signal]func(*Redacted){
 		Term:         exit,
 		os.Interrupt: exit,
 		Hup:          reload,
 	}
-	Name      string     = "Inspeqtor"
+	Name      string     = "Redacted"
 	Licensing string     = "Licensed under the GNU Public License 3.0"
-	singleton *Inspeqtor = nil
+	singleton *Redacted = nil
 )
 
-func (i *Inspeqtor) Start() {
+func (i *Redacted) Start() {
 	err := i.openSocket(i.SocketPath)
 	if err != nil {
 		util.Warn("Could not create Unix socket: %s", err.Error())
@@ -74,7 +74,7 @@ func (i *Inspeqtor) Start() {
 	singleton = i
 }
 
-func (i *Inspeqtor) safelyAccept() {
+func (i *Redacted) safelyAccept() {
 	defer func() {
 		if err := recover(); err != nil {
 			// TODO Is there a way to print out the backtrace of the goroutine where it crashed?
@@ -85,7 +85,7 @@ func (i *Inspeqtor) safelyAccept() {
 	i.acceptCommand()
 }
 
-func (i *Inspeqtor) Parse() error {
+func (i *Redacted) Parse() error {
 	i.ServiceManagers = services.Detect()
 
 	config, err := ParseGlobal(i.RootDir)
@@ -117,7 +117,7 @@ func (i *Inspeqtor) Parse() error {
 	return nil
 }
 
-func HandleSignal(sig os.Signal, handler func(*Inspeqtor)) {
+func HandleSignal(sig os.Signal, handler func(*Redacted)) {
 	SignalHandlers[sig] = handler
 }
 
@@ -165,7 +165,7 @@ func wrapService(s *Service) error {
 	return nil
 }
 
-func reload(i *Inspeqtor) {
+func reload(i *Redacted) {
 	util.Info(Name + " reloading")
 	newi, err := New(i.RootDir, i.SocketPath)
 	if err != nil {
@@ -187,14 +187,14 @@ func reload(i *Inspeqtor) {
 	newi.Start()
 }
 
-func exit(i *Inspeqtor) {
+func exit(i *Redacted) {
 	util.Info(Name + " exiting")
 
 	i.Shutdown()
 	os.Exit(0)
 }
 
-func (i *Inspeqtor) Shutdown() {
+func (i *Redacted) Shutdown() {
 	i.Valid = false
 	if i.Socket != nil {
 		err := i.Socket.Close()
@@ -208,7 +208,7 @@ func (i *Inspeqtor) Shutdown() {
 //
 // since we can't test this method in an automated fashion, it should
 // contain as little logic as possible.
-func (i *Inspeqtor) runLoop() {
+func (i *Redacted) runLoop() {
 	util.DebugDebug("Resolving services")
 	for _, svc := range i.Services {
 		svc.Resolve(i.ServiceManagers)
@@ -227,18 +227,18 @@ func (i *Inspeqtor) runLoop() {
 	}
 }
 
-func (i *Inspeqtor) silenced() bool {
+func (i *Redacted) silenced() bool {
 	return time.Now().Before(i.SilenceUntil)
 }
 
-func (i *Inspeqtor) scanSystem() {
+func (i *Redacted) scanSystem() {
 	// "Trust, but verify"
 	// https://en.wikipedia.org/wiki/Trust%2C_but_verify
 	i.scan()
 	i.verify()
 }
 
-func (i *Inspeqtor) scan() {
+func (i *Redacted) scan() {
 	start := time.Now()
 	var barrier sync.WaitGroup
 	barrier.Add(1)
@@ -256,7 +256,7 @@ func (i *Inspeqtor) scan() {
 	util.Debug("Collection complete in " + time.Now().Sub(start).String())
 }
 
-func (i *Inspeqtor) verify() {
+func (i *Redacted) verify() {
 	if i.silenced() {
 		// We are silenced until some point in the future.
 		// We don't want to check rules (as a deploy might use
@@ -278,7 +278,7 @@ func (i *Inspeqtor) verify() {
 	}
 }
 
-func (i *Inspeqtor) TestAlertRoutes() int {
+func (i *Redacted) TestAlertRoutes() int {
 	bad := 0
 	util.Info("Testing alert routes")
 	for _, route := range i.GlobalConfig.AlertRoutes {

@@ -2,7 +2,7 @@ package daemon
 
 import (
 	"errors"
-	"github.com/mperham/inspeqtor/util"
+	"github.com/mperham/redacted/util"
 	"strconv"
 	"strings"
 )

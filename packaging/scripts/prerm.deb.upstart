@@ -1,5 +1,5 @@
 #!/bin/sh
 set -e
 
-echo Stopping Inspeqtor
-initctl stop inspeqtor || :
+echo Stopping Redacted
+initctl stop redacted || :

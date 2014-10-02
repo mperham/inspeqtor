@@ -1,7 +1,7 @@
 package ast
 
 import (
-	"github.com/mperham/inspeqtor/conf/global/token"
+	"github.com/mperham/redacted/conf/global/token"
 	"strconv"
 )
 

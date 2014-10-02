@@ -5,8 +5,8 @@ import(
 	"bytes"
 	"fmt"
 	"errors"
-	parseError "github.com/mperham/inspeqtor/conf/inq/errors"
-	"github.com/mperham/inspeqtor/conf/inq/token"
+	parseError "github.com/mperham/redacted/conf/inq/errors"
+	"github.com/mperham/redacted/conf/inq/token"
 )
 
 const (
