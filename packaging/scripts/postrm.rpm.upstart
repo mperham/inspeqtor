@@ -6,8 +6,8 @@ set -e
 
 if [ "$1" -ge 1 ]; then
   # Package upgrade, not uninstall
-  echo Restarting inspeqtor
-  initctl restart inspeqtor || :
+  echo Restarting redacted
+  initctl restart redacted || :
 else
-  rm -f /etc/init/inspeqtor.conf
+  rm -f /etc/init/redacted.conf
 fi

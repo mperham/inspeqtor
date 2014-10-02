@@ -1,4 +1,4 @@
-package inspeqtor
+package redacted
 
 import (
 	"fmt"

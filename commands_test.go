@@ -1,11 +1,11 @@
-package inspeqtor
+package redacted
 
 import (
 	"bytes"
 	"fmt"
-	"github.com/mperham/inspeqtor/metrics"
-	"github.com/mperham/inspeqtor/services"
-	"github.com/mperham/inspeqtor/util"
+	"github.com/mperham/redacted/metrics"
+	"github.com/mperham/redacted/services"
+	"github.com/mperham/redacted/util"
 	"github.com/stretchr/testify/assert"
 	"io"
 	"net"
@@ -124,7 +124,7 @@ func TestStatus(t *testing.T) {
 	line, err := resp.ReadString('\n')
 	assert.Nil(t, err)
 
-	idxs := regexp.MustCompile(fmt.Sprintf("\\AInspeqtor %s, uptime: ", VERSION)).FindStringIndex(line)
+	idxs := regexp.MustCompile(fmt.Sprintf("\\ARedacted %s, uptime: ", VERSION)).FindStringIndex(line)
 	assert.NotNil(t, idxs)
 	assert.Equal(t, 0, idxs[0])
 }

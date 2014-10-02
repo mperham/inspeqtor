@@ -2,39 +2,39 @@
 
 set -e
 
-if [ ! -d /etc/inspeqtor ]; then
-  mkdir /etc/inspeqtor
+if [ ! -d /etc/redacted ]; then
+  mkdir /etc/redacted
 fi
 
-if [ ! -d /etc/inspeqtor/conf.d ]; then
-  cp -r /usr/share/inspeqtor/conf.d /etc/inspeqtor/conf.d
+if [ ! -d /etc/redacted/conf.d ]; then
+  cp -r /usr/share/redacted/conf.d /etc/redacted/conf.d
 
   # on Ubuntu, allow any adms to edit inqs
-  if ! chown -R root:adm /etc/inspeqtor/conf.d ; then
+  if ! chown -R root:adm /etc/redacted/conf.d ; then
     true # ignore if adm doesn't exist
   fi
 fi
 
-if [ ! -f /etc/inspeqtor/inspeqtor.conf ]; then
-  cp /usr/share/inspeqtor/inspeqtor.conf /etc/inspeqtor
+if [ ! -f /etc/redacted/redacted.conf ]; then
+  cp /usr/share/redacted/redacted.conf /etc/redacted
   # passwords in here, root readable only.
-  chmod 600 /etc/inspeqtor/inspeqtor.conf
+  chmod 600 /etc/redacted/redacted.conf
 fi
 
 if which systemctl > /dev/null; then
-  echo "Using systemd to control Inspeqtor"
-  cp /usr/share/inspeqtor/systemd/inspeqtor.service /lib/systemd/system/inspeqtor.service
+  echo "Using systemd to control Redacted"
+  cp /usr/share/redacted/systemd/redacted.service /lib/systemd/system/redacted.service
 
   systemctl daemon-reload || :
   if [ "$1" = 1 ] ; then
     # first time install
-    systemctl enable inspeqtor || :
-    systemctl start inspeqtor || :
+    systemctl enable redacted || :
+    systemctl start redacted || :
   else
-    echo "Upgrading inspeqtor"
+    echo "Upgrading redacted"
   fi
 else
-  echo "Couldn't find systemd to control Inspeqtor, cannot proceed."
+  echo "Couldn't find systemd to control Redacted, cannot proceed."
   echo "Open an issue and tell us about your system."
   exit 1
 fi
@@ -48,9 +48,9 @@ cat <<"TXT"
             |_|            |_|
 
 
-Thank you for installing Inspeqtor!
+Thank you for installing Redacted!
 
 TXT
 
-echo Please configure your alert settings in /etc/inspeqtor/inspeqtor.conf and then restart Inspeqtor with \"sudo systemctl restart inspeqtor\".
+echo Please configure your alert settings in /etc/redacted/redacted.conf and then restart Redacted with \"sudo systemctl restart redacted\".
 exit 0

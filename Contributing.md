@@ -1,8 +1,8 @@
-# Contributing to Inspeqtor
+# Contributing to Redacted
 
 ## Open an issue
 
-Tell us about bugs so we can fix them, please!  Include your inspeqtor
+Tell us about bugs so we can fix them, please!  Include your redacted
 version, OS version you are running and any relevant configuration or
 log output.
 

@@ -1,10 +1,10 @@
-package inspeqtor
+package redacted
 
 import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/mperham/inspeqtor/util"
+	"github.com/mperham/redacted/util"
 	"net/smtp"
 	"strings"
 	"text/template"
@@ -170,7 +170,7 @@ func (e *EmailNotifier) setup(hash map[string]string) error {
 	}
 	from, ok := hash["from_email"]
 	if !ok {
-		from = "inspeqtor@example.com"
+		from = "redacted@example.com"
 	} else {
 		from = from
 	}

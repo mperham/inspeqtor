@@ -4,9 +4,9 @@ set -e
 
 # https://www.debian.org/doc/debian-policy/ch-maintainerscripts.html
 
-rm -f /etc/init/inspeqtor.conf
+rm -f /etc/init/redacted.conf
 
 if [ "$1" = "purge" ] ; then
-  echo "Purging inspeqtor configuration"
-  rm -rf /etc/inspeqtor
+  echo "Purging redacted configuration"
+  rm -rf /etc/redacted
 fi

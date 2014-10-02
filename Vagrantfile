@@ -12,7 +12,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # Every Vagrant virtual environment requires a box to build off of.
   config.vm.box = "chef/centos-6.5"
 
-  config.vm.synced_folder ".", "/home/vagrant/src/github.com/mperham/inspeqtor"
+  config.vm.synced_folder ".", "/home/vagrant/src/github.com/mperham/redacted"
 
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs

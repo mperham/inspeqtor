@@ -1,11 +1,11 @@
-package inspeqtor
+package redacted
 
 import (
 	"bufio"
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/mperham/inspeqtor/util"
+	"github.com/mperham/redacted/util"
 	"io"
 	"math"
 	"net"
@@ -15,11 +15,11 @@ import (
 )
 
 /*
- * Commands are ways for the external world to communicate with Inspeqtor
+ * Commands are ways for the external world to communicate with Redacted
  * via its command socket.
  */
 
-type commandFunc func(*Inspeqtor, []string, io.Writer)
+type commandFunc func(*Redacted, []string, io.Writer)
 
 var (
 	CommandHandlers = map[string]commandFunc{
@@ -31,7 +31,7 @@ var (
 	}
 )
 
-func (i *Inspeqtor) openSocket(path string) error {
+func (i *Redacted) openSocket(path string) error {
 	if i.Socket != nil {
 		return errors.New("Socket is already open!")
 	}
@@ -44,7 +44,7 @@ func (i *Inspeqtor) openSocket(path string) error {
 	return nil
 }
 
-func (i *Inspeqtor) acceptCommand() {
+func (i *Redacted) acceptCommand() {
 	c, err := i.Socket.Accept()
 	if err != nil {
 		if i.Valid {
@@ -72,7 +72,7 @@ func (i *Inspeqtor) acceptCommand() {
 	funk(i, fields[1:], c)
 }
 
-func startDeploy(i *Inspeqtor, args []string, resp io.Writer) {
+func startDeploy(i *Redacted, args []string, resp io.Writer) {
 	length := time.Duration(i.GlobalConfig.Top.DeployLength) * time.Second
 	i.SilenceUntil = time.Now().Add(length)
 
@@ -80,13 +80,13 @@ func startDeploy(i *Inspeqtor, args []string, resp io.Writer) {
 	io.WriteString(resp, "Starting deploy, now silenced\n")
 }
 
-func finishDeploy(i *Inspeqtor, args []string, resp io.Writer) {
+func finishDeploy(i *Redacted, args []string, resp io.Writer) {
 	i.SilenceUntil = time.Now()
 	util.Info("Finished deploy")
 	io.WriteString(resp, "Finished deploy, volume turned to 11\n")
 }
 
-func currentStatus(i *Inspeqtor, args []string, resp io.Writer) {
+func currentStatus(i *Redacted, args []string, resp io.Writer) {
 	io.WriteString(resp, fmt.Sprintf(
 		"%s %s, uptime: %s, pid: %d\n", Name, VERSION, time.Now().Sub(i.StartedAt).String(), os.Getpid()))
 	io.WriteString(resp, "\n")
@@ -140,7 +140,7 @@ func currentStatus(i *Inspeqtor, args []string, resp io.Writer) {
 	}
 }
 
-func heart(i *Inspeqtor, args []string, resp io.Writer) {
+func heart(i *Redacted, args []string, resp io.Writer) {
 	io.WriteString(resp, "Awwww, I love you too.\n")
 }
 
@@ -153,7 +153,7 @@ type displayable interface {
 	Size() int
 }
 
-func sparkline(i *Inspeqtor, args []string, resp io.Writer) {
+func sparkline(i *Redacted, args []string, resp io.Writer) {
 	if len(args) < 2 {
 		io.WriteString(resp, "show [target] [metric]\n")
 		return
@@ -198,7 +198,7 @@ func buildSparkline(target Checkable, metric string, buf func(string, string) di
 		v := buff.At(i)
 		if v == nil {
 			util.Warn("BUG: Nil data in ring buffer: %d %d", sz, i)
-			return "Inspeqtor bug, error building graph\n"
+			return "Redacted bug, error building graph\n"
 		}
 		values[-i] = *v
 	}

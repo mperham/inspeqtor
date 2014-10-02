@@ -2,7 +2,7 @@
 # systemd unit file for CentOS 7, Ubuntu bleeding edge
 #
 [Unit]
-Description=Inspeqtor
+Description=Redacted
 # start us only once the network and logging subsystems are available
 After=syslog.target network.target
 
@@ -11,11 +11,11 @@ After=syslog.target network.target
 # http://0pointer.de/public/systemd-man/systemd.exec.html
 [Service]
 Type=simple
-ExecStart=/usr/bin/inspeqtor -c /etc/inspeqtor -s /var/run/inspeqtor.sock
-# allow `systemctl reload inspeqtor`
+ExecStart=/usr/bin/redacted -c /etc/redacted -s /var/run/redacted.sock
+# allow `systemctl reload redacted`
 ExecReload=/bin/kill -HUP $MAINPID
 # ensure our socket is cleaned up, even if we crashed
-ExecStartPre=/bin/rm -f /var/run/inspeqtor.sock
+ExecStartPre=/bin/rm -f /var/run/redacted.sock
 
 # if we crash, restart
 RestartSec=1
@@ -24,7 +24,7 @@ Restart=on-failure
 # use syslog for logging
 StandardOutput=syslog
 StandardError=syslog
-SyslogIdentifier=inspeqtor
+SyslogIdentifier=redacted
 
 [Install]
 WantedBy=multi-user.target

@@ -2,6 +2,6 @@
 set -e
 
 if [ "$1" = 0 ] ; then
-  echo Stopping inspeqtor
-  initctl stop inspeqtor || :
+  echo Stopping redacted
+  initctl stop redacted || :
 fi

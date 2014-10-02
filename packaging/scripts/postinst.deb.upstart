@@ -2,31 +2,31 @@
 
 set -e
 
-if [ ! -d /etc/inspeqtor ]; then
-  mkdir /etc/inspeqtor
+if [ ! -d /etc/redacted ]; then
+  mkdir /etc/redacted
 fi
 
-if [ ! -d /etc/inspeqtor/conf.d ]; then
-  cp -r /usr/share/inspeqtor/conf.d /etc/inspeqtor/conf.d
+if [ ! -d /etc/redacted/conf.d ]; then
+  cp -r /usr/share/redacted/conf.d /etc/redacted/conf.d
 
   # on Ubuntu, allow any adms to edit inqs
-  if ! chown -R root:adm /etc/inspeqtor/conf.d ; then
+  if ! chown -R root:adm /etc/redacted/conf.d ; then
     true # ignore if adm doesn't exist
   fi
 fi
 
-if [ ! -f /etc/inspeqtor/inspeqtor.conf ]; then
-  cp /usr/share/inspeqtor/inspeqtor.conf /etc/inspeqtor
+if [ ! -f /etc/redacted/redacted.conf ]; then
+  cp /usr/share/redacted/redacted.conf /etc/redacted
   # passwords in here, root readable only.
-  chmod 600 /etc/inspeqtor/inspeqtor.conf
+  chmod 600 /etc/redacted/redacted.conf
 fi
 
 if [ -d /etc/init ]; then
-  echo "Using upstart to control Inspeqtor"
-  cp -r /usr/share/inspeqtor/init/inspeqtor.conf /etc/init/inspeqtor.conf
-  initctl start inspeqtor || :
+  echo "Using upstart to control Redacted"
+  cp -r /usr/share/redacted/init/redacted.conf /etc/init/redacted.conf
+  initctl start redacted || :
 else
-  echo "Couldn't find upstart to control Inspeqtor, cannot proceed."
+  echo "Couldn't find upstart to control Redacted, cannot proceed."
   echo "Open an issue and tell us about your system."
   exit 1
 fi
@@ -40,9 +40,9 @@ cat <<"TXT"
             |_|            |_|
 
 
-Thank you for installing Inspeqtor!
+Thank you for installing Redacted!
 
 TXT
 
-echo Please configure your alert settings in /etc/inspeqtor/inspeqtor.conf and then restart Inspeqtor with \"sudo initctl restart inspeqtor\".
+echo Please configure your alert settings in /etc/redacted/redacted.conf and then restart Redacted with \"sudo initctl restart redacted\".
 exit 0

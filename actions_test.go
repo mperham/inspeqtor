@@ -1,9 +1,9 @@
-package inspeqtor
+package redacted
 
 import (
 	"bytes"
-	"github.com/mperham/inspeqtor/metrics"
-	"github.com/mperham/inspeqtor/services"
+	"github.com/mperham/redacted/metrics"
+	"github.com/mperham/redacted/services"
 	"github.com/stretchr/testify/assert"
 	"strings"
 	"testing"

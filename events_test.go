@@ -2,11 +2,11 @@
  * Integration tests which verify various events fire under various conditions
  */
 
-package inspeqtor
+package redacted
 
 import (
-	"github.com/mperham/inspeqtor/metrics"
-	"github.com/mperham/inspeqtor/services"
+	"github.com/mperham/redacted/metrics"
+	"github.com/mperham/redacted/services"
 	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"

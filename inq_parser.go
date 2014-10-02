@@ -1,20 +1,20 @@
-package inspeqtor
+package redacted
 
 import (
 	"errors"
-	"github.com/mperham/inspeqtor/conf/inq/ast"
-	"github.com/mperham/inspeqtor/conf/inq/lexer"
-	"github.com/mperham/inspeqtor/conf/inq/parser"
-	"github.com/mperham/inspeqtor/metrics"
-	"github.com/mperham/inspeqtor/services"
-	"github.com/mperham/inspeqtor/util"
+	"github.com/mperham/redacted/conf/inq/ast"
+	"github.com/mperham/redacted/conf/inq/lexer"
+	"github.com/mperham/redacted/conf/inq/parser"
+	"github.com/mperham/redacted/metrics"
+	"github.com/mperham/redacted/services"
+	"github.com/mperham/redacted/util"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 )
 
 /*
-Parses the host- and service-specific rules in /etc/inspeqtor/conf.d/*.inq
+Parses the host- and service-specific rules in /etc/redacted/conf.d/*.inq
 */
 func ParseInq(global *ConfigFile, confDir string) (*Host, []Checkable, error) {
 	util.Debug("Parsing config in " + confDir)

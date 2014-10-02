@@ -1,15 +1,15 @@
-package inspeqtor
+package redacted
 
 import (
 	"errors"
 	"fmt"
-	"github.com/mperham/inspeqtor/metrics"
-	"github.com/mperham/inspeqtor/services"
-	"github.com/mperham/inspeqtor/util"
+	"github.com/mperham/redacted/metrics"
+	"github.com/mperham/redacted/services"
+	"github.com/mperham/redacted/util"
 	"syscall"
 )
 
-// A named thing which can checked by Inspeqtor
+// A named thing which can checked by Redacted
 type Entity struct {
 	name       string
 	rules      []*Rule

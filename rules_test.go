@@ -1,7 +1,7 @@
-package inspeqtor
+package redacted
 
 import (
-	"github.com/mperham/inspeqtor/metrics"
+	"github.com/mperham/redacted/metrics"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )

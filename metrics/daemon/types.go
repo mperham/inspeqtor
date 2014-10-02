@@ -1,14 +1,14 @@
 package daemon
 
 import (
-	"github.com/mperham/inspeqtor/metrics"
-	"github.com/mperham/inspeqtor/util"
+	"github.com/mperham/redacted/metrics"
+	"github.com/mperham/redacted/util"
 	"io/ioutil"
 	"os/exec"
 )
 
 /*
- Daemon-specific metrics are process-specific metrics which can be pushed into Inspeqtor
+ Daemon-specific metrics are process-specific metrics which can be pushed into Redacted
  and used as rule checks.
 
  check service redis with hostname [localhost], port [6379], socket [nil], password [nil]

@@ -1,7 +1,7 @@
 package services
 
 import (
-	"github.com/mperham/inspeqtor/util"
+	"github.com/mperham/redacted/util"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )

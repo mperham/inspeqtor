@@ -3,7 +3,7 @@ package daemon
 import (
 	"errors"
 	"fmt"
-	"github.com/mperham/inspeqtor/util"
+	"github.com/mperham/redacted/util"
 	"io/ioutil"
 	"net/http"
 	"regexp"

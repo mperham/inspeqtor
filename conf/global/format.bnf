@@ -1,7 +1,7 @@
 // https://github.com/awalterschulze/katydid/blob/master/asm/asm.bnf
 
 /*
-Global parser for /etc/inspeqtor/inspeqtor.conf
+Global parser for /etc/redacted/redacted.conf
 */
 
 _lineComment : '#' {.} '\n' ;
@@ -18,7 +18,7 @@ _quotedpair : '\\' . ;
 _quotedstring : '"' (_quotedpair | .) {_quotedpair | .} '"' ;
 value : (_atom | _quotedstring) ;
 
-<< import "github.com/mperham/inspeqtor/conf/global/ast" >>
+<< import "github.com/mperham/redacted/conf/global/ast" >>
 
 Config
   : SetStatement                  << ast.NewConfig($0.(map[string]string), nil) >>

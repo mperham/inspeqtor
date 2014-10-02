@@ -8,4 +8,4 @@ Current:   {{.Rule.FetchDisplayCurrentValue}}
 Threshold: {{.Rule.DisplayThreshold}}
 
 Your Pal,
-Inspeqtor
+Redacted

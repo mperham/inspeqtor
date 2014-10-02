@@ -2,8 +2,8 @@ package cli
 
 import (
 	"flag"
-	"github.com/mperham/inspeqtor"
-	"github.com/mperham/inspeqtor/util"
+	"github.com/mperham/redacted"
+	"github.com/mperham/redacted/util"
 	"log"
 	"os"
 )
@@ -18,10 +18,10 @@ type CmdOptions struct {
 
 var (
 	StartupInfo = func() {
-		log.Println(inspeqtor.Licensing)
+		log.Println(redacted.Licensing)
 		log.Println("")
-		log.Println("Want more? Upgrade to Inspeqtor Pro for more features and support.")
-		log.Println("See http://contribsys.com/inspeqtor for details.")
+		log.Println("Want more? Upgrade to Redacted Pro for more features and support.")
+		log.Println("See http://contribsys.com/redacted for details.")
 		log.Println("")
 	}
 )
@@ -36,9 +36,9 @@ func SetupLogging() {
 }
 
 func ParseArguments() CmdOptions {
-	defaults := CmdOptions{false, false, "/etc/inspeqtor", "info", "/var/run/inspeqtor.sock"}
+	defaults := CmdOptions{false, false, "/etc/redacted", "info", "/var/run/redacted.sock"}
 
-	log.Println(inspeqtor.Name, inspeqtor.VERSION)
+	log.Println(redacted.Name, redacted.VERSION)
 	log.Println("Copyright © 2014 Contributed Systems LLC")
 
 	if StartupInfo != nil {
@@ -52,8 +52,8 @@ func ParseArguments() CmdOptions {
 
 	// undocumented on purpose, for testing only, we don't want people changing these
 	// if possible
-	flag.StringVar(&defaults.SocketPath, "s", "/var/run/inspeqtor.sock", "")
-	flag.StringVar(&defaults.ConfigDirectory, "c", "/etc/inspeqtor", "")
+	flag.StringVar(&defaults.SocketPath, "s", "/var/run/redacted.sock", "")
+	flag.StringVar(&defaults.ConfigDirectory, "c", "/etc/redacted", "")
 	helpPtr := flag.Bool("help", false, "You're looking at it")
 	help2Ptr := flag.Bool("h", false, "You're looking at it")
 	versionPtr := flag.Bool("v", false, "Show version")

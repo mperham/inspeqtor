@@ -1,9 +1,9 @@
 package global
 
 import (
-	"github.com/mperham/inspeqtor/conf/global/ast"
-	"github.com/mperham/inspeqtor/conf/global/lexer"
-	"github.com/mperham/inspeqtor/conf/global/parser"
+	"github.com/mperham/redacted/conf/global/ast"
+	"github.com/mperham/redacted/conf/global/lexer"
+	"github.com/mperham/redacted/conf/global/parser"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"log"
@@ -11,7 +11,7 @@ import (
 )
 
 func TestBasicParsing(t *testing.T) {
-	data, err := ioutil.ReadFile("fixtures/inspeqtor.conf")
+	data, err := ioutil.ReadFile("fixtures/redacted.conf")
 	assert.Nil(t, err)
 
 	s := lexer.NewLexer([]byte(data))

@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/mperham/inspeqtor"
-	"github.com/mperham/inspeqtor/cli"
-	"github.com/mperham/inspeqtor/util"
+	"github.com/mperham/redacted"
+	"github.com/mperham/redacted/cli"
+	"github.com/mperham/redacted/util"
 	"log"
 	"os"
 )
@@ -12,7 +12,7 @@ func main() {
 	cli.SetupLogging()
 	options := cli.ParseArguments()
 
-	ins, err := inspeqtor.New(options.ConfigDirectory, options.SocketPath)
+	ins, err := redacted.New(options.ConfigDirectory, options.SocketPath)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -27,11 +27,11 @@ func main() {
 	} else if options.TestAlertRoutes {
 		ins.TestAlertRoutes()
 	} else {
-		// Fire up the Inspeqtor singleton
+		// Fire up the Redacted singleton
 		ins.Start()
 
 		// Install the global signal handlers
 		// This method never returns.
-		inspeqtor.HandleSignals()
+		redacted.HandleSignals()
 	}
 }

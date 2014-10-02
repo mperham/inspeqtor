@@ -4,7 +4,7 @@ package errors
 import(
 	"bytes"
 	"fmt"
-	"github.com/mperham/inspeqtor/conf/global/token"
+	"github.com/mperham/redacted/conf/global/token"
 )
 
 type ErrorSymbol interface {

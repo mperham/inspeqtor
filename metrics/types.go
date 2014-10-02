@@ -2,7 +2,7 @@ package metrics
 
 import (
 	"errors"
-	"github.com/mperham/inspeqtor/util"
+	"github.com/mperham/redacted/util"
 	"regexp"
 	"sort"
 	"strconv"
@@ -112,8 +112,8 @@ func (store *storage) MetricNames(family string) []string {
 func (store *storage) Get(family string, name string) float64 {
 	metric, _ := store.find(family, name)
 	if metric == nil {
-		// This can happen when using an Inspeqtor Pro .inq file
-		// with Inspeqtor, since metrics like mysql(Queries) won't exist.
+		// This can happen when using an Redacted Pro .inq file
+		// with Redacted, since metrics like mysql(Queries) won't exist.
 		util.Warn("BUG: Metric %s(%s) does not exist", family, name)
 		return 0
 	}
