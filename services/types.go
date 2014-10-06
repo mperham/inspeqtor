@@ -73,6 +73,9 @@ var (
 		func() (InitSystem, error) {
 			return detectSystemd("/etc/systemd")
 		},
+		func() (InitSystem, error) {
+			return detectInitd("/")
+		},
 	}
 )
 
