@@ -52,7 +52,8 @@ in-depth documentation around each Pro feature.
 
 ## License
 
-Licensed under GPLv3.
+Inspeqtor is licensed under GPLv3.  Inspeqtor Pro is licensed under the
+custom commercial license in COMM-LICENSE.
 
 
 # Author
