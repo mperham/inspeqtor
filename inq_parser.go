@@ -121,7 +121,7 @@ func convertRule(global *ConfigFile, check Checkable, inqrule ast.Rule) (*Rule, 
 		op, inqrule.Threshold.Raw, float64(inqrule.Threshold.Parsed), 0, inqrule.CycleCount, 0, Ok, actions}, nil
 }
 
-func convertAction(global *ConfigFile, check Checkable, action ast.Action) (Action, error) {
+func convertAction(global *ConfigFile, check Eventable, action ast.Action) (Action, error) {
 	switch action.Name() {
 	case "alert":
 		route := global.AlertRoutes[""]

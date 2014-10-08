@@ -38,13 +38,13 @@ func init() {
  An Action is something which is triggered when a rule is broken.  This is typically
  either a Notification or to Restart the service.
 */
-type ActionBuilder func(Checkable, *AlertRoute) (Action, error)
+type ActionBuilder func(Eventable, *AlertRoute) (Action, error)
 
 /*
  A Notifier is a route to send an alert somewhere else.  The global
  conf sets up the necessary params for the notification to work.
 */
-type NotifierBuilder func(Checkable, map[string]string) (Action, error)
+type NotifierBuilder func(Eventable, map[string]string) (Action, error)
 
 var (
 	Actions = map[string]ActionBuilder{
@@ -57,7 +57,7 @@ var (
 	}
 )
 
-func buildAlerter(check Checkable, route *AlertRoute) (Action, error) {
+func buildAlerter(check Eventable, route *AlertRoute) (Action, error) {
 	funk := Notifier[route.Channel]
 	if funk == nil {
 		// TODO Include valid channels
@@ -66,7 +66,7 @@ func buildAlerter(check Checkable, route *AlertRoute) (Action, error) {
 	return funk(check, route.Config)
 }
 
-func buildRestarter(check Checkable, _ *AlertRoute) (Action, error) {
+func buildRestarter(check Eventable, _ *AlertRoute) (Action, error) {
 	switch check.(type) {
 	case *Service:
 		return &Restarter{check.(*Service)}, nil
@@ -83,7 +83,7 @@ func (r Restarter) Trigger(event *Event) error {
 	return r.Service.Restart()
 }
 
-func buildEmailNotifier(check Checkable, config map[string]string) (Action, error) {
+func buildEmailNotifier(check Eventable, config map[string]string) (Action, error) {
 	en := &EmailNotifier{}
 	err := en.setup(config)
 	if err != nil {
@@ -92,7 +92,7 @@ func buildEmailNotifier(check Checkable, config map[string]string) (Action, erro
 	return en, nil
 }
 
-func buildGmailNotifier(check Checkable, params map[string]string) (Action, error) {
+func buildGmailNotifier(check Eventable, params map[string]string) (Action, error) {
 	params["smtp_server"] = "smtp.gmail.com"
 	return buildEmailNotifier(check, params)
 }

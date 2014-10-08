@@ -80,6 +80,11 @@ func (h *Host) Collect(silenced bool, completeCallback func(Checkable)) {
 	}
 }
 
+type Eventable interface {
+	Name() string
+	Parameter(string) string
+}
+
 type Checkable interface {
 	Name() string
 	Parameter(string) string
