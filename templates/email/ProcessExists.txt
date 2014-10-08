@@ -2,7 +2,7 @@ To: {{.Config.To}} <{{.Config.To}}>
 From: {{.Config.From}} <{{.Config.From}}>
 Subject: {{.Target}} is now running.
 
-The {{.Checkable.Name}} service is now running with PID {{.Service.Process.Pid}}
+The {{.Thing.Name}} service is now running with PID {{.Service.Process.Pid}}
 
 Your Pal,
 Inspeqtor

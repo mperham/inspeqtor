@@ -32,12 +32,16 @@ func (s EventType) String() string {
 
 type Event struct {
 	Type EventType
-	Checkable
+	Eventable
 	*Rule
 }
 
+func (e *Event) Thing() Eventable {
+	return e.Eventable
+}
+
 func (e *Event) Service() *Service {
-	return e.Checkable.(*Service)
+	return e.Eventable.(*Service)
 }
 
 func (e *Event) Hostname() string {
@@ -49,12 +53,12 @@ func (e *Event) Hostname() string {
 }
 
 func (e *Event) Target() string {
-	switch x := e.Checkable.(type) {
+	switch x := e.Eventable.(type) {
 	case *Service:
 		return fmt.Sprintf("%s[%s]", e.Hostname(), x.Name())
 	case *Host:
 		return fmt.Sprintf("%s", x.Name())
 	default:
-		return fmt.Sprintf("Unknown: %s", e.Checkable)
+		return fmt.Sprintf("Unknown: %s", e.Eventable)
 	}
 }
