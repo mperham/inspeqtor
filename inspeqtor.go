@@ -28,7 +28,7 @@ type Inspeqtor struct {
 	GlobalConfig    *ConfigFile
 	Socket          net.Listener
 	SilenceUntil    time.Time
-	Valid           bool
+	Stopping        bool
 }
 
 func New(dir string, socketpath string) (*Inspeqtor, error) {
@@ -38,7 +38,7 @@ func New(dir string, socketpath string) (*Inspeqtor, error) {
 		SilenceUntil: time.Now(),
 		Host:         &Host{&Entity{name: "localhost", metrics: metrics.NewMockStore()}},
 		GlobalConfig: &ConfigFile{Defaults, map[string]*AlertRoute{}},
-		Valid:        true}
+		Stopping:     false}
 	return i, nil
 }
 
@@ -195,7 +195,7 @@ func exit(i *Inspeqtor) {
 }
 
 func (i *Inspeqtor) Shutdown() {
-	i.Valid = false
+	i.Stopping = true
 	if i.Socket != nil {
 		err := i.Socket.Close()
 		if err != nil {
@@ -219,7 +219,7 @@ func (i *Inspeqtor) runLoop() {
 	for {
 		select {
 		case <-time.After(time.Duration(i.GlobalConfig.Top.CycleTime) * time.Second):
-			if !i.Valid {
+			if i.Stopping {
 				return
 			}
 			i.scanSystem()
