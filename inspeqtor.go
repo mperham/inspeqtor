@@ -28,7 +28,7 @@ type Inspeqtor struct {
 	GlobalConfig    *ConfigFile
 	Socket          net.Listener
 	SilenceUntil    time.Time
-	Stopping        bool
+	Stopping        chan struct{}
 }
 
 func New(dir string, socketpath string) (*Inspeqtor, error) {
@@ -38,7 +38,7 @@ func New(dir string, socketpath string) (*Inspeqtor, error) {
 		SilenceUntil: time.Now(),
 		Host:         &Host{&Entity{name: "localhost", metrics: metrics.NewMockStore()}},
 		GlobalConfig: &ConfigFile{Defaults, map[string]*AlertRoute{}},
-		Stopping:     false}
+		Stopping:     make(chan struct{})}
 	return i, nil
 }
 
@@ -65,7 +65,10 @@ func (i *Inspeqtor) Start() {
 
 	go func() {
 		for {
-			i.safelyAccept()
+			if !i.safelyAccept() {
+				util.Debug("Shutting down command socket")
+				return
+			}
 		}
 	}()
 
@@ -74,7 +77,7 @@ func (i *Inspeqtor) Start() {
 	singleton = i
 }
 
-func (i *Inspeqtor) safelyAccept() {
+func (i *Inspeqtor) safelyAccept() bool {
 	defer func() {
 		if err := recover(); err != nil {
 			// TODO Is there a way to print out the backtrace of the goroutine where it crashed?
@@ -82,7 +85,7 @@ func (i *Inspeqtor) safelyAccept() {
 		}
 	}()
 
-	i.acceptCommand()
+	return i.acceptCommand()
 }
 
 func (i *Inspeqtor) Parse() error {
@@ -195,13 +198,14 @@ func exit(i *Inspeqtor) {
 }
 
 func (i *Inspeqtor) Shutdown() {
-	i.Stopping = true
+	close(i.Stopping)
 	if i.Socket != nil {
 		err := i.Socket.Close()
 		if err != nil {
 			util.Warn(err.Error())
 		}
 	}
+	time.Sleep(time.Millisecond)
 }
 
 // this method never returns.
@@ -219,10 +223,10 @@ func (i *Inspeqtor) runLoop() {
 	for {
 		select {
 		case <-time.After(time.Duration(i.GlobalConfig.Top.CycleTime) * time.Second):
-			if i.Stopping {
-				return
-			}
 			i.scanSystem()
+		case <-i.Stopping:
+			util.Debug("Shutting down main run loop")
+			return
 		}
 	}
 }

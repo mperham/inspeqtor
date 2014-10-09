@@ -44,13 +44,16 @@ func (i *Inspeqtor) openSocket(path string) error {
 	return nil
 }
 
-func (i *Inspeqtor) acceptCommand() {
+func (i *Inspeqtor) acceptCommand() bool {
 	c, err := i.Socket.Accept()
 	if err != nil {
-		if i.Stopping {
-			util.Warn("Unix socket shutdown: %s", err.Error())
+		select {
+		case <-i.Stopping:
+			// we're stopping or reloading, no big deal...
+		default:
+			util.Warn("%v", err)
 		}
-		return
+		return false
 	}
 	defer c.Close()
 	c.SetDeadline(time.Now().Add(2 * time.Second))
@@ -59,7 +62,7 @@ func (i *Inspeqtor) acceptCommand() {
 	line, err := reader.ReadString('\n')
 	if err != nil {
 		util.Info("Did not receive command line in time: %s", err.Error())
-		return
+		return true
 	}
 
 	fields := strings.Fields(line)
@@ -67,10 +70,11 @@ func (i *Inspeqtor) acceptCommand() {
 	if funk == nil {
 		util.Warn("Unknown command: %s", strings.TrimSpace(line))
 		io.WriteString(c, "Unknown command: "+line)
-		return
+		return true
 	}
 
 	funk(i, fields[1:], c)
+	return true
 }
 
 func startDeploy(i *Inspeqtor, args []string, resp io.Writer) {
