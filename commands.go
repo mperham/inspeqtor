@@ -58,7 +58,8 @@ func (i *Inspeqtor) acceptCommand() {
 	reader := bufio.NewReader(c)
 	line, err := reader.ReadString('\n')
 	if err != nil {
-		util.Info("Did not receive a command line in time: %s", err.Error())
+		util.Info("Did not receive command line in time: %s", err.Error())
+		return
 	}
 
 	fields := strings.Fields(line)
