@@ -47,7 +47,7 @@ func (i *Inspeqtor) openSocket(path string) error {
 func (i *Inspeqtor) acceptCommand() {
 	c, err := i.Socket.Accept()
 	if err != nil {
-		if i.Valid {
+		if i.Stopping {
 			util.Warn("Unix socket shutdown: %s", err.Error())
 		}
 		return
