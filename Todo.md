@@ -1,4 +1,0 @@
-- The packaging pre/post scripts are brittle and hard to test.
-- Better config parser error handling?
-- More integration tests
-- Add proper file-based targets for Makefile
