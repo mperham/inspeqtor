@@ -54,6 +54,7 @@ var (
 	Notifier = map[string]NotifierBuilder{
 		"email": buildEmailNotifier,
 		"gmail": buildGmailNotifier,
+		"null":  buildNullNotifier,
 	}
 )
 
@@ -81,6 +82,20 @@ type Restarter struct {
 
 func (r Restarter) Trigger(event *Event) error {
 	return r.Service.Restart()
+}
+
+// Useful for testing
+type NullNotifier struct {
+	LastEvent *Event
+}
+
+func (e *NullNotifier) Trigger(event *Event) error {
+	e.LastEvent = event
+	return nil
+}
+
+func buildNullNotifier(check Eventable, config map[string]string) (Action, error) {
+	return &NullNotifier{}, nil
 }
 
 func buildEmailNotifier(check Eventable, config map[string]string) (Action, error) {
