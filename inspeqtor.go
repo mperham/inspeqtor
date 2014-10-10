@@ -57,6 +57,7 @@ var (
 )
 
 func (i *Inspeqtor) Start() {
+	util.Debug("Starting command socket")
 	err := i.openSocket(i.SocketPath)
 	if err != nil {
 		util.Warn("Could not create Unix socket: %s", err.Error())
@@ -72,6 +73,7 @@ func (i *Inspeqtor) Start() {
 		}
 	}()
 
+	util.Debug("Starting main run loop")
 	go i.runLoop()
 
 	singleton = i
