@@ -51,9 +51,10 @@ var (
 		os.Interrupt: exit,
 		Hup:          reload,
 	}
-	Name      string     = "Inspeqtor"
-	Licensing string     = "Licensed under the GNU Public License 3.0"
-	singleton *Inspeqtor = nil
+	Name      string                         = "Inspeqtor"
+	Licensing string                         = "Licensed under the GNU Public License 3.0"
+	Singleton *Inspeqtor                     = nil
+	Reloaders []func(*Inspeqtor, *Inspeqtor) = []func(*Inspeqtor, *Inspeqtor){basicReloader}
 )
 
 func (i *Inspeqtor) Start() {
@@ -76,7 +77,7 @@ func (i *Inspeqtor) Start() {
 	util.Debug("Starting main run loop")
 	go i.runLoop()
 
-	singleton = i
+	Singleton = i
 }
 
 func (i *Inspeqtor) safelyAccept() bool {
@@ -136,7 +137,7 @@ func HandleSignals() {
 		sig := <-signals
 		util.Debug("Received signal %d", sig)
 		funk := SignalHandlers[sig]
-		funk(singleton)
+		funk(Singleton)
 	}
 }
 
@@ -170,6 +171,10 @@ func wrapService(s *Service) error {
 	return nil
 }
 
+func basicReloader(oldcopy *Inspeqtor, newcopy *Inspeqtor) {
+	newcopy.SilenceUntil = oldcopy.SilenceUntil
+}
+
 func reload(i *Inspeqtor) {
 	util.Info(Name + " reloading")
 	newi, err := New(i.RootDir, i.SocketPath)
@@ -177,7 +182,6 @@ func reload(i *Inspeqtor) {
 		util.Warn("Unable to reload: %s", err.Error())
 		return
 	}
-	newi.SilenceUntil = i.SilenceUntil
 
 	err = newi.Parse()
 	if err != nil {
@@ -185,9 +189,15 @@ func reload(i *Inspeqtor) {
 		return
 	}
 
+	// we're reloading and newcopy will become the new
+	// singleton.  Pro hooks into this to reload its features too.
+	for _, callback := range Reloaders {
+		callback(i, newi)
+	}
+
 	// TODO proper reloading would not throw away the existing metric data
 	// in i but defining new metrics can change the storage tree.  Implement
-	// deep metric tree ring buffer sync if possible?
+	// deep metric tree ring buffer sync if possible in basicReloader?
 	i.Shutdown()
 	newi.Start()
 }
@@ -207,6 +217,7 @@ func (i *Inspeqtor) Shutdown() {
 			util.Warn(err.Error())
 		}
 	}
+	// let other goroutines log their exit
 	time.Sleep(time.Millisecond)
 }
 
