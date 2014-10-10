@@ -51,10 +51,10 @@ var (
 		os.Interrupt: exit,
 		Hup:          reload,
 	}
-	Name      string                         = "Inspeqtor"
-	Licensing string                         = "Licensed under the GNU Public License 3.0"
-	Singleton *Inspeqtor                     = nil
-	Reloaders []func(*Inspeqtor, *Inspeqtor) = []func(*Inspeqtor, *Inspeqtor){basicReloader}
+	Name      string                               = "Inspeqtor"
+	Licensing string                               = "Licensed under the GNU Public License 3.0"
+	Singleton *Inspeqtor                           = nil
+	Reloaders []func(*Inspeqtor, *Inspeqtor) error = []func(*Inspeqtor, *Inspeqtor) error{basicReloader}
 )
 
 func (i *Inspeqtor) Start() {
@@ -171,8 +171,9 @@ func wrapService(s *Service) error {
 	return nil
 }
 
-func basicReloader(oldcopy *Inspeqtor, newcopy *Inspeqtor) {
+func basicReloader(oldcopy *Inspeqtor, newcopy *Inspeqtor) error {
 	newcopy.SilenceUntil = oldcopy.SilenceUntil
+	return nil
 }
 
 func reload(i *Inspeqtor) {
@@ -192,7 +193,11 @@ func reload(i *Inspeqtor) {
 	// we're reloading and newcopy will become the new
 	// singleton.  Pro hooks into this to reload its features too.
 	for _, callback := range Reloaders {
-		callback(i, newi)
+		err := callback(i, newi)
+		if err != nil {
+			util.Warn("Unable to reload: %s", err.Error())
+			return
+		}
 	}
 
 	// TODO proper reloading would not throw away the existing metric data
