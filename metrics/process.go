@@ -1,6 +1,7 @@
 package metrics
 
 import (
+	"errors"
 	"github.com/mperham/inspeqtor/util"
 	"io/ioutil"
 	"os/exec"
@@ -77,7 +78,7 @@ func (ps *processStorage) Collect(pid int) error {
  */
 func (ps *processStorage) capturePs(pid int) error {
 	cmd := exec.Command("ps", "So", "rss,time,utime", "-p", strconv.Itoa(pid))
-	sout, err := cmd.CombinedOutput()
+	sout, err := util.SafeRun(cmd)
 	if err != nil {
 		return err
 	}
@@ -85,6 +86,10 @@ func (ps *processStorage) capturePs(pid int) error {
 	lines, err := util.ReadLines(sout)
 	if err != nil {
 		return err
+	}
+
+	if len(lines) < 2 {
+		return errors.New("Insufficient output from ps")
 	}
 
 	fields := strings.Fields(lines[1])

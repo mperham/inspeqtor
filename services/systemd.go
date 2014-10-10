@@ -49,7 +49,7 @@ func (u *Systemd) Restart(serviceName string) error {
 		//sout = []byte(u.dummyOutput)
 	} else {
 		cmd := exec.Command("systemctl", "restart", serviceName)
-		_, err := cmd.CombinedOutput()
+		_, err := util.SafeRun(cmd, util.RestartTimeout)
 		if err != nil {
 			return &ServiceError{u.Name(), serviceName, err}
 		}
@@ -66,7 +66,7 @@ func (u *Systemd) LookupService(serviceName string) (*ProcessStatus, error) {
 		sout = []byte(u.dummyOutput)
 	} else {
 		cmd := exec.Command("systemctl", "show", "-p", "MainPID", serviceName)
-		sout, err = cmd.CombinedOutput()
+		sout, err = util.SafeRun(cmd)
 	}
 
 	if err != nil {
@@ -93,7 +93,7 @@ func (u *Systemd) LookupService(serviceName string) (*ProcessStatus, error) {
 		sout = []byte(u.dummyOutput2)
 	} else {
 		cmd := exec.Command("systemctl", "is-enabled", serviceName)
-		sout, err = cmd.CombinedOutput()
+		sout, err = util.SafeRun(cmd)
 	}
 	if err != nil || string(sout) != "enabled\n" {
 		return nil, &ServiceError{u.Name(), serviceName, ErrServiceNotFound}

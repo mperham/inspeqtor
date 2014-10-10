@@ -107,7 +107,7 @@ func (hs *hostStorage) collectMemory() error {
 		}
 	} else {
 		cmd := exec.Command("sysctl", "-n", "vm.swapusage")
-		sout, err := cmd.CombinedOutput()
+		sout, err := util.SafeRun(cmd)
 		if err != nil {
 			return err
 		}
@@ -178,7 +178,7 @@ func (hs *hostStorage) collectLoadAverage() error {
 		loadavgString = string(contentBytes)
 	} else {
 		cmd := exec.Command("sysctl", "-n", "vm.loadavg")
-		sout, err := cmd.CombinedOutput()
+		sout, err := util.SafeRun(cmd)
 		if err != nil {
 			return err
 		}
@@ -253,7 +253,7 @@ func (hs *hostStorage) collectDisk(path string) error {
 
 	if path == "" {
 		cmd := exec.Command("df", "-P")
-		sout, err := cmd.CombinedOutput()
+		sout, err := util.SafeRun(cmd)
 		if err != nil {
 			return err
 		}

@@ -98,7 +98,6 @@ type Collector interface {
 }
 
 func execCmd(command string, args []string, stdin []byte) ([]byte, error) {
-	util.Debug("Executing %s %v", command, args)
 	cmd := exec.Command(command, args...)
 	if stdin != nil {
 		in, err := cmd.StdinPipe()
@@ -112,7 +111,7 @@ func execCmd(command string, args []string, stdin []byte) ([]byte, error) {
 		}
 	}
 
-	sout, err := cmd.CombinedOutput()
+	sout, err := util.SafeRun(cmd)
 	if err != nil {
 		return nil, err
 	}

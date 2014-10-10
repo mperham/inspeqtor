@@ -55,7 +55,7 @@ func (u *Upstart) Restart(serviceName string) error {
 		sout = []byte(u.dummyOutput)
 	} else {
 		cmd := exec.Command("initctl", "restart", serviceName)
-		sout, err = cmd.CombinedOutput()
+		sout, err = util.SafeRun(cmd, util.RestartTimeout)
 		if err != nil {
 			return &ServiceError{u.Name(), serviceName, err}
 		}
@@ -83,7 +83,7 @@ func (u *Upstart) LookupService(serviceName string) (*ProcessStatus, error) {
 		sout = []byte(u.dummyOutput)
 	} else {
 		cmd := exec.Command("initctl", "status", serviceName)
-		sout, err = cmd.CombinedOutput()
+		sout, err = util.SafeRun(cmd)
 		if err != nil {
 			return nil, &ServiceError{u.Name(), serviceName, err}
 		}

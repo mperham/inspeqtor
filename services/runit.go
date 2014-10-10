@@ -67,7 +67,7 @@ func (r *Runit) Restart(serviceName string) error {
 
 	if r.dummyOutput == "" {
 		cmd := exec.Command("sv", "restart", serviceName)
-		sout, err := cmd.CombinedOutput()
+		sout, err := util.SafeRun(cmd, util.RestartTimeout)
 		if err != nil {
 			return &ServiceError{r.Name(), serviceName, err}
 		}

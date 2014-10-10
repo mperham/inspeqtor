@@ -52,7 +52,7 @@ func (i *Initd) Restart(serviceName string) error {
 	path := "/etc/init.d/" + serviceName
 
 	cmd := exec.Command(path, "restart")
-	_, err := cmd.CombinedOutput()
+	_, err := util.SafeRun(cmd, util.RestartTimeout)
 	if err != nil {
 		return err
 	}

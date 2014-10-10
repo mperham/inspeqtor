@@ -62,7 +62,7 @@ func (l *Launchd) Restart(serviceName string) error {
 	}
 
 	cmd := exec.Command("launchctl", "unload", path)
-	sout, err := cmd.CombinedOutput()
+	sout, err := util.SafeRun(cmd)
 	if err != nil {
 		return &ServiceError{l.Name(), serviceName, err}
 	}
@@ -73,7 +73,7 @@ func (l *Launchd) Restart(serviceName string) error {
 	}
 
 	cmd = exec.Command("launchctl", "load", path)
-	sout, err = cmd.CombinedOutput()
+	sout, err = util.SafeRun(cmd)
 	if err != nil {
 		return &ServiceError{l.Name(), serviceName, err}
 	}
@@ -87,7 +87,7 @@ func (l *Launchd) Restart(serviceName string) error {
 
 func (l *Launchd) LookupService(serviceName string) (*ProcessStatus, error) {
 	cmd := exec.Command("launchctl", "list")
-	sout, err := cmd.CombinedOutput()
+	sout, err := util.SafeRun(cmd)
 	if err != nil {
 		return nil, &ServiceError{l.Name(), serviceName, err}
 	}
