@@ -1,6 +1,6 @@
 # Inspeqtor
 
-![GoDoc](https://godoc.org/github.com/mperham/inspeqtor?status.svg)
+[![GoDoc](https://godoc.org/github.com/mperham/inspeqtor?status.svg)](https://godoc.org/github.com/mperham/inspeqtor)
 
 **This software is still under active development and should be considered beta quality**
 
