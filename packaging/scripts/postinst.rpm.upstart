@@ -6,14 +6,23 @@ if [ ! -d /etc/inspeqtor ]; then
   mkdir /etc/inspeqtor
 fi
 
-if [ ! -d /etc/inspeqtor/conf.d ]; then
-  cp -r /usr/share/inspeqtor/conf.d /etc/inspeqtor/conf.d
-
-  # on Ubuntu, allow any adms to edit inqs
-  if ! chown -R root:adm /etc/inspeqtor/conf.d ; then
-    true # ignore if adm doesn't exist
-  fi
+if [ -f /etc/inspeqtor/conf.d/host.inq ]; then
+  mv /etc/inspeqtor/conf.d/host.inq /etc/inspeqtor/host.inq
 fi
+
+if [ -d /etc/inspeqtor/conf.d ]; then
+  mv /etc/inspeqtor/conf.d /etc/inspeqtor/services.d
+fi
+
+for i in jobs.d services.d; do
+  if [ ! -d /etc/inspeqtor/$i ]; then
+    cp -r /usr/share/inspeqtor/$i /etc/inspeqtor/$i
+
+    if ! chown -R root:adm /etc/inspeqtor/$i ; then
+      true # ignore if adm doesn't exist
+    fi
+  fi
+done
 
 if [ ! -f /etc/inspeqtor/inspeqtor.conf ]; then
   cp /usr/share/inspeqtor/inspeqtor.conf /etc/inspeqtor
