@@ -10,6 +10,7 @@ See [Current Release Status](https://github.com/mperham/inspeqtor/milestones) he
 
 ## 0.6.0
 
+- Changed the /etc/inspeqtor layout a bit [#22]
 - Add init.d support to Inspeqtor. [#14]
 - Monitor [cron job execution](https://github.com/mperham/inspeqtor/wiki/Pro-Recurring-Jobs) [#5] **Pro**
 

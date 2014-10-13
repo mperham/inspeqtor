@@ -14,23 +14,63 @@ import (
 )
 
 /*
-Parses the host- and service-specific rules in /etc/inspeqtor/conf.d/*.inq
+Parses the host-specific rules in /etc/inspeqtor/host.inq
 */
-func ParseInq(global *ConfigFile, confDir string) (*Host, []Checkable, error) {
+func ParseHost(global *ConfigFile, hostInq string) (*Host, error) {
+	var host *Host
+
+	result, err := util.FileExists(hostInq)
+	if err != nil {
+		return nil, err
+	}
+	if !result {
+		return nil, errors.New("Missing required file: " + hostInq)
+	}
+
+	util.DebugDebug("Parsing " + hostInq)
+	data, err := ioutil.ReadFile(hostInq)
+	if err != nil {
+		return nil, err
+	}
+
+	s := lexer.NewLexer([]byte(data))
+	p := parser.NewParser()
+	obj, err := p.Parse(s)
+	if err != nil {
+		return nil, err
+	}
+
+	switch x := obj.(type) {
+	case *ast.HostCheck:
+		host, err = BuildHost(global, x)
+		if err != nil {
+			return nil, err
+		}
+		util.DebugDebug("Host: %+v", *host)
+	default:
+		return nil, errors.New("Invalid host.inq configuration file")
+	}
+
+	return host, nil
+}
+
+/*
+Parses the service-specific rules in /etc/inspeqtor/services.d/*.inq
+*/
+func ParseServices(global *ConfigFile, confDir string) ([]Checkable, error) {
 	util.Debug("Parsing config in " + confDir)
 	files, err := filepath.Glob(confDir + "/*.inq")
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	var host *Host
 	var checks []Checkable
 
 	for _, filename := range files {
 		util.DebugDebug("Parsing " + filename)
 		data, err := ioutil.ReadFile(filename)
 		if err != nil {
-			return nil, nil, err
+			return nil, err
 		}
 
 		s := lexer.NewLexer([]byte(data))
@@ -41,31 +81,20 @@ func ParseInq(global *ConfigFile, confDir string) (*Host, []Checkable, error) {
 			continue
 		}
 
-		switch obj.(type) {
-		case *ast.HostCheck:
-			if host != nil {
-				panic("Found more than one \"check host\" configuration in " + confDir)
-			}
-			host, err = BuildHost(global, obj.(*ast.HostCheck))
-			if err != nil {
-				return nil, nil, err
-			}
-			util.DebugDebug("Host: %+v", *host)
+		switch x := obj.(type) {
 		case *ast.ProcessCheck:
-			svc, err := BuildService(global, obj.(*ast.ProcessCheck))
+			svc, err := BuildService(global, x)
 			if err != nil {
-				return nil, nil, err
+				return nil, err
 			}
 			util.DebugDebug("Service: %+v", *svc)
 			checks = append(checks, svc)
+		default:
+			return nil, errors.New("Invalid " + filename + " configuration file")
 		}
 	}
 
-	if host == nil {
-		return nil, nil, errors.New("No " + confDir + "/host.inq file found for host monitoring")
-	}
-
-	return host, checks, nil
+	return checks, nil
 }
 
 var (
