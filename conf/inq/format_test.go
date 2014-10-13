@@ -10,7 +10,7 @@ import (
 )
 
 func TestMysqlParsing(t *testing.T) {
-	data, err := ioutil.ReadFile("conf.d/mysql.inq")
+	data, err := ioutil.ReadFile("fixtures/mysql.inq")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -29,7 +29,7 @@ func TestMysqlParsing(t *testing.T) {
 }
 
 func TestBasicServiceParsing(t *testing.T) {
-	data, err := ioutil.ReadFile("conf.d/memcached.inq")
+	data, err := ioutil.ReadFile("fixtures/memcached.inq")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -55,7 +55,7 @@ func TestBasicServiceParsing(t *testing.T) {
 }
 
 func TestBasicHostParsing(t *testing.T) {
-	data, err := ioutil.ReadFile("conf.d/host.inq")
+	data, err := ioutil.ReadFile("fixtures/host.inq")
 	if err != nil {
 		t.Fatal(err)
 	}

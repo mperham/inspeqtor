@@ -1,0 +1,21 @@
+# Inspeqtor Pro can verify recurring job execution.
+#
+# Your job should call "inspeqtorctl job <name>" when it runs
+# successfully to confirm execution, where <name> is the name
+# of the job as noted below
+#
+
+check jobs
+  #
+  # You can give the listed jobs an owner so alerts go
+  # straight to that person/team.
+  #
+  with owner bob
+
+  some-job happens every 2 hours
+  some-other-job happens every 5 minutes
+  credit-check happens every minute
+# <name> happens every <N> [minute|minutes|hour|hours|day|days]
+
+# You can use any number of *.inq files in this directory to
+# list your jobs.

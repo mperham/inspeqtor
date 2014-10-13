@@ -2,6 +2,7 @@ package inspeqtor
 
 import (
 	"github.com/stretchr/testify/assert"
+	"strings"
 	"testing"
 )
 
@@ -12,6 +13,13 @@ func TestInspeqtorParse(t *testing.T) {
 	err = i.Parse()
 	assert.Nil(t, err)
 	assert.Equal(t, uint16(15), i.GlobalConfig.Top.CycleTime)
+
+	i, err = New("testx", "")
+	assert.NotNil(t, i)
+	assert.Nil(t, err)
+	err = i.Parse()
+	assert.NotNil(t, err)
+	assert.True(t, strings.Index(err.Error(), "Missing required file") >= 0)
 }
 
 func TestCreateSocket(t *testing.T) {
