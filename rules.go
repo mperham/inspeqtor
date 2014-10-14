@@ -43,6 +43,7 @@ type Rule struct {
 	DisplayThreshold string
 	Threshold        float64
 	CurrentValue     float64
+	PerSec           bool
 	CycleCount       int
 	TrippedCount     int
 	State            RuleState
@@ -103,19 +104,24 @@ func (r *Rule) Reset() {
  Triggered - threshold breached enough times, action should be taken
  Recovered - rule is currently Triggered but threshold was not breached this time
 */
-func (rule *Rule) Check() *Event {
+func (rule *Rule) Check(cycleTime uint) *Event {
 	rule.CurrentValue = rule.FetchLatestMetricValue()
 	if rule.CurrentValue == -1 {
 		return nil
+	}
+
+	curVal := rule.CurrentValue
+	if rule.PerSec {
+		curVal = curVal / float64(cycleTime)
 	}
 
 	tripped := false
 
 	switch rule.Op {
 	case LT:
-		tripped = rule.CurrentValue < rule.Threshold
+		tripped = curVal < rule.Threshold
 	case GT:
-		tripped = rule.CurrentValue > rule.Threshold
+		tripped = curVal > rule.Threshold
 	}
 
 	if tripped {

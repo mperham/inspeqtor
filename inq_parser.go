@@ -147,7 +147,7 @@ func convertRule(global *ConfigFile, check Checkable, inqrule ast.Rule) (*Rule, 
 	}
 
 	return &Rule{check, inqrule.Metric.Family, inqrule.Metric.Name,
-		op, inqrule.Threshold.Raw, float64(inqrule.Threshold.Parsed), 0, inqrule.CycleCount, 0, Ok, actions}, nil
+		op, inqrule.Threshold.Raw, float64(inqrule.Threshold.Parsed), 0, inqrule.Threshold.PerSec, inqrule.CycleCount, 0, Ok, actions}, nil
 }
 
 func convertAction(global *ConfigFile, check Eventable, action ast.Action) (Action, error) {

@@ -37,6 +37,14 @@ func (e *Entity) Metrics() metrics.Store {
 	return e.metrics
 }
 
+func (e *Entity) CycleTime() uint {
+	if Singleton != nil {
+		return Singleton.GlobalConfig.Top.CycleTime
+	} else {
+		return 15
+	}
+}
+
 func NewHost() *Host {
 	return &Host{&Entity{"localhost", nil, metrics.NewHostStore("/proc", 15), nil}}
 }
@@ -153,7 +161,7 @@ func (svc *Service) Collect(silenced bool, completeCallback func(Checkable)) {
 func (s *Host) Verify() []*Event {
 	events := []*Event{}
 	for _, r := range s.Rules() {
-		evt := r.Check()
+		evt := r.Check(s.CycleTime())
 		if evt != nil {
 			events = append(events, evt)
 			for _, a := range r.Actions {
@@ -174,7 +182,7 @@ func (s *Service) Verify() []*Event {
 	}
 
 	for _, r := range s.Rules() {
-		evt := r.Check()
+		evt := r.Check(s.CycleTime())
 		if evt != nil {
 			events = append(events, evt)
 			for _, a := range r.Actions {

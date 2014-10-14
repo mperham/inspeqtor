@@ -135,7 +135,7 @@ func TestEmailEventRuleRecovered(t *testing.T) {
 func validRuleEvent(etype EventType) *Event {
 	svc := &Service{&Entity{"mysql", nil, metrics.NewProcessStore("/proc", 15), nil}, nil, &services.ProcessStatus{100, services.Up}, nil}
 	return &Event{
-		etype, svc, &Rule{svc, "memory", "rss", GT, "64m", 64 * 1024 * 1024, 0, 1, 0, Ok, []Action{mockAction()}},
+		etype, svc, &Rule{svc, "memory", "rss", GT, "64m", 64 * 1024 * 1024, 0, false, 1, 0, Ok, []Action{mockAction()}},
 	}
 }
 

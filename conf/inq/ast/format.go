@@ -45,6 +45,7 @@ func (s *SimpleAction) Name() string { return s.ActionName }
 type Amount struct {
 	Raw    string
 	Parsed int64
+	PerSec bool
 }
 
 var (
@@ -133,10 +134,19 @@ func Metric(family interface{}, name interface{}) (*RuleMetric, error) {
 }
 
 func HumanAmount(digits interface{}) (*Amount, error) {
-	str := string(digits.(*token.Token).Lit)
+	orig := string(digits.(*token.Token).Lit)
+	str := orig
+
+	perSec := false
+	slen := len(str)
+	if slen > 4 && str[slen-4:] == "/sec" {
+		perSec = true
+		str = str[0 : slen-4]
+	}
+
 	amt, err := strconv.ParseInt(str, 10, 64)
 	if err == nil {
-		return &Amount{str, amt}, nil
+		return &Amount{orig, amt, perSec}, nil
 	}
 
 	sizecode := str[len(str)-1:]
@@ -160,7 +170,7 @@ func HumanAmount(digits interface{}) (*Amount, error) {
 	} else if sizecode == "%" {
 		// nothing to do
 	}
-	return &Amount{str, amt}, nil
+	return &Amount{orig, amt, perSec}, nil
 }
 
 func ToInt64(v interface{}) (*Amount, error) {
@@ -169,5 +179,5 @@ func ToInt64(v interface{}) (*Amount, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &Amount{raw, parsed}, nil
+	return &Amount{raw, parsed, false}, nil
 }

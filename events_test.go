@@ -115,7 +115,7 @@ func TestEventRuleFails(t *testing.T) {
 	act := mockAction()
 
 	svc := &Service{&Entity{"me", nil, metrics.NewProcessStore("/proc", 15), nil}, act, &services.ProcessStatus{os.Getpid(), services.Up}, services.MockInit()}
-	rule := &Rule{svc, "memory", "rss", LT, "100m", 100 * 1024 * 1024, 0, 2, 0, Ok, []Action{act}}
+	rule := &Rule{svc, "memory", "rss", LT, "100m", 100 * 1024 * 1024, 0, false, 2, 0, Ok, []Action{act}}
 	svc.rules = []*Rule{rule}
 
 	// first collection should trip but not trigger since rule requires 2 cycles
@@ -137,7 +137,7 @@ func TestEventRuleRecovers(t *testing.T) {
 	act := mockAction()
 
 	svc := &Service{&Entity{"me", nil, metrics.NewProcessStore("/proc", 15), nil}, act, &services.ProcessStatus{os.Getpid(), services.Up}, services.MockInit()}
-	rule := &Rule{svc, "memory", "rss", LT, "100m", 100 * 1024 * 1024, 0, 1, 0, Ok, []Action{act}}
+	rule := &Rule{svc, "memory", "rss", LT, "100m", 100 * 1024 * 1024, 0, false, 1, 0, Ok, []Action{act}}
 	svc.rules = []*Rule{rule}
 
 	svc.Collect(false, func(_ Checkable) {})

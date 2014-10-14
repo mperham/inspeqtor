@@ -1,4 +1,8 @@
 check service mysql
 #  if not exists then start
-  if memory(rss) > 2g then restart
+  if memory:rss > 2g then restart
+  # support old () metrics for now
   if cpu(user) > 50 then alert
+
+  if mysql:Queries > 1k/sec then alert
+  if mysql:Slow_queries > 2/sec then alert

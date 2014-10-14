@@ -220,13 +220,13 @@ var productionsTable = ProdTab {
 		},
 	},
 	ProdTabEntry{
-		String: `Rule : "if" Metric operator HumanAmount "then" ActionList	<< ast.NewRule(X[1], X[2], X[3], X[5], &ast.Amount{"1",1}), nil >>`,
+		String: `Rule : "if" Metric operator HumanAmount "then" ActionList	<< ast.NewRule(X[1], X[2], X[3], X[5], &ast.Amount{"1",1,false}), nil >>`,
 		Id: "Rule",
 		NTType: 11,
 		Index: 20,
 		NumSymbols: 6,
 		ReduceFunc: func(X []Attrib) (Attrib, error) {
-			return ast.NewRule(X[1], X[2], X[3], X[5], &ast.Amount{"1",1}), nil
+			return ast.NewRule(X[1], X[2], X[3], X[5], &ast.Amount{"1",1,false}), nil
 		},
 	},
 	ProdTabEntry{

@@ -53,6 +53,10 @@ func Prepare(ds *Store) error {
 	return ds.DaemonSpecific.Prepare(execCmd)
 }
 
+func (ds *Store) Load(values ...interface{}) {
+	ds.Store.(metrics.Loadable).Load(values...)
+}
+
 func (ds *Store) Watch(metricName string) {
 	valid := ds.DaemonSpecific.ValidMetrics()
 	for _, m := range valid {
