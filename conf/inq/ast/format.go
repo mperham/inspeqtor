@@ -1,6 +1,7 @@
 package ast
 
 import (
+	"errors"
 	"github.com/mperham/inspeqtor/conf/inq/token"
 	"strconv"
 	"strings"
@@ -144,6 +145,10 @@ func HumanAmount(digits interface{}) (*Amount, error) {
 		str = str[0 : slen-4]
 	}
 
+	if strings.Index(str, "/") > 0 {
+		return nil, errors.New("Invalid amount: " + orig)
+	}
+
 	amt, err := strconv.ParseInt(str, 10, 64)
 	if err == nil {
 		return &Amount{orig, amt, perSec}, nil
@@ -169,6 +174,8 @@ func HumanAmount(digits interface{}) (*Amount, error) {
 		amt *= 1024 * 1024 * 1024 * 1024 * 1024
 	} else if sizecode == "%" {
 		// nothing to do
+	} else {
+		return nil, errors.New("Invalid amount: " + orig)
 	}
 	return &Amount{orig, amt, perSec}, nil
 }

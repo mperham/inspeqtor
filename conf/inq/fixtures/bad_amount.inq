@@ -1,0 +1,2 @@
+check service foo
+  if memory:rss > 250m/min then alert ops, restart

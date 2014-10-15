@@ -6,6 +6,7 @@ import (
 	"github.com/mperham/inspeqtor/conf/inq/parser"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
+	"strings"
 	"testing"
 )
 
@@ -39,8 +40,21 @@ func TestMysqlParsing(t *testing.T) {
 	assert.Equal(t, check.Rules[3].Threshold.PerSec, true)
 }
 
-func TestBasicServiceParsing(t *testing.T) {
+func TestBadAmount(t *testing.T) {
+	data, err := ioutil.ReadFile("fixtures/bad_amount.inq")
+	if err != nil {
+		t.Fatal(err)
+	}
 
+	s := lexer.NewLexer([]byte(data))
+	p := parser.NewParser()
+	obj, err := p.Parse(s)
+	assert.Nil(t, obj)
+	assert.NotNil(t, err)
+	assert.True(t, strings.Contains(err.Error(), "Invalid amount"))
+}
+
+func TestBasicServiceParsing(t *testing.T) {
 	data, err := ioutil.ReadFile("fixtures/memcached.inq")
 	if err != nil {
 		t.Fatal(err)
