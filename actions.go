@@ -51,7 +51,7 @@ var (
 		"alert":   buildAlerter,
 		"restart": buildRestarter,
 	}
-	Notifier = map[string]NotifierBuilder{
+	Notifiers = map[string]NotifierBuilder{
 		"email": buildEmailNotifier,
 		"gmail": buildGmailNotifier,
 		"null":  buildNullNotifier,
@@ -59,7 +59,7 @@ var (
 )
 
 func buildAlerter(check Eventable, route *AlertRoute) (Action, error) {
-	funk := Notifier[route.Channel]
+	funk := Notifiers[route.Channel]
 	if funk == nil {
 		// TODO Include valid channels
 		return nil, errors.New(fmt.Sprintf("No such notification scheme: %s", route.Channel))
@@ -128,7 +128,7 @@ type EmailEvent struct {
 }
 
 func ValidateChannel(name string, channel string, config map[string]string) (*AlertRoute, error) {
-	_, ok := Notifier[channel]
+	_, ok := Notifiers[channel]
 	if !ok {
 		return nil, errors.New("No such notification type: " + channel)
 	}
