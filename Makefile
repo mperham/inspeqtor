@@ -20,6 +20,8 @@ prepare:
 	#sudo tar -C /usr/local -xzf go1.3.1.linux-amd64.tar.gz
 	go get github.com/stretchr/testify/...
 	go get github.com/jteeuwen/go-bindata/...
+	# needed for `make fmt`
+	go get code.google.com/p/go.tools/cmd/goimports
 	@echo Now you should be ready to run "make"
 
 test:
