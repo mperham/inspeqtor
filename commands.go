@@ -3,6 +3,7 @@ package inspeqtor
 import (
 	"bufio"
 	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -27,6 +28,7 @@ var (
 		"start":  startDeploy,
 		"finish": finishDeploy,
 		"status": currentStatus,
+		"export": export,
 		"show":   sparkline,
 		"♡":      heart,
 	}
@@ -144,6 +146,42 @@ func currentStatus(i *Inspeqtor, args []string, resp io.Writer) {
 			}
 		}
 	}
+}
+
+func export(i *Inspeqtor, args []string, resp io.Writer) {
+	dump := map[string]interface{}{}
+	dump["exported_at"] = time.Now().Unix()
+
+	host := map[string]interface{}{}
+	host["metrics"] = pullMetrics(i.Host)
+	host["name"] = i.Host.Name()
+	dump["host"] = host
+
+	svcs := map[string]interface{}{}
+	for _, service := range i.Services {
+		s := service.(*Service)
+		svc := map[string]interface{}{}
+		svc["metrics"] = pullMetrics(service)
+		svc["pid"] = s.Process.Pid
+		svc["name"] = service.Name()
+		svcs[service.Name()] = svc
+	}
+	dump["services"] = svcs
+
+	json.NewEncoder(resp).Encode(dump)
+}
+
+func pullMetrics(thing Checkable) map[string]interface{} {
+	metrics := map[string]interface{}{}
+	store := thing.Metrics()
+	for _, fam := range store.Families() {
+		famdata := map[string]interface{}{}
+		for _, met := range store.MetricNames(fam) {
+			famdata[met] = store.Get(fam, met)
+		}
+		metrics[fam] = famdata
+	}
+	return metrics
 }
 
 func heart(i *Inspeqtor, args []string, resp io.Writer) {

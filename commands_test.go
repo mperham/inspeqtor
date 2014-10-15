@@ -6,6 +6,7 @@ import (
 	"io"
 	"net"
 	"regexp"
+	"strings"
 	"testing"
 	"time"
 
@@ -128,6 +129,26 @@ func TestStatus(t *testing.T) {
 	idxs := regexp.MustCompile(fmt.Sprintf("\\AInspeqtor %s, uptime: ", VERSION)).FindStringIndex(line)
 	assert.NotNil(t, idxs)
 	assert.Equal(t, 0, idxs[0])
+}
+
+func TestExport(t *testing.T) {
+	t.Parallel()
+	i, err := New("_", "")
+	i.Services = []Checkable{
+		&Service{&Entity{"foo", nil, metrics.NewProcessStore("/proc", 15), nil}, nil, &services.ProcessStatus{99, services.Up}, nil},
+	}
+
+	var resp bytes.Buffer
+
+	assert.Nil(t, err)
+	proc := CommandHandlers["export"]
+	proc(i, []string{}, &resp)
+
+	line, err := resp.ReadString('\n')
+	assert.Nil(t, err)
+	assert.True(t, strings.Contains(line, "\"pid\":99"))
+	assert.True(t, strings.Contains(line, "\"name\":\"foo\""))
+	assert.True(t, strings.Contains(line, "\"memory\":{\"rss\":-1}"))
 }
 
 type mockDisplayable struct {
