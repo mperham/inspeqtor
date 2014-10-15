@@ -2,9 +2,10 @@ package daemon
 
 import (
 	"errors"
-	"github.com/mperham/inspeqtor/util"
 	"strconv"
 	"strings"
+
+	"github.com/mperham/inspeqtor/util"
 )
 
 type RedisSource struct {

@@ -2,11 +2,12 @@ package services
 
 import (
 	"errors"
-	"github.com/mperham/inspeqtor/util"
 	"os/exec"
 	"path/filepath"
 	"strconv"
 	"strings"
+
+	"github.com/mperham/inspeqtor/util"
 )
 
 type Systemd struct {

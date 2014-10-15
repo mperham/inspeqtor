@@ -1,9 +1,10 @@
 package inspeqtor
 
 import (
-	"github.com/stretchr/testify/assert"
 	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestInspeqtorParse(t *testing.T) {

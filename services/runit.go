@@ -12,12 +12,13 @@ package services
 
 import (
 	"errors"
-	"github.com/mperham/inspeqtor/util"
 	"io/ioutil"
 	"os/exec"
 	"path/filepath"
 	"strconv"
 	"strings"
+
+	"github.com/mperham/inspeqtor/util"
 )
 
 type Runit struct {

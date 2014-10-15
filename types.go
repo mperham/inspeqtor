@@ -3,10 +3,11 @@ package inspeqtor
 import (
 	"errors"
 	"fmt"
+	"syscall"
+
 	"github.com/mperham/inspeqtor/metrics"
 	"github.com/mperham/inspeqtor/services"
 	"github.com/mperham/inspeqtor/util"
-	"syscall"
 )
 
 // A named thing which can checked by Inspeqtor

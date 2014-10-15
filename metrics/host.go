@@ -1,11 +1,12 @@
 package metrics
 
 import (
-	"github.com/mperham/inspeqtor/util"
 	"io/ioutil"
 	"os/exec"
 	"strconv"
 	"strings"
+
+	"github.com/mperham/inspeqtor/util"
 )
 
 type hostStorage struct {

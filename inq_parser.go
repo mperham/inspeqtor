@@ -2,15 +2,16 @@ package inspeqtor
 
 import (
 	"errors"
+	"io/ioutil"
+	"os"
+	"path/filepath"
+
 	"github.com/mperham/inspeqtor/conf/inq/ast"
 	"github.com/mperham/inspeqtor/conf/inq/lexer"
 	"github.com/mperham/inspeqtor/conf/inq/parser"
 	"github.com/mperham/inspeqtor/metrics"
 	"github.com/mperham/inspeqtor/services"
 	"github.com/mperham/inspeqtor/util"
-	"io/ioutil"
-	"os"
-	"path/filepath"
 )
 
 /*

@@ -1,13 +1,14 @@
 package services
 
 import (
-	"github.com/mperham/inspeqtor/util"
 	"io/ioutil"
 	"os/exec"
 	"path/filepath"
 	"strconv"
 	"strings"
 	"syscall"
+
+	"github.com/mperham/inspeqtor/util"
 )
 
 type Initd struct {

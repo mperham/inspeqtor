@@ -1,16 +1,17 @@
 package inspeqtor
 
 import (
-	"github.com/mperham/inspeqtor/metrics"
-	"github.com/mperham/inspeqtor/metrics/daemon"
-	"github.com/mperham/inspeqtor/services"
-	"github.com/mperham/inspeqtor/util"
 	"net"
 	"os"
 	"os/signal"
 	"sync"
 	"syscall"
 	"time"
+
+	"github.com/mperham/inspeqtor/metrics"
+	"github.com/mperham/inspeqtor/metrics/daemon"
+	"github.com/mperham/inspeqtor/services"
+	"github.com/mperham/inspeqtor/util"
 )
 
 const (

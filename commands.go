@@ -5,13 +5,14 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/mperham/inspeqtor/util"
 	"io"
 	"math"
 	"net"
 	"os"
 	"strings"
 	"time"
+
+	"github.com/mperham/inspeqtor/util"
 )
 
 /*

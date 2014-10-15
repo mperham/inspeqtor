@@ -1,12 +1,12 @@
-
 package lexer
 
-import(
+import (
 	"fmt"
+
 	"github.com/mperham/inspeqtor/conf/inq/token"
 )
 
-type ActionTable [NumStates] ActionRow
+type ActionTable [NumStates]ActionRow
 
 type ActionRow struct {
 	Accept token.Type
@@ -18,257 +18,256 @@ func (this ActionRow) String() string {
 }
 
 var ActTab = ActionTable{
- 	ActionRow{ // S0
+	ActionRow{ // S0
 		Accept: 0,
- 		Ignore: "",
- 	},
- 	ActionRow{ // S1
+		Ignore: "",
+	},
+	ActionRow{ // S1
 		Accept: -1,
- 		Ignore: "!whitespace",
- 	},
- 	ActionRow{ // S2
+		Ignore: "!whitespace",
+	},
+	ActionRow{ // S2
 		Accept: 2,
- 		Ignore: "",
- 	},
- 	ActionRow{ // S3
+		Ignore: "",
+	},
+	ActionRow{ // S3
 		Accept: 0,
- 		Ignore: "",
- 	},
- 	ActionRow{ // S4
+		Ignore: "",
+	},
+	ActionRow{ // S4
 		Accept: 2,
- 		Ignore: "",
- 	},
- 	ActionRow{ // S5
+		Ignore: "",
+	},
+	ActionRow{ // S5
 		Accept: 11,
- 		Ignore: "",
- 	},
- 	ActionRow{ // S6
+		Ignore: "",
+	},
+	ActionRow{ // S6
 		Accept: 12,
- 		Ignore: "",
- 	},
- 	ActionRow{ // S7
+		Ignore: "",
+	},
+	ActionRow{ // S7
 		Accept: 6,
- 		Ignore: "",
- 	},
- 	ActionRow{ // S8
+		Ignore: "",
+	},
+	ActionRow{ // S8
 		Accept: 10,
- 		Ignore: "",
- 	},
- 	ActionRow{ // S9
+		Ignore: "",
+	},
+	ActionRow{ // S9
 		Accept: 14,
- 		Ignore: "",
- 	},
- 	ActionRow{ // S10
+		Ignore: "",
+	},
+	ActionRow{ // S10
 		Accept: 2,
- 		Ignore: "",
- 	},
- 	ActionRow{ // S11
+		Ignore: "",
+	},
+	ActionRow{ // S11
 		Accept: 2,
- 		Ignore: "",
- 	},
- 	ActionRow{ // S12
+		Ignore: "",
+	},
+	ActionRow{ // S12
 		Accept: 2,
- 		Ignore: "",
- 	},
- 	ActionRow{ // S13
+		Ignore: "",
+	},
+	ActionRow{ // S13
 		Accept: 2,
- 		Ignore: "",
- 	},
- 	ActionRow{ // S14
+		Ignore: "",
+	},
+	ActionRow{ // S14
 		Accept: 2,
- 		Ignore: "",
- 	},
- 	ActionRow{ // S15
+		Ignore: "",
+	},
+	ActionRow{ // S15
 		Accept: 2,
- 		Ignore: "",
- 	},
- 	ActionRow{ // S16
+		Ignore: "",
+	},
+	ActionRow{ // S16
 		Accept: 2,
- 		Ignore: "",
- 	},
- 	ActionRow{ // S17
+		Ignore: "",
+	},
+	ActionRow{ // S17
 		Accept: 2,
- 		Ignore: "",
- 	},
- 	ActionRow{ // S18
+		Ignore: "",
+	},
+	ActionRow{ // S18
 		Accept: 2,
- 		Ignore: "",
- 	},
- 	ActionRow{ // S19
+		Ignore: "",
+	},
+	ActionRow{ // S19
 		Accept: 0,
- 		Ignore: "",
- 	},
- 	ActionRow{ // S20
+		Ignore: "",
+	},
+	ActionRow{ // S20
 		Accept: 0,
- 		Ignore: "",
- 	},
- 	ActionRow{ // S21
+		Ignore: "",
+	},
+	ActionRow{ // S21
 		Accept: -1,
- 		Ignore: "!comment",
- 	},
- 	ActionRow{ // S22
+		Ignore: "!comment",
+	},
+	ActionRow{ // S22
 		Accept: 0,
- 		Ignore: "",
- 	},
- 	ActionRow{ // S23
+		Ignore: "",
+	},
+	ActionRow{ // S23
 		Accept: 2,
- 		Ignore: "",
- 	},
- 	ActionRow{ // S24
+		Ignore: "",
+	},
+	ActionRow{ // S24
 		Accept: 2,
- 		Ignore: "",
- 	},
- 	ActionRow{ // S25
+		Ignore: "",
+	},
+	ActionRow{ // S25
 		Accept: 2,
- 		Ignore: "",
- 	},
- 	ActionRow{ // S26
+		Ignore: "",
+	},
+	ActionRow{ // S26
 		Accept: 2,
- 		Ignore: "",
- 	},
- 	ActionRow{ // S27
+		Ignore: "",
+	},
+	ActionRow{ // S27
 		Accept: 2,
- 		Ignore: "",
- 	},
- 	ActionRow{ // S28
+		Ignore: "",
+	},
+	ActionRow{ // S28
 		Accept: 13,
- 		Ignore: "",
- 	},
- 	ActionRow{ // S29
+		Ignore: "",
+	},
+	ActionRow{ // S29
 		Accept: 2,
- 		Ignore: "",
- 	},
- 	ActionRow{ // S30
+		Ignore: "",
+	},
+	ActionRow{ // S30
 		Accept: 2,
- 		Ignore: "",
- 	},
- 	ActionRow{ // S31
+		Ignore: "",
+	},
+	ActionRow{ // S31
 		Accept: 2,
- 		Ignore: "",
- 	},
- 	ActionRow{ // S32
+		Ignore: "",
+	},
+	ActionRow{ // S32
 		Accept: 2,
- 		Ignore: "",
- 	},
- 	ActionRow{ // S33
+		Ignore: "",
+	},
+	ActionRow{ // S33
 		Accept: 0,
- 		Ignore: "",
- 	},
- 	ActionRow{ // S34
+		Ignore: "",
+	},
+	ActionRow{ // S34
 		Accept: 2,
- 		Ignore: "",
- 	},
- 	ActionRow{ // S35
+		Ignore: "",
+	},
+	ActionRow{ // S35
 		Accept: 0,
- 		Ignore: "",
- 	},
- 	ActionRow{ // S36
+		Ignore: "",
+	},
+	ActionRow{ // S36
 		Accept: 2,
- 		Ignore: "",
- 	},
- 	ActionRow{ // S37
+		Ignore: "",
+	},
+	ActionRow{ // S37
 		Accept: 2,
- 		Ignore: "",
- 	},
- 	ActionRow{ // S38
+		Ignore: "",
+	},
+	ActionRow{ // S38
 		Accept: 2,
- 		Ignore: "",
- 	},
- 	ActionRow{ // S39
+		Ignore: "",
+	},
+	ActionRow{ // S39
 		Accept: 16,
- 		Ignore: "",
- 	},
- 	ActionRow{ // S40
+		Ignore: "",
+	},
+	ActionRow{ // S40
 		Accept: 2,
- 		Ignore: "",
- 	},
- 	ActionRow{ // S41
+		Ignore: "",
+	},
+	ActionRow{ // S41
 		Accept: 2,
- 		Ignore: "",
- 	},
- 	ActionRow{ // S42
+		Ignore: "",
+	},
+	ActionRow{ // S42
 		Accept: 2,
- 		Ignore: "",
- 	},
- 	ActionRow{ // S43
+		Ignore: "",
+	},
+	ActionRow{ // S43
 		Accept: 2,
- 		Ignore: "",
- 	},
- 	ActionRow{ // S44
+		Ignore: "",
+	},
+	ActionRow{ // S44
 		Accept: 2,
- 		Ignore: "",
- 	},
- 	ActionRow{ // S45
+		Ignore: "",
+	},
+	ActionRow{ // S45
 		Accept: 2,
- 		Ignore: "",
- 	},
- 	ActionRow{ // S46
+		Ignore: "",
+	},
+	ActionRow{ // S46
 		Accept: 2,
- 		Ignore: "",
- 	},
- 	ActionRow{ // S47
+		Ignore: "",
+	},
+	ActionRow{ // S47
 		Accept: 2,
- 		Ignore: "",
- 	},
- 	ActionRow{ // S48
+		Ignore: "",
+	},
+	ActionRow{ // S48
 		Accept: 3,
- 		Ignore: "",
- 	},
- 	ActionRow{ // S49
+		Ignore: "",
+	},
+	ActionRow{ // S49
 		Accept: 2,
- 		Ignore: "",
- 	},
- 	ActionRow{ // S50
+		Ignore: "",
+	},
+	ActionRow{ // S50
 		Accept: 2,
- 		Ignore: "",
- 	},
- 	ActionRow{ // S51
+		Ignore: "",
+	},
+	ActionRow{ // S51
 		Accept: 15,
- 		Ignore: "",
- 	},
- 	ActionRow{ // S52
+		Ignore: "",
+	},
+	ActionRow{ // S52
 		Accept: 9,
- 		Ignore: "",
- 	},
- 	ActionRow{ // S53
+		Ignore: "",
+	},
+	ActionRow{ // S53
 		Accept: 8,
- 		Ignore: "",
- 	},
- 	ActionRow{ // S54
+		Ignore: "",
+	},
+	ActionRow{ // S54
 		Accept: 4,
- 		Ignore: "",
- 	},
- 	ActionRow{ // S55
+		Ignore: "",
+	},
+	ActionRow{ // S55
 		Accept: 2,
- 		Ignore: "",
- 	},
- 	ActionRow{ // S56
+		Ignore: "",
+	},
+	ActionRow{ // S56
 		Accept: 2,
- 		Ignore: "",
- 	},
- 	ActionRow{ // S57
+		Ignore: "",
+	},
+	ActionRow{ // S57
 		Accept: 2,
- 		Ignore: "",
- 	},
- 	ActionRow{ // S58
+		Ignore: "",
+	},
+	ActionRow{ // S58
 		Accept: 17,
- 		Ignore: "",
- 	},
- 	ActionRow{ // S59
+		Ignore: "",
+	},
+	ActionRow{ // S59
 		Accept: 2,
- 		Ignore: "",
- 	},
- 	ActionRow{ // S60
+		Ignore: "",
+	},
+	ActionRow{ // S60
 		Accept: 2,
- 		Ignore: "",
- 	},
- 	ActionRow{ // S61
+		Ignore: "",
+	},
+	ActionRow{ // S61
 		Accept: 7,
- 		Ignore: "",
- 	},
- 	ActionRow{ // S62
+		Ignore: "",
+	},
+	ActionRow{ // S62
 		Accept: 5,
- 		Ignore: "",
- 	},
- 		
+		Ignore: "",
+	},
 }

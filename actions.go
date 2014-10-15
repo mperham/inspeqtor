@@ -4,10 +4,11 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/mperham/inspeqtor/util"
 	"net/smtp"
 	"strings"
 	"text/template"
+
+	"github.com/mperham/inspeqtor/util"
 )
 
 type Action interface {

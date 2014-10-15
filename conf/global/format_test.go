@@ -1,13 +1,14 @@
 package global
 
 import (
+	"io/ioutil"
+	"log"
+	"testing"
+
 	"github.com/mperham/inspeqtor/conf/global/ast"
 	"github.com/mperham/inspeqtor/conf/global/lexer"
 	"github.com/mperham/inspeqtor/conf/global/parser"
 	"github.com/stretchr/testify/assert"
-	"io/ioutil"
-	"log"
-	"testing"
 )
 
 func TestBasicParsing(t *testing.T) {

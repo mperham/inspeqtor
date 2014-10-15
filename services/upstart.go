@@ -2,12 +2,13 @@ package services
 
 import (
 	"errors"
-	"github.com/mperham/inspeqtor/util"
 	"os/exec"
 	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/mperham/inspeqtor/util"
 )
 
 type Upstart struct {

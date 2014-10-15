@@ -1,8 +1,9 @@
 package ast
 
 import (
-	"github.com/mperham/inspeqtor/conf/global/token"
 	"strconv"
+
+	"github.com/mperham/inspeqtor/conf/global/token"
 )
 
 func AppendPair(k interface{}, v interface{}, hash interface{}) (map[string]string, error) {

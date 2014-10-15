@@ -29,6 +29,9 @@ test:
 build: test
 	@GOOS=linux GOARCH=amd64 go build -o inspeqtor cmd/main.go
 
+fmt:
+	find . -name "*.go" -exec goimports -w {} \;
+
 clean:
 	rm -f main inspeqtor templates.go
 	rm -rf packaging/output

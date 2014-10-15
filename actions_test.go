@@ -2,11 +2,12 @@ package inspeqtor
 
 import (
 	"bytes"
+	"strings"
+	"testing"
+
 	"github.com/mperham/inspeqtor/metrics"
 	"github.com/mperham/inspeqtor/services"
 	"github.com/stretchr/testify/assert"
-	"strings"
-	"testing"
 )
 
 func makeAction(actionName, notifType string, config map[string]string) (Action, error) {

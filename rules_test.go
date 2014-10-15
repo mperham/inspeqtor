@@ -1,10 +1,11 @@
 package inspeqtor
 
 import (
+	"testing"
+
 	"github.com/mperham/inspeqtor/metrics"
 	"github.com/mperham/inspeqtor/metrics/daemon"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 const (

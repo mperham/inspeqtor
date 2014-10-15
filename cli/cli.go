@@ -2,10 +2,11 @@ package cli
 
 import (
 	"flag"
-	"github.com/mperham/inspeqtor"
-	"github.com/mperham/inspeqtor/util"
 	"log"
 	"os"
+
+	"github.com/mperham/inspeqtor"
+	"github.com/mperham/inspeqtor/util"
 )
 
 type CmdOptions struct {

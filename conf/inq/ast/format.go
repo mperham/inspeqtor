@@ -2,9 +2,10 @@ package ast
 
 import (
 	"errors"
-	"github.com/mperham/inspeqtor/conf/inq/token"
 	"strconv"
 	"strings"
+
+	"github.com/mperham/inspeqtor/conf/inq/token"
 )
 
 type HostCheck struct {

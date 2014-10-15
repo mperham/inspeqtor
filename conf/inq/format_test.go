@@ -1,13 +1,14 @@
 package inq
 
 import (
+	"io/ioutil"
+	"strings"
+	"testing"
+
 	"github.com/mperham/inspeqtor/conf/inq/ast"
 	"github.com/mperham/inspeqtor/conf/inq/lexer"
 	"github.com/mperham/inspeqtor/conf/inq/parser"
 	"github.com/stretchr/testify/assert"
-	"io/ioutil"
-	"strings"
-	"testing"
 )
 
 func TestMysqlParsing(t *testing.T) {

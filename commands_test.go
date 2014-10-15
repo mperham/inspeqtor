@@ -3,15 +3,16 @@ package inspeqtor
 import (
 	"bytes"
 	"fmt"
-	"github.com/mperham/inspeqtor/metrics"
-	"github.com/mperham/inspeqtor/services"
-	"github.com/mperham/inspeqtor/util"
-	"github.com/stretchr/testify/assert"
 	"io"
 	"net"
 	"regexp"
 	"testing"
 	"time"
+
+	"github.com/mperham/inspeqtor/metrics"
+	"github.com/mperham/inspeqtor/services"
+	"github.com/mperham/inspeqtor/util"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestAcceptSocket(t *testing.T) {

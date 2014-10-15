@@ -2,12 +2,13 @@ package metrics
 
 import (
 	"errors"
-	"github.com/mperham/inspeqtor/util"
 	"io/ioutil"
 	"os/exec"
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/mperham/inspeqtor/util"
 )
 
 var (

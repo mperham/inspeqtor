@@ -3,6 +3,7 @@ package services
 import (
 	"errors"
 	"fmt"
+
 	"github.com/mperham/inspeqtor/util"
 )
 

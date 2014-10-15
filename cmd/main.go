@@ -1,11 +1,12 @@
 package main
 
 import (
+	"log"
+	"os"
+
 	"github.com/mperham/inspeqtor"
 	"github.com/mperham/inspeqtor/cli"
 	"github.com/mperham/inspeqtor/util"
-	"log"
-	"os"
 )
 
 func main() {

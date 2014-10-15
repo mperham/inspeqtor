@@ -1,9 +1,10 @@
 package services
 
 import (
+	"testing"
+
 	"github.com/mperham/inspeqtor/util"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestLaunchd(t *testing.T) {

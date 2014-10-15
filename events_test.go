@@ -5,11 +5,12 @@
 package inspeqtor
 
 import (
+	"os"
+	"testing"
+
 	"github.com/mperham/inspeqtor/metrics"
 	"github.com/mperham/inspeqtor/services"
 	"github.com/stretchr/testify/assert"
-	"os"
-	"testing"
 )
 
 func TestEventProcessDisappears(t *testing.T) {

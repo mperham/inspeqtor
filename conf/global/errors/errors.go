@@ -1,9 +1,9 @@
-
 package errors
 
-import(
+import (
 	"bytes"
 	"fmt"
+
 	"github.com/mperham/inspeqtor/conf/global/token"
 )
 

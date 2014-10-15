@@ -1,8 +1,9 @@
 package inspeqtor
 
 import (
-	"github.com/mperham/inspeqtor/util"
 	"reflect"
+
+	"github.com/mperham/inspeqtor/util"
 )
 
 type Operator uint8

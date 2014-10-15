@@ -3,12 +3,13 @@ package services
 import (
 	"errors"
 	"fmt"
-	"github.com/mperham/inspeqtor/util"
 	"os"
 	"os/exec"
 	"os/user"
 	"strconv"
 	"strings"
+
+	"github.com/mperham/inspeqtor/util"
 )
 
 type Launchd struct {

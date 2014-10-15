@@ -1,10 +1,11 @@
 package util
 
 import (
-	"github.com/stretchr/testify/assert"
 	"os/exec"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestSafeRun(t *testing.T) {

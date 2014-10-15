@@ -1,10 +1,11 @@
 package daemon
 
 import (
-	"github.com/mperham/inspeqtor/metrics"
-	"github.com/mperham/inspeqtor/util"
 	"io/ioutil"
 	"os/exec"
+
+	"github.com/mperham/inspeqtor/metrics"
+	"github.com/mperham/inspeqtor/util"
 )
 
 /*

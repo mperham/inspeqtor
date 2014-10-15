@@ -2,10 +2,11 @@ package metrics
 
 import (
 	"errors"
-	"github.com/mperham/inspeqtor/util"
 	"regexp"
 	"sort"
 	"strconv"
+
+	"github.com/mperham/inspeqtor/util"
 )
 
 const (

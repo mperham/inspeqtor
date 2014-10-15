@@ -1,27 +1,27 @@
-
 package lexer
 
 import (
-	
+
 	// "fmt"
 	// "github.com/mperham/inspeqtor/conf/inq/util"
-	
+
 	"io/ioutil"
 	"unicode/utf8"
+
 	"github.com/mperham/inspeqtor/conf/inq/token"
 )
 
-const(
-	NoState = -1
-	NumStates = 63
+const (
+	NoState    = -1
+	NumStates  = 63
 	NumSymbols = 101
-) 
+)
 
 type Lexer struct {
-	src             []byte
-	pos             int
-	line            int
-	column          int
+	src    []byte
+	pos    int
+	line   int
+	column int
 }
 
 func NewLexer(src []byte) *Lexer {
@@ -43,9 +43,9 @@ func NewLexerFile(fpath string) (*Lexer, error) {
 }
 
 func (this *Lexer) Scan() (tok *token.Token) {
-	
+
 	// fmt.Printf("Lexer.Scan() pos=%d\n", this.pos)
-	
+
 	tok = new(token.Token)
 	if this.pos >= len(this.src) {
 		tok.Type = token.EOF
@@ -56,9 +56,9 @@ func (this *Lexer) Scan() (tok *token.Token) {
 	tok.Type = token.INVALID
 	state, rune1, size := 0, rune(-1), 0
 	for state != -1 {
-	
+
 		// fmt.Printf("\tpos=%d, line=%d, col=%d, state=%d\n", this.pos, this.line, this.column, state)
-	
+
 		if this.pos >= len(this.src) {
 			rune1 = -1
 		} else {
@@ -77,7 +77,6 @@ func (this *Lexer) Scan() (tok *token.Token) {
 			this.column++
 		}
 
-	
 		// Production start
 		if rune1 != -1 {
 			state = TransTab[state](rune1)
@@ -98,7 +97,6 @@ func (this *Lexer) Scan() (tok *token.Token) {
 		// }
 		// state = nextState
 		// Debug end
-	
 
 		if state != -1 {
 			switch {
