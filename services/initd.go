@@ -12,14 +12,14 @@ import (
 )
 
 type Initd struct {
-	root      string
-	path      string
-	pidParser func([]byte) (int, error)
+	ctlPath    string
+	varrunPath string
+	pidParser  func([]byte) (int, error)
 }
 
 func (i *Initd) LookupService(serviceName string) (*ProcessStatus, error) {
-	ctlpath := i.path + "/" + serviceName
-	result, _ := util.FileExists(ctlpath)
+	path := i.ctlPath + serviceName
+	result, _ := util.FileExists(path)
 	if !result {
 		// service script does not exist in etc/init.d, not under
 		// init.d control
@@ -28,8 +28,8 @@ func (i *Initd) LookupService(serviceName string) (*ProcessStatus, error) {
 
 	// First try to find the PID file with same name in /var/run.
 	paths := []string{
-		i.root + "var/run/" + serviceName + ".pid",
-		i.root + "var/run/" + serviceName + "/" + serviceName + ".pid",
+		i.varrunPath + serviceName + ".pid",
+		i.varrunPath + serviceName + "/" + serviceName + ".pid",
 	}
 
 	for _, path := range paths {
@@ -50,7 +50,7 @@ func (i *Initd) Name() string {
 }
 
 func (i *Initd) Restart(serviceName string) error {
-	path := "/etc/init.d/" + serviceName
+	path := i.ctlPath + serviceName
 
 	cmd := exec.Command(path, "restart")
 	_, err := util.SafeRun(cmd, util.RestartTimeout)
@@ -94,27 +94,32 @@ func (i *Initd) readPidFile(path string) (*ProcessStatus, error) {
 }
 
 func detectInitd(root string) (InitSystem, error) {
-	path := root + "etc/init.d"
-	result, err := util.FileExists(path)
+	ctlpath := root + "etc/init.d/"
+	result, err := util.FileExists(ctlpath)
 	if err != nil {
 		return nil, err
 	}
 
 	if !result {
-		util.Debug("init.d not detected in /etc/init.d")
+		util.Debug("init.d not detected in " + ctlpath)
 		return nil, nil
 	}
 
-	matches, err := filepath.Glob(path + "/*")
+	matches, err := filepath.Glob(ctlpath + "*")
 	if err != nil {
 		return nil, err
 	}
 
+	if !result {
+		util.Debug("init.d not detected in " + ctlpath)
+		return nil, nil
+	}
+
 	if len(matches) > 0 {
-		util.Info("Detected init.d in " + path)
-		return &Initd{root, path, pidForString}, nil
+		util.Info("Detected init.d in " + ctlpath)
+		return &Initd{ctlpath, root + "var/run/", pidForString}, nil
 	} else {
-		util.Debug(path + " exists but appears to be empty")
+		util.Info(ctlpath + " exists but appears to be empty")
 		return nil, nil
 	}
 }
