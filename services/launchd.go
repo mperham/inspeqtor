@@ -17,11 +17,7 @@ type Launchd struct {
 }
 
 func detectLaunchd(rootDir string) (InitSystem, error) {
-	file, err := util.FileExists(rootDir + "mach_kernel")
-	if err != nil {
-		return nil, err
-	}
-	if !file {
+	if !util.Darwin() {
 		return nil, nil
 	}
 	util.Info("Detected OSX, using launchd")

@@ -16,7 +16,7 @@ var (
 )
 
 func Darwin() bool {
-	b, _ := FileExists("/mach_kernel")
+	b, _ := FileExists("/Applications")
 	return b
 }
 
