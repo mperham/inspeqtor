@@ -23,6 +23,8 @@ func (*mockStore) MetricNames(family string) []string {
 	return []string{"user"}
 }
 
+func (*mockStore) Each(func(family, name string, metric Metric)) {
+}
 func (*mockStore) Save(family, name string, value float64) {
 }
 func (*mockStore) DeclareCounter(family, name string, xform TransformFunc, display DisplayFunc) {

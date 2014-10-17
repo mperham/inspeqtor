@@ -69,6 +69,8 @@ type Store interface {
 	DeclareCounter(family, name string, xform TransformFunc, display DisplayFunc)
 	DeclareGauge(family, name string, display DisplayFunc)
 	Metric(family, name string) Metric
+
+	Each(func(family, name string, metric Metric))
 }
 
 type Loadable interface {
@@ -77,6 +79,14 @@ type Loadable interface {
 
 type storage struct {
 	tree map[string]*family
+}
+
+func (store *storage) Each(iter func(family, name string, metric Metric)) {
+	for _, fam := range store.Families() {
+		for _, met := range store.MetricNames(fam) {
+			iter(fam, met, store.Metric(fam, met))
+		}
+	}
 }
 
 func (store *storage) Metric(family, name string) Metric {
@@ -165,6 +175,7 @@ type Metric interface {
 	At(int) *float64
 	Displayable(float64) string
 	Size() int
+	Type() Type
 }
 
 type gauge struct {
@@ -188,6 +199,14 @@ func (c *counter) Size() int {
 		return 0
 	}
 	return sz
+}
+
+func (g *gauge) Type() Type {
+	return Gauge
+}
+
+func (c *counter) Type() Type {
+	return Counter
 }
 
 func (g *gauge) Put(val float64) {
