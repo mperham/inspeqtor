@@ -30,6 +30,7 @@ type Inspeqtor struct {
 	Socket          net.Listener
 	SilenceUntil    time.Time
 	Stopping        chan struct{}
+	Handlers        map[string][]func(*Inspeqtor)
 }
 
 func New(dir string, socketpath string) (*Inspeqtor, error) {
@@ -39,7 +40,9 @@ func New(dir string, socketpath string) (*Inspeqtor, error) {
 		SilenceUntil: time.Now(),
 		Host:         &Host{&Entity{name: "localhost", metrics: metrics.NewMockStore()}},
 		GlobalConfig: &ConfigFile{Defaults, map[string]*AlertRoute{}},
-		Stopping:     make(chan struct{})}
+		Stopping:     make(chan struct{}),
+		Handlers:     map[string][]func(*Inspeqtor){},
+	}
 	return i, nil
 }
 
@@ -228,6 +231,8 @@ func (i *Inspeqtor) Shutdown() {
 			util.Warn(err.Error())
 		}
 	}
+	i.Fire("shutdown")
+
 	// let other goroutines log their exit
 	time.Sleep(time.Millisecond)
 }
@@ -264,6 +269,7 @@ func (i *Inspeqtor) scanSystem() {
 	// https://en.wikipedia.org/wiki/Trust%2C_but_verify
 	i.scan()
 	i.verify()
+	i.Fire("cycleComplete")
 }
 
 func (i *Inspeqtor) scan() {
@@ -329,4 +335,21 @@ func (i *Inspeqtor) TestAlertRoutes() int {
 		}
 	}
 	return bad
+}
+
+func (i *Inspeqtor) Listen(eventName string, handler func(*Inspeqtor)) {
+	x := i.Handlers[eventName]
+	if x == nil {
+		x = []func(*Inspeqtor){}
+	}
+	i.Handlers[eventName] = append(x, handler)
+}
+
+func (i *Inspeqtor) Fire(eventName string) {
+	x := i.Handlers[eventName]
+	if len(x) > 0 {
+		for _, handler := range x {
+			handler(i)
+		}
+	}
 }
