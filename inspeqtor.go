@@ -246,7 +246,7 @@ func (i *Inspeqtor) runLoop() {
 
 	for {
 		select {
-		case <-time.After(time.Duration(i.GlobalConfig.Top.CycleTime) * time.Second):
+		case <-time.After(time.Duration(i.GlobalConfig.CycleTime) * time.Second):
 			i.scanSystem()
 		case <-i.Stopping:
 			util.Debug("Shutting down main run loop")

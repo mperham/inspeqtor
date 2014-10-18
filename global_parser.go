@@ -18,9 +18,10 @@ Parses the global inspeqtor configuration in /etc/inspeqtor/inspeqtor.conf.
 type GlobalConfig struct {
 	CycleTime    uint
 	DeployLength uint
+	Variables    map[string]string
 }
 
-var Defaults = GlobalConfig{15, 300}
+var Defaults = GlobalConfig{15, 300, map[string]string{}}
 
 /*
   An alert route is a way to send an alert to a recipient.
@@ -45,7 +46,7 @@ type AlertRoute struct {
 }
 
 type ConfigFile struct {
-	Top         GlobalConfig
+	GlobalConfig
 	AlertRoutes map[string]*AlertRoute
 }
 
@@ -71,15 +72,15 @@ func ParseGlobal(rootDir string) (*ConfigFile, error) {
 		}
 		ast := obj.(ast.Config)
 
-		var config ConfigFile
-		config.Top = Defaults
+		config := ConfigFile{Defaults, map[string]*AlertRoute{}}
+
+		config.Variables = ast.Variables
 		if val, has := ast.Variables["log_level"]; has {
 			util.SetLogLevel(val)
 		}
-		parseValue(ast, &config.Top.CycleTime, "cycle_time", 15)
-		parseValue(ast, &config.Top.DeployLength, "deploy_length", 300)
+		parseValue(ast, &config.CycleTime, "cycle_time", 15)
+		parseValue(ast, &config.DeployLength, "deploy_length", 300)
 
-		config.AlertRoutes = map[string]*AlertRoute{}
 		for _, v := range ast.Routes {
 			ar, err := ValidateChannel(v.Name, v.Channel, v.Config)
 			if err != nil {

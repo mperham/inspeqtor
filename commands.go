@@ -81,7 +81,7 @@ func (i *Inspeqtor) acceptCommand() bool {
 }
 
 func startDeploy(i *Inspeqtor, args []string, resp io.Writer) {
-	length := time.Duration(i.GlobalConfig.Top.DeployLength) * time.Second
+	length := time.Duration(i.GlobalConfig.DeployLength) * time.Second
 	i.SilenceUntil = time.Now().Add(length)
 
 	util.Info("Starting deploy")

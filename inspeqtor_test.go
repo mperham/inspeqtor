@@ -13,7 +13,8 @@ func TestInspeqtorParse(t *testing.T) {
 	assert.Nil(t, err)
 	err = i.Parse()
 	assert.Nil(t, err)
-	assert.Equal(t, uint16(15), i.GlobalConfig.Top.CycleTime)
+	assert.Equal(t, i.GlobalConfig.CycleTime, uint16(15))
+	assert.Equal(t, i.GlobalConfig.Variables["foo"], "bar")
 
 	i, err = New("testx", "")
 	assert.NotNil(t, i)

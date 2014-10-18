@@ -40,7 +40,7 @@ func (e *Entity) Metrics() metrics.Store {
 
 func (e *Entity) CycleTime() uint {
 	if Singleton != nil {
-		return Singleton.GlobalConfig.Top.CycleTime
+		return Singleton.GlobalConfig.CycleTime
 	} else {
 		return 15
 	}
