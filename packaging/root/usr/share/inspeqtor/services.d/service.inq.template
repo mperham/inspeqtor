@@ -16,10 +16,10 @@
 # In launchd:
 #   ~/Library/LaunchAgents/<name>.plist
 #
-# Note that Inspeqtor explicitly does not support traditional /etc/init.d;
-# this is a conscious decision: sysvinit is terrible.  You shouldn't need
-# a 50-100 bash script just to start/stop your daemon.  Learn to use
-# the modern init systems above and you'll never go back.
+# Supporting traditional init.d is a little trickier, see the
+# https://github.com/mperham/inspeqtor/wiki/Initd wiki page
+# for more details. tl;dr You need to populate a PID file at
+# /var/run/<name>.pid or /var/run/<name>/<name>.pid
 #
 
 #
@@ -49,7 +49,8 @@ check service mysql
   if cpu:user > 90% for 2 cycles then alert
 
   #
-  # Alert if there's an unexpected burst of queries to the database.
-  # This is an example of a Daemon-Specific Metric.
+  # Alert if we see too many queries or slow queries. These are
+  # examples of Daemon-Specific Metrics.
   #
-  #if mysql:Queries > 1000 for 2 cycles then alert
+  #if mysql:Queries > 100/sec for 2 cycles then alert
+  #if mysql:Slow_queries > 1/sec for 2 cycles then alert

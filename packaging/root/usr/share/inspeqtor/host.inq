@@ -2,9 +2,8 @@
 # Inspeqtor's default system check.
 #
 # .inq files represent a thing to monitor and verify.
-# Inspeqtor MUST, at minimum, have a "check host" recipe.
-# host.inq is the naming convention for checking the
-# host itself.
+# Inspeqtor MUST, at minimum, have a "check host" recipe
+# in /etc/inspeqtor/host.inq
 #
 check host
 
