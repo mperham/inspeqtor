@@ -99,7 +99,7 @@ func (rs *MysqlSource) runRepl(values metricMap, funk executor) (metricMap, erro
 func (rs *MysqlSource) runStatus(funk executor) (metricMap, error) {
 	args := rs.buildArgs()
 	args = append(args, "-e")
-	args = append(args, "show status")
+	args = append(args, "show global status")
 	sout, err := funk("mysql", args, nil)
 	lines, err := util.ReadLines(sout)
 	if err != nil {
