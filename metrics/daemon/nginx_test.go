@@ -46,6 +46,8 @@ func TestRealNginxConnection(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, hash)
 
+	// brew tap homebrew/homebrew-nginx
+	// brew install nginx-full --with-status
 	assert.True(t, hash["requests"] > 0, "This test will fail if you don't have nginx installed")
 }
 
