@@ -20,6 +20,7 @@ See [Current Release Status](https://github.com/mperham/inspeqtor/milestones) he
   if mysql:Slow_queries > 1/sec then alert
 ```
 - Changed the /etc/inspeqtor layout a bit [#22]
+- inspeqtorctl no longer requires sudo for members of the 'adm' group [#27]
 
 ## 0.5.0
 

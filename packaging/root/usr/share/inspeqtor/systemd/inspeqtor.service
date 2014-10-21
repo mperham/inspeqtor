@@ -16,6 +16,9 @@ ExecStart=/usr/bin/inspeqtor -c /etc/inspeqtor -s /var/run/inspeqtor.sock
 ExecReload=/bin/kill -HUP $MAINPID
 # ensure our socket is cleaned up, even if we crashed
 ExecStartPre=/bin/rm -f /var/run/inspeqtor.sock
+# Allow any 'adm' user to run inspeqtorctl without sudo
+Group=adm
+UMask=0002
 
 # if we crash, restart
 RestartSec=1
