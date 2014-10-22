@@ -139,3 +139,6 @@ upload:	package
 	package_cloud push contribsys/inspeqtor/el/6 packaging/output/upstart/$(NAME)-$(VERSION)-$(ITERATION).x86_64.rpm
 
 .PHONY: all clean test build package upload
+
+poop:
+	echo "💩"
