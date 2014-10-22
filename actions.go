@@ -19,7 +19,7 @@ var (
 	emailTemplates = map[EventType]*template.Template{}
 )
 
-func init() {
+func loadEmailTemplates() {
 	for _, event := range Events {
 		str := event.String()
 		asset, err := Asset("templates/email/" + str + ".txt")
@@ -142,6 +142,10 @@ func (e EmailNotifier) Trigger(event *Event) error {
 
 func (e *EmailNotifier) TriggerEmail(event *Event, sender EmailSender) error {
 	var doc bytes.Buffer
+
+	if len(emailTemplates) == 0 {
+		loadEmailTemplates()
+	}
 	template := emailTemplates[event.Type]
 	err := template.Execute(&doc, &EmailEvent{event, e})
 	if err != nil {
