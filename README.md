@@ -2,8 +2,6 @@
 
 [![GoDoc](https://godoc.org/github.com/mperham/inspeqtor?status.svg)](https://godoc.org/github.com/mperham/inspeqtor)
 
-**This software is still under active development and should be considered beta quality**
-
 Inspeqtor monitors your application infrastructure.  It gathers and verifies key metrics
 from all the moving parts in your application and alerts you when something
 looks wrong.  It understands the application deployment workflow so it
@@ -11,7 +9,7 @@ won't bother you during a deploy.
 
 What it does:
 
-* Monitor systemd-, upstart-, runit- or launchd-managed services
+* Monitor init.d-, systemd-, upstart-, runit- or launchd-managed services
 * Monitor process memory and CPU usage
 * Monitor daemon-specific metrics (e.g. redis, memcached, mysql, nginx...)
 * Monitor and alert based on host CPU, load, swap and disk usage
@@ -38,9 +36,10 @@ Linux 3.0+.  It will run on OS X.  FreeBSD is untested.  It uses about 5-10MB of
 ## Upgrade
 
 [Inspeqtor Pro](http://contribsys.com/inspeqtor) is the commercial upgrade for Inspeqtor and offers more
-features, official support and a non-GPL license:
+features, dedicated support and a non-GPL license:
 
-* Monitor legacy /etc/init.d services with PID files
+* Monitor cron job execution
+* Export metrics to Statsd
 * Route alerts to different teams or individuals
 * Send alerts to Slack or other team chat rooms
 * More to come...
