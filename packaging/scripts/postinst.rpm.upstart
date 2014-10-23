@@ -8,6 +8,8 @@ fi
 
 if [ -f /etc/inspeqtor/conf.d/host.inq ]; then
   mv /etc/inspeqtor/conf.d/host.inq /etc/inspeqtor/host.inq
+else
+  cp /usr/share/inspeqtor/host.inq /etc/inspeqtor/host.inq
 fi
 
 if [ -d /etc/inspeqtor/conf.d ]; then
