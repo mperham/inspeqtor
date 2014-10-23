@@ -1,5 +1,5 @@
 #
-# Inspeqtor's default system check.
+# Inspeqtor's default host check.
 #
 # .inq files represent a thing to monitor and verify.
 # Inspeqtor MUST, at minimum, have a "check host" recipe

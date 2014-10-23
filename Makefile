@@ -2,7 +2,7 @@ NAME=inspeqtor
 VERSION=0.6.0
 
 # when fixing packaging bugs but not changing the binary, we increment ITERATION
-ITERATION=1
+ITERATION=2
 BASENAME=$(NAME)_$(VERSION)-$(ITERATION)
 
 # contains various secret or machine-specific variables.
@@ -132,7 +132,11 @@ build_deb_upstart: build
 		inspeqtor=/usr/bin/inspeqtor \
 		packaging/root/=/
 
-upload:	package
+tag:
+	git tag v$(VERSION)-$(ITERATION)
+	git push --tags
+
+upload:	package tag
 	package_cloud push contribsys/inspeqtor/ubuntu/precise packaging/output/upstart/$(NAME)_$(VERSION)-$(ITERATION)_amd64.deb
 	package_cloud push contribsys/inspeqtor/ubuntu/trusty packaging/output/upstart/$(NAME)_$(VERSION)-$(ITERATION)_amd64.deb
 	package_cloud push contribsys/inspeqtor/el/7 packaging/output/systemd/$(NAME)-$(VERSION)-$(ITERATION).x86_64.rpm
