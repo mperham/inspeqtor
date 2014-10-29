@@ -74,10 +74,10 @@ func TestCollectDiskMetrics(t *testing.T) {
 		t.Error(err)
 	}
 	if store.Get("disk", "/") != 17 {
-		t.Error("Unexpected results: %v", store.Get("disk", "/"))
+		t.Errorf("Unexpected results: %v", store.Get("disk", "/"))
 	}
 	if store.Get("disk", "/old") != 30 {
-		t.Error("Unexpected results: %v", store.Get("disk", "/old"))
+		t.Errorf("Unexpected results: %v", store.Get("disk", "/old"))
 	}
 
 	store = NewHostStore("", 15).(*hostStorage)
@@ -86,7 +86,7 @@ func TestCollectDiskMetrics(t *testing.T) {
 		t.Error(err)
 	}
 	if store.Get("disk", "/") != 7 {
-		t.Error("Unexpected results: %v", store.Get("disk", "/"))
+		t.Errorf("Unexpected results: %v", store.Get("disk", "/"))
 	}
 
 	store = NewHostStore("", 15).(*hostStorage)
@@ -95,6 +95,6 @@ func TestCollectDiskMetrics(t *testing.T) {
 		t.Error(err)
 	}
 	if store.Get("disk", "/") <= 0 {
-		t.Error("Expected root disk to have more than 0% usage")
+		t.Error("Expected root disk to have more than 0 usage")
 	}
 }

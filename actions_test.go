@@ -15,7 +15,7 @@ func makeAction(actionName, notifType string, config map[string]string) (Action,
 }
 
 func mockService(name string) *Service {
-	return &Service{&Entity{name, nil, nil, nil}, nil, &services.ProcessStatus{999, services.Up}, services.MockInit()}
+	return &Service{&Entity{name, nil, nil, nil}, nil, services.WithStatus(999, services.Up), services.MockInit()}
 }
 
 func TestRestartAlert(t *testing.T) {
@@ -134,14 +134,14 @@ func TestEmailEventRuleRecovered(t *testing.T) {
 }
 
 func validRuleEvent(etype EventType) *Event {
-	svc := &Service{&Entity{"mysql", nil, metrics.NewProcessStore("/proc", 15), nil}, nil, &services.ProcessStatus{100, services.Up}, nil}
+	svc := &Service{&Entity{"mysql", nil, metrics.NewProcessStore("/proc", 15), nil}, nil, services.WithStatus(100, services.Up), nil}
 	return &Event{
 		etype, svc, &Rule{svc, "memory", "rss", GT, "64m", 64 * 1024 * 1024, 0, false, 1, 0, Ok, []Action{mockAction()}},
 	}
 }
 
 func validProcessEvent(etype EventType) *Event {
-	svc := &Service{&Entity{"mysql", nil, metrics.NewProcessStore("/proc", 15), nil}, nil, &services.ProcessStatus{100, services.Up}, nil}
+	svc := &Service{&Entity{"mysql", nil, metrics.NewProcessStore("/proc", 15), nil}, nil, services.WithStatus(100, services.Up), nil}
 	return &Event{etype, svc, nil}
 }
 

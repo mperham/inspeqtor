@@ -114,7 +114,7 @@ func TestStatus(t *testing.T) {
 	t.Parallel()
 	i, err := New("_", "")
 	i.Services = []Checkable{
-		&Service{&Entity{"foo", nil, metrics.NewProcessStore("/proc", 15), nil}, nil, &services.ProcessStatus{99, services.Up}, nil},
+		&Service{&Entity{"foo", nil, metrics.NewProcessStore("/proc", 15), nil}, nil, services.WithStatus(99, services.Up), nil},
 	}
 
 	var resp bytes.Buffer
@@ -135,7 +135,7 @@ func TestExport(t *testing.T) {
 	t.Parallel()
 	i, err := New("_", "")
 	i.Services = []Checkable{
-		&Service{&Entity{"foo", nil, metrics.NewProcessStore("/proc", 15), nil}, nil, &services.ProcessStatus{99, services.Up}, nil},
+		&Service{&Entity{"foo", nil, metrics.NewProcessStore("/proc", 15), nil}, nil, services.WithStatus(99, services.Up), nil},
 	}
 
 	var resp bytes.Buffer

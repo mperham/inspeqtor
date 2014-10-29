@@ -147,7 +147,7 @@ func (svc *Service) Collect(silenced bool, completeCallback func(Checkable)) {
 			err := syscall.Kill(svc.Process.Pid, syscall.Signal(0))
 			if err != nil {
 				util.Info("Service %s with process %d does not exist: %s", svc.Name(), svc.Process.Pid, err)
-				svc.Transition(&services.ProcessStatus{0, services.Down}, func(et EventType) {
+				svc.Transition(services.WithStatus(0, services.Down), func(et EventType) {
 					if !silenced {
 						svc.EventHandler.Trigger(&Event{et, svc, nil})
 					}

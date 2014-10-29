@@ -191,8 +191,6 @@ func (e *EmailNotifier) setup(hash map[string]string) error {
 	from, ok := hash["from_email"]
 	if !ok {
 		from = "inspeqtor@example.com"
-	} else {
-		from = from
 	}
 
 	e.Username = usr

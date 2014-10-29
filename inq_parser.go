@@ -171,7 +171,7 @@ func convertService(global *ConfigFile, inqsvc *ast.ProcessCheck) (*Service, err
 
 	svc := &Service{&Entity{inqsvc.Name, nil, storage, inqsvc.Parameters}, nil, services.NewStatus(), nil}
 
-	action, err := BuildAction(global, svc, &ast.SimpleAction{"alert"})
+	action, err := BuildAction(global, svc, &ast.SimpleAction{ActionName: "alert"})
 	if err != nil {
 		return nil, err
 	}

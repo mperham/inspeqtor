@@ -12,6 +12,10 @@ type ProcessStatus struct {
 	Status
 }
 
+func WithStatus(pid int, status Status) *ProcessStatus {
+	return &ProcessStatus{Pid: pid, Status: status}
+}
+
 func NewStatus() *ProcessStatus {
 	return &ProcessStatus{0, Unknown}
 }
