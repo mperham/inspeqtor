@@ -35,9 +35,7 @@ fmt:
 	find . -name "*.go" -exec goimports -w {} \;
 
 vet:
-	@for i in . cli cmd metrics metrics/daemon services util; do \
-	  pushd $$i > /dev/null && go vet && popd > /dev/null ; \
-	done
+	go vet ./...
 
 clean:
 	rm -f main inspeqtor templates.go
