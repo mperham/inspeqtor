@@ -4,8 +4,15 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/mperham/inspeqtor/util"
 	"github.com/stretchr/testify/assert"
 )
+
+func init() {
+	util.LogVerbose = true
+	util.LogDebug = true
+	util.LogInfo = true
+}
 
 func TestInspeqtorParse(t *testing.T) {
 	t.Parallel()
