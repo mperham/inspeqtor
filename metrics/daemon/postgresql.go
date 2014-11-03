@@ -239,6 +239,6 @@ var (
 		metric{"deadlocks", c, nil},
 		metric{"blk_hit_rate", g, &funcWrapper{metrics.DisplayPercent, nil}},
 		metric{"seq_scans", c, nil},
-		metric{"total_size", c, &funcWrapper{inMB, nil}},
+		metric{"total_size", g, &funcWrapper{inMB, nil}},
 	}
 )
