@@ -29,5 +29,5 @@ func TestTimeout(t *testing.T) {
 	cmd := exec.Command("sleep", "1")
 	sout, err := SafeRun(cmd, time.Duration(10)*time.Millisecond)
 	assert.NotNil(t, err)
-	assert.Nil(t, sout)
+	assert.Equal(t, string(sout), "")
 }

@@ -33,10 +33,11 @@ var (
 	c                                   = metrics.Counter
 	g                                   = metrics.Gauge
 	Sources map[string]collectorBuilder = map[string]collectorBuilder{
-		"redis":     buildRedisSource,
-		"mysql":     buildMysqlSource,
-		"memcached": buildMemcachedSource,
-		"nginx":     buildNginxSource,
+		"redis":      buildRedisSource,
+		"mysql":      buildMysqlSource,
+		"memcached":  buildMemcachedSource,
+		"nginx":      buildNginxSource,
+		"postgresql": buildPostgresqlSource,
 	}
 	inMB = metrics.DisplayInMB
 )
@@ -116,11 +117,7 @@ func execCmd(command string, args []string, stdin []byte) ([]byte, error) {
 		}
 	}
 
-	sout, err := util.SafeRun(cmd)
-	if err != nil {
-		return nil, err
-	}
-	return sout, nil
+	return util.SafeRun(cmd)
 }
 
 func testExec(path string) func(string, []string, []byte) ([]byte, error) {

@@ -38,7 +38,7 @@ func SafeRun(cmd *exec.Cmd, timeout ...time.Duration) ([]byte, error) {
 	cmd.Stderr = &b
 	err := cmd.Start()
 	if err != nil {
-		return nil, err
+		return b.Bytes(), err
 	}
 
 	done := make(chan error, 1)
@@ -57,10 +57,10 @@ func SafeRun(cmd *exec.Cmd, timeout ...time.Duration) ([]byte, error) {
 			Warn("failed to kill command: %s", err)
 		}
 		<-done // allow goroutine to exit
-		return nil, errors.New(fmt.Sprintf("Command timed out: %s", cmd.Args))
+		return b.Bytes(), errors.New(fmt.Sprintf("Command timed out: %s", cmd.Args))
 	case err := <-done:
 		if err != nil {
-			return nil, err
+			return b.Bytes(), err
 		}
 	}
 
