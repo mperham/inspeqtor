@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/mperham/inspeqtor/metrics"
 	"github.com/mperham/inspeqtor/util"
 )
 
@@ -172,26 +173,32 @@ func dbStats(pg *pgSource, data metricMap) error {
 		return errors.New(fmt.Sprintf("Results row size == %d", len(results[0])))
 	}
 
-	val := results[0][0]
-	ival, err := strconv.ParseUint(val, 10, 64)
-	if err != nil {
-		return err
+	if _, ok := pg.metrics["rollbacks"]; ok {
+		val := results[0][0]
+		ival, err := strconv.ParseUint(val, 10, 64)
+		if err != nil {
+			return err
+		}
+		data["rollbacks"] = float64(ival)
 	}
-	data["rollbacks"] = float64(ival)
 
-	val = results[0][1]
-	ival, err = strconv.ParseUint(val, 10, 64)
-	if err != nil {
-		return err
+	if _, ok := pg.metrics["deadlocks"]; ok {
+		val := results[0][1]
+		ival, err := strconv.ParseUint(val, 10, 64)
+		if err != nil {
+			return err
+		}
+		data["deadlocks"] = float64(ival)
 	}
-	data["deadlocks"] = float64(ival)
 
-	val = results[0][2]
-	fval, err := strconv.ParseFloat(val, 64)
-	if err != nil {
-		return err
+	if _, ok := pg.metrics["blk_hit_rate"]; ok {
+		val := results[0][2]
+		fval, err := strconv.ParseFloat(val, 64)
+		if err != nil {
+			return err
+		}
+		data["blk_hit_rate"] = fval * 100
 	}
-	data["blk_hit_rate"] = fval
 	return nil
 }
 
@@ -230,7 +237,7 @@ var (
 	pgMetrics []metric = []metric{
 		metric{"rollbacks", c, nil},
 		metric{"deadlocks", c, nil},
-		metric{"blk_hit_rate", g, nil},
+		metric{"blk_hit_rate", g, &funcWrapper{metrics.DisplayPercent, nil}},
 		metric{"seq_scans", c, nil},
 		metric{"total_size", c, &funcWrapper{inMB, nil}},
 	}
