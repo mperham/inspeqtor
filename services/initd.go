@@ -32,13 +32,15 @@ func (i *Initd) LookupService(serviceName string) (*ProcessStatus, error) {
 		i.varrunPath + serviceName + "/" + serviceName + ".pid",
 	}
 
-	for _, path := range paths {
-		st, err := i.readPidFile(path)
+	for _, pidpath := range paths {
+		st, err := i.readPidFile(pidpath)
 		if err != nil {
-			util.Info("Error processing PID file %s: %s", path, err.Error())
+			util.Info("Error processing PID file %s: %s", pidpath, err.Error())
 			continue
 		} else if st != nil {
 			return st, nil
+		} else {
+			util.Info("No such pidfile %s", pidpath)
 		}
 	}
 
