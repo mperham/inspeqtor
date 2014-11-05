@@ -169,7 +169,7 @@ func dbStats(pg *pgSource, data metricMap) error {
 	if len(results) != 1 {
 		return errors.New(fmt.Sprintf("Results size == %d", len(results)))
 	}
-	if len(results[0]) != 3 {
+	if len(results[0]) != 4 {
 		return errors.New(fmt.Sprintf("Results row size == %d", len(results[0])))
 	}
 
