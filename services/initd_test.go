@@ -18,7 +18,8 @@ func TestInitd(t *testing.T) {
 
 	// service does not exist
 	st, err := l.LookupService("apache2")
-	assert.Nil(t, err)
+	assert.NotNil(t, err)
+	assert.Equal(t, err.(*ServiceError).Err.Error(), "No such service")
 	assert.Nil(t, st)
 
 	// service exists but pidfile doesn't

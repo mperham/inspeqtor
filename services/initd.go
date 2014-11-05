@@ -23,7 +23,7 @@ func (i *Initd) LookupService(serviceName string) (*ProcessStatus, error) {
 	if !result {
 		// service script does not exist in etc/init.d, not under
 		// init.d control
-		return nil, nil
+		return nil, &ServiceError{i.Name(), serviceName, ErrServiceNotFound}
 	}
 
 	// First try to find the PID file with same name in /var/run.

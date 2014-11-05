@@ -55,8 +55,8 @@ type InitSystem interface {
 	// Name of the init system: "upstart", "runit", etc.
 	Name() string
 
-	// Find the process info for a given service name.  All errors
-	// returned must be of type ServiceError.
+	// Find the process info for a given service name.  Method MUST
+	// either return a non-nil ProcessStatus or a ServiceError.
 	LookupService(name string) (*ProcessStatus, error)
 
 	// Restart the process associated with the given service name.  All errors
