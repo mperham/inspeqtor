@@ -10,6 +10,7 @@ See [Current Release Status](https://github.com/mperham/inspeqtor/milestones) he
 ## 0.7.0-1
 
 - Add daemon-specific metrics for PostgreSQL! [#26]
+- Fix bug in init.d support, better logging
 
 
 ## 0.6.0-2
