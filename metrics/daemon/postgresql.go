@@ -247,7 +247,7 @@ var (
 	pgMetrics []metric = []metric{
 		metric{"rollbacks", c, nil},
 		metric{"deadlocks", c, nil},
-		metric{"numbackends", c, nil},
+		metric{"numbackends", g, nil},
 		metric{"blk_hit_rate", g, &funcWrapper{metrics.DisplayPercent, nil}},
 		metric{"seq_scans", c, nil},
 		metric{"total_size", g, &funcWrapper{inMB, nil}},
