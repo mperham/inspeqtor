@@ -95,7 +95,7 @@ func buildPostgresqlSource(params map[string]string) (Collector, error) {
 func populate(pg *pgSource, data metricMap, name string) error {
 	var sqlfunk func(*pgSource, metricMap) error
 	switch name {
-	case "rollbacks", "deadlocks", "blk_hit_rate":
+	case "rollbacks", "deadlocks", "numbackends", "blk_hit_rate":
 		sqlfunk = dbStats
 	case "seq_scans":
 		sqlfunk = userStats
@@ -161,7 +161,7 @@ func sizeStats(pg *pgSource, data metricMap) error {
 }
 
 func dbStats(pg *pgSource, data metricMap) error {
-	sql := "select sum(xact_rollback), sum(deadlocks), sum(blks_hit) / (sum(blks_read) + sum(blks_hit)) from pg_stat_database"
+	sql := "select sum(xact_rollback), sum(deadlocks), sum(numbackends), sum(blks_hit) / (sum(blks_read) + sum(blks_hit)) from pg_stat_database"
 	results, err := runSql(pg, sql)
 	if err != nil {
 		return err
@@ -191,14 +191,24 @@ func dbStats(pg *pgSource, data metricMap) error {
 		data["deadlocks"] = float64(ival)
 	}
 
-	if _, ok := pg.metrics["blk_hit_rate"]; ok {
+	if _, ok := pg.metrics["numbackends"]; ok {
 		val := results[0][2]
+		fval, err := strconv.ParseUint(val, 10, 64)
+		if err != nil {
+			return err
+		}
+		data["numbackends"] = float64(fval)
+	}
+
+	if _, ok := pg.metrics["blk_hit_rate"]; ok {
+		val := results[0][3]
 		fval, err := strconv.ParseFloat(val, 64)
 		if err != nil {
 			return err
 		}
 		data["blk_hit_rate"] = fval * 100
 	}
+
 	return nil
 }
 
@@ -237,6 +247,7 @@ var (
 	pgMetrics []metric = []metric{
 		metric{"rollbacks", c, nil},
 		metric{"deadlocks", c, nil},
+		metric{"numbackends", c, nil},
 		metric{"blk_hit_rate", g, &funcWrapper{metrics.DisplayPercent, nil}},
 		metric{"seq_scans", c, nil},
 		metric{"total_size", g, &funcWrapper{inMB, nil}},
