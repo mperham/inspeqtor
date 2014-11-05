@@ -7,6 +7,11 @@ Version 1.0 will be released when it is stable and ready for widespread usage.
 
 See [Current Release Status](https://github.com/mperham/inspeqtor/milestones) here.
 
+## 0.7.0-1
+
+- Add daemon-specific metrics for PostgreSQL! [#26]
+
+
 ## 0.6.0-2
 
 - Fix missing /etc/inspeqtor/host.inq in packaging.
