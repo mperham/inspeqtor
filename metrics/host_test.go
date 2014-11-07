@@ -63,7 +63,6 @@ func TestCollectRealHostMetrics(t *testing.T) {
 	assert.True(t, store.Get("load", "1") > 0)
 	assert.True(t, store.Get("load", "5") > 0)
 	assert.True(t, store.Get("load", "15") > 0)
-	assert.True(t, store.Get("swap", "") > 0, "Will fail if your swap usage is 0%")
 }
 
 func TestCollectDiskMetrics(t *testing.T) {
