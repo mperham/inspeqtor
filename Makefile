@@ -21,7 +21,7 @@ prepare:
 	go get github.com/stretchr/testify/...
 	go get github.com/jteeuwen/go-bindata/...
 	# needed for `make fmt`
-	go get golang.org/x/tools/cmd/goimports
+	#go get golang.org/x/tools/cmd/goimports
 	@echo Now you should be ready to run "make"
 
 test:

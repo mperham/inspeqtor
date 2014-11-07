@@ -1,0 +1,7 @@
+language: go
+install: make prepare
+addons:
+  postgresql: "9.2"
+services:
+  - memcached
+  - redis-server

@@ -43,9 +43,8 @@ func TestRealPostgresqlConnection(t *testing.T) {
 	t.Parallel()
 
 	/*
-		To get this test running locally, you must have a root superuser:
-		  createuser -s root
-			createdb root
+		To get this test running locally, you must have a postgres user:
+		  createuser -s postgres
 	*/
 
 	rs := psqlSource()
