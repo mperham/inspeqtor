@@ -74,7 +74,7 @@ func (pg *pgSource) buildArgs() []string {
 }
 
 func buildPostgresqlSource(params map[string]string) (Collector, error) {
-	rs := &pgSource{"localhost", "5432", "postgres", map[string]bool{}, false, execCmd}
+	rs := &pgSource{"localhost", "5432", "root", map[string]bool{}, false, execCmd}
 	for k, v := range params {
 		switch k {
 		case "username":

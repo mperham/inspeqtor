@@ -3,3 +3,6 @@ install: make prepare
 services:
   - memcached
   - redis-server
+before_install:
+  - createuser -s root
+  - createdb root
