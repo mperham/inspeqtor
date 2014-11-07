@@ -46,9 +46,7 @@ func (u *Systemd) Name() string {
 }
 
 func (u *Systemd) Restart(serviceName string) error {
-	if len(u.dummyOutput) != 0 {
-		//sout = []byte(u.dummyOutput)
-	} else {
+	if len(u.dummyOutput) == 0 {
 		cmd := exec.Command("systemctl", "restart", serviceName)
 		_, err := util.SafeRun(cmd, util.RestartTimeout)
 		if err != nil {
