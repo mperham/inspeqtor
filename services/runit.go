@@ -17,6 +17,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/mperham/inspeqtor/util"
 )
@@ -59,16 +60,12 @@ func detectRunit(root string) (InitSystem, error) {
 	return nil, nil
 }
 
-func (r *Runit) Name() string {
-	return "runit"
-}
-
-func (r *Runit) Restart(serviceName string) error {
+func (r *Runit) serviceCommand(serviceName string, command string, timeout time.Duration) error {
 	out := []byte{}
 
 	if r.dummyOutput == "" {
-		cmd := exec.Command("sv", "restart", serviceName)
-		sout, err := util.SafeRun(cmd, util.RestartTimeout)
+		cmd := exec.Command("sv", command, serviceName)
+		sout, err := util.SafeRun(cmd, timeout)
 		if err != nil {
 			return &ServiceError{r.Name(), serviceName, err}
 		}
@@ -86,6 +83,10 @@ func (r *Runit) Restart(serviceName string) error {
 		return &ServiceError{r.Name(), serviceName, errors.New("Unexpected output: " + strings.Join(lines, "\n"))}
 	}
 	return nil
+}
+
+func (r *Runit) Name() string {
+	return "runit"
 }
 
 func (r *Runit) LookupService(serviceName string) (*ProcessStatus, error) {
@@ -109,4 +110,12 @@ func (r *Runit) LookupService(serviceName string) (*ProcessStatus, error) {
 	}
 
 	return &ProcessStatus{int(pid), Up}, nil
+}
+
+func (r *Runit) Restart(serviceName string) error {
+	return r.serviceCommand(serviceName, "restart", util.RestartTimeout)
+}
+
+func (r *Runit) Reload(serviceName string) error {
+	return r.serviceCommand(serviceName, "reload", util.CmdTimeout)
 }
