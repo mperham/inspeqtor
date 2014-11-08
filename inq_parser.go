@@ -1,7 +1,7 @@
 package inspeqtor
 
 import (
-	"errors"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -25,7 +25,7 @@ func ParseHost(global *ConfigFile, hostInq string) (*Host, error) {
 		return nil, err
 	}
 	if !result {
-		return nil, errors.New("Missing required file: " + hostInq)
+		return nil, fmt.Errorf("Missing required file: %s", hostInq)
 	}
 
 	util.DebugDebug("Parsing " + hostInq)
@@ -49,7 +49,7 @@ func ParseHost(global *ConfigFile, hostInq string) (*Host, error) {
 		}
 		util.DebugDebug("Host: %+v", *host)
 	default:
-		return nil, errors.New("Invalid host.inq configuration file")
+		return nil, fmt.Errorf("Invalid host.inq configuration file")
 	}
 
 	return host, nil
@@ -91,7 +91,7 @@ func ParseServices(global *ConfigFile, confDir string) ([]Checkable, error) {
 			util.DebugDebug("Service: %+v", *svc)
 			checks = append(checks, svc)
 		default:
-			return nil, errors.New("Invalid " + filename + " configuration file")
+			return nil, fmt.Errorf("Invalid configuration file: %s", filename)
 		}
 	}
 
@@ -135,7 +135,7 @@ func convertRule(global *ConfigFile, check Checkable, inqrule ast.Rule) (*Rule, 
 	case "<":
 		op = LT
 	default:
-		return nil, errors.New("Unknown operator: " + inqrule.Operator)
+		return nil, fmt.Errorf("Unknown operator: %s", inqrule.Operator)
 	}
 
 	actions := make([]Action, 0)
@@ -156,7 +156,7 @@ func convertAction(global *ConfigFile, check Eventable, action ast.Action) (Acti
 	case "alert":
 		route := global.AlertRoutes[""]
 		if route == nil {
-			return nil, errors.New("No alert route configured!")
+			return nil, fmt.Errorf("Please configure a \"send alerts\" statement in inspeqtor.conf.")
 		}
 		return Actions["alert"](check, route)
 	case "restart":
