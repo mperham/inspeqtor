@@ -4,6 +4,7 @@ import (
 	"errors"
 	"io/ioutil"
 	"os/exec"
+	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
@@ -15,15 +16,18 @@ var (
 	timeRegexp = regexp.MustCompile("\\A(\\d+):(\\d\\d).(\\d\\d)\\z")
 )
 
+type dynamicCollector func(int, *processStorage) error
+
 type processStorage struct {
 	*storage
-	path string
+	path   string
+	dyncol []dynamicCollector
 }
 
 func NewProcessStore(path string, cycleSeconds uint) Store {
 	store := &processStorage{
-		&storage{map[string]*family{}},
-		path,
+		storage: &storage{map[string]*family{}},
+		path:    path,
 	}
 
 	tickPercentage := func(cur, prev float64) float64 {
@@ -38,10 +42,103 @@ func NewProcessStore(path string, cycleSeconds uint) Store {
 	return store
 }
 
+func (ps *processStorage) Prepare(metricFamily, metricName string) error {
+	if metricFamily == "memory" && metricName == "total_rss" {
+		ps.DeclareGauge("memory", "total_rss", DisplayInMB)
+		ps.dyncol = append(ps.dyncol, totalRssCollector)
+	}
+	return nil
+}
+
 func (ps *processStorage) Load(values ...interface{}) {
 	if len(values) > 0 {
 		ps.fill(values...)
 	}
+}
+
+type processEntry struct {
+	pid  int
+	ppid int
+	rss  int64
+}
+
+/*
+  Collecting total RSS for a process is actually rather involved on Linux.
+	Because of this, we only collect the value if the user defines a rule
+	for it.  This is a "dynamicCollector".
+*/
+func totalRssCollector(mypid int, ps *processStorage) error {
+	// Assume PIDs < 100 are kernel threads
+	matches, err := filepath.Glob("/proc/[1-9][0-9]*/status")
+	if err != nil {
+		return err
+	}
+	var live []processEntry
+
+	for _, file := range matches {
+		pe := processEntry{}
+
+		data, err := ioutil.ReadFile(file)
+		if err != nil {
+			// race condition between globbing and reading, process
+			// can disappear at any moment
+			continue
+		}
+
+		lines, err := util.ReadLines(data)
+		if err != nil {
+			return err
+		}
+		for _, line := range lines {
+			if line[0] == 'V' || line[0] == 'P' {
+				items := strings.Fields(line)
+				switch items[0] {
+				case "Pid:":
+					pid, err := strconv.Atoi(items[1])
+					if err != nil {
+						return err
+					}
+					pe.pid = pid
+				case "PPid:":
+					ppid, err := strconv.Atoi(items[1])
+					if err != nil {
+						return err
+					}
+					pe.ppid = ppid
+				case "VmRSS:":
+					val, err := strconv.ParseInt(items[1], 10, 64)
+					if err != nil {
+						return err
+					}
+					pe.rss = val * 1024
+				}
+			}
+		}
+
+		if pe.rss != 0 {
+			live = append(live, pe)
+		}
+	}
+	util.Debug("Calculating %d processes", len(live))
+
+	rss := memoryFor(live, mypid)
+	util.Debug("Total RSS for %d: %d", mypid, rss)
+
+	ps.Save("memory", "total_rss", float64(rss))
+	return nil
+}
+
+// recursively walk the array, looking for children, grandchildren, etc
+func memoryFor(procs []processEntry, curpid int) int64 {
+	var rss int64
+	for _, entry := range procs {
+		if entry.pid == curpid {
+			rss += entry.rss
+		} else if entry.ppid == curpid {
+			rss += memoryFor(procs, entry.pid)
+		}
+	}
+	return rss
 }
 
 func (ps *processStorage) Collect(pid int) error {
@@ -66,6 +163,13 @@ func (ps *processStorage) Collect(pid int) error {
 		}
 
 		err = ps.captureCpu(pid)
+		if err != nil {
+			return err
+		}
+	}
+
+	for _, fn := range ps.dyncol {
+		err = fn(pid, ps)
 		if err != nil {
 			return err
 		}

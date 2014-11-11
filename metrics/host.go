@@ -41,6 +41,10 @@ func NewHostStore(path string, cycleSeconds uint) Store {
 	return store
 }
 
+func (hs *hostStorage) Prepare(metricFamily, metricName string) error {
+	return nil
+}
+
 func (hs *hostStorage) Collect(_ int) error {
 	var err error
 
