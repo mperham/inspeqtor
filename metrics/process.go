@@ -68,7 +68,6 @@ type processEntry struct {
 	for it.  This is a "dynamicCollector".
 */
 func totalRssCollector(mypid int, ps *processStorage) error {
-	// Assume PIDs < 100 are kernel threads
 	matches, err := filepath.Glob("/proc/[1-9][0-9]*/status")
 	if err != nil {
 		return err
