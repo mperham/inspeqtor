@@ -20,6 +20,7 @@ prepare:
 	#sudo tar -C /usr/local -xzf go1.3.1.linux-amd64.tar.gz
 	go get github.com/stretchr/testify/...
 	go get github.com/jteeuwen/go-bindata/...
+	go get code.google.com/p/gocc/...
 	# needed for `make fmt`
 	#go get golang.org/x/tools/cmd/goimports
 	@echo Now you should be ready to run "make"
@@ -27,6 +28,12 @@ prepare:
 test:
 	@go-bindata -pkg inspeqtor -o templates.go templates/...
 	@go test -parallel 4 ./... | grep -v "no test files"
+
+gocc:
+	# Generate parser and token package for conf/global/format.bnf and
+	# conf/inq/format.bnf
+	cd $(shell pwd)/conf/global && $(GOPATH)/bin/gocc format.bnf
+	cd $(shell pwd)/conf/inq && $(GOPATH)/bin/gocc format.bnf
 
 build: test
 	@GOOS=linux GOARCH=amd64 go build -o inspeqtor cmd/main.go
