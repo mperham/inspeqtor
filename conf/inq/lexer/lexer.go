@@ -1,7 +1,6 @@
 package lexer
 
 import (
-
 	// "fmt"
 	// "github.com/mperham/inspeqtor/conf/inq/util"
 

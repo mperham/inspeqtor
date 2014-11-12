@@ -1,4 +1,4 @@
 check service memcached with owner dev, foo bar, endpoint /foo, quoted "whoa sp\"aces"
-#  if not exists then start
+  # if not exists then start
   if memory(rss) > 250m then alert ops, restart
   if cpu:user > 4 then alert

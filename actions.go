@@ -37,7 +37,7 @@ func loadEmailTemplates() {
 
 /*
  An Action is something which is triggered when a rule is broken.  This is typically
- either a Notification or to Restart the service.
+ either a Notification, Restart or a Reload to the the service.
 */
 type ActionBuilder func(Eventable, *AlertRoute) (Action, error)
 
@@ -51,6 +51,7 @@ var (
 	Actions = map[string]ActionBuilder{
 		"alert":   buildAlerter,
 		"restart": buildRestarter,
+		"reload":  buildReloader,
 	}
 	Notifiers = map[string]NotifierBuilder{
 		"email": buildEmailNotifier,
@@ -77,12 +78,29 @@ func buildRestarter(check Eventable, _ *AlertRoute) (Action, error) {
 	}
 }
 
+func buildReloader(check Eventable, _ *AlertRoute) (Action, error) {
+	switch check.(type) {
+	case *Service:
+		return &Reloader{check.(*Service)}, nil
+	default:
+		return nil, errors.New("Cannot reload " + check.Name())
+	}
+}
+
 type Restarter struct {
 	*Service
 }
 
 func (r Restarter) Trigger(event *Event) error {
 	return r.Service.Restart()
+}
+
+type Reloader struct {
+	*Service
+}
+
+func (r Reloader) Trigger(event *Event) error {
+	return r.Service.Reload()
 }
 
 // Useful for testing

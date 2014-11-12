@@ -127,6 +127,11 @@ func (m *MockInitSystem) Restart(name string) error {
 	return nil
 }
 
+func (m *MockInitSystem) Reload(name string) error {
+	m.Actions = append(m.Actions, "reload "+name)
+	return nil
+}
+
 func (m *MockInitSystem) LookupService(name string) (*ProcessStatus, error) {
 	if m.CurrentStatus != nil {
 		return m.CurrentStatus, nil
