@@ -36,4 +36,7 @@ func TestDetectSystemd(t *testing.T) {
 
 	err = init.Restart("rsyslog")
 	assert.Nil(t, err)
+
+	err = init.Reload("rsyslog")
+	assert.Nil(t, err)
 }

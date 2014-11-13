@@ -49,4 +49,7 @@ func TestDetectUpstart(t *testing.T) {
 	upstart.dummyOutput = "rsyslog start/running, process 28192"
 	err = init.Restart("rsyslog")
 	assert.Nil(t, err)
+
+	err = init.Reload("rsyslog")
+	assert.Nil(t, err)
 }
