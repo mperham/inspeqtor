@@ -51,8 +51,6 @@ type Rule struct {
 	Actions          []Action
 }
 
-// TODO: The "Reload" function has been tacked onto the restarter type,
-// this may output the wrong string.
 func (r *Rule) Consequence() string {
 	for _, a := range r.Actions {
 		// So clean!

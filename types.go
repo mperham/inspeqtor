@@ -211,7 +211,6 @@ func (s *Service) Restart() error {
 }
 
 func (s *Service) Reload() error {
-	// TODO: Keep the Pid? Change the status?
 	go func() {
 		util.Debug("Reloading %s", s.Name())
 		err := s.Manager.Reload(s.Name())
