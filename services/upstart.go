@@ -60,7 +60,7 @@ func (u *Upstart) serviceCommand(serviceName string, command string, timeout tim
 	}
 
 	lines, err := util.ReadLines(sout)
-	if len(lines) != 1 {
+	if command == "restart" && len(lines) != 1 {
 		return &ServiceError{u.Name(), serviceName, errors.New("Unexpected output: " + strings.Join(lines, "\n"))}
 	}
 	return nil
