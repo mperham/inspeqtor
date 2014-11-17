@@ -46,7 +46,7 @@ func detectUpstart(path string) (InitSystem, error) {
 	return nil, nil
 }
 
-func (u *Upstart) serviceCommand(serviceName string, command string, timeout time.Duration) error {
+func (u *Upstart) serviceCommand(serviceName string, command string, timeout time.Duration, expectedLines int) error {
 	var err error
 	var sout []byte
 	if len(u.dummyOutput) != 0 {
@@ -60,7 +60,7 @@ func (u *Upstart) serviceCommand(serviceName string, command string, timeout tim
 	}
 
 	lines, err := util.ReadLines(sout)
-	if command == "restart" && len(lines) != 1 {
+	if len(lines) != expectedLines {
 		return &ServiceError{u.Name(), serviceName, errors.New("Unexpected output: " + strings.Join(lines, "\n"))}
 	}
 	return nil
@@ -126,9 +126,9 @@ func (u *Upstart) LookupService(serviceName string) (*ProcessStatus, error) {
 }
 
 func (u *Upstart) Restart(serviceName string) error {
-	return u.serviceCommand(serviceName, "restart", util.RestartTimeout)
+	return u.serviceCommand(serviceName, "restart", util.RestartTimeout, 1)
 }
 
 func (u *Upstart) Reload(serviceName string) error {
-	return u.serviceCommand(serviceName, "reload", util.CmdTimeout)
+	return u.serviceCommand(serviceName, "reload", util.CmdTimeout, 0)
 }
