@@ -65,7 +65,7 @@ type InitSystem interface {
 
 	// Reload the process associated with the service name. Typically this will
 	// send a HUP signal to the service. Not all system managers will handle
-	// "restart", in which case they'll throw a ServiceError.
+	// "reload", in which case they'll throw a ServiceError.
 	Reload(name string) error
 }
 

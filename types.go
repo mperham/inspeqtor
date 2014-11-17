@@ -104,8 +104,8 @@ type Checkable interface {
 	Collect(bool, func(Checkable))
 }
 
-// A Service is Restartable, Host is not.
-type Restartable interface {
+// A Service is Controllable, a Host is not.
+type Controllable interface {
 	Restart() error
 	Reload() error
 }
