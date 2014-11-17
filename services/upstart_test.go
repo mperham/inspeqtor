@@ -12,8 +12,10 @@ func TestDetectUpstart(t *testing.T) {
 	init, err := detectUpstart("etc/init")
 	assert.Nil(t, err)
 
+	var output string
+	output = "mysql start/running, process 14190"
 	upstart := init.(*Upstart)
-	upstart.dummyOutput = "mysql start/running, process 14190"
+	upstart.dummyOutput = &output
 	st, err := init.LookupService("mysql")
 	assert.Nil(t, err)
 	assert.Equal(t, 14190, st.Pid)
@@ -21,7 +23,8 @@ func TestDetectUpstart(t *testing.T) {
 	assert.Equal(t, st.String(), "Up/14190")
 
 	// conf exists, but job is invalid
-	upstart.dummyOutput = "initctl: Unknown job: foo"
+	output = "initctl: Unknown job: foo"
+	upstart.dummyOutput = &output
 	st, err = init.LookupService("foo")
 	assert.Nil(t, st)
 	assert.NotNil(t, err)
@@ -32,13 +35,15 @@ func TestDetectUpstart(t *testing.T) {
 	assert.NotNil(t, err)
 
 	// running as non-root
-	upstart.dummyOutput = "initctl: Unable to connect to system bus: Failed to connect to socket /var/run/dbus/system_bus_socket: No such file or directory"
+	output = "initctl: Unable to connect to system bus: Failed to connect to socket /var/run/dbus/system_bus_socket: No such file or directory"
+	upstart.dummyOutput = &output
 	st, err = init.LookupService("foo")
 	assert.NotNil(t, err)
 	assert.Nil(t, st)
 
 	// garbage
-	upstart.dummyOutput = "what the deuce?"
+	output = "what the deuce?"
+	upstart.dummyOutput = &output
 	st, err = init.LookupService("mysql")
 	assert.Nil(t, st)
 	assert.NotNil(t, err)
@@ -46,10 +51,13 @@ func TestDetectUpstart(t *testing.T) {
 		t.Error("Unexpected error: " + err.Error())
 	}
 
-	upstart.dummyOutput = "rsyslog start/running, process 28192"
+	output = "rsyslog start/running, process 28192"
+	upstart.dummyOutput = &output
 	err = init.Restart("rsyslog")
 	assert.Nil(t, err)
 
+	output = ""
+	upstart.dummyOutput = &output
 	err = init.Reload("rsyslog")
 	assert.Nil(t, err)
 }

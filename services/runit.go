@@ -24,7 +24,7 @@ import (
 
 type Runit struct {
 	path        string
-	dummyOutput string
+	dummyOutput *string
 }
 
 func detectRunit(root string) (InitSystem, error) {
@@ -54,7 +54,7 @@ func detectRunit(root string) (InitSystem, error) {
 
 	if len(matches) > 0 {
 		util.Info("Detected runit in " + path)
-		return &Runit{path, ""}, nil
+		return &Runit{path, nil}, nil
 	}
 
 	return nil, nil
@@ -63,7 +63,7 @@ func detectRunit(root string) (InitSystem, error) {
 func (r *Runit) serviceCommand(serviceName string, command string, timeout time.Duration) error {
 	out := []byte{}
 
-	if r.dummyOutput == "" {
+	if r.dummyOutput == nil {
 		cmd := exec.Command("sv", command, serviceName)
 		sout, err := util.SafeRun(cmd, timeout)
 		if err != nil {
@@ -71,8 +71,8 @@ func (r *Runit) serviceCommand(serviceName string, command string, timeout time.
 		}
 		out = sout
 	} else {
-		out = []byte(r.dummyOutput)
-		r.dummyOutput = ""
+		out = []byte(*r.dummyOutput)
+		r.dummyOutput = nil
 	}
 
 	lines, err := util.ReadLines(out)

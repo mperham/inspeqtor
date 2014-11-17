@@ -2,6 +2,7 @@ package inq
 
 import (
 	"io/ioutil"
+	"sort"
 	"strings"
 	"testing"
 
@@ -69,17 +70,25 @@ func TestBasicServiceParsing(t *testing.T) {
 	}
 
 	check := obj.(*ast.ProcessCheck)
-	assert.Equal(t, check.Name, "memcached")
-	assert.Equal(t, len(check.Rules), 2)
-	assert.Equal(t, len(check.Parameters), 4)
-	assert.Equal(t, check.Parameters["owner"], "dev")
-	assert.Equal(t, check.Parameters["foo"], "bar")
-	assert.Equal(t, check.Parameters["endpoint"], "/foo")
-	assert.Equal(t, check.Parameters["quoted"], "whoa sp\"aces")
-	assert.Equal(t, check.Rules[0].Actions[1].Name(), "alert")
-	assert.Equal(t, check.Rules[0].Actions[2].Name(), "reload")
-	assert.Equal(t, check.Rules[1].Metric.Family, "cpu")
-	assert.Equal(t, check.Rules[1].Metric.Name, "user")
+	assert.Equal(t, "memcached", check.Name)
+	assert.Equal(t, 2, len(check.Rules))
+	assert.Equal(t, 4, len(check.Parameters))
+	assert.Equal(t, "dev", check.Parameters["owner"])
+	assert.Equal(t, "bar", check.Parameters["foo"])
+	assert.Equal(t, "/foo", check.Parameters["endpoint"])
+	assert.Equal(t, "whoa sp\"aces", check.Parameters["quoted"])
+	assert.Equal(t, "cpu", check.Rules[1].Metric.Family)
+	assert.Equal(t, "user", check.Rules[1].Metric.Name)
+
+	var names []string
+	for _, act := range check.Rules[0].Actions {
+		names = append(names, act.Name())
+	}
+	sort.Strings(names)
+
+	assert.Equal(t, "alert", names[0])
+	assert.Equal(t, "reload", names[1])
+	assert.Equal(t, "restart", names[2])
 }
 
 func TestBasicHostParsing(t *testing.T) {
