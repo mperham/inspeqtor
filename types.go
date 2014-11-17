@@ -104,9 +104,10 @@ type Checkable interface {
 	Collect(bool, func(Checkable))
 }
 
-// A Service is Restartable, Host is not.
-type Restartable interface {
+// A Service is Controllable, a Host is not.
+type Controllable interface {
 	Restart() error
+	Reload() error
 }
 
 /*
@@ -204,6 +205,19 @@ func (s *Service) Restart() error {
 			util.Warn(err.Error())
 		} else {
 			util.DebugDebug("Restarted %s", s.Name())
+		}
+	}()
+	return nil
+}
+
+func (s *Service) Reload() error {
+	go func() {
+		util.Debug("Reloading %s", s.Name())
+		err := s.Manager.Reload(s.Name())
+		if err != nil {
+			util.Warn(err.Error())
+		} else {
+			util.DebugDebug("Reloaded %s", s.Name())
 		}
 	}()
 	return nil

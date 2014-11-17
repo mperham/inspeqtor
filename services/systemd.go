@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/mperham/inspeqtor/util"
 )
@@ -41,41 +42,39 @@ func detectSystemd(path string) (InitSystem, error) {
 	return nil, nil
 }
 
-func (u *Systemd) Name() string {
-	return "systemd"
-}
-
-func (u *Systemd) Restart(serviceName string) error {
-	if len(u.dummyOutput) != 0 {
-		//sout = []byte(u.dummyOutput)
-	} else {
-		cmd := exec.Command("systemctl", "restart", serviceName)
-		_, err := util.SafeRun(cmd, util.RestartTimeout)
+func (s *Systemd) serviceCommand(serviceName string, command string, timeout time.Duration) error {
+	if len(s.dummyOutput) == 0 {
+		cmd := exec.Command("systemctl", command, serviceName)
+		_, err := util.SafeRun(cmd, timeout)
 		if err != nil {
-			return &ServiceError{u.Name(), serviceName, err}
+			return &ServiceError{s.Name(), serviceName, err}
 		}
 	}
 
 	return nil
 }
 
-func (u *Systemd) LookupService(serviceName string) (*ProcessStatus, error) {
+func (u *Systemd) Name() string {
+	return "systemd"
+}
+
+func (s *Systemd) LookupService(serviceName string) (*ProcessStatus, error) {
 	var sout []byte
 	var err error
 
-	if len(u.dummyOutput) != 0 {
-		sout = []byte(u.dummyOutput)
+	if len(s.dummyOutput) != 0 {
+		sout = []byte(s.dummyOutput)
 	} else {
 		cmd := exec.Command("systemctl", "show", "-p", "MainPID", serviceName)
 		sout, err = util.SafeRun(cmd)
 	}
 
 	if err != nil {
-		return nil, &ServiceError{u.Name(), serviceName, err}
+		return nil, &ServiceError{s.Name(), serviceName, err}
 	}
 	lines, err := util.ReadLines(sout)
 	if len(lines) != 1 {
-		return nil, &ServiceError{u.Name(), serviceName, errors.New("Unexpected output: " + strings.Join(lines, "\n"))}
+		return nil, &ServiceError{s.Name(), serviceName, errors.New("Unexpected output: " + strings.Join(lines, "\n"))}
 	}
 
 	// Output will be "MainPID=1234" or
@@ -85,20 +84,28 @@ func (u *Systemd) LookupService(serviceName string) (*ProcessStatus, error) {
 	if fields[1] != "0" {
 		pid, err := strconv.ParseInt(fields[1], 10, 32)
 		if err != nil {
-			return nil, &ServiceError{u.Name(), serviceName, err}
+			return nil, &ServiceError{s.Name(), serviceName, err}
 		}
 		return &ProcessStatus{int(pid), Up}, nil
 	}
 
-	if len(u.dummyOutput2) != 0 {
-		sout = []byte(u.dummyOutput2)
+	if len(s.dummyOutput2) != 0 {
+		sout = []byte(s.dummyOutput2)
 	} else {
 		cmd := exec.Command("systemctl", "is-enabled", serviceName)
 		sout, err = util.SafeRun(cmd)
 	}
 	if err != nil || string(sout) != "enabled\n" {
-		return nil, &ServiceError{u.Name(), serviceName, ErrServiceNotFound}
+		return nil, &ServiceError{s.Name(), serviceName, ErrServiceNotFound}
 	} else {
 		return &ProcessStatus{0, Down}, nil
 	}
+}
+
+func (s *Systemd) Restart(serviceName string) error {
+	return s.serviceCommand(serviceName, "restart", util.RestartTimeout)
+}
+
+func (s *Systemd) Reload(serviceName string) error {
+	return s.serviceCommand(serviceName, "reload", util.CmdTimeout)
 }

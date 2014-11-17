@@ -40,6 +40,14 @@ func TestRestart(t *testing.T) {
 	assert.Equal(t, services.Starting, s.Process.Status)
 }
 
+func TestReload(t *testing.T) {
+	t.Parallel()
+	service := mockService("foobar")
+	res, err := Actions["reload"](service, nil)
+	assert.Nil(t, err)
+	assert.NotNil(t, res)
+}
+
 func TestGmailNotifier(t *testing.T) {
 	t.Parallel()
 	action, err := makeAction("alert", "gmail", map[string]string{

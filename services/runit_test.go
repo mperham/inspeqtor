@@ -26,4 +26,7 @@ func TestDetectRunit(t *testing.T) {
 	runit.(*Runit).dummyOutput = "ok: run: memcached: (pid 28125) 1s"
 	err = runit.Restart("memcached")
 	assert.Nil(t, err)
+
+	err = runit.Reload("memcached")
+	assert.Nil(t, err)
 }

@@ -67,6 +67,7 @@ ActionList
 
 Action
   : "restart"       << ast.AddAction($0, nil) >>
+  | "reload"        << ast.AddAction($0, nil) >>
   | "alert"         << ast.AddAction($0, nil) >>
   | "alert" name    << ast.AddAction($0, $1) >>
 ;

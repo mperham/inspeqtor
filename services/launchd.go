@@ -37,10 +37,6 @@ func detectLaunchd(rootDir string) (InitSystem, error) {
 	return &Launchd{paths}, nil
 }
 
-func (l *Launchd) Name() string {
-	return "launchd"
-}
-
 func (l *Launchd) resolvePlist(serviceName string) string {
 	for _, path := range l.dirs {
 		candidate := fmt.Sprintf("%s/%s.plist", path, serviceName)
@@ -52,34 +48,8 @@ func (l *Launchd) resolvePlist(serviceName string) string {
 	return ""
 }
 
-func (l *Launchd) Restart(serviceName string) error {
-	path := l.resolvePlist(serviceName)
-	if path == "" {
-		return &ServiceError{l.Name(), serviceName, ErrServiceNotFound}
-	}
-
-	cmd := exec.Command("launchctl", "unload", path)
-	sout, err := util.SafeRun(cmd)
-	if err != nil {
-		return &ServiceError{l.Name(), serviceName, err}
-	}
-
-	lines, err := util.ReadLines(sout)
-	if len(lines) != 0 {
-		return &ServiceError{l.Name(), serviceName, errors.New("Unexpected output: " + strings.Join(lines, "\n"))}
-	}
-
-	cmd = exec.Command("launchctl", "load", path)
-	sout, err = util.SafeRun(cmd)
-	if err != nil {
-		return &ServiceError{l.Name(), serviceName, err}
-	}
-
-	lines, err = util.ReadLines(sout)
-	if len(lines) != 0 {
-		return &ServiceError{l.Name(), serviceName, errors.New("Unexpected output: " + strings.Join(lines, "\n"))}
-	}
-	return nil
+func (l *Launchd) Name() string {
+	return "launchd"
 }
 
 func (l *Launchd) LookupService(serviceName string) (*ProcessStatus, error) {
@@ -113,4 +83,38 @@ func (l *Launchd) LookupService(serviceName string) (*ProcessStatus, error) {
 	}
 
 	return nil, &ServiceError{l.Name(), serviceName, ErrServiceNotFound}
+}
+
+func (l *Launchd) Restart(serviceName string) error {
+	path := l.resolvePlist(serviceName)
+	if path == "" {
+		return &ServiceError{l.Name(), serviceName, ErrServiceNotFound}
+	}
+
+	cmd := exec.Command("launchctl", "unload", path)
+	sout, err := util.SafeRun(cmd)
+	if err != nil {
+		return &ServiceError{l.Name(), serviceName, err}
+	}
+
+	lines, err := util.ReadLines(sout)
+	if len(lines) != 0 {
+		return &ServiceError{l.Name(), serviceName, errors.New("Unexpected output: " + strings.Join(lines, "\n"))}
+	}
+
+	cmd = exec.Command("launchctl", "load", path)
+	sout, err = util.SafeRun(cmd)
+	if err != nil {
+		return &ServiceError{l.Name(), serviceName, err}
+	}
+
+	lines, err = util.ReadLines(sout)
+	if len(lines) != 0 {
+		return &ServiceError{l.Name(), serviceName, errors.New("Unexpected output: " + strings.Join(lines, "\n"))}
+	}
+	return nil
+}
+
+func (l *Launchd) Reload(serviceName string) error {
+	return &ServiceError{l.Name(), serviceName, errors.New("Reload isn't supported")}
 }

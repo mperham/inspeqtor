@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 	"syscall"
+	"time"
 
 	"github.com/mperham/inspeqtor/util"
 )
@@ -15,51 +16,6 @@ type Initd struct {
 	ctlPath    string
 	varrunPath string
 	pidParser  func([]byte) (int, error)
-}
-
-func (i *Initd) LookupService(serviceName string) (*ProcessStatus, error) {
-	path := i.ctlPath + serviceName
-	result, _ := util.FileExists(path)
-	if !result {
-		// service script does not exist in etc/init.d, not under
-		// init.d control
-		return nil, &ServiceError{i.Name(), serviceName, ErrServiceNotFound}
-	}
-
-	// First try to find the PID file with same name in /var/run.
-	paths := []string{
-		i.varrunPath + serviceName + ".pid",
-		i.varrunPath + serviceName + "/" + serviceName + ".pid",
-	}
-
-	for _, pidpath := range paths {
-		st, err := i.readPidFile(pidpath)
-		if err != nil {
-			util.Info("Error processing PID file %s: %s", pidpath, err.Error())
-			continue
-		} else if st != nil {
-			return st, nil
-		} else {
-			util.Info("No such pidfile %s", pidpath)
-		}
-	}
-
-	return &ProcessStatus{0, Down}, nil
-}
-
-func (i *Initd) Name() string {
-	return "init.d"
-}
-
-func (i *Initd) Restart(serviceName string) error {
-	path := i.ctlPath + serviceName
-
-	cmd := exec.Command(path, "restart")
-	_, err := util.SafeRun(cmd, util.RestartTimeout)
-	if err != nil {
-		return err
-	}
-	return nil
 }
 
 func pidForString(data []byte) (int, error) {
@@ -124,4 +80,58 @@ func detectInitd(root string) (InitSystem, error) {
 		util.Info(ctlpath + " exists but appears to be empty")
 		return nil, nil
 	}
+}
+
+func (i *Initd) serviceCommand(serviceName string, command string, timeout time.Duration) error {
+	path := i.ctlPath + serviceName
+	cmd := exec.Command(path, command)
+	_, err := util.SafeRun(cmd, timeout)
+
+	if err != nil {
+		return &ServiceError{i.Name(), serviceName, err}
+	}
+
+	return nil
+}
+
+func (i *Initd) Name() string {
+	return "init.d"
+}
+
+func (i *Initd) LookupService(serviceName string) (*ProcessStatus, error) {
+	path := i.ctlPath + serviceName
+	result, _ := util.FileExists(path)
+	if !result {
+		// service script does not exist in etc/init.d, not under
+		// init.d control
+		return nil, &ServiceError{i.Name(), serviceName, ErrServiceNotFound}
+	}
+
+	// First try to find the PID file with same name in /var/run.
+	paths := []string{
+		i.varrunPath + serviceName + ".pid",
+		i.varrunPath + serviceName + "/" + serviceName + ".pid",
+	}
+
+	for _, pidpath := range paths {
+		st, err := i.readPidFile(pidpath)
+		if err != nil {
+			util.Info("Error processing PID file %s: %s", pidpath, err.Error())
+			continue
+		} else if st != nil {
+			return st, nil
+		} else {
+			util.Info("No such pidfile %s", pidpath)
+		}
+	}
+
+	return &ProcessStatus{0, Down}, nil
+}
+
+func (i *Initd) Restart(serviceName string) error {
+	return i.serviceCommand(serviceName, "restart", util.RestartTimeout)
+}
+
+func (i *Initd) Reload(serviceName string) error {
+	return i.serviceCommand(serviceName, "reload", util.CmdTimeout)
 }

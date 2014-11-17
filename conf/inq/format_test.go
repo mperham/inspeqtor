@@ -77,6 +77,7 @@ func TestBasicServiceParsing(t *testing.T) {
 	assert.Equal(t, check.Parameters["endpoint"], "/foo")
 	assert.Equal(t, check.Parameters["quoted"], "whoa sp\"aces")
 	assert.Equal(t, check.Rules[0].Actions[1].Name(), "alert")
+	assert.Equal(t, check.Rules[0].Actions[2].Name(), "reload")
 	assert.Equal(t, check.Rules[1].Metric.Family, "cpu")
 	assert.Equal(t, check.Rules[1].Metric.Name, "user")
 }
