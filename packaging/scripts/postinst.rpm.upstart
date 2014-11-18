@@ -16,6 +16,12 @@ if [ -d /etc/inspeqtor/conf.d ]; then
   mv /etc/inspeqtor/conf.d /etc/inspeqtor/services.d
 fi
 
+# CentOS 6.x doesn't have an adm group.
+# CentOS 7.x and Ubuntu do.  Standardize!
+if ! groupadd adm ; then
+  true
+fi
+
 for i in jobs.d services.d; do
   if [ ! -d /etc/inspeqtor/$i ]; then
     cp -r /usr/share/inspeqtor/$i /etc/inspeqtor/$i
