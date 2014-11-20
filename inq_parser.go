@@ -163,6 +163,8 @@ func convertAction(global *ConfigFile, check Eventable, action ast.Action) (Acti
 			return nil, fmt.Errorf("Please configure a \"send alerts\" statement in inspeqtor.conf.")
 		}
 		return Actions["alert"](check, route)
+	case "reload":
+		return Actions["reload"](check, nil)
 	case "restart":
 		return Actions["restart"](check, nil)
 	}

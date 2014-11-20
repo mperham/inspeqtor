@@ -7,13 +7,14 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/mperham/inspeqtor/util"
 )
 
 type Upstart struct {
 	path        string
-	dummyOutput string
+	dummyOutput *string
 }
 
 var (
@@ -38,35 +39,36 @@ func detectUpstart(path string) (InitSystem, error) {
 
 	if len(matches) > 0 {
 		util.Info("Detected upstart in " + path)
-		return &Upstart{path, ""}, nil
+		return &Upstart{path, nil}, nil
 	}
 
 	util.Debug("upstart not detected, empty " + path)
 	return nil, nil
 }
 
-func (u *Upstart) Name() string {
-	return "upstart"
-}
-
-func (u *Upstart) Restart(serviceName string) error {
+func (u *Upstart) serviceCommand(serviceName string, command string, timeout time.Duration, expectedLines int) error {
 	var err error
 	var sout []byte
-	if len(u.dummyOutput) != 0 {
-		sout = []byte(u.dummyOutput)
+
+	if u.dummyOutput != nil {
+		sout = []byte(*u.dummyOutput)
 	} else {
-		cmd := exec.Command("initctl", "restart", serviceName)
-		sout, err = util.SafeRun(cmd, util.RestartTimeout)
+		cmd := exec.Command("initctl", command, serviceName)
+		sout, err = util.SafeRun(cmd, timeout)
 		if err != nil {
 			return &ServiceError{u.Name(), serviceName, err}
 		}
 	}
 
 	lines, err := util.ReadLines(sout)
-	if len(lines) != 1 {
+	if len(lines) != expectedLines {
 		return &ServiceError{u.Name(), serviceName, errors.New("Unexpected output: " + strings.Join(lines, "\n"))}
 	}
 	return nil
+}
+
+func (u *Upstart) Name() string {
+	return "upstart"
 }
 
 func (u *Upstart) LookupService(serviceName string) (*ProcessStatus, error) {
@@ -80,8 +82,8 @@ func (u *Upstart) LookupService(serviceName string) (*ProcessStatus, error) {
 	}
 
 	var sout []byte
-	if len(u.dummyOutput) != 0 {
-		sout = []byte(u.dummyOutput)
+	if u.dummyOutput != nil {
+		sout = []byte(*u.dummyOutput)
 	} else {
 		cmd := exec.Command("initctl", "status", serviceName)
 		sout, err = util.SafeRun(cmd)
@@ -122,4 +124,12 @@ func (u *Upstart) LookupService(serviceName string) (*ProcessStatus, error) {
 	}
 
 	return nil, &ServiceError{u.Name(), serviceName, errors.New("Unknown upstart output: " + line)}
+}
+
+func (u *Upstart) Restart(serviceName string) error {
+	return u.serviceCommand(serviceName, "restart", util.RestartTimeout, 1)
+}
+
+func (u *Upstart) Reload(serviceName string) error {
+	return u.serviceCommand(serviceName, "reload", util.CmdTimeout, 0)
 }

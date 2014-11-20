@@ -9,8 +9,11 @@ See [Current Release Status](https://github.com/mperham/inspeqtor/milestones) he
 
 ## 0.7.0-1
 
+- Welcome new committer, @sorentwo!
 - Add daemon-specific metrics for PostgreSQL! [#26]
 - Fix bug in init.d support, better logging
+- Add new `reload` action which will send the HUP signal to a service [sorentwo, #38]
+- Prefix all statsd metrics with hostname [#42] **Pro**
 
 
 ## 0.6.0-2

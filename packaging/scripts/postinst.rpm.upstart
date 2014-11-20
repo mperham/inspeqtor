@@ -16,6 +16,12 @@ if [ -d /etc/inspeqtor/conf.d ]; then
   mv /etc/inspeqtor/conf.d /etc/inspeqtor/services.d
 fi
 
+# CentOS 6.x doesn't have an adm group.
+# CentOS 7.x and Ubuntu do.  Standardize!
+if ! groupadd adm ; then
+  true
+fi
+
 for i in jobs.d services.d; do
   if [ ! -d /etc/inspeqtor/$i ]; then
     cp -r /usr/share/inspeqtor/$i /etc/inspeqtor/$i
@@ -34,7 +40,7 @@ fi
 
 if [ -d /etc/init ]; then
   echo "Using upstart to control Inspeqtor"
-  cp -r /usr/share/inspeqtor/init/inspeqtor.conf /etc/init/inspeqtor.conf
+  cp -r /usr/share/inspeqtor/init/inspeqtor.rpm.conf /etc/init/inspeqtor.conf
   if [ "$1" = 1 ] ; then
     # first time install, upgrades are restarted in postrm
     initctl start inspeqtor || :
