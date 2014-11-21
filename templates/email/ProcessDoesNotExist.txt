@@ -1,5 +1,5 @@
-To: {{.Config.To}} <{{.Config.To}}>
-From: {{.Config.From}} <{{.Config.From}}>
+To: <{{.Config.To}}>
+From: <{{.Config.From}}>
 Subject: {{.Target}} does not exist.
 
 I can't locate a process for the {{.Thing.Name}} service on {{.Hostname}}.
