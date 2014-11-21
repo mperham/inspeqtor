@@ -1,5 +1,5 @@
-To: {{.Config.To}} <{{.Config.To}}>
-From: {{.Config.From}} <{{.Config.From}}>
+To: <{{.Config.To}}>
+From: <{{.Config.From}}>
 Subject: {{.Target}} {{.Rule.Metric}} has recovered
 
 {{.Target}} {{.Rule.Metric}} has recovered.
