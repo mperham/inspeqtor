@@ -70,7 +70,7 @@ func (s *Systemd) LookupService(serviceName string) (*ProcessStatus, error) {
 	}
 
 	if err != nil {
-		return nil, &ServiceError{s.Name(), serviceName, err}
+		return nil, &ServiceError{s.Name(), serviceName, ErrServiceNotFound}
 	}
 	lines, err := util.ReadLines(sout)
 	if len(lines) != 1 {
@@ -95,6 +95,7 @@ func (s *Systemd) LookupService(serviceName string) (*ProcessStatus, error) {
 		cmd := exec.Command("systemctl", "is-enabled", serviceName)
 		sout, err = util.SafeRun(cmd)
 	}
+
 	if err != nil || string(sout) != "enabled\n" {
 		return nil, &ServiceError{s.Name(), serviceName, ErrServiceNotFound}
 	} else {
