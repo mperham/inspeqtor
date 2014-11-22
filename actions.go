@@ -179,11 +179,18 @@ func sendEmail(e *EmailNotifier, doc bytes.Buffer) error {
 	} else {
 		util.Debug("Sending email to %s", e.To)
 		util.Debug("Sending email:\n%s", string(doc.Bytes()))
-		auth := smtp.PlainAuth("", e.Username, e.Password, e.Host)
-		err := smtp.SendMail(e.Host+":587", auth, e.From,
-			[]string{e.To}, doc.Bytes())
-		if err != nil {
-			return err
+		if e.Username != "" {
+			auth := smtp.PlainAuth("", e.Username, e.Password, e.Host)
+			err := smtp.SendMail(e.Host+":587", auth, e.From,
+				[]string{e.To}, doc.Bytes())
+			if err != nil {
+				return err
+			}
+		} else {
+			err := smtp.SendMail(e.Host+":25", nil, e.From, []string{e.To}, doc.Bytes())
+			if err != nil {
+				return err
+			}
 		}
 	}
 	return nil
@@ -192,11 +199,11 @@ func sendEmail(e *EmailNotifier, doc bytes.Buffer) error {
 func (e *EmailNotifier) setup(hash map[string]string) error {
 	usr, ok := hash["username"]
 	if !ok {
-		return errors.New("You must have a username configured to send email")
+		usr = ""
 	}
 	pwd, ok := hash["password"]
 	if !ok {
-		return errors.New("You must have a password configured to send email")
+		pwd = ""
 	}
 	host, ok := hash["smtp_server"]
 	if !ok {
