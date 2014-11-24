@@ -71,6 +71,16 @@ func TestEmailNotifier(t *testing.T) {
 	assert.NotNil(t, action)
 }
 
+func TestUnauthenticatedEmailNotifier(t *testing.T) {
+	t.Parallel()
+	action, err := makeAction("alert", "email", map[string]string{
+		"smtp_server": "smtp.example.com",
+		"to_email":    "mike@example.org",
+	})
+	assert.Nil(t, err)
+	assert.NotNil(t, action)
+}
+
 func TestInvalidNotifier(t *testing.T) {
 	t.Parallel()
 	action, err := makeAction("alert", "emaul", map[string]string{})
