@@ -7,6 +7,24 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+const (
+	KB = 1024
+)
+
+func TestTotalRSSCollection(t *testing.T) {
+	t.Parallel()
+	store := NewProcessStore("total_rss_proc", 15).(*processStorage)
+	store.Prepare("memory", "total_rss")
+
+	err := totalRssCollector(400, store)
+	assert.Nil(t, err)
+	assert.Equal(t, 112361472, store.Get("memory", "total_rss"))
+
+	err = totalRssCollector(404, store)
+	assert.Nil(t, err)
+	assert.Equal(t, 90000*KB, store.Get("memory", "total_rss"))
+}
+
 func TestNonexistentProcessCollect(t *testing.T) {
 	t.Parallel()
 	store := NewProcessStore("proc", 15)

@@ -2,6 +2,7 @@ package metrics
 
 import (
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"os/exec"
 	"path/filepath"
@@ -68,7 +69,7 @@ type processEntry struct {
 	for it.  This is a "dynamicCollector".
 */
 func totalRssCollector(mypid int, ps *processStorage) error {
-	matches, err := filepath.Glob("/proc/[1-9][0-9]*/status")
+	matches, err := filepath.Glob(fmt.Sprintf("%s/[1-9][0-9]*/status", ps.path))
 	if err != nil {
 		return err
 	}
@@ -90,22 +91,23 @@ func totalRssCollector(mypid int, ps *processStorage) error {
 		}
 		for _, line := range lines {
 			if line[0] == 'V' || line[0] == 'P' {
-				items := strings.Fields(line)
+				items := strings.Split(line, ":")
 				switch items[0] {
-				case "Pid:":
-					pid, err := strconv.Atoi(items[1])
+				case "Pid":
+					pid, err := strconv.Atoi(strings.TrimSpace(items[1]))
 					if err != nil {
 						return err
 					}
 					pe.pid = pid
-				case "PPid:":
-					ppid, err := strconv.Atoi(items[1])
+				case "PPid":
+					ppid, err := strconv.Atoi(strings.TrimSpace(items[1]))
 					if err != nil {
 						return err
 					}
 					pe.ppid = ppid
-				case "VmRSS:":
-					val, err := strconv.ParseInt(items[1], 10, 64)
+				case "VmRSS":
+					vals := strings.Fields(items[1])
+					val, err := strconv.ParseInt(vals[0], 10, 64)
 					if err != nil {
 						return err
 					}
@@ -118,10 +120,10 @@ func totalRssCollector(mypid int, ps *processStorage) error {
 			live = append(live, pe)
 		}
 	}
-	util.Debug("Calculating %d processes", len(live))
+	util.DebugDebug("Calculating %d processes", len(live))
 
 	rss := memoryFor(live, mypid)
-	util.Debug("Total RSS for %d: %d", mypid, rss)
+	util.DebugDebug("Total RSS for %d: %d", mypid, rss)
 
 	ps.Save("memory", "total_rss", float64(rss))
 	return nil
