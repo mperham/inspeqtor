@@ -11,11 +11,11 @@ See [Current Release Status](https://github.com/mperham/inspeqtor/milestones) he
 
 - Welcome new committer, @sorentwo!
 - Add daemon-specific metrics for PostgreSQL! [#26]
-- Fix bug in init.d support, better logging
+- Fix bugs in init.d support, better logging
 - Add new `reload` action which will send the HUP signal to a service [sorentwo, #38]
 - Support unauthenticated port 25 SMTP [felixbuenemann, #48]
 - Add memory:total\_rss metric for the total memory consumed by a tree of
-  processes (e.g. Apache or Unicorn) [#10]
+  processes (e.g. useful if child processes are bloating) [#10]
 - Prefix all statsd metrics with hostname [#42] **Pro**
 
 
