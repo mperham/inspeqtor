@@ -112,6 +112,7 @@ func (hs *hostStorage) collectMemory() error {
 		}
 	} else {
 		cmd := exec.Command("sysctl", "-n", "vm.swapusage")
+		cmd.Env = []string{"LANG=C"}
 		sout, err := util.SafeRun(cmd)
 		if err != nil {
 			return err
@@ -183,6 +184,7 @@ func (hs *hostStorage) collectLoadAverage() error {
 		loadavgString = string(contentBytes)
 	} else {
 		cmd := exec.Command("sysctl", "-n", "vm.loadavg")
+		cmd.Env = []string{"LANG=C"}
 		sout, err := util.SafeRun(cmd)
 		if err != nil {
 			return err

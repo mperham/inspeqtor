@@ -1,5 +1,5 @@
-To: {{.Config.To}} <{{.Config.To}}>
-From: {{.Config.From}} <{{.Config.From}}>
+To: <{{.Config.To}}>
+From: <{{.Config.From}}>
 Subject: {{.Target}} is now running.
 
 The {{.Thing.Name}} service is now running with PID {{.Service.Process.Pid}}

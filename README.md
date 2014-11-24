@@ -57,6 +57,12 @@ Inspeqtor is licensed under GPLv3.  Inspeqtor Pro is licensed under the
 custom commercial license in COMM-LICENSE.
 
 
+## Want to Help?
+
+See the [Development](https://github.com/mperham/inspeqtor/wiki/Development) wiki page for details on how
+to get the source code and build Inspeqtor locally.
+
+
 # Author
 
 Inspeqtor is written by [Mike Perham](http://twitter.com/mperham) of [Contributed Systems](http://contribsys.com).  We build awesome open source-based infrastructure to help you build awesome apps.
