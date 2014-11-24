@@ -62,6 +62,11 @@ type Store interface {
 	Display(family string, name string) string
 	Collect(pid int) error
 
+	// declare that a rule wants to act on this metric.
+	// useful if we only want to collect a metric if a
+	// rule will act upon it.
+	Prepare(family, name string) error
+
 	Families() []string
 	MetricNames(family string) []string
 

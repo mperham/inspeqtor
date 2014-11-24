@@ -121,6 +121,10 @@ func convertHost(global *ConfigFile, inqhost *ast.HostCheck) (*Host, error) {
 		if err != nil {
 			return nil, err
 		}
+		err = storage.Prepare(rule.MetricFamily, rule.MetricName)
+		if err != nil {
+			return nil, err
+		}
 		rules[idx] = rule
 	}
 	h.rules = rules
@@ -181,6 +185,10 @@ func convertService(global *ConfigFile, inqsvc *ast.ProcessCheck) (*Service, err
 
 	for idx, rule := range inqsvc.Rules {
 		rule, err := convertRule(global, svc, rule)
+		if err != nil {
+			return nil, err
+		}
+		err = storage.Prepare(rule.MetricFamily, rule.MetricName)
 		if err != nil {
 			return nil, err
 		}

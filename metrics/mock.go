@@ -6,10 +6,13 @@ func NewMockStore() Store {
 
 type mockStore struct{}
 
-func (*mockStore) Get(family string, name string) float64 {
+func (*mockStore) Get(family, name string) float64 {
 	return 0
 }
-func (*mockStore) Display(family string, name string) string {
+func (*mockStore) Prepare(family, name string) error {
+	return nil
+}
+func (*mockStore) Display(family, name string) string {
 	return "0"
 }
 func (*mockStore) Collect(pid int) error {
