@@ -21,7 +21,7 @@ func TestEventProcessDisappears(t *testing.T) {
 	act := mockAction()
 
 	assert.Equal(t, 0, act.Size())
-	svc := &Service{&Entity{"foo", nil, metrics.NewProcessStore("/proc", 15), nil}, act, services.WithStatus(99, services.Up), init}
+	svc := &Service{&Entity{"foo", nil, metrics.NewProcessStore("/proc", 15), nil}, act, services.WithStatus(10, services.Up), init}
 	svc.Collect(false, func(_ Checkable) {})
 	assert.Equal(t, services.Down, svc.Process.Status)
 	assert.Equal(t, 0, svc.Process.Pid)
@@ -37,7 +37,7 @@ func TestEventProcessDisappearsDuringDeploy(t *testing.T) {
 	act := mockAction()
 
 	assert.Equal(t, 0, act.Size())
-	svc := &Service{&Entity{"foo", nil, metrics.NewProcessStore("/proc", 15), nil}, act, services.WithStatus(99, services.Up), init}
+	svc := &Service{&Entity{"foo", nil, metrics.NewProcessStore("/proc", 15), nil}, act, services.WithStatus(10, services.Up), init}
 	svc.Collect(true, func(_ Checkable) {})
 	assert.Equal(t, services.Down, svc.Process.Status)
 	assert.Equal(t, 0, svc.Process.Pid)
