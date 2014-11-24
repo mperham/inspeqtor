@@ -4,5 +4,5 @@ check service mysql
   # support old () metrics for now
   if cpu(user) > 50 then alert
 
-  if mysql:Queries > 1k/sec then alert
+  if mysql:Queries > 1k/sec for 3 cycles then alert
   if mysql:Slow_queries > 2/sec then alert

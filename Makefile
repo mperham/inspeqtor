@@ -16,28 +16,32 @@ BASENAME=$(NAME)_$(VERSION)-$(ITERATION)
 all: test
 
 prepare:
-	#wget https://storage.googleapis.com/golang/go1.3.1.linux-amd64.tar.gz
-	#sudo tar -C /usr/local -xzf go1.3.1.linux-amd64.tar.gz
+	#wget https://storage.googleapis.com/golang/go1.3.3.linux-amd64.tar.gz
+	#sudo tar -C /usr/local -xzf go1.3.3.linux-amd64.tar.gz
 	go get github.com/stretchr/testify/...
 	go get github.com/jteeuwen/go-bindata/...
 	go get code.google.com/p/gocc/...
 	# needed for `make fmt`
-	#go get golang.org/x/tools/cmd/goimports
+	go get golang.org/x/tools/cmd/goimports
 	@echo Now you should be ready to run "make"
 
 test:
 	@go-bindata -pkg inspeqtor -o templates.go templates/...
 	@go test -parallel 4 ./... | grep -v "no test files"
 
+# gocc produces ill-formated code, clean it up with fmt
+parsers: gocc fmt
+
+# Generate parser and token package for conf/global/format.bnf and
+# conf/inq/format.bnf
 gocc:
-	# Generate parser and token package for conf/global/format.bnf and
-	# conf/inq/format.bnf
 	cd $(shell pwd)/conf/global && $(GOPATH)/bin/gocc format.bnf
 	cd $(shell pwd)/conf/inq && $(GOPATH)/bin/gocc format.bnf
 
 build: test
 	@GOOS=linux GOARCH=amd64 go build -o inspeqtor cmd/main.go
 
+# goimports produces slightly different formatted code from go fmt
 fmt:
 	find . -name "*.go" -exec goimports -w {} \;
 
