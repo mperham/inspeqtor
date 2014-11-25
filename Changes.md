@@ -7,7 +7,7 @@ Version 1.0 will be released when it is stable and ready for widespread usage.
 
 See [Current Release Status](https://github.com/mperham/inspeqtor/milestones) here.
 
-## 0.7.0-1
+## 0.7.0-2
 
 - Welcome new committer, @sorentwo!
 - Add daemon-specific metrics for PostgreSQL! [#26]
