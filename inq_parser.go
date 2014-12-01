@@ -167,8 +167,9 @@ func convertAction(global *ConfigFile, check Eventable, action ast.Action) (Acti
 		return Actions["reload"](check, nil)
 	case "restart":
 		return Actions["restart"](check, nil)
+	default:
+		return nil, fmt.Errorf("Unknown action: %", action.Name())
 	}
-	return nil, nil
 }
 
 func convertService(global *ConfigFile, inqsvc *ast.ProcessCheck) (*Service, error) {
