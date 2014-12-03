@@ -163,6 +163,8 @@ func (svc *Service) Collect(silenced bool, completeCallback func(Checkable)) {
 func (s *Host) Verify() []*Event {
 	events := []*Event{}
 	for _, r := range s.Rules() {
+		// When running "make real", the race detector will complain
+		// of a race condition here.  I believe it's harmless.
 		evt := r.Check(s.CycleTime())
 		if evt != nil {
 			events = append(events, evt)
