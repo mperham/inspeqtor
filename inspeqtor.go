@@ -244,7 +244,10 @@ func (i *Inspeqtor) Shutdown() {
 func (i *Inspeqtor) runLoop() {
 	util.DebugDebug("Resolving services")
 	for _, svc := range i.Services {
-		svc.Resolve(i.ServiceManagers)
+		err := svc.Resolve(i.ServiceManagers)
+		if err != nil {
+			util.Warn(err.Error())
+		}
 	}
 
 	i.scanSystem()

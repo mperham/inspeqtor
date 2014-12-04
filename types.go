@@ -1,7 +1,6 @@
 package inspeqtor
 
 import (
-	"errors"
 	"fmt"
 	"syscall"
 
@@ -254,7 +253,7 @@ func (svc *Service) Resolve(mgrs []services.InitSystem) error {
 		break
 	}
 	if svc.Manager == nil {
-		return errors.New(fmt.Sprintf("Could not find service %s, did you misspell it?", svc.Name()))
+		return fmt.Errorf("Could not find service %s, did you misspell it?", svc.Name())
 	}
 	return nil
 }
