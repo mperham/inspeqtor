@@ -1,6 +1,7 @@
 package inspeqtor
 
 import (
+	_ "expvar"
 	"fmt"
 	"net"
 	"net/http"
