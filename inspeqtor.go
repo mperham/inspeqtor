@@ -1,7 +1,9 @@
 package inspeqtor
 
 import (
+	"fmt"
 	"net"
+	"net/http"
 	"os"
 	"os/signal"
 	"sync"
@@ -28,6 +30,7 @@ type Inspeqtor struct {
 	Services        []Checkable
 	GlobalConfig    *ConfigFile
 	Socket          net.Listener
+	Expose          net.Listener
 	SilenceUntil    time.Time
 	Stopping        chan struct{}
 	Handlers        map[string][]func(*Inspeqtor)
@@ -77,6 +80,21 @@ func (i *Inspeqtor) Start() {
 			}
 		}
 	}()
+
+	// if expose_port is 0, disable the feature altogether
+	if i.GlobalConfig.ExposePort != 0 {
+		sock, err := net.Listen("tcp", fmt.Sprintf("localhost:%d", i.GlobalConfig.ExposePort))
+		if err != nil {
+			util.Warn("Could not listen on port %d: %s", i.GlobalConfig.ExposePort, err.Error())
+			exit(i)
+		}
+		i.Expose = sock
+		go func() {
+			// TODO How do we error handling here?
+			util.Info("Expose now available at port %d", i.GlobalConfig.ExposePort)
+			http.Serve(i.Expose, nil)
+		}()
+	}
 
 	util.Debug("Starting main run loop")
 	go i.runLoop()
@@ -225,8 +243,15 @@ func exit(i *Inspeqtor) {
 
 func (i *Inspeqtor) Shutdown() {
 	close(i.Stopping)
+
 	if i.Socket != nil {
 		err := i.Socket.Close()
+		if err != nil {
+			util.Warn(err.Error())
+		}
+	}
+	if i.Expose != nil {
+		err := i.Expose.Close()
 		if err != nil {
 			util.Warn(err.Error())
 		}

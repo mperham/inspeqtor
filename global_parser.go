@@ -17,11 +17,12 @@ Parses the global inspeqtor configuration in /etc/inspeqtor/inspeqtor.conf.
 */
 type GlobalConfig struct {
 	CycleTime    uint
+	ExposePort   uint
 	DeployLength uint
 	Variables    map[string]string
 }
 
-var Defaults = GlobalConfig{15, 300, map[string]string{}}
+var Defaults = GlobalConfig{15, 4677, 300, map[string]string{}}
 
 /*
   An alert route is a way to send an alert to a recipient.
@@ -80,6 +81,7 @@ func ParseGlobal(rootDir string) (*ConfigFile, error) {
 		}
 		parseValue(ast, &config.CycleTime, "cycle_time", 15)
 		parseValue(ast, &config.DeployLength, "deploy_length", 300)
+		parseValue(ast, &config.ExposePort, "expose_port", 4677)
 
 		for _, v := range ast.Routes {
 			ar, err := ValidateChannel(v.Name, v.Channel, v.Config)
