@@ -37,6 +37,9 @@ func (rs *MemcachedSource) ValidMetrics() []metric {
 
 func (rs *MemcachedSource) runCli(funk executor) (metricMap, error) {
 	sout, err := funk("nc", []string{rs.Hostname, rs.Port}, []byte("stats\n"))
+	if err != nil {
+		return nil, err
+	}
 	lines, err := util.ReadLines(sout)
 	if err != nil {
 		return nil, err
