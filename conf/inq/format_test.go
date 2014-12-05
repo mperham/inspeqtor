@@ -56,6 +56,26 @@ func TestBadAmount(t *testing.T) {
 	assert.True(t, strings.Contains(err.Error(), "Invalid amount"))
 }
 
+func TestExpose(t *testing.T) {
+	data, err := ioutil.ReadFile("fixtures/inspeqtor.inq")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	s := lexer.NewLexer([]byte(data))
+	p := parser.NewParser()
+	obj, err := p.Parse(s)
+	assert.NotNil(t, obj)
+	assert.Nil(t, err)
+
+	check := obj.(*ast.ProcessCheck)
+	assert.Equal(t, check.Name, "inspeqtor")
+	assert.Equal(t, len(check.Parameters), 0)
+	assert.Equal(t, len(check.Rules), 0)
+	assert.Equal(t, len(check.Exposed), 1)
+	assert.Equal(t, "memstats", check.Exposed[0])
+}
+
 func TestBasicServiceParsing(t *testing.T) {
 	data, err := ioutil.ReadFile("fixtures/memcached.inq")
 	if err != nil {

@@ -43,21 +43,31 @@ check host
   if cpu(user) > 400% for 2 cycles then alert
   if swap > 20% for 2 cycles then alert
 
+# expose is an Inspeqtor Pro feature which provides a visualization UI for
+# certain specific daemon subsystems.  memstats allows you to visualize
+# the Go garbage collection and memory stats.
+check inspeqtor
+  expose memstats
+
 */
 
 Check
-  : Preamble Checktype name ParameterList RuleList  << ast.NewProcessCheck($1, $2, $4, $3), nil >>
-  | Preamble Checktype name RuleList                << ast.NewProcessCheck($1, $2, $3, map[string]string{}), nil >>
-  | Preamble "host" ParameterList RuleList          << ast.NewHostCheck($3, $2), nil >>
-  | Preamble "host" RuleList                        << ast.NewHostCheck($2, map[string]string{}), nil >>
+  : "check" "service" name ParameterList RuleList              << ast.NewProcessCheck($2, $3, nil, $4), nil >>
+  | "check" "service" name ParameterList ExposedList RuleList  << ast.NewProcessCheck($2, $3, $4, $5), nil >>
+  | "check" "service" name ExposedList                         << ast.NewProcessCheck($2, nil, $3, nil), nil >>
+  | "check" "service" name RuleList                            << ast.NewProcessCheck($2, nil, nil, $3), nil >>
+  | "check" "service" name ExposedList RuleList                << ast.NewProcessCheck($2, nil, $3, $4), nil >>
+  | "check" "host" ParameterList RuleList                      << ast.NewHostCheck($3, $2), nil >>
+  | "check" "host" RuleList                                    << ast.NewHostCheck($2, map[string]string{}), nil >>
 ;
 
-Preamble
- : "check"          << $0, nil >>
+ExposedList
+  : "expose" Exposed    << $1, nil >>
 ;
 
-Checktype
- : "service"        << $0, nil >>
+Exposed
+  : name "," Exposed    << ast.AddExposed($0, $2) >>
+  | name                << ast.AddExposed($0, nil) >>
 ;
 
 ActionList

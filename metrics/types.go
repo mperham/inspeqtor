@@ -58,24 +58,37 @@ type TransformFunc func(float64, float64) float64
 type DisplayFunc func(float64) string
 
 type Store interface {
+	Readable
+	Writable
+	Collectable
+}
+
+type BareStore interface {
+	Readable
+	Writable
+}
+
+type Readable interface {
 	Get(family string, name string) float64
 	Display(family string, name string) string
-	Collect(pid int) error
+	Families() []string
+	MetricNames(family string) []string
+	Metric(family, name string) Metric
+	Each(func(family, name string, metric Metric))
+}
 
+type Collectable interface {
+	Collect(pid int) error
 	// declare that a rule wants to act on this metric.
 	// useful if we only want to collect a metric if a
 	// rule will act upon it.
 	Prepare(family, name string) error
+}
 
-	Families() []string
-	MetricNames(family string) []string
-
+type Writable interface {
 	Save(family, name string, value float64)
 	DeclareCounter(family, name string, xform TransformFunc, display DisplayFunc)
 	DeclareGauge(family, name string, display DisplayFunc)
-	Metric(family, name string) Metric
-
-	Each(func(family, name string, metric Metric))
 }
 
 type Loadable interface {
@@ -84,6 +97,10 @@ type Loadable interface {
 
 type storage struct {
 	tree map[string]*family
+}
+
+func NewStore() BareStore {
+	return &storage{map[string]*family{}}
 }
 
 func (store *storage) Each(iter func(family, name string, metric Metric)) {

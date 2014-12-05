@@ -14,10 +14,11 @@ var actionTab = actionTable{
 		actions: [numSymbols]action{
 			nil,      /* INVALID */
 			nil,      /* $ */
+			shift(2), /* check */
+			nil,      /* service */
 			nil,      /* name */
 			nil,      /* host */
-			shift(3), /* check */
-			nil,      /* service */
+			nil,      /* expose */
 			nil,      /* , */
 			nil,      /* restart */
 			nil,      /* reload */
@@ -39,10 +40,11 @@ var actionTab = actionTable{
 		actions: [numSymbols]action{
 			nil,          /* INVALID */
 			accept(true), /* $ */
-			nil,          /* name */
-			nil,          /* host */
 			nil,          /* check */
 			nil,          /* service */
+			nil,          /* name */
+			nil,          /* host */
+			nil,          /* expose */
 			nil,          /* , */
 			nil,          /* restart */
 			nil,          /* reload */
@@ -64,10 +66,11 @@ var actionTab = actionTable{
 		actions: [numSymbols]action{
 			nil,      /* INVALID */
 			nil,      /* $ */
-			nil,      /* name */
-			shift(5), /* host */
 			nil,      /* check */
-			shift(6), /* service */
+			shift(3), /* service */
+			nil,      /* name */
+			shift(4), /* host */
+			nil,      /* expose */
 			nil,      /* , */
 			nil,      /* restart */
 			nil,      /* reload */
@@ -87,37 +90,13 @@ var actionTab = actionTable{
 	actionRow{ // S3
 		canRecover: false,
 		actions: [numSymbols]action{
-			nil,       /* INVALID */
-			nil,       /* $ */
-			nil,       /* name */
-			reduce(5), /* host, reduce: Preamble */
-			nil,       /* check */
-			reduce(5), /* service, reduce: Preamble */
-			nil,       /* , */
-			nil,       /* restart */
-			nil,       /* reload */
-			nil,       /* alert */
-			nil,       /* with */
-			nil,       /* : */
-			nil,       /* ( */
-			nil,       /* ) */
-			nil,       /* if */
-			nil,       /* operator */
-			nil,       /* then */
-			nil,       /* for */
-			nil,       /* cycles */
-
-		},
-	},
-	actionRow{ // S4
-		canRecover: false,
-		actions: [numSymbols]action{
 			nil,      /* INVALID */
 			nil,      /* $ */
-			shift(7), /* name */
-			nil,      /* host */
 			nil,      /* check */
 			nil,      /* service */
+			shift(5), /* name */
+			nil,      /* host */
+			nil,      /* expose */
 			nil,      /* , */
 			nil,      /* restart */
 			nil,      /* reload */
@@ -134,24 +113,51 @@ var actionTab = actionTable{
 
 		},
 	},
+	actionRow{ // S4
+		canRecover: false,
+		actions: [numSymbols]action{
+			nil,       /* INVALID */
+			nil,       /* $ */
+			nil,       /* check */
+			nil,       /* service */
+			nil,       /* name */
+			nil,       /* host */
+			nil,       /* expose */
+			nil,       /* , */
+			nil,       /* restart */
+			nil,       /* reload */
+			nil,       /* alert */
+			shift(8),  /* with */
+			nil,       /* : */
+			nil,       /* ( */
+			nil,       /* ) */
+			shift(10), /* if */
+			nil,       /* operator */
+			nil,       /* then */
+			nil,       /* for */
+			nil,       /* cycles */
+
+		},
+	},
 	actionRow{ // S5
 		canRecover: false,
 		actions: [numSymbols]action{
 			nil,       /* INVALID */
 			nil,       /* $ */
-			nil,       /* name */
-			nil,       /* host */
 			nil,       /* check */
 			nil,       /* service */
+			nil,       /* name */
+			nil,       /* host */
+			shift(14), /* expose */
 			nil,       /* , */
 			nil,       /* restart */
 			nil,       /* reload */
 			nil,       /* alert */
-			shift(10), /* with */
+			shift(15), /* with */
 			nil,       /* : */
 			nil,       /* ( */
 			nil,       /* ) */
-			shift(12), /* if */
+			shift(10), /* if */
 			nil,       /* operator */
 			nil,       /* then */
 			nil,       /* for */
@@ -164,10 +170,63 @@ var actionTab = actionTable{
 		actions: [numSymbols]action{
 			nil,       /* INVALID */
 			nil,       /* $ */
-			reduce(6), /* name, reduce: Checktype */
-			nil,       /* host */
 			nil,       /* check */
 			nil,       /* service */
+			nil,       /* name */
+			nil,       /* host */
+			nil,       /* expose */
+			nil,       /* , */
+			nil,       /* restart */
+			nil,       /* reload */
+			nil,       /* alert */
+			nil,       /* with */
+			nil,       /* : */
+			nil,       /* ( */
+			nil,       /* ) */
+			shift(10), /* if */
+			nil,       /* operator */
+			nil,       /* then */
+			nil,       /* for */
+			nil,       /* cycles */
+
+		},
+	},
+	actionRow{ // S7
+		canRecover: false,
+		actions: [numSymbols]action{
+			nil,       /* INVALID */
+			reduce(7), /* $, reduce: Check */
+			nil,       /* check */
+			nil,       /* service */
+			nil,       /* name */
+			nil,       /* host */
+			nil,       /* expose */
+			nil,       /* , */
+			nil,       /* restart */
+			nil,       /* reload */
+			nil,       /* alert */
+			nil,       /* with */
+			nil,       /* : */
+			nil,       /* ( */
+			nil,       /* ) */
+			shift(10), /* if */
+			nil,       /* operator */
+			nil,       /* then */
+			nil,       /* for */
+			nil,       /* cycles */
+
+		},
+	},
+	actionRow{ // S8
+		canRecover: false,
+		actions: [numSymbols]action{
+			nil,       /* INVALID */
+			nil,       /* $ */
+			nil,       /* check */
+			nil,       /* service */
+			shift(18), /* name */
+			nil,       /* host */
+			nil,       /* expose */
 			nil,       /* , */
 			nil,       /* restart */
 			nil,       /* reload */
@@ -184,78 +243,29 @@ var actionTab = actionTable{
 
 		},
 	},
-	actionRow{ // S7
-		canRecover: false,
-		actions: [numSymbols]action{
-			nil,       /* INVALID */
-			nil,       /* $ */
-			nil,       /* name */
-			nil,       /* host */
-			nil,       /* check */
-			nil,       /* service */
-			nil,       /* , */
-			nil,       /* restart */
-			nil,       /* reload */
-			nil,       /* alert */
-			shift(10), /* with */
-			nil,       /* : */
-			nil,       /* ( */
-			nil,       /* ) */
-			shift(12), /* if */
-			nil,       /* operator */
-			nil,       /* then */
-			nil,       /* for */
-			nil,       /* cycles */
-
-		},
-	},
-	actionRow{ // S8
-		canRecover: false,
-		actions: [numSymbols]action{
-			nil,       /* INVALID */
-			nil,       /* $ */
-			nil,       /* name */
-			nil,       /* host */
-			nil,       /* check */
-			nil,       /* service */
-			nil,       /* , */
-			nil,       /* restart */
-			nil,       /* reload */
-			nil,       /* alert */
-			nil,       /* with */
-			nil,       /* : */
-			nil,       /* ( */
-			nil,       /* ) */
-			shift(12), /* if */
-			nil,       /* operator */
-			nil,       /* then */
-			nil,       /* for */
-			nil,       /* cycles */
-
-		},
-	},
 	actionRow{ // S9
 		canRecover: false,
 		actions: [numSymbols]action{
-			nil,       /* INVALID */
-			reduce(4), /* $, reduce: Check */
-			nil,       /* name */
-			nil,       /* host */
-			nil,       /* check */
-			nil,       /* service */
-			nil,       /* , */
-			nil,       /* restart */
-			nil,       /* reload */
-			nil,       /* alert */
-			nil,       /* with */
-			nil,       /* : */
-			nil,       /* ( */
-			nil,       /* ) */
-			shift(12), /* if */
-			nil,       /* operator */
-			nil,       /* then */
-			nil,       /* for */
-			nil,       /* cycles */
+			nil,        /* INVALID */
+			reduce(27), /* $, reduce: RuleList */
+			nil,        /* check */
+			nil,        /* service */
+			nil,        /* name */
+			nil,        /* host */
+			nil,        /* expose */
+			nil,        /* , */
+			nil,        /* restart */
+			nil,        /* reload */
+			nil,        /* alert */
+			nil,        /* with */
+			nil,        /* : */
+			nil,        /* ( */
+			nil,        /* ) */
+			reduce(27), /* if, reduce: RuleList */
+			nil,        /* operator */
+			nil,        /* then */
+			nil,        /* for */
+			nil,        /* cycles */
 
 		},
 	},
@@ -264,10 +274,11 @@ var actionTab = actionTable{
 		actions: [numSymbols]action{
 			nil,       /* INVALID */
 			nil,       /* $ */
-			shift(17), /* name */
-			nil,       /* host */
 			nil,       /* check */
 			nil,       /* service */
+			shift(20), /* name */
+			nil,       /* host */
+			nil,       /* expose */
 			nil,       /* , */
 			nil,       /* restart */
 			nil,       /* reload */
@@ -287,37 +298,13 @@ var actionTab = actionTable{
 	actionRow{ // S11
 		canRecover: false,
 		actions: [numSymbols]action{
-			nil,        /* INVALID */
-			reduce(23), /* $, reduce: RuleList */
-			nil,        /* name */
-			nil,        /* host */
-			nil,        /* check */
-			nil,        /* service */
-			nil,        /* , */
-			nil,        /* restart */
-			nil,        /* reload */
-			nil,        /* alert */
-			nil,        /* with */
-			nil,        /* : */
-			nil,        /* ( */
-			nil,        /* ) */
-			reduce(23), /* if, reduce: RuleList */
-			nil,        /* operator */
-			nil,        /* then */
-			nil,        /* for */
-			nil,        /* cycles */
-
-		},
-	},
-	actionRow{ // S12
-		canRecover: false,
-		actions: [numSymbols]action{
 			nil,       /* INVALID */
 			nil,       /* $ */
-			shift(19), /* name */
-			nil,       /* host */
 			nil,       /* check */
 			nil,       /* service */
+			nil,       /* name */
+			nil,       /* host */
+			shift(24), /* expose */
 			nil,       /* , */
 			nil,       /* restart */
 			nil,       /* reload */
@@ -326,7 +313,33 @@ var actionTab = actionTable{
 			nil,       /* : */
 			nil,       /* ( */
 			nil,       /* ) */
-			nil,       /* if */
+			shift(10), /* if */
+			nil,       /* operator */
+			nil,       /* then */
+			nil,       /* for */
+			nil,       /* cycles */
+
+		},
+	},
+	actionRow{ // S12
+		canRecover: false,
+		actions: [numSymbols]action{
+			nil,       /* INVALID */
+			reduce(4), /* $, reduce: Check */
+			nil,       /* check */
+			nil,       /* service */
+			nil,       /* name */
+			nil,       /* host */
+			nil,       /* expose */
+			nil,       /* , */
+			nil,       /* restart */
+			nil,       /* reload */
+			nil,       /* alert */
+			nil,       /* with */
+			nil,       /* : */
+			nil,       /* ( */
+			nil,       /* ) */
+			shift(10), /* if */
 			nil,       /* operator */
 			nil,       /* then */
 			nil,       /* for */
@@ -338,11 +351,12 @@ var actionTab = actionTable{
 		canRecover: false,
 		actions: [numSymbols]action{
 			nil,       /* INVALID */
-			nil,       /* $ */
-			nil,       /* name */
-			nil,       /* host */
+			reduce(3), /* $, reduce: Check */
 			nil,       /* check */
 			nil,       /* service */
+			nil,       /* name */
+			nil,       /* host */
+			nil,       /* expose */
 			nil,       /* , */
 			nil,       /* restart */
 			nil,       /* reload */
@@ -351,7 +365,7 @@ var actionTab = actionTable{
 			nil,       /* : */
 			nil,       /* ( */
 			nil,       /* ) */
-			shift(12), /* if */
+			shift(10), /* if */
 			nil,       /* operator */
 			nil,       /* then */
 			nil,       /* for */
@@ -363,11 +377,12 @@ var actionTab = actionTable{
 		canRecover: false,
 		actions: [numSymbols]action{
 			nil,       /* INVALID */
-			reduce(2), /* $, reduce: Check */
-			nil,       /* name */
-			nil,       /* host */
+			nil,       /* $ */
 			nil,       /* check */
 			nil,       /* service */
+			shift(26), /* name */
+			nil,       /* host */
+			nil,       /* expose */
 			nil,       /* , */
 			nil,       /* restart */
 			nil,       /* reload */
@@ -376,7 +391,7 @@ var actionTab = actionTable{
 			nil,       /* : */
 			nil,       /* ( */
 			nil,       /* ) */
-			shift(12), /* if */
+			nil,       /* if */
 			nil,       /* operator */
 			nil,       /* then */
 			nil,       /* for */
@@ -388,11 +403,12 @@ var actionTab = actionTable{
 		canRecover: false,
 		actions: [numSymbols]action{
 			nil,       /* INVALID */
-			reduce(3), /* $, reduce: Check */
-			nil,       /* name */
-			nil,       /* host */
+			nil,       /* $ */
 			nil,       /* check */
 			nil,       /* service */
+			shift(28), /* name */
+			nil,       /* host */
+			nil,       /* expose */
 			nil,       /* , */
 			nil,       /* restart */
 			nil,       /* reload */
@@ -401,7 +417,7 @@ var actionTab = actionTable{
 			nil,       /* : */
 			nil,       /* ( */
 			nil,       /* ) */
-			shift(12), /* if */
+			nil,       /* if */
 			nil,       /* operator */
 			nil,       /* then */
 			nil,       /* for */
@@ -412,12 +428,39 @@ var actionTab = actionTable{
 	actionRow{ // S16
 		canRecover: false,
 		actions: [numSymbols]action{
+			nil,       /* INVALID */
+			reduce(6), /* $, reduce: Check */
+			nil,       /* check */
+			nil,       /* service */
+			nil,       /* name */
+			nil,       /* host */
+			nil,       /* expose */
+			nil,       /* , */
+			nil,       /* restart */
+			nil,       /* reload */
+			nil,       /* alert */
+			nil,       /* with */
+			nil,       /* : */
+			nil,       /* ( */
+			nil,       /* ) */
+			shift(10), /* if */
+			nil,       /* operator */
+			nil,       /* then */
+			nil,       /* for */
+			nil,       /* cycles */
+
+		},
+	},
+	actionRow{ // S17
+		canRecover: false,
+		actions: [numSymbols]action{
 			nil,        /* INVALID */
-			reduce(24), /* $, reduce: RuleList */
-			nil,        /* name */
-			nil,        /* host */
+			reduce(28), /* $, reduce: RuleList */
 			nil,        /* check */
 			nil,        /* service */
+			nil,        /* name */
+			nil,        /* host */
+			nil,        /* expose */
 			nil,        /* , */
 			nil,        /* restart */
 			nil,        /* reload */
@@ -426,7 +469,7 @@ var actionTab = actionTable{
 			nil,        /* : */
 			nil,        /* ( */
 			nil,        /* ) */
-			reduce(24), /* if, reduce: RuleList */
+			reduce(28), /* if, reduce: RuleList */
 			nil,        /* operator */
 			nil,        /* then */
 			nil,        /* for */
@@ -434,15 +477,16 @@ var actionTab = actionTable{
 
 		},
 	},
-	actionRow{ // S17
+	actionRow{ // S18
 		canRecover: false,
 		actions: [numSymbols]action{
 			nil,       /* INVALID */
 			nil,       /* $ */
-			shift(22), /* name */
-			nil,       /* host */
 			nil,       /* check */
 			nil,       /* service */
+			shift(30), /* name */
+			nil,       /* host */
+			nil,       /* expose */
 			nil,       /* , */
 			nil,       /* restart */
 			nil,       /* reload */
@@ -459,15 +503,16 @@ var actionTab = actionTable{
 
 		},
 	},
-	actionRow{ // S18
+	actionRow{ // S19
 		canRecover: false,
 		actions: [numSymbols]action{
 			nil,        /* INVALID */
 			nil,        /* $ */
-			nil,        /* name */
-			nil,        /* host */
 			nil,        /* check */
 			nil,        /* service */
+			nil,        /* name */
+			nil,        /* host */
+			nil,        /* expose */
 			nil,        /* , */
 			nil,        /* restart */
 			nil,        /* reload */
@@ -476,33 +521,8 @@ var actionTab = actionTable{
 			nil,        /* : */
 			nil,        /* ( */
 			nil,        /* ) */
-			reduce(13), /* if, reduce: ParameterList */
+			reduce(17), /* if, reduce: ParameterList */
 			nil,        /* operator */
-			nil,        /* then */
-			nil,        /* for */
-			nil,        /* cycles */
-
-		},
-	},
-	actionRow{ // S19
-		canRecover: false,
-		actions: [numSymbols]action{
-			nil,        /* INVALID */
-			nil,        /* $ */
-			nil,        /* name */
-			nil,        /* host */
-			nil,        /* check */
-			nil,        /* service */
-			nil,        /* , */
-			nil,        /* restart */
-			nil,        /* reload */
-			nil,        /* alert */
-			nil,        /* with */
-			shift(23),  /* : */
-			shift(24),  /* ( */
-			nil,        /* ) */
-			nil,        /* if */
-			reduce(18), /* operator, reduce: Metric */
 			nil,        /* then */
 			nil,        /* for */
 			nil,        /* cycles */
@@ -512,12 +532,39 @@ var actionTab = actionTable{
 	actionRow{ // S20
 		canRecover: false,
 		actions: [numSymbols]action{
+			nil,        /* INVALID */
+			nil,        /* $ */
+			nil,        /* check */
+			nil,        /* service */
+			nil,        /* name */
+			nil,        /* host */
+			nil,        /* expose */
+			nil,        /* , */
+			nil,        /* restart */
+			nil,        /* reload */
+			nil,        /* alert */
+			nil,        /* with */
+			shift(31),  /* : */
+			shift(32),  /* ( */
+			nil,        /* ) */
+			nil,        /* if */
+			reduce(22), /* operator, reduce: Metric */
+			nil,        /* then */
+			nil,        /* for */
+			nil,        /* cycles */
+
+		},
+	},
+	actionRow{ // S21
+		canRecover: false,
+		actions: [numSymbols]action{
 			nil,       /* INVALID */
 			nil,       /* $ */
-			nil,       /* name */
-			nil,       /* host */
 			nil,       /* check */
 			nil,       /* service */
+			nil,       /* name */
+			nil,       /* host */
+			nil,       /* expose */
 			nil,       /* , */
 			nil,       /* restart */
 			nil,       /* reload */
@@ -527,32 +574,7 @@ var actionTab = actionTable{
 			nil,       /* ( */
 			nil,       /* ) */
 			nil,       /* if */
-			shift(25), /* operator */
-			nil,       /* then */
-			nil,       /* for */
-			nil,       /* cycles */
-
-		},
-	},
-	actionRow{ // S21
-		canRecover: false,
-		actions: [numSymbols]action{
-			nil,       /* INVALID */
-			reduce(1), /* $, reduce: Check */
-			nil,       /* name */
-			nil,       /* host */
-			nil,       /* check */
-			nil,       /* service */
-			nil,       /* , */
-			nil,       /* restart */
-			nil,       /* reload */
-			nil,       /* alert */
-			nil,       /* with */
-			nil,       /* : */
-			nil,       /* ( */
-			nil,       /* ) */
-			shift(12), /* if */
-			nil,       /* operator */
+			shift(33), /* operator */
 			nil,       /* then */
 			nil,       /* for */
 			nil,       /* cycles */
@@ -562,37 +584,13 @@ var actionTab = actionTable{
 	actionRow{ // S22
 		canRecover: false,
 		actions: [numSymbols]action{
-			nil,        /* INVALID */
-			nil,        /* $ */
-			nil,        /* name */
-			nil,        /* host */
-			nil,        /* check */
-			nil,        /* service */
-			shift(26),  /* , */
-			nil,        /* restart */
-			nil,        /* reload */
-			nil,        /* alert */
-			nil,        /* with */
-			nil,        /* : */
-			nil,        /* ( */
-			nil,        /* ) */
-			reduce(15), /* if, reduce: Parameters */
-			nil,        /* operator */
-			nil,        /* then */
-			nil,        /* for */
-			nil,        /* cycles */
-
-		},
-	},
-	actionRow{ // S23
-		canRecover: false,
-		actions: [numSymbols]action{
 			nil,       /* INVALID */
-			nil,       /* $ */
-			shift(27), /* name */
-			nil,       /* host */
+			reduce(1), /* $, reduce: Check */
 			nil,       /* check */
 			nil,       /* service */
+			nil,       /* name */
+			nil,       /* host */
+			nil,       /* expose */
 			nil,       /* , */
 			nil,       /* restart */
 			nil,       /* reload */
@@ -601,7 +599,33 @@ var actionTab = actionTable{
 			nil,       /* : */
 			nil,       /* ( */
 			nil,       /* ) */
-			nil,       /* if */
+			shift(10), /* if */
+			nil,       /* operator */
+			nil,       /* then */
+			nil,       /* for */
+			nil,       /* cycles */
+
+		},
+	},
+	actionRow{ // S23
+		canRecover: false,
+		actions: [numSymbols]action{
+			nil,       /* INVALID */
+			nil,       /* $ */
+			nil,       /* check */
+			nil,       /* service */
+			nil,       /* name */
+			nil,       /* host */
+			nil,       /* expose */
+			nil,       /* , */
+			nil,       /* restart */
+			nil,       /* reload */
+			nil,       /* alert */
+			nil,       /* with */
+			nil,       /* : */
+			nil,       /* ( */
+			nil,       /* ) */
+			shift(10), /* if */
 			nil,       /* operator */
 			nil,       /* then */
 			nil,       /* for */
@@ -614,10 +638,11 @@ var actionTab = actionTable{
 		actions: [numSymbols]action{
 			nil,       /* INVALID */
 			nil,       /* $ */
-			shift(28), /* name */
-			nil,       /* host */
 			nil,       /* check */
 			nil,       /* service */
+			shift(35), /* name */
+			nil,       /* host */
+			nil,       /* expose */
 			nil,       /* , */
 			nil,       /* restart */
 			nil,       /* reload */
@@ -638,11 +663,12 @@ var actionTab = actionTable{
 		canRecover: false,
 		actions: [numSymbols]action{
 			nil,       /* INVALID */
-			nil,       /* $ */
-			shift(29), /* name */
-			nil,       /* host */
+			reduce(5), /* $, reduce: Check */
 			nil,       /* check */
 			nil,       /* service */
+			nil,       /* name */
+			nil,       /* host */
+			nil,       /* expose */
 			nil,       /* , */
 			nil,       /* restart */
 			nil,       /* reload */
@@ -651,7 +677,7 @@ var actionTab = actionTable{
 			nil,       /* : */
 			nil,       /* ( */
 			nil,       /* ) */
-			nil,       /* if */
+			shift(10), /* if */
 			nil,       /* operator */
 			nil,       /* then */
 			nil,       /* for */
@@ -662,12 +688,39 @@ var actionTab = actionTable{
 	actionRow{ // S26
 		canRecover: false,
 		actions: [numSymbols]action{
+			nil,        /* INVALID */
+			reduce(10), /* $, reduce: Exposed */
+			nil,        /* check */
+			nil,        /* service */
+			nil,        /* name */
+			nil,        /* host */
+			nil,        /* expose */
+			shift(37),  /* , */
+			nil,        /* restart */
+			nil,        /* reload */
+			nil,        /* alert */
+			nil,        /* with */
+			nil,        /* : */
+			nil,        /* ( */
+			nil,        /* ) */
+			reduce(10), /* if, reduce: Exposed */
+			nil,        /* operator */
+			nil,        /* then */
+			nil,        /* for */
+			nil,        /* cycles */
+
+		},
+	},
+	actionRow{ // S27
+		canRecover: false,
+		actions: [numSymbols]action{
 			nil,       /* INVALID */
-			nil,       /* $ */
-			shift(17), /* name */
-			nil,       /* host */
+			reduce(8), /* $, reduce: ExposedList */
 			nil,       /* check */
 			nil,       /* service */
+			nil,       /* name */
+			nil,       /* host */
+			nil,       /* expose */
 			nil,       /* , */
 			nil,       /* restart */
 			nil,       /* reload */
@@ -676,36 +729,11 @@ var actionTab = actionTable{
 			nil,       /* : */
 			nil,       /* ( */
 			nil,       /* ) */
-			nil,       /* if */
+			reduce(8), /* if, reduce: ExposedList */
 			nil,       /* operator */
 			nil,       /* then */
 			nil,       /* for */
 			nil,       /* cycles */
-
-		},
-	},
-	actionRow{ // S27
-		canRecover: false,
-		actions: [numSymbols]action{
-			nil,        /* INVALID */
-			nil,        /* $ */
-			nil,        /* name */
-			nil,        /* host */
-			nil,        /* check */
-			nil,        /* service */
-			nil,        /* , */
-			nil,        /* restart */
-			nil,        /* reload */
-			nil,        /* alert */
-			nil,        /* with */
-			nil,        /* : */
-			nil,        /* ( */
-			nil,        /* ) */
-			nil,        /* if */
-			reduce(19), /* operator, reduce: Metric */
-			nil,        /* then */
-			nil,        /* for */
-			nil,        /* cycles */
 
 		},
 	},
@@ -714,10 +742,11 @@ var actionTab = actionTable{
 		actions: [numSymbols]action{
 			nil,       /* INVALID */
 			nil,       /* $ */
-			nil,       /* name */
-			nil,       /* host */
 			nil,       /* check */
 			nil,       /* service */
+			shift(38), /* name */
+			nil,       /* host */
+			nil,       /* expose */
 			nil,       /* , */
 			nil,       /* restart */
 			nil,       /* reload */
@@ -725,7 +754,7 @@ var actionTab = actionTable{
 			nil,       /* with */
 			nil,       /* : */
 			nil,       /* ( */
-			shift(32), /* ) */
+			nil,       /* ) */
 			nil,       /* if */
 			nil,       /* operator */
 			nil,       /* then */
@@ -739,10 +768,11 @@ var actionTab = actionTable{
 		actions: [numSymbols]action{
 			nil,        /* INVALID */
 			nil,        /* $ */
-			nil,        /* name */
-			nil,        /* host */
 			nil,        /* check */
 			nil,        /* service */
+			nil,        /* name */
+			nil,        /* host */
+			reduce(17), /* expose, reduce: ParameterList */
 			nil,        /* , */
 			nil,        /* restart */
 			nil,        /* reload */
@@ -751,10 +781,10 @@ var actionTab = actionTable{
 			nil,        /* : */
 			nil,        /* ( */
 			nil,        /* ) */
-			nil,        /* if */
+			reduce(17), /* if, reduce: ParameterList */
 			nil,        /* operator */
-			reduce(17), /* then, reduce: HumanAmount */
-			reduce(17), /* for, reduce: HumanAmount */
+			nil,        /* then */
+			nil,        /* for */
 			nil,        /* cycles */
 
 		},
@@ -762,12 +792,39 @@ var actionTab = actionTable{
 	actionRow{ // S30
 		canRecover: false,
 		actions: [numSymbols]action{
+			nil,        /* INVALID */
+			nil,        /* $ */
+			nil,        /* check */
+			nil,        /* service */
+			nil,        /* name */
+			nil,        /* host */
+			nil,        /* expose */
+			shift(39),  /* , */
+			nil,        /* restart */
+			nil,        /* reload */
+			nil,        /* alert */
+			nil,        /* with */
+			nil,        /* : */
+			nil,        /* ( */
+			nil,        /* ) */
+			reduce(19), /* if, reduce: Parameters */
+			nil,        /* operator */
+			nil,        /* then */
+			nil,        /* for */
+			nil,        /* cycles */
+
+		},
+	},
+	actionRow{ // S31
+		canRecover: false,
+		actions: [numSymbols]action{
 			nil,       /* INVALID */
 			nil,       /* $ */
-			nil,       /* name */
-			nil,       /* host */
 			nil,       /* check */
 			nil,       /* service */
+			shift(40), /* name */
+			nil,       /* host */
+			nil,       /* expose */
 			nil,       /* , */
 			nil,       /* restart */
 			nil,       /* reload */
@@ -778,59 +835,35 @@ var actionTab = actionTable{
 			nil,       /* ) */
 			nil,       /* if */
 			nil,       /* operator */
-			shift(33), /* then */
-			shift(34), /* for */
+			nil,       /* then */
+			nil,       /* for */
 			nil,       /* cycles */
-
-		},
-	},
-	actionRow{ // S31
-		canRecover: false,
-		actions: [numSymbols]action{
-			nil,        /* INVALID */
-			nil,        /* $ */
-			nil,        /* name */
-			nil,        /* host */
-			nil,        /* check */
-			nil,        /* service */
-			nil,        /* , */
-			nil,        /* restart */
-			nil,        /* reload */
-			nil,        /* alert */
-			nil,        /* with */
-			nil,        /* : */
-			nil,        /* ( */
-			nil,        /* ) */
-			reduce(14), /* if, reduce: Parameters */
-			nil,        /* operator */
-			nil,        /* then */
-			nil,        /* for */
-			nil,        /* cycles */
 
 		},
 	},
 	actionRow{ // S32
 		canRecover: false,
 		actions: [numSymbols]action{
-			nil,        /* INVALID */
-			nil,        /* $ */
-			nil,        /* name */
-			nil,        /* host */
-			nil,        /* check */
-			nil,        /* service */
-			nil,        /* , */
-			nil,        /* restart */
-			nil,        /* reload */
-			nil,        /* alert */
-			nil,        /* with */
-			nil,        /* : */
-			nil,        /* ( */
-			nil,        /* ) */
-			nil,        /* if */
-			reduce(20), /* operator, reduce: Metric */
-			nil,        /* then */
-			nil,        /* for */
-			nil,        /* cycles */
+			nil,       /* INVALID */
+			nil,       /* $ */
+			nil,       /* check */
+			nil,       /* service */
+			shift(41), /* name */
+			nil,       /* host */
+			nil,       /* expose */
+			nil,       /* , */
+			nil,       /* restart */
+			nil,       /* reload */
+			nil,       /* alert */
+			nil,       /* with */
+			nil,       /* : */
+			nil,       /* ( */
+			nil,       /* ) */
+			nil,       /* if */
+			nil,       /* operator */
+			nil,       /* then */
+			nil,       /* for */
+			nil,       /* cycles */
 
 		},
 	},
@@ -839,14 +872,15 @@ var actionTab = actionTable{
 		actions: [numSymbols]action{
 			nil,       /* INVALID */
 			nil,       /* $ */
-			nil,       /* name */
-			nil,       /* host */
 			nil,       /* check */
 			nil,       /* service */
+			shift(42), /* name */
+			nil,       /* host */
+			nil,       /* expose */
 			nil,       /* , */
-			shift(37), /* restart */
-			shift(38), /* reload */
-			shift(39), /* alert */
+			nil,       /* restart */
+			nil,       /* reload */
+			nil,       /* alert */
 			nil,       /* with */
 			nil,       /* : */
 			nil,       /* ( */
@@ -863,11 +897,12 @@ var actionTab = actionTable{
 		canRecover: false,
 		actions: [numSymbols]action{
 			nil,       /* INVALID */
-			nil,       /* $ */
-			shift(40), /* name */
-			nil,       /* host */
+			reduce(2), /* $, reduce: Check */
 			nil,       /* check */
 			nil,       /* service */
+			nil,       /* name */
+			nil,       /* host */
+			nil,       /* expose */
 			nil,       /* , */
 			nil,       /* restart */
 			nil,       /* reload */
@@ -876,7 +911,7 @@ var actionTab = actionTable{
 			nil,       /* : */
 			nil,       /* ( */
 			nil,       /* ) */
-			nil,       /* if */
+			shift(10), /* if */
 			nil,       /* operator */
 			nil,       /* then */
 			nil,       /* for */
@@ -888,12 +923,13 @@ var actionTab = actionTable{
 		canRecover: false,
 		actions: [numSymbols]action{
 			nil,        /* INVALID */
-			reduce(21), /* $, reduce: Rule */
-			nil,        /* name */
-			nil,        /* host */
+			nil,        /* $ */
 			nil,        /* check */
 			nil,        /* service */
-			nil,        /* , */
+			nil,        /* name */
+			nil,        /* host */
+			nil,        /* expose */
+			shift(44),  /* , */
 			nil,        /* restart */
 			nil,        /* reload */
 			nil,        /* alert */
@@ -901,7 +937,7 @@ var actionTab = actionTable{
 			nil,        /* : */
 			nil,        /* ( */
 			nil,        /* ) */
-			reduce(21), /* if, reduce: Rule */
+			reduce(10), /* if, reduce: Exposed */
 			nil,        /* operator */
 			nil,        /* then */
 			nil,        /* for */
@@ -913,12 +949,13 @@ var actionTab = actionTable{
 		canRecover: false,
 		actions: [numSymbols]action{
 			nil,       /* INVALID */
-			reduce(7), /* $, reduce: ActionList */
-			nil,       /* name */
-			nil,       /* host */
+			nil,       /* $ */
 			nil,       /* check */
 			nil,       /* service */
-			shift(42), /* , */
+			nil,       /* name */
+			nil,       /* host */
+			nil,       /* expose */
+			nil,       /* , */
 			nil,       /* restart */
 			nil,       /* reload */
 			nil,       /* alert */
@@ -926,7 +963,7 @@ var actionTab = actionTable{
 			nil,       /* : */
 			nil,       /* ( */
 			nil,       /* ) */
-			reduce(7), /* if, reduce: ActionList */
+			reduce(8), /* if, reduce: ExposedList */
 			nil,       /* operator */
 			nil,       /* then */
 			nil,       /* for */
@@ -938,12 +975,13 @@ var actionTab = actionTable{
 		canRecover: false,
 		actions: [numSymbols]action{
 			nil,       /* INVALID */
-			reduce(9), /* $, reduce: Action */
-			nil,       /* name */
-			nil,       /* host */
+			nil,       /* $ */
 			nil,       /* check */
 			nil,       /* service */
-			reduce(9), /* ,, reduce: Action */
+			shift(26), /* name */
+			nil,       /* host */
+			nil,       /* expose */
+			nil,       /* , */
 			nil,       /* restart */
 			nil,       /* reload */
 			nil,       /* alert */
@@ -951,7 +989,7 @@ var actionTab = actionTable{
 			nil,       /* : */
 			nil,       /* ( */
 			nil,       /* ) */
-			reduce(9), /* if, reduce: Action */
+			nil,       /* if */
 			nil,       /* operator */
 			nil,       /* then */
 			nil,       /* for */
@@ -963,12 +1001,13 @@ var actionTab = actionTable{
 		canRecover: false,
 		actions: [numSymbols]action{
 			nil,        /* INVALID */
-			reduce(10), /* $, reduce: Action */
-			nil,        /* name */
-			nil,        /* host */
+			nil,        /* $ */
 			nil,        /* check */
 			nil,        /* service */
-			reduce(10), /* ,, reduce: Action */
+			nil,        /* name */
+			nil,        /* host */
+			reduce(19), /* expose, reduce: Parameters */
+			shift(46),  /* , */
 			nil,        /* restart */
 			nil,        /* reload */
 			nil,        /* alert */
@@ -976,7 +1015,7 @@ var actionTab = actionTable{
 			nil,        /* : */
 			nil,        /* ( */
 			nil,        /* ) */
-			reduce(10), /* if, reduce: Action */
+			reduce(19), /* if, reduce: Parameters */
 			nil,        /* operator */
 			nil,        /* then */
 			nil,        /* for */
@@ -987,25 +1026,26 @@ var actionTab = actionTable{
 	actionRow{ // S39
 		canRecover: false,
 		actions: [numSymbols]action{
-			nil,        /* INVALID */
-			reduce(11), /* $, reduce: Action */
-			shift(43),  /* name */
-			nil,        /* host */
-			nil,        /* check */
-			nil,        /* service */
-			reduce(11), /* ,, reduce: Action */
-			nil,        /* restart */
-			nil,        /* reload */
-			nil,        /* alert */
-			nil,        /* with */
-			nil,        /* : */
-			nil,        /* ( */
-			nil,        /* ) */
-			reduce(11), /* if, reduce: Action */
-			nil,        /* operator */
-			nil,        /* then */
-			nil,        /* for */
-			nil,        /* cycles */
+			nil,       /* INVALID */
+			nil,       /* $ */
+			nil,       /* check */
+			nil,       /* service */
+			shift(18), /* name */
+			nil,       /* host */
+			nil,       /* expose */
+			nil,       /* , */
+			nil,       /* restart */
+			nil,       /* reload */
+			nil,       /* alert */
+			nil,       /* with */
+			nil,       /* : */
+			nil,       /* ( */
+			nil,       /* ) */
+			nil,       /* if */
+			nil,       /* operator */
+			nil,       /* then */
+			nil,       /* for */
+			nil,       /* cycles */
 
 		},
 	},
@@ -1014,10 +1054,63 @@ var actionTab = actionTable{
 		actions: [numSymbols]action{
 			nil,        /* INVALID */
 			nil,        /* $ */
-			nil,        /* name */
-			nil,        /* host */
 			nil,        /* check */
 			nil,        /* service */
+			nil,        /* name */
+			nil,        /* host */
+			nil,        /* expose */
+			nil,        /* , */
+			nil,        /* restart */
+			nil,        /* reload */
+			nil,        /* alert */
+			nil,        /* with */
+			nil,        /* : */
+			nil,        /* ( */
+			nil,        /* ) */
+			nil,        /* if */
+			reduce(23), /* operator, reduce: Metric */
+			nil,        /* then */
+			nil,        /* for */
+			nil,        /* cycles */
+
+		},
+	},
+	actionRow{ // S41
+		canRecover: false,
+		actions: [numSymbols]action{
+			nil,       /* INVALID */
+			nil,       /* $ */
+			nil,       /* check */
+			nil,       /* service */
+			nil,       /* name */
+			nil,       /* host */
+			nil,       /* expose */
+			nil,       /* , */
+			nil,       /* restart */
+			nil,       /* reload */
+			nil,       /* alert */
+			nil,       /* with */
+			nil,       /* : */
+			nil,       /* ( */
+			shift(48), /* ) */
+			nil,       /* if */
+			nil,       /* operator */
+			nil,       /* then */
+			nil,       /* for */
+			nil,       /* cycles */
+
+		},
+	},
+	actionRow{ // S42
+		canRecover: false,
+		actions: [numSymbols]action{
+			nil,        /* INVALID */
+			nil,        /* $ */
+			nil,        /* check */
+			nil,        /* service */
+			nil,        /* name */
+			nil,        /* host */
+			nil,        /* expose */
 			nil,        /* , */
 			nil,        /* restart */
 			nil,        /* reload */
@@ -1028,21 +1121,22 @@ var actionTab = actionTable{
 			nil,        /* ) */
 			nil,        /* if */
 			nil,        /* operator */
-			nil,        /* then */
-			nil,        /* for */
-			reduce(16), /* cycles, reduce: IntAmount */
+			reduce(21), /* then, reduce: HumanAmount */
+			reduce(21), /* for, reduce: HumanAmount */
+			nil,        /* cycles */
 
 		},
 	},
-	actionRow{ // S41
+	actionRow{ // S43
 		canRecover: false,
 		actions: [numSymbols]action{
 			nil,       /* INVALID */
 			nil,       /* $ */
-			nil,       /* name */
-			nil,       /* host */
 			nil,       /* check */
 			nil,       /* service */
+			nil,       /* name */
+			nil,       /* host */
+			nil,       /* expose */
 			nil,       /* , */
 			nil,       /* restart */
 			nil,       /* reload */
@@ -1053,59 +1147,9 @@ var actionTab = actionTable{
 			nil,       /* ) */
 			nil,       /* if */
 			nil,       /* operator */
-			nil,       /* then */
-			nil,       /* for */
-			shift(44), /* cycles */
-
-		},
-	},
-	actionRow{ // S42
-		canRecover: false,
-		actions: [numSymbols]action{
-			nil,       /* INVALID */
-			nil,       /* $ */
-			nil,       /* name */
-			nil,       /* host */
-			nil,       /* check */
-			nil,       /* service */
-			nil,       /* , */
-			shift(37), /* restart */
-			shift(38), /* reload */
-			shift(39), /* alert */
-			nil,       /* with */
-			nil,       /* : */
-			nil,       /* ( */
-			nil,       /* ) */
-			nil,       /* if */
-			nil,       /* operator */
-			nil,       /* then */
-			nil,       /* for */
+			shift(49), /* then */
+			shift(50), /* for */
 			nil,       /* cycles */
-
-		},
-	},
-	actionRow{ // S43
-		canRecover: false,
-		actions: [numSymbols]action{
-			nil,        /* INVALID */
-			reduce(12), /* $, reduce: Action */
-			nil,        /* name */
-			nil,        /* host */
-			nil,        /* check */
-			nil,        /* service */
-			reduce(12), /* ,, reduce: Action */
-			nil,        /* restart */
-			nil,        /* reload */
-			nil,        /* alert */
-			nil,        /* with */
-			nil,        /* : */
-			nil,        /* ( */
-			nil,        /* ) */
-			reduce(12), /* if, reduce: Action */
-			nil,        /* operator */
-			nil,        /* then */
-			nil,        /* for */
-			nil,        /* cycles */
 
 		},
 	},
@@ -1114,10 +1158,11 @@ var actionTab = actionTable{
 		actions: [numSymbols]action{
 			nil,       /* INVALID */
 			nil,       /* $ */
-			nil,       /* name */
-			nil,       /* host */
 			nil,       /* check */
 			nil,       /* service */
+			shift(35), /* name */
+			nil,       /* host */
+			nil,       /* expose */
 			nil,       /* , */
 			nil,       /* restart */
 			nil,       /* reload */
@@ -1128,7 +1173,7 @@ var actionTab = actionTable{
 			nil,       /* ) */
 			nil,       /* if */
 			nil,       /* operator */
-			shift(46), /* then */
+			nil,       /* then */
 			nil,       /* for */
 			nil,       /* cycles */
 
@@ -1138,11 +1183,12 @@ var actionTab = actionTable{
 		canRecover: false,
 		actions: [numSymbols]action{
 			nil,       /* INVALID */
-			reduce(8), /* $, reduce: ActionList */
-			nil,       /* name */
-			nil,       /* host */
+			reduce(9), /* $, reduce: Exposed */
 			nil,       /* check */
 			nil,       /* service */
+			nil,       /* name */
+			nil,       /* host */
+			nil,       /* expose */
 			nil,       /* , */
 			nil,       /* restart */
 			nil,       /* reload */
@@ -1151,7 +1197,7 @@ var actionTab = actionTable{
 			nil,       /* : */
 			nil,       /* ( */
 			nil,       /* ) */
-			reduce(8), /* if, reduce: ActionList */
+			reduce(9), /* if, reduce: Exposed */
 			nil,       /* operator */
 			nil,       /* then */
 			nil,       /* for */
@@ -1164,14 +1210,15 @@ var actionTab = actionTable{
 		actions: [numSymbols]action{
 			nil,       /* INVALID */
 			nil,       /* $ */
-			nil,       /* name */
-			nil,       /* host */
 			nil,       /* check */
 			nil,       /* service */
+			shift(28), /* name */
+			nil,       /* host */
+			nil,       /* expose */
 			nil,       /* , */
-			shift(37), /* restart */
-			shift(38), /* reload */
-			shift(39), /* alert */
+			nil,       /* restart */
+			nil,       /* reload */
+			nil,       /* alert */
 			nil,       /* with */
 			nil,       /* : */
 			nil,       /* ( */
@@ -1188,11 +1235,12 @@ var actionTab = actionTable{
 		canRecover: false,
 		actions: [numSymbols]action{
 			nil,        /* INVALID */
-			reduce(22), /* $, reduce: Rule */
-			nil,        /* name */
-			nil,        /* host */
+			nil,        /* $ */
 			nil,        /* check */
 			nil,        /* service */
+			nil,        /* name */
+			nil,        /* host */
+			nil,        /* expose */
 			nil,        /* , */
 			nil,        /* restart */
 			nil,        /* reload */
@@ -1201,7 +1249,475 @@ var actionTab = actionTable{
 			nil,        /* : */
 			nil,        /* ( */
 			nil,        /* ) */
-			reduce(22), /* if, reduce: Rule */
+			reduce(18), /* if, reduce: Parameters */
+			nil,        /* operator */
+			nil,        /* then */
+			nil,        /* for */
+			nil,        /* cycles */
+
+		},
+	},
+	actionRow{ // S48
+		canRecover: false,
+		actions: [numSymbols]action{
+			nil,        /* INVALID */
+			nil,        /* $ */
+			nil,        /* check */
+			nil,        /* service */
+			nil,        /* name */
+			nil,        /* host */
+			nil,        /* expose */
+			nil,        /* , */
+			nil,        /* restart */
+			nil,        /* reload */
+			nil,        /* alert */
+			nil,        /* with */
+			nil,        /* : */
+			nil,        /* ( */
+			nil,        /* ) */
+			nil,        /* if */
+			reduce(24), /* operator, reduce: Metric */
+			nil,        /* then */
+			nil,        /* for */
+			nil,        /* cycles */
+
+		},
+	},
+	actionRow{ // S49
+		canRecover: false,
+		actions: [numSymbols]action{
+			nil,       /* INVALID */
+			nil,       /* $ */
+			nil,       /* check */
+			nil,       /* service */
+			nil,       /* name */
+			nil,       /* host */
+			nil,       /* expose */
+			nil,       /* , */
+			shift(55), /* restart */
+			shift(56), /* reload */
+			shift(57), /* alert */
+			nil,       /* with */
+			nil,       /* : */
+			nil,       /* ( */
+			nil,       /* ) */
+			nil,       /* if */
+			nil,       /* operator */
+			nil,       /* then */
+			nil,       /* for */
+			nil,       /* cycles */
+
+		},
+	},
+	actionRow{ // S50
+		canRecover: false,
+		actions: [numSymbols]action{
+			nil,       /* INVALID */
+			nil,       /* $ */
+			nil,       /* check */
+			nil,       /* service */
+			shift(58), /* name */
+			nil,       /* host */
+			nil,       /* expose */
+			nil,       /* , */
+			nil,       /* restart */
+			nil,       /* reload */
+			nil,       /* alert */
+			nil,       /* with */
+			nil,       /* : */
+			nil,       /* ( */
+			nil,       /* ) */
+			nil,       /* if */
+			nil,       /* operator */
+			nil,       /* then */
+			nil,       /* for */
+			nil,       /* cycles */
+
+		},
+	},
+	actionRow{ // S51
+		canRecover: false,
+		actions: [numSymbols]action{
+			nil,       /* INVALID */
+			nil,       /* $ */
+			nil,       /* check */
+			nil,       /* service */
+			nil,       /* name */
+			nil,       /* host */
+			nil,       /* expose */
+			nil,       /* , */
+			nil,       /* restart */
+			nil,       /* reload */
+			nil,       /* alert */
+			nil,       /* with */
+			nil,       /* : */
+			nil,       /* ( */
+			nil,       /* ) */
+			reduce(9), /* if, reduce: Exposed */
+			nil,       /* operator */
+			nil,       /* then */
+			nil,       /* for */
+			nil,       /* cycles */
+
+		},
+	},
+	actionRow{ // S52
+		canRecover: false,
+		actions: [numSymbols]action{
+			nil,        /* INVALID */
+			nil,        /* $ */
+			nil,        /* check */
+			nil,        /* service */
+			nil,        /* name */
+			nil,        /* host */
+			reduce(18), /* expose, reduce: Parameters */
+			nil,        /* , */
+			nil,        /* restart */
+			nil,        /* reload */
+			nil,        /* alert */
+			nil,        /* with */
+			nil,        /* : */
+			nil,        /* ( */
+			nil,        /* ) */
+			reduce(18), /* if, reduce: Parameters */
+			nil,        /* operator */
+			nil,        /* then */
+			nil,        /* for */
+			nil,        /* cycles */
+
+		},
+	},
+	actionRow{ // S53
+		canRecover: false,
+		actions: [numSymbols]action{
+			nil,        /* INVALID */
+			reduce(25), /* $, reduce: Rule */
+			nil,        /* check */
+			nil,        /* service */
+			nil,        /* name */
+			nil,        /* host */
+			nil,        /* expose */
+			nil,        /* , */
+			nil,        /* restart */
+			nil,        /* reload */
+			nil,        /* alert */
+			nil,        /* with */
+			nil,        /* : */
+			nil,        /* ( */
+			nil,        /* ) */
+			reduce(25), /* if, reduce: Rule */
+			nil,        /* operator */
+			nil,        /* then */
+			nil,        /* for */
+			nil,        /* cycles */
+
+		},
+	},
+	actionRow{ // S54
+		canRecover: false,
+		actions: [numSymbols]action{
+			nil,        /* INVALID */
+			reduce(11), /* $, reduce: ActionList */
+			nil,        /* check */
+			nil,        /* service */
+			nil,        /* name */
+			nil,        /* host */
+			nil,        /* expose */
+			shift(60),  /* , */
+			nil,        /* restart */
+			nil,        /* reload */
+			nil,        /* alert */
+			nil,        /* with */
+			nil,        /* : */
+			nil,        /* ( */
+			nil,        /* ) */
+			reduce(11), /* if, reduce: ActionList */
+			nil,        /* operator */
+			nil,        /* then */
+			nil,        /* for */
+			nil,        /* cycles */
+
+		},
+	},
+	actionRow{ // S55
+		canRecover: false,
+		actions: [numSymbols]action{
+			nil,        /* INVALID */
+			reduce(13), /* $, reduce: Action */
+			nil,        /* check */
+			nil,        /* service */
+			nil,        /* name */
+			nil,        /* host */
+			nil,        /* expose */
+			reduce(13), /* ,, reduce: Action */
+			nil,        /* restart */
+			nil,        /* reload */
+			nil,        /* alert */
+			nil,        /* with */
+			nil,        /* : */
+			nil,        /* ( */
+			nil,        /* ) */
+			reduce(13), /* if, reduce: Action */
+			nil,        /* operator */
+			nil,        /* then */
+			nil,        /* for */
+			nil,        /* cycles */
+
+		},
+	},
+	actionRow{ // S56
+		canRecover: false,
+		actions: [numSymbols]action{
+			nil,        /* INVALID */
+			reduce(14), /* $, reduce: Action */
+			nil,        /* check */
+			nil,        /* service */
+			nil,        /* name */
+			nil,        /* host */
+			nil,        /* expose */
+			reduce(14), /* ,, reduce: Action */
+			nil,        /* restart */
+			nil,        /* reload */
+			nil,        /* alert */
+			nil,        /* with */
+			nil,        /* : */
+			nil,        /* ( */
+			nil,        /* ) */
+			reduce(14), /* if, reduce: Action */
+			nil,        /* operator */
+			nil,        /* then */
+			nil,        /* for */
+			nil,        /* cycles */
+
+		},
+	},
+	actionRow{ // S57
+		canRecover: false,
+		actions: [numSymbols]action{
+			nil,        /* INVALID */
+			reduce(15), /* $, reduce: Action */
+			nil,        /* check */
+			nil,        /* service */
+			shift(61),  /* name */
+			nil,        /* host */
+			nil,        /* expose */
+			reduce(15), /* ,, reduce: Action */
+			nil,        /* restart */
+			nil,        /* reload */
+			nil,        /* alert */
+			nil,        /* with */
+			nil,        /* : */
+			nil,        /* ( */
+			nil,        /* ) */
+			reduce(15), /* if, reduce: Action */
+			nil,        /* operator */
+			nil,        /* then */
+			nil,        /* for */
+			nil,        /* cycles */
+
+		},
+	},
+	actionRow{ // S58
+		canRecover: false,
+		actions: [numSymbols]action{
+			nil,        /* INVALID */
+			nil,        /* $ */
+			nil,        /* check */
+			nil,        /* service */
+			nil,        /* name */
+			nil,        /* host */
+			nil,        /* expose */
+			nil,        /* , */
+			nil,        /* restart */
+			nil,        /* reload */
+			nil,        /* alert */
+			nil,        /* with */
+			nil,        /* : */
+			nil,        /* ( */
+			nil,        /* ) */
+			nil,        /* if */
+			nil,        /* operator */
+			nil,        /* then */
+			nil,        /* for */
+			reduce(20), /* cycles, reduce: IntAmount */
+
+		},
+	},
+	actionRow{ // S59
+		canRecover: false,
+		actions: [numSymbols]action{
+			nil,       /* INVALID */
+			nil,       /* $ */
+			nil,       /* check */
+			nil,       /* service */
+			nil,       /* name */
+			nil,       /* host */
+			nil,       /* expose */
+			nil,       /* , */
+			nil,       /* restart */
+			nil,       /* reload */
+			nil,       /* alert */
+			nil,       /* with */
+			nil,       /* : */
+			nil,       /* ( */
+			nil,       /* ) */
+			nil,       /* if */
+			nil,       /* operator */
+			nil,       /* then */
+			nil,       /* for */
+			shift(62), /* cycles */
+
+		},
+	},
+	actionRow{ // S60
+		canRecover: false,
+		actions: [numSymbols]action{
+			nil,       /* INVALID */
+			nil,       /* $ */
+			nil,       /* check */
+			nil,       /* service */
+			nil,       /* name */
+			nil,       /* host */
+			nil,       /* expose */
+			nil,       /* , */
+			shift(55), /* restart */
+			shift(56), /* reload */
+			shift(57), /* alert */
+			nil,       /* with */
+			nil,       /* : */
+			nil,       /* ( */
+			nil,       /* ) */
+			nil,       /* if */
+			nil,       /* operator */
+			nil,       /* then */
+			nil,       /* for */
+			nil,       /* cycles */
+
+		},
+	},
+	actionRow{ // S61
+		canRecover: false,
+		actions: [numSymbols]action{
+			nil,        /* INVALID */
+			reduce(16), /* $, reduce: Action */
+			nil,        /* check */
+			nil,        /* service */
+			nil,        /* name */
+			nil,        /* host */
+			nil,        /* expose */
+			reduce(16), /* ,, reduce: Action */
+			nil,        /* restart */
+			nil,        /* reload */
+			nil,        /* alert */
+			nil,        /* with */
+			nil,        /* : */
+			nil,        /* ( */
+			nil,        /* ) */
+			reduce(16), /* if, reduce: Action */
+			nil,        /* operator */
+			nil,        /* then */
+			nil,        /* for */
+			nil,        /* cycles */
+
+		},
+	},
+	actionRow{ // S62
+		canRecover: false,
+		actions: [numSymbols]action{
+			nil,       /* INVALID */
+			nil,       /* $ */
+			nil,       /* check */
+			nil,       /* service */
+			nil,       /* name */
+			nil,       /* host */
+			nil,       /* expose */
+			nil,       /* , */
+			nil,       /* restart */
+			nil,       /* reload */
+			nil,       /* alert */
+			nil,       /* with */
+			nil,       /* : */
+			nil,       /* ( */
+			nil,       /* ) */
+			nil,       /* if */
+			nil,       /* operator */
+			shift(64), /* then */
+			nil,       /* for */
+			nil,       /* cycles */
+
+		},
+	},
+	actionRow{ // S63
+		canRecover: false,
+		actions: [numSymbols]action{
+			nil,        /* INVALID */
+			reduce(12), /* $, reduce: ActionList */
+			nil,        /* check */
+			nil,        /* service */
+			nil,        /* name */
+			nil,        /* host */
+			nil,        /* expose */
+			nil,        /* , */
+			nil,        /* restart */
+			nil,        /* reload */
+			nil,        /* alert */
+			nil,        /* with */
+			nil,        /* : */
+			nil,        /* ( */
+			nil,        /* ) */
+			reduce(12), /* if, reduce: ActionList */
+			nil,        /* operator */
+			nil,        /* then */
+			nil,        /* for */
+			nil,        /* cycles */
+
+		},
+	},
+	actionRow{ // S64
+		canRecover: false,
+		actions: [numSymbols]action{
+			nil,       /* INVALID */
+			nil,       /* $ */
+			nil,       /* check */
+			nil,       /* service */
+			nil,       /* name */
+			nil,       /* host */
+			nil,       /* expose */
+			nil,       /* , */
+			shift(55), /* restart */
+			shift(56), /* reload */
+			shift(57), /* alert */
+			nil,       /* with */
+			nil,       /* : */
+			nil,       /* ( */
+			nil,       /* ) */
+			nil,       /* if */
+			nil,       /* operator */
+			nil,       /* then */
+			nil,       /* for */
+			nil,       /* cycles */
+
+		},
+	},
+	actionRow{ // S65
+		canRecover: false,
+		actions: [numSymbols]action{
+			nil,        /* INVALID */
+			reduce(26), /* $, reduce: Rule */
+			nil,        /* check */
+			nil,        /* service */
+			nil,        /* name */
+			nil,        /* host */
+			nil,        /* expose */
+			nil,        /* , */
+			nil,        /* restart */
+			nil,        /* reload */
+			nil,        /* alert */
+			nil,        /* with */
+			nil,        /* : */
+			nil,        /* ( */
+			nil,        /* ) */
+			reduce(26), /* if, reduce: Rule */
 			nil,        /* operator */
 			nil,        /* then */
 			nil,        /* for */

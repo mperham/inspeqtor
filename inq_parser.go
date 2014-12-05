@@ -103,6 +103,7 @@ var (
 	BuildService = convertService
 	BuildRule    = convertRule
 	BuildAction  = convertAction
+	BuildExpose  = convertExpose
 )
 
 // GACK, so ugly
@@ -129,6 +130,10 @@ func convertHost(global *ConfigFile, inqhost *ast.HostCheck) (*Host, error) {
 	}
 	h.rules = rules
 	return h, nil
+}
+
+func convertExpose(global *ConfigFile, check Checkable, elements []string, options map[string]string) error {
+	return nil
 }
 
 func convertRule(global *ConfigFile, check Checkable, inqrule ast.Rule) (*Rule, error) {
@@ -197,5 +202,12 @@ func convertService(global *ConfigFile, inqsvc *ast.ProcessCheck) (*Service, err
 		rules[idx] = rule
 	}
 	svc.rules = rules
+
+	if len(inqsvc.Exposed) > 0 {
+		err := BuildExpose(global, svc, inqsvc.Exposed, inqsvc.Parameters)
+		if err != nil {
+			return nil, err
+		}
+	}
 	return svc, nil
 }
