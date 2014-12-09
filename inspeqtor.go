@@ -60,10 +60,10 @@ var (
 		os.Interrupt: exit,
 		Hup:          reload,
 	}
-	Name      string                               = "Inspeqtor"
-	Licensing string                               = "Licensed under the GNU Public License 3.0"
-	Singleton *Inspeqtor                           = nil
-	Reloaders []func(*Inspeqtor, *Inspeqtor) error = []func(*Inspeqtor, *Inspeqtor) error{basicReloader}
+	Name      = "Inspeqtor"
+	Licensing = "Licensed under the GNU Public License 3.0"
+	Singleton *Inspeqtor
+	Reloaders = []func(*Inspeqtor, *Inspeqtor) error{basicReloader}
 
 	counters = expvar.NewMap("inspeqtor")
 )
@@ -169,7 +169,7 @@ func HandleSignal(sig os.Signal, handler func(*Inspeqtor)) {
 
 func HandleSignals() {
 	signals := make(chan os.Signal)
-	for k, _ := range SignalHandlers {
+	for k := range SignalHandlers {
 		signal.Notify(signals, k)
 	}
 
@@ -367,14 +367,14 @@ func (i *Inspeqtor) TestAlertRoutes() int {
 		util.Debug("Creating notification for %s/%s", route.Channel, nm)
 		notifier, err := Actions["alert"](i.Host, route)
 		if err != nil {
-			bad += 1
+			bad++
 			util.Warn("Error creating %s/%s route: %s", route.Channel, nm, err.Error())
 			continue
 		}
 		util.Debug("Triggering notification for %s/%s", route.Channel, nm)
 		err = notifier.Trigger(&Event{RuleFailed, i.Host, i.Host.Rules()[0]})
 		if err != nil {
-			bad += 1
+			bad++
 			util.Warn("Error firing %s/%s route: %s", route.Channel, nm, err.Error())
 		}
 	}

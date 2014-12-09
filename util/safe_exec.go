@@ -10,10 +10,10 @@ import (
 
 var (
 	// default command timeout
-	CmdTimeout time.Duration = 3 * time.Second
+	CmdTimeout = 3 * time.Second
 	// restarting services can take a few seconds so
 	// allow a little more leeway here
-	RestartTimeout time.Duration = 10 * time.Second
+	RestartTimeout = 10 * time.Second
 )
 
 /*
@@ -57,7 +57,7 @@ func SafeRun(cmd *exec.Cmd, timeout ...time.Duration) ([]byte, error) {
 			Warn("failed to kill command: %s", err)
 		}
 		<-done // allow goroutine to exit
-		return b.Bytes(), errors.New(fmt.Sprintf("Command timed out: %s", cmd.Args))
+		return b.Bytes(), fmt.Errorf("Command timed out: %s", cmd.Args)
 	case err := <-done:
 		if err != nil {
 			return b.Bytes(), err

@@ -1,13 +1,3 @@
-// runit manages services usually found in /etc/service or /service, which
-// are soft links to the actual service directories in /etc/sv:
-//    <service_name>/
-//        run
-//        log/
-//           run
-//        supervise/
-//           pid  # => 4994
-//           stat # => run / down
-//
 package services
 
 import (

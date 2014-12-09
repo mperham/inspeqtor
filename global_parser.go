@@ -1,7 +1,6 @@
 package inspeqtor
 
 import (
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"strconv"
@@ -89,15 +88,15 @@ func ParseGlobal(rootDir string) (*ConfigFile, error) {
 				return nil, err
 			}
 			if _, ok := config.AlertRoutes[v.Name]; ok {
-				return nil, errors.New(fmt.Sprintf("Duplicate alert config for '%s'", v.Name))
+				return nil, fmt.Errorf("Duplicate alert config for '%s'", v.Name)
 			}
 			config.AlertRoutes[v.Name] = ar
 		}
 		return &config, nil
-	} else {
-		util.Info("No configuration file found at " + rootDir + "/inspector.conf")
-		return &ConfigFile{Defaults, nil}, nil
 	}
+
+	util.Info("No configuration file found at " + rootDir + "/inspector.conf")
+	return &ConfigFile{Defaults, nil}, nil
 }
 
 func parseValue(ast ast.Config, store *uint, name string, def uint) {

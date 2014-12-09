@@ -20,10 +20,10 @@ const (
 	  during that cycle.  Multithreaded processes running on
 	  systems with multiple CPUs/cores can use more than 100% CPU.
 	*/
-	CLK_TCK = 100
+	ClkTck = 100
 
 	// all metric ring buffers will store one hour of metric history
-	SLOTS = 3600 / 15
+	Slots = 3600 / 15
 )
 
 type Type uint8
@@ -126,7 +126,7 @@ func (store *storage) Metric(family, name string) Metric {
 
 func (store *storage) Families() []string {
 	families := []string{}
-	for k, _ := range store.tree {
+	for k := range store.tree {
 		families = append(families, k)
 	}
 	sort.Strings(families)
@@ -135,7 +135,7 @@ func (store *storage) Families() []string {
 
 func (store *storage) MetricNames(family string) []string {
 	met := []string{}
-	for k, _ := range store.tree[family].metrics {
+	for k := range store.tree[family].metrics {
 		met = append(met, k)
 	}
 	sort.Strings(met)
@@ -259,9 +259,8 @@ func (g *gauge) Display() string {
 func (g *gauge) Displayable(val float64) string {
 	if g.forDisplay != nil {
 		return g.forDisplay(val)
-	} else {
-		return strconv.FormatFloat(val, 'f', 1, 64)
 	}
+	return strconv.FormatFloat(val, 'f', 1, 64)
 }
 
 func (c *counter) Display() string {
@@ -272,9 +271,8 @@ func (c *counter) Display() string {
 func (c *counter) Displayable(val float64) string {
 	if c.forDisplay != nil {
 		return c.forDisplay(val)
-	} else {
-		return strconv.FormatFloat(val, 'f', 1, 64)
 	}
+	return strconv.FormatFloat(val, 'f', 1, 64)
 }
 
 /*
@@ -325,7 +323,7 @@ func (store *storage) DeclareGauge(familyName string, name string, display Displ
 
 	data := fam.metrics[name]
 	if data == nil {
-		fam.metrics[name] = &gauge{util.NewRingBuffer(SLOTS), display}
+		fam.metrics[name] = &gauge{util.NewRingBuffer(Slots), display}
 		data = fam.metrics[name]
 	}
 }
@@ -339,7 +337,7 @@ func (store *storage) DeclareCounter(familyName string, name string, xform Trans
 
 	data := fam.metrics[name]
 	if data == nil {
-		fam.metrics[name] = &counter{util.NewRingBuffer(SLOTS), xform, display}
+		fam.metrics[name] = &counter{util.NewRingBuffer(Slots), xform, display}
 		data = fam.metrics[name]
 	}
 }

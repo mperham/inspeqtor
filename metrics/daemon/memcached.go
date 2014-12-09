@@ -62,7 +62,7 @@ func (rs *MemcachedSource) runCli(funk executor) (metricMap, error) {
 	}
 
 	if len(rs.metrics) > len(values) {
-		for k, _ := range rs.metrics {
+		for k := range rs.metrics {
 			if _, ok := values[k]; !ok {
 				util.Info("Could not find metric %s(%s), did you spell it right?", rs.Name(), k)
 			}
@@ -90,7 +90,7 @@ func buildMemcachedSource(params map[string]string) (Collector, error) {
 }
 
 var (
-	memcachedMetrics []metric = []metric{
+	memcachedMetrics = []metric{
 		metric{"curr_connections", g, nil},
 		metric{"total_connections", c, nil},
 		metric{"cmd_get", c, nil},

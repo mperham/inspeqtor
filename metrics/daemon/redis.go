@@ -61,7 +61,7 @@ func (rs *RedisSource) runCli(funk executor) (metricMap, error) {
 	}
 
 	if len(rs.metrics) > len(values) {
-		for k, _ := range rs.metrics {
+		for k := range rs.metrics {
 			if _, ok := values[k]; !ok {
 				util.Warn("Could not find metric redis(%s), did you spell it right?", k)
 			}
@@ -115,7 +115,7 @@ func buildRedisSource(params map[string]string) (Collector, error) {
 }
 
 var (
-	redisMetrics []metric = []metric{
+	redisMetrics = []metric{
 		metric{"connected_clients", g, nil},
 		metric{"client_longest_output_list", g, nil},
 		metric{"client_biggest_input_buf", g, nil},

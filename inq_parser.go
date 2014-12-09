@@ -147,7 +147,7 @@ func convertRule(global *ConfigFile, check Checkable, inqrule ast.Rule) (*Rule, 
 		return nil, fmt.Errorf("Unknown operator: %s", inqrule.Operator)
 	}
 
-	actions := make([]Action, 0)
+	var actions []Action
 	for _, action := range inqrule.Actions {
 		act, err := BuildAction(global, check, action)
 		if err != nil {
@@ -173,7 +173,7 @@ func convertAction(global *ConfigFile, check Eventable, action ast.Action) (Acti
 	case "restart":
 		return Actions["restart"](check, nil)
 	default:
-		return nil, fmt.Errorf("Unknown action: %", action.Name())
+		return nil, fmt.Errorf("Unknown action: %s", action.Name())
 	}
 }
 

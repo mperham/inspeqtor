@@ -52,7 +52,7 @@ type Amount struct {
 }
 
 var (
-	ONE_CYCLE    = &Amount{Raw: "1", Parsed: 1, PerSec: false}
+	OneCycle     = &Amount{Raw: "1", Parsed: 1, PerSec: false}
 	CreateAction = func(props ...string) (Action, error) {
 		return &SimpleAction{props[0]}, nil
 	}

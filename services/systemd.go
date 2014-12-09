@@ -54,7 +54,7 @@ func (s *Systemd) serviceCommand(serviceName string, command string, timeout tim
 	return nil
 }
 
-func (u *Systemd) Name() string {
+func (s *Systemd) Name() string {
 	return "systemd"
 }
 
@@ -98,9 +98,8 @@ func (s *Systemd) LookupService(serviceName string) (*ProcessStatus, error) {
 
 	if err != nil || string(sout) != "enabled\n" {
 		return nil, &ServiceError{s.Name(), serviceName, ErrServiceNotFound}
-	} else {
-		return &ProcessStatus{0, Down}, nil
 	}
+	return &ProcessStatus{0, Down}, nil
 }
 
 func (s *Systemd) Restart(serviceName string) error {

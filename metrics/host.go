@@ -19,12 +19,12 @@ func NewHostStore(path string, cycleSeconds uint) Store {
 
 	store := &hostStorage{
 		&storage{map[string]*family{}},
-		float64(cycleSeconds * CLK_TCK),
+		float64(cycleSeconds * ClkTck),
 		path,
 	}
 
 	tickPercentage := func(cur, prev float64) float64 {
-		return float64((float64(cur-prev) / float64(cycleSeconds*CLK_TCK)) * 100)
+		return float64((float64(cur-prev) / float64(cycleSeconds*ClkTck)) * 100)
 	}
 
 	store.DeclareGauge("swap", "", DisplayPercent)
@@ -56,7 +56,7 @@ func (hs *hostStorage) Collect(_ int) error {
 	if err != nil {
 		return err
 	}
-	err = hs.collectCpu()
+	err = hs.collectCPU()
 	if err != nil {
 		return err
 	}
@@ -216,7 +216,7 @@ func (hs *hostStorage) collectLoadAverage() error {
 	return nil
 }
 
-func (hs *hostStorage) collectCpu() error {
+func (hs *hostStorage) collectCPU() error {
 	ok, err := util.FileExists(hs.path + "/stat")
 	if err != nil {
 		return err

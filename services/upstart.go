@@ -18,7 +18,7 @@ type Upstart struct {
 }
 
 var (
-	pidScanner *regexp.Regexp = regexp.MustCompile(" (start|stop)\\/([a-z\\-]+)(?:, process (\\d+))?")
+	pidScanner = regexp.MustCompile(" (start|stop)\\/([a-z\\-]+)(?:, process (\\d+))?")
 )
 
 func detectUpstart(path string) (InitSystem, error) {

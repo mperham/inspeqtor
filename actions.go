@@ -64,7 +64,7 @@ func buildAlerter(check Eventable, route *AlertRoute) (Action, error) {
 	funk := Notifiers[route.Channel]
 	if funk == nil {
 		// TODO Include valid channels
-		return nil, errors.New(fmt.Sprintf("No such notification scheme: %s", route.Channel))
+		return nil, fmt.Errorf("No such notification scheme: %s", route.Channel)
 	}
 	return funk(check, route.Config)
 }

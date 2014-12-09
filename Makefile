@@ -45,8 +45,9 @@ build: test
 fmt:
 	find . -name "*.go" -exec goimports -w {} \;
 
-vet:
+lint:
 	go vet ./...
+	golint ./... | grep -v exported
 
 clean:
 	rm -f main inspeqtor templates.go

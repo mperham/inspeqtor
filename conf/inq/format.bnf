@@ -112,7 +112,7 @@ Metric
   ;
 
 Rule
-  : "if" Metric operator HumanAmount "then" ActionList  << ast.NewRule($1, $2, $3, $5, ast.ONE_CYCLE), nil >>
+  : "if" Metric operator HumanAmount "then" ActionList  << ast.NewRule($1, $2, $3, $5, ast.OneCycle), nil >>
   | "if" Metric operator HumanAmount "for" IntAmount "cycles" "then" ActionList  << ast.NewRule($1, $2, $3, $8, $5), nil >>;
 
 RuleList
