@@ -53,8 +53,12 @@ func TestAcceptSocket(t *testing.T) {
 	assert.False(t, i.silenced())
 	i.acceptCommand()
 	assert.True(t, i.silenced())
+	x := i.SilenceUntil
 	i.acceptCommand()
-	assert.False(t, i.silenced())
+	// Inspeqtor will be silenced for one more cycle, verify the
+	// silence period shrunk
+	assert.True(t, i.silenced())
+	assert.True(t, x.After(i.SilenceUntil))
 	i.acceptCommand()
 }
 
@@ -63,7 +67,7 @@ func TestStartDeploy(t *testing.T) {
 	i, err := New("_", "")
 	i.SilenceUntil = time.Now()
 
-	outbuf := make([]byte, 0)
+	var outbuf []byte
 	resp := bytes.NewBuffer(outbuf)
 
 	assert.Nil(t, err)
@@ -81,14 +85,16 @@ func TestFinishDeploy(t *testing.T) {
 	t.Parallel()
 	i, err := New("_", "")
 
-	outbuf := make([]byte, 0)
+	var outbuf []byte
 	resp := bytes.NewBuffer(outbuf)
 
 	assert.Nil(t, err)
 	proc := CommandHandlers["finish"]
 	proc(i, []string{}, resp)
 
-	assert.True(t, i.SilenceUntil.Before(time.Now()))
+	oneCycle := time.Duration(i.GlobalConfig.CycleTime) * time.Second
+
+	assert.True(t, i.SilenceUntil.Before(time.Now().Add(oneCycle)))
 	output, err := resp.ReadString('\n')
 	assert.Nil(t, err)
 	assert.Equal(t, "Finished deploy, volume turned to 11\n", output)
@@ -98,7 +104,7 @@ func TestTheLove(t *testing.T) {
 	t.Parallel()
 	i, err := New("_", "")
 
-	outbuf := make([]byte, 0)
+	var outbuf []byte
 	resp := bytes.NewBuffer(outbuf)
 
 	assert.Nil(t, err)

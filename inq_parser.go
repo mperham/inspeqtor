@@ -103,6 +103,7 @@ var (
 	BuildService = convertService
 	BuildRule    = convertRule
 	BuildAction  = convertAction
+	BuildExpose  = convertExpose
 )
 
 // GACK, so ugly
@@ -131,6 +132,10 @@ func convertHost(global *ConfigFile, inqhost *ast.HostCheck) (*Host, error) {
 	return h, nil
 }
 
+func convertExpose(global *ConfigFile, check Checkable, elements []string, options map[string]string) error {
+	return nil
+}
+
 func convertRule(global *ConfigFile, check Checkable, inqrule ast.Rule) (*Rule, error) {
 	op := GT
 	switch inqrule.Operator {
@@ -142,7 +147,7 @@ func convertRule(global *ConfigFile, check Checkable, inqrule ast.Rule) (*Rule, 
 		return nil, fmt.Errorf("Unknown operator: %s", inqrule.Operator)
 	}
 
-	actions := make([]Action, 0)
+	var actions []Action
 	for _, action := range inqrule.Actions {
 		act, err := BuildAction(global, check, action)
 		if err != nil {
@@ -168,7 +173,7 @@ func convertAction(global *ConfigFile, check Eventable, action ast.Action) (Acti
 	case "restart":
 		return Actions["restart"](check, nil)
 	default:
-		return nil, fmt.Errorf("Unknown action: %", action.Name())
+		return nil, fmt.Errorf("Unknown action: %s", action.Name())
 	}
 }
 
@@ -197,5 +202,12 @@ func convertService(global *ConfigFile, inqsvc *ast.ProcessCheck) (*Service, err
 		rules[idx] = rule
 	}
 	svc.rules = rules
+
+	if len(inqsvc.Exposed) > 0 {
+		err := BuildExpose(global, svc, inqsvc.Exposed, inqsvc.Parameters)
+		if err != nil {
+			return nil, err
+		}
+	}
 	return svc, nil
 }

@@ -32,7 +32,7 @@ func NewProcessStore(path string, cycleSeconds uint) Store {
 	}
 
 	tickPercentage := func(cur, prev float64) float64 {
-		return float64(((cur - prev) / float64(cycleSeconds*CLK_TCK)) * 100)
+		return float64(((cur - prev) / float64(cycleSeconds*ClkTck)) * 100)
 	}
 
 	store.DeclareGauge("memory", "rss", DisplayInMB)
@@ -158,12 +158,12 @@ func (ps *processStorage) Collect(pid int) error {
 			return err
 		}
 	} else {
-		err = ps.captureVm(pid)
+		err = ps.captureVM(pid)
 		if err != nil {
 			return err
 		}
 
-		err = ps.captureCpu(pid)
+		err = ps.captureCPU(pid)
 		if err != nil {
 			return err
 		}
@@ -234,7 +234,7 @@ func (ps *processStorage) capturePs(pid int) error {
 	return nil
 }
 
-func (ps *processStorage) captureCpu(pid int) error {
+func (ps *processStorage) captureCPU(pid int) error {
 	dir := ps.path + "/" + strconv.Itoa(int(pid))
 	data, err := ioutil.ReadFile(dir + "/stat")
 	if err != nil {
@@ -272,7 +272,7 @@ func (ps *processStorage) captureCpu(pid int) error {
 	return nil
 }
 
-func (ps *processStorage) captureVm(pid int) error {
+func (ps *processStorage) captureVM(pid int) error {
 	dir := ps.path + "/" + strconv.Itoa(int(pid))
 	data, err := ioutil.ReadFile(dir + "/status")
 	if err != nil {

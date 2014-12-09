@@ -20,10 +20,10 @@ const (
 	  during that cycle.  Multithreaded processes running on
 	  systems with multiple CPUs/cores can use more than 100% CPU.
 	*/
-	CLK_TCK = 100
+	ClkTck = 100
 
 	// all metric ring buffers will store one hour of metric history
-	SLOTS = 3600 / 15
+	Slots = 3600 / 15
 )
 
 type Type uint8
@@ -58,24 +58,37 @@ type TransformFunc func(float64, float64) float64
 type DisplayFunc func(float64) string
 
 type Store interface {
+	Readable
+	Writable
+	Collectable
+}
+
+type BareStore interface {
+	Readable
+	Writable
+}
+
+type Readable interface {
 	Get(family string, name string) float64
 	Display(family string, name string) string
-	Collect(pid int) error
+	Families() []string
+	MetricNames(family string) []string
+	Metric(family, name string) Metric
+	Each(func(family, name string, metric Metric))
+}
 
+type Collectable interface {
+	Collect(pid int) error
 	// declare that a rule wants to act on this metric.
 	// useful if we only want to collect a metric if a
 	// rule will act upon it.
 	Prepare(family, name string) error
+}
 
-	Families() []string
-	MetricNames(family string) []string
-
+type Writable interface {
 	Save(family, name string, value float64)
 	DeclareCounter(family, name string, xform TransformFunc, display DisplayFunc)
 	DeclareGauge(family, name string, display DisplayFunc)
-	Metric(family, name string) Metric
-
-	Each(func(family, name string, metric Metric))
 }
 
 type Loadable interface {
@@ -84,6 +97,10 @@ type Loadable interface {
 
 type storage struct {
 	tree map[string]*family
+}
+
+func NewStore() BareStore {
+	return &storage{map[string]*family{}}
 }
 
 func (store *storage) Each(iter func(family, name string, metric Metric)) {
@@ -109,7 +126,7 @@ func (store *storage) Metric(family, name string) Metric {
 
 func (store *storage) Families() []string {
 	families := []string{}
-	for k, _ := range store.tree {
+	for k := range store.tree {
 		families = append(families, k)
 	}
 	sort.Strings(families)
@@ -118,7 +135,7 @@ func (store *storage) Families() []string {
 
 func (store *storage) MetricNames(family string) []string {
 	met := []string{}
-	for k, _ := range store.tree[family].metrics {
+	for k := range store.tree[family].metrics {
 		met = append(met, k)
 	}
 	sort.Strings(met)
@@ -242,9 +259,8 @@ func (g *gauge) Display() string {
 func (g *gauge) Displayable(val float64) string {
 	if g.forDisplay != nil {
 		return g.forDisplay(val)
-	} else {
-		return strconv.FormatFloat(val, 'f', 1, 64)
 	}
+	return strconv.FormatFloat(val, 'f', 1, 64)
 }
 
 func (c *counter) Display() string {
@@ -255,9 +271,8 @@ func (c *counter) Display() string {
 func (c *counter) Displayable(val float64) string {
 	if c.forDisplay != nil {
 		return c.forDisplay(val)
-	} else {
-		return strconv.FormatFloat(val, 'f', 1, 64)
 	}
+	return strconv.FormatFloat(val, 'f', 1, 64)
 }
 
 /*
@@ -308,7 +323,7 @@ func (store *storage) DeclareGauge(familyName string, name string, display Displ
 
 	data := fam.metrics[name]
 	if data == nil {
-		fam.metrics[name] = &gauge{util.NewRingBuffer(SLOTS), display}
+		fam.metrics[name] = &gauge{util.NewRingBuffer(Slots), display}
 		data = fam.metrics[name]
 	}
 }
@@ -322,7 +337,7 @@ func (store *storage) DeclareCounter(familyName string, name string, xform Trans
 
 	data := fam.metrics[name]
 	if data == nil {
-		fam.metrics[name] = &counter{util.NewRingBuffer(SLOTS), xform, display}
+		fam.metrics[name] = &counter{util.NewRingBuffer(Slots), xform, display}
 		data = fam.metrics[name]
 	}
 }

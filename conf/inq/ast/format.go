@@ -16,6 +16,7 @@ type HostCheck struct {
 type ProcessCheck struct {
 	Name       string
 	Rules      RuleList
+	Exposed    []string
 	Parameters map[string]string
 }
 
@@ -51,7 +52,7 @@ type Amount struct {
 }
 
 var (
-	ONE_CYCLE    = &Amount{Raw: "1", Parsed: 1, PerSec: false}
+	OneCycle     = &Amount{Raw: "1", Parsed: 1, PerSec: false}
 	CreateAction = func(props ...string) (Action, error) {
 		return &SimpleAction{props[0]}, nil
 	}
@@ -96,11 +97,41 @@ func AddParam(key interface{}, val interface{}, hash interface{}) (map[string]st
 	return h, nil
 }
 
-func NewProcessCheck(checkType interface{}, name interface{}, rules interface{}, params interface{}) *ProcessCheck {
+func AddExposed(name interface{}, arr interface{}) ([]string, error) {
+	nm := string(name.(*token.Token).Lit)
+
+	var h []string
+
+	if arr == nil {
+		h = []string{}
+	} else {
+		h = arr.([]string)
+	}
+	h = append(h, nm)
+
+	return h, nil
+}
+
+func NewProcessCheck(name interface{}, params interface{}, exposed interface{}, rules interface{}) *ProcessCheck {
+	exp := []string{}
+	if exposed != nil {
+		exp = exposed.([]string)
+	}
+	prm := map[string]string{}
+	if params != nil {
+		prm = params.(map[string]string)
+	}
+
+	rlz := RuleList{}
+	if rules != nil {
+		rlz = rules.(RuleList)
+	}
+
 	return &ProcessCheck{
 		string(name.(*token.Token).Lit),
-		rules.(RuleList),
-		params.(map[string]string),
+		rlz,
+		exp,
+		prm,
 	}
 }
 func NewHostCheck(rules interface{}, params interface{}) *HostCheck {

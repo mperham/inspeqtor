@@ -30,7 +30,7 @@ func (pg *pgSource) Watch(metricName string) {
 func (pg *pgSource) Capture() (metricMap, error) {
 	data := metricMap{}
 
-	for name, _ := range pg.metrics {
+	for name := range pg.metrics {
 		if _, ok := data[name]; !ok {
 			err := populate(pg, data, name)
 			if err != nil {
@@ -114,10 +114,10 @@ func userStats(pg *pgSource, data metricMap) error {
 		return err
 	}
 	if len(results) != 1 {
-		return errors.New(fmt.Sprintf("Results size == %d", len(results)))
+		return fmt.Errorf("Results size == %d", len(results))
 	}
 	if len(results[0]) != 1 {
-		return errors.New(fmt.Sprintf("Results row size == %d", len(results[0])))
+		return fmt.Errorf("Results row size == %d", len(results[0]))
 	}
 
 	val := results[0][0]
@@ -142,10 +142,10 @@ func sizeStats(pg *pgSource, data metricMap) error {
 		return err
 	}
 	if len(results) != 1 {
-		return errors.New(fmt.Sprintf("Results size == %d", len(results)))
+		return fmt.Errorf("Results size == %d", len(results))
 	}
 	if len(results[0]) != 1 {
-		return errors.New(fmt.Sprintf("Results row size == %d", len(results[0])))
+		return fmt.Errorf("Results row size == %d", len(results[0]))
 	}
 
 	val := results[0][0]
@@ -167,10 +167,10 @@ func dbStats(pg *pgSource, data metricMap) error {
 		return err
 	}
 	if len(results) != 1 {
-		return errors.New(fmt.Sprintf("Results size == %d", len(results)))
+		return fmt.Errorf("Results size == %d", len(results))
 	}
 	if len(results[0]) != 4 {
-		return errors.New(fmt.Sprintf("Results row size == %d", len(results[0])))
+		return fmt.Errorf("Results row size == %d", len(results[0]))
 	}
 
 	if _, ok := pg.metrics["rollbacks"]; ok {
@@ -244,7 +244,7 @@ func runSql(pg *pgSource, stmt string) ([][]string, error) {
 }
 
 var (
-	pgMetrics []metric = []metric{
+	pgMetrics = []metric{
 		metric{"rollbacks", c, nil},
 		metric{"deadlocks", c, nil},
 		metric{"numbackends", g, nil},

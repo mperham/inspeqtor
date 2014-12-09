@@ -40,9 +40,8 @@ func (e *Entity) Metrics() metrics.Store {
 func (e *Entity) CycleTime() uint {
 	if Singleton != nil {
 		return Singleton.GlobalConfig.CycleTime
-	} else {
-		return 15
 	}
+	return 15
 }
 
 func NewHost() *Host {
@@ -65,8 +64,8 @@ type Service struct {
 	Manager      services.InitSystem
 }
 
-func (s *Service) SetMetrics(newStore metrics.Store) {
-	s.metrics = newStore
+func (svc *Service) SetMetrics(newStore metrics.Store) {
+	svc.metrics = newStore
 }
 
 /*
@@ -135,7 +134,11 @@ func (svc *Service) Collect(silenced bool, completeCallback func(Checkable)) {
 		} else {
 			svc.Transition(status, func(et EventType) {
 				if !silenced {
-					svc.EventHandler.Trigger(&Event{et, svc, nil})
+					counters.Add("events", 1)
+					err = svc.EventHandler.Trigger(&Event{et, svc, nil})
+					if err != nil {
+						util.Warn("Error firing event: %s", err.Error())
+					}
 				}
 			})
 		}
@@ -149,7 +152,11 @@ func (svc *Service) Collect(silenced bool, completeCallback func(Checkable)) {
 				util.Info("Service %s with process %d does not exist: %s", svc.Name(), svc.Process.Pid, err)
 				svc.Transition(services.WithStatus(0, services.Down), func(et EventType) {
 					if !silenced {
-						svc.EventHandler.Trigger(&Event{et, svc, nil})
+						counters.Add("events", 1)
+						err = svc.EventHandler.Trigger(&Event{et, svc, nil})
+						if err != nil {
+							util.Warn("Error firing event: %s", err.Error())
+						}
 					}
 				})
 			} else {
@@ -159,66 +166,72 @@ func (svc *Service) Collect(silenced bool, completeCallback func(Checkable)) {
 	}
 }
 
-func (s *Host) Verify() []*Event {
+func (h *Host) Verify() []*Event {
 	events := []*Event{}
-	for _, r := range s.Rules() {
+	for _, r := range h.Rules() {
 		// When running "make real", the race detector will complain
 		// of a race condition here.  I believe it's harmless.
-		evt := r.Check(s.CycleTime())
+		evt := r.Check(h.CycleTime())
 		if evt != nil {
 			events = append(events, evt)
 			for _, a := range r.Actions {
-				a.Trigger(evt)
+				err := a.Trigger(evt)
+				if err != nil {
+					util.Warn("Error firing event: %s", err.Error())
+				}
 			}
 		}
 	}
 	return events
 }
 
-func (s *Service) Verify() []*Event {
+func (svc *Service) Verify() []*Event {
 	events := []*Event{}
 
-	if s.Process.Status != services.Up {
+	if svc.Process.Status != services.Up {
 		// we probably shouldn't verify anything that isn't actually Up
-		util.Debug("%s is %s, skipping...", s.Name(), s.Process.Status)
+		util.Debug("%s is %s, skipping...", svc.Name(), svc.Process.Status)
 		return events
 	}
 
-	for _, r := range s.Rules() {
-		evt := r.Check(s.CycleTime())
+	for _, r := range svc.Rules() {
+		evt := r.Check(svc.CycleTime())
 		if evt != nil {
 			events = append(events, evt)
 			for _, a := range r.Actions {
-				a.Trigger(evt)
+				err := a.Trigger(evt)
+				if err != nil {
+					util.Warn("Error firing event: %s", err.Error())
+				}
 			}
 		}
 	}
 	return events
 }
 
-func (s *Service) Restart() error {
-	s.Process.Pid = 0
-	s.Process.Status = services.Starting
+func (svc *Service) Restart() error {
+	svc.Process.Pid = 0
+	svc.Process.Status = services.Starting
 	go func() {
-		util.Debug("Restarting %s", s.Name())
-		err := s.Manager.Restart(s.Name())
+		util.Debug("Restarting %s", svc.Name())
+		err := svc.Manager.Restart(svc.Name())
 		if err != nil {
 			util.Warn(err.Error())
 		} else {
-			util.DebugDebug("Restarted %s", s.Name())
+			util.DebugDebug("Restarted %s", svc.Name())
 		}
 	}()
 	return nil
 }
 
-func (s *Service) Reload() error {
+func (svc *Service) Reload() error {
 	go func() {
-		util.Debug("Reloading %s", s.Name())
-		err := s.Manager.Reload(s.Name())
+		util.Debug("Reloading %s", svc.Name())
+		err := svc.Manager.Reload(svc.Name())
 		if err != nil {
 			util.Warn(err.Error())
 		} else {
-			util.DebugDebug("Reloaded %s", s.Name())
+			util.DebugDebug("Reloaded %s", svc.Name())
 		}
 	}()
 	return nil
@@ -248,7 +261,11 @@ func (svc *Service) Resolve(mgrs []services.InitSystem) error {
 		util.Info("Found %s/%s with status %s", sm.Name(), svc.Name(), ps)
 		svc.Manager = sm
 		svc.Transition(ps, func(et EventType) {
-			svc.EventHandler.Trigger(&Event{et, svc, nil})
+			counters.Add("events", 1)
+			err = svc.EventHandler.Trigger(&Event{et, svc, nil})
+			if err != nil {
+				util.Warn("Error firing event: %s", err.Error())
+			}
 		})
 		break
 	}
@@ -258,9 +275,9 @@ func (svc *Service) Resolve(mgrs []services.InitSystem) error {
 	return nil
 }
 
-func (s *Service) Transition(ps *services.ProcessStatus, emitter func(EventType)) {
-	oldst := s.Process.Status
-	s.Process = ps
+func (svc *Service) Transition(ps *services.ProcessStatus, emitter func(EventType)) {
+	oldst := svc.Process.Status
+	svc.Process = ps
 
 	if oldst == ps.Status {
 		// don't fire PDNE events every cycle
@@ -281,6 +298,6 @@ func (s *Service) Transition(ps *services.ProcessStatus, emitter func(EventType)
 	}
 }
 
-func (s *Service) String() string {
-	return fmt.Sprintf("%s [%s]", s.Name(), s.Process)
+func (svc *Service) String() string {
+	return fmt.Sprintf("%s [%s]", svc.Name(), svc.Process)
 }

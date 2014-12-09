@@ -90,7 +90,7 @@ var (
 )
 
 func Detect() []InitSystem {
-	inits := make([]InitSystem, 0)
+	var inits []InitSystem
 
 	for name, funk := range SupportedInits {
 		sm, err := funk()
@@ -135,7 +135,6 @@ func (m *MockInitSystem) Reload(name string) error {
 func (m *MockInitSystem) LookupService(name string) (*ProcessStatus, error) {
 	if m.CurrentStatus != nil {
 		return m.CurrentStatus, nil
-	} else {
-		return &ProcessStatus{123, Up}, nil
 	}
+	return &ProcessStatus{123, Up}, nil
 }

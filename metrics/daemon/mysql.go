@@ -123,7 +123,7 @@ func (rs *MysqlSource) runStatus(funk executor) (metricMap, error) {
 	}
 
 	if len(rs.metrics) > len(values) {
-		for k, _ := range rs.metrics {
+		for k := range rs.metrics {
 			if _, ok := values[k]; !ok {
 				util.Warn("Could not find metric mysql(%s), did you spell it right?", k)
 			}
@@ -194,7 +194,7 @@ func buildMysqlSource(params map[string]string) (Collector, error) {
 }
 
 var (
-	mysqlMetrics []metric = []metric{
+	mysqlMetrics = []metric{
 		metric{"Aborted_clients", c, nil},
 		metric{"Aborted_connects", c, nil},
 		metric{"Bytes_received", c, &funcWrapper{inMB, nil}},

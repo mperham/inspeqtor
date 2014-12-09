@@ -30,9 +30,9 @@ type funcWrapper struct {
 }
 
 var (
-	c                                   = metrics.Counter
-	g                                   = metrics.Gauge
-	Sources map[string]collectorBuilder = map[string]collectorBuilder{
+	c       = metrics.Counter
+	g       = metrics.Gauge
+	Sources = map[string]collectorBuilder{
 		"redis":      buildRedisSource,
 		"mysql":      buildMysqlSource,
 		"memcached":  buildMemcachedSource,

@@ -96,7 +96,7 @@ func (rs *nginxSource) runCli() (metricMap, error) {
 	}
 
 	if len(rs.metrics) > len(values) {
-		for k, _ := range rs.metrics {
+		for k := range rs.metrics {
 			if _, ok := values[k]; !ok {
 				util.Info("Could not find metric %s(%s), did you spell it right?", rs.Name(), k)
 			}
@@ -126,7 +126,7 @@ func buildNginxSource(params map[string]string) (Collector, error) {
 }
 
 var (
-	nginxMetrics []metric = []metric{
+	nginxMetrics = []metric{
 		metric{"Active_connections", g, nil},
 		metric{"accepts", c, nil},
 		metric{"handled", c, nil},

@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"expvar"
 	"fmt"
 	"io"
 	"math"
@@ -84,12 +85,17 @@ func startDeploy(i *Inspeqtor, args []string, resp io.Writer) {
 	length := time.Duration(i.GlobalConfig.DeployLength) * time.Second
 	i.SilenceUntil = time.Now().Add(length)
 
+	counters.Get("deploy").(*expvar.Int).Set(1)
 	util.Info("Starting deploy")
 	io.WriteString(resp, "Starting deploy, now silenced\n")
 }
 
 func finishDeploy(i *Inspeqtor, args []string, resp io.Writer) {
-	i.SilenceUntil = time.Now()
+	// silence until after the next cycle, give the deploy a little time to
+	// settle before alerting again.
+	i.SilenceUntil = time.Now().Add(time.Duration(i.GlobalConfig.CycleTime) * time.Second)
+
+	counters.Get("deploy").(*expvar.Int).Set(0)
 	util.Info("Finished deploy")
 	io.WriteString(resp, "Finished deploy, volume turned to 11\n")
 }
@@ -168,7 +174,10 @@ func export(i *Inspeqtor, args []string, resp io.Writer) {
 	}
 	dump["services"] = svcs
 
-	json.NewEncoder(resp).Encode(dump)
+	err := json.NewEncoder(resp).Encode(dump)
+	if err != nil {
+		io.WriteString(resp, fmt.Sprintf("Unable to dump JSON: %s", err.Error()))
+	}
 }
 
 func pullMetrics(thing Checkable) map[string]interface{} {

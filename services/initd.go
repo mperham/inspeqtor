@@ -76,10 +76,10 @@ func detectInitd(root string) (InitSystem, error) {
 	if len(matches) > 0 {
 		util.Info("Detected init.d in " + ctlpath)
 		return &Initd{ctlpath, root + "var/run/", pidForString}, nil
-	} else {
-		util.Info(ctlpath + " exists but appears to be empty")
-		return nil, nil
 	}
+
+	util.Info(ctlpath + " exists but appears to be empty")
+	return nil, nil
 }
 
 func (i *Initd) serviceCommand(serviceName string, command string, timeout time.Duration) error {

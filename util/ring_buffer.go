@@ -68,7 +68,7 @@ func (buf *RingBuffer) Size() int {
 	var count int
 	for _, x := range buf.values {
 		if x != nil {
-			count += 1
+			count++
 		}
 	}
 
@@ -93,7 +93,7 @@ func (buf *RingBuffer) Export() []float64 {
 		v := buf.values[i]
 		if v != nil {
 			data[idx] = *v
-			idx += 1
+			idx++
 		}
 	}
 
@@ -101,7 +101,7 @@ func (buf *RingBuffer) Export() []float64 {
 		v := buf.values[i]
 		if v != nil {
 			data[idx] = *v
-			idx += 1
+			idx++
 		}
 	}
 
