@@ -91,7 +91,9 @@ func startDeploy(i *Inspeqtor, args []string, resp io.Writer) {
 }
 
 func finishDeploy(i *Inspeqtor, args []string, resp io.Writer) {
-	i.SilenceUntil = time.Now()
+	// silence until after the next cycle, give the deploy a little time to
+	// settle before alerting again.
+	i.SilenceUntil = time.Now().Add(time.Duration(i.GlobalConfig.CycleTime) * time.Second)
 
 	counters.Get("deploy").(*expvar.Int).Set(0)
 	util.Info("Finished deploy")
