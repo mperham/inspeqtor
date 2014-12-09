@@ -11,6 +11,7 @@ import (
 )
 
 type pgSource struct {
+	Database    string
 	Hostname    string
 	Port        string
 	Username    string
@@ -51,13 +52,21 @@ func (pg *pgSource) ValidMetrics() []metric {
 	return pgMetrics
 }
 
+// Password must be specified via a ~/.pgpass file
+// http://www.postgresql.org/docs/current/static/libpq-pgpass.html
 func (pg *pgSource) buildArgs() []string {
 	args := []string{"-Xt"}
+
+	if pg.Database != "" {
+		args = append(args, "-d")
+		args = append(args, pg.Database)
+	}
 
 	if pg.Hostname != "" {
 		args = append(args, "-h")
 		args = append(args, pg.Hostname)
 	}
+
 	if pg.Port != "" {
 		args = append(args, "-p")
 		args = append(args, pg.Port)
@@ -67,20 +76,20 @@ func (pg *pgSource) buildArgs() []string {
 		args = append(args, "-U")
 		args = append(args, pg.Username)
 	}
-	// Password must be specified via a ~/.pgpass file
-	// http://www.postgresql.org/docs/current/static/libpq-pgpass.html
 
 	return args
 }
 
 func buildPostgresqlSource(params map[string]string) (Collector, error) {
-	rs := &pgSource{"localhost", "5432", "postgres", map[string]bool{}, false, execCmd}
+	rs := &pgSource{"", "localhost", "5432", "postgres", map[string]bool{}, false, execCmd}
 	for k, v := range params {
 		switch k {
-		case "username":
-			rs.Username = v
+		case "database":
+			rs.Database = v
 		case "hostname":
 			rs.Hostname = v
+		case "username":
+			rs.Username = v
 		case "port":
 			_, err := strconv.ParseUint(v, 10, 32)
 			if err != nil {
