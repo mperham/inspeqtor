@@ -1,7 +1,7 @@
 package inspeqtor
 
 import (
-	_ "expvar"
+	"expvar"
 	"fmt"
 	"net"
 	"net/http"
@@ -63,7 +63,14 @@ var (
 	Licensing string                               = "Licensed under the GNU Public License 3.0"
 	Singleton *Inspeqtor                           = nil
 	Reloaders []func(*Inspeqtor, *Inspeqtor) error = []func(*Inspeqtor, *Inspeqtor) error{basicReloader}
+
+	counters = expvar.NewMap("inspeqtor")
+	deploy   = new(expvar.Int)
 )
+
+func init() {
+	counters.Set("deploy", deploy)
+}
 
 func (i *Inspeqtor) Start() {
 	util.Debug("Starting command socket")

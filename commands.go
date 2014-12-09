@@ -84,12 +84,15 @@ func startDeploy(i *Inspeqtor, args []string, resp io.Writer) {
 	length := time.Duration(i.GlobalConfig.DeployLength) * time.Second
 	i.SilenceUntil = time.Now().Add(length)
 
+	deploy.Set(1)
 	util.Info("Starting deploy")
 	io.WriteString(resp, "Starting deploy, now silenced\n")
 }
 
 func finishDeploy(i *Inspeqtor, args []string, resp io.Writer) {
 	i.SilenceUntil = time.Now()
+
+	deploy.Set(0)
 	util.Info("Finished deploy")
 	io.WriteString(resp, "Finished deploy, volume turned to 11\n")
 }
