@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"sync"
 	"syscall"
 	"time"
@@ -100,7 +101,11 @@ func (i *Inspeqtor) Start() {
 		go func() {
 			// TODO How do we error handling here?
 			util.Info("Expose now available at port %d", i.GlobalConfig.ExposePort)
-			http.Serve(i.Expose, nil)
+			err := http.Serve(i.Expose, nil)
+			// Don't log an "error" when we shut down normally and close the socket
+			if err != nil && !strings.Contains(err.Error(), "use of closed network") {
+				util.Warn("HTTP server error: %s", err.Error())
+			}
 		}()
 	}
 

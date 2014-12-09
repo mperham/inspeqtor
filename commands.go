@@ -171,7 +171,10 @@ func export(i *Inspeqtor, args []string, resp io.Writer) {
 	}
 	dump["services"] = svcs
 
-	json.NewEncoder(resp).Encode(dump)
+	err := json.NewEncoder(resp).Encode(dump)
+	if err != nil {
+		io.WriteString(resp, fmt.Sprintf("Unable to dump JSON: %s", err.Error()))
+	}
 }
 
 func pullMetrics(thing Checkable) map[string]interface{} {

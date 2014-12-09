@@ -136,7 +136,10 @@ func (svc *Service) Collect(silenced bool, completeCallback func(Checkable)) {
 		} else {
 			svc.Transition(status, func(et EventType) {
 				if !silenced {
-					svc.EventHandler.Trigger(&Event{et, svc, nil})
+					err = svc.EventHandler.Trigger(&Event{et, svc, nil})
+					if err != nil {
+						util.Warn("Error firing event: %s", err.Error())
+					}
 				}
 			})
 		}
@@ -150,7 +153,10 @@ func (svc *Service) Collect(silenced bool, completeCallback func(Checkable)) {
 				util.Info("Service %s with process %d does not exist: %s", svc.Name(), svc.Process.Pid, err)
 				svc.Transition(services.WithStatus(0, services.Down), func(et EventType) {
 					if !silenced {
-						svc.EventHandler.Trigger(&Event{et, svc, nil})
+						err = svc.EventHandler.Trigger(&Event{et, svc, nil})
+						if err != nil {
+							util.Warn("Error firing event: %s", err.Error())
+						}
 					}
 				})
 			} else {
@@ -169,7 +175,10 @@ func (s *Host) Verify() []*Event {
 		if evt != nil {
 			events = append(events, evt)
 			for _, a := range r.Actions {
-				a.Trigger(evt)
+				err := a.Trigger(evt)
+				if err != nil {
+					util.Warn("Error firing event: %s", err.Error())
+				}
 			}
 		}
 	}
@@ -190,7 +199,10 @@ func (s *Service) Verify() []*Event {
 		if evt != nil {
 			events = append(events, evt)
 			for _, a := range r.Actions {
-				a.Trigger(evt)
+				err := a.Trigger(evt)
+				if err != nil {
+					util.Warn("Error firing event: %s", err.Error())
+				}
 			}
 		}
 	}
@@ -249,7 +261,10 @@ func (svc *Service) Resolve(mgrs []services.InitSystem) error {
 		util.Info("Found %s/%s with status %s", sm.Name(), svc.Name(), ps)
 		svc.Manager = sm
 		svc.Transition(ps, func(et EventType) {
-			svc.EventHandler.Trigger(&Event{et, svc, nil})
+			err = svc.EventHandler.Trigger(&Event{et, svc, nil})
+			if err != nil {
+				util.Warn("Error firing event: %s", err.Error())
+			}
 		})
 		break
 	}
