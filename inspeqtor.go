@@ -66,11 +66,11 @@ var (
 	Reloaders []func(*Inspeqtor, *Inspeqtor) error = []func(*Inspeqtor, *Inspeqtor) error{basicReloader}
 
 	counters = expvar.NewMap("inspeqtor")
-	deploy   = new(expvar.Int)
 )
 
 func init() {
-	counters.Set("deploy", deploy)
+	counters.Add("deploy", 0)
+	counters.Add("events", 0)
 }
 
 func (i *Inspeqtor) Start() {
@@ -343,9 +343,15 @@ func (i *Inspeqtor) verify() {
 			}
 		}
 	} else {
-		i.Host.Verify()
+		e := i.Host.Verify()
+		if len(e) > 0 {
+			counters.Add("events", int64(len(e)))
+		}
 		for _, svc := range i.Services {
-			svc.Verify()
+			e := svc.Verify()
+			if len(e) > 0 {
+				counters.Add("events", int64(len(e)))
+			}
 		}
 	}
 }

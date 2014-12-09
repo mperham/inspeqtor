@@ -136,6 +136,7 @@ func (svc *Service) Collect(silenced bool, completeCallback func(Checkable)) {
 		} else {
 			svc.Transition(status, func(et EventType) {
 				if !silenced {
+					counters.Add("events", 1)
 					err = svc.EventHandler.Trigger(&Event{et, svc, nil})
 					if err != nil {
 						util.Warn("Error firing event: %s", err.Error())
@@ -153,6 +154,7 @@ func (svc *Service) Collect(silenced bool, completeCallback func(Checkable)) {
 				util.Info("Service %s with process %d does not exist: %s", svc.Name(), svc.Process.Pid, err)
 				svc.Transition(services.WithStatus(0, services.Down), func(et EventType) {
 					if !silenced {
+						counters.Add("events", 1)
 						err = svc.EventHandler.Trigger(&Event{et, svc, nil})
 						if err != nil {
 							util.Warn("Error firing event: %s", err.Error())
@@ -261,6 +263,7 @@ func (svc *Service) Resolve(mgrs []services.InitSystem) error {
 		util.Info("Found %s/%s with status %s", sm.Name(), svc.Name(), ps)
 		svc.Manager = sm
 		svc.Transition(ps, func(et EventType) {
+			counters.Add("events", 1)
 			err = svc.EventHandler.Trigger(&Event{et, svc, nil})
 			if err != nil {
 				util.Warn("Error firing event: %s", err.Error())

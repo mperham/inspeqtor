@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"expvar"
 	"fmt"
 	"io"
 	"math"
@@ -84,7 +85,7 @@ func startDeploy(i *Inspeqtor, args []string, resp io.Writer) {
 	length := time.Duration(i.GlobalConfig.DeployLength) * time.Second
 	i.SilenceUntil = time.Now().Add(length)
 
-	deploy.Set(1)
+	counters.Get("deploy").(*expvar.Int).Set(1)
 	util.Info("Starting deploy")
 	io.WriteString(resp, "Starting deploy, now silenced\n")
 }
@@ -92,7 +93,7 @@ func startDeploy(i *Inspeqtor, args []string, resp io.Writer) {
 func finishDeploy(i *Inspeqtor, args []string, resp io.Writer) {
 	i.SilenceUntil = time.Now()
 
-	deploy.Set(0)
+	counters.Get("deploy").(*expvar.Int).Set(0)
 	util.Info("Finished deploy")
 	io.WriteString(resp, "Finished deploy, volume turned to 11\n")
 }
