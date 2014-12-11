@@ -28,8 +28,8 @@ func (pg *pgSource) Watch(metricName string) {
 	pg.metrics[metricName] = true
 }
 
-func (pg *pgSource) Capture() (metricMap, error) {
-	data := metricMap{}
+func (pg *pgSource) Capture() (MetricMap, error) {
+	data := MetricMap{}
 
 	for name := range pg.metrics {
 		if _, ok := data[name]; !ok {
@@ -43,7 +43,7 @@ func (pg *pgSource) Capture() (metricMap, error) {
 	return data, nil
 }
 
-func (pg *pgSource) Prepare(funk executor) error {
+func (pg *pgSource) Prepare() error {
 	_, err := runSql(pg, "select 1")
 	return err
 }
@@ -101,8 +101,8 @@ func buildPostgresqlSource(params map[string]string) (Collector, error) {
 	return rs, nil
 }
 
-func populate(pg *pgSource, data metricMap, name string) error {
-	var sqlfunk func(*pgSource, metricMap) error
+func populate(pg *pgSource, data MetricMap, name string) error {
+	var sqlfunk func(*pgSource, MetricMap) error
 	switch name {
 	case "rollbacks", "deadlocks", "numbackends", "blk_hit_rate":
 		sqlfunk = dbStats
@@ -116,7 +116,7 @@ func populate(pg *pgSource, data metricMap, name string) error {
 	return sqlfunk(pg, data)
 }
 
-func userStats(pg *pgSource, data metricMap) error {
+func userStats(pg *pgSource, data MetricMap) error {
 	sql := "select sum(seq_scan) from pg_stat_user_tables"
 	results, err := runSql(pg, sql)
 	if err != nil {
@@ -141,7 +141,7 @@ func userStats(pg *pgSource, data metricMap) error {
 	return nil
 }
 
-func sizeStats(pg *pgSource, data metricMap) error {
+func sizeStats(pg *pgSource, data MetricMap) error {
 	sql := `select sum(pg_total_relation_size(pg_class.oid))
 					FROM pg_class LEFT JOIN pg_namespace N ON (N.oid = pg_class.relnamespace)
 					WHERE nspname NOT IN ('pg_catalog', 'information_schema') AND
@@ -169,7 +169,7 @@ func sizeStats(pg *pgSource, data metricMap) error {
 	return nil
 }
 
-func dbStats(pg *pgSource, data metricMap) error {
+func dbStats(pg *pgSource, data MetricMap) error {
 	sql := "select sum(xact_rollback), sum(deadlocks), sum(numbackends), sum(blks_hit) / (sum(blks_read) + sum(blks_hit)) from pg_stat_database"
 	results, err := runSql(pg, sql)
 	if err != nil {

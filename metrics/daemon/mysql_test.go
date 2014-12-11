@@ -25,7 +25,8 @@ func TestMysqlCollection(t *testing.T) {
 	rs.Watch("Seconds_Behind_Master")
 	assert.True(t, rs.metrics["Seconds_Behind_Master"])
 
-	err := rs.Prepare(testExec("fixtures/mysql.slave.running.txt"))
+	rs.exec = testExec("fixtures/mysql.slave.running.txt")
+	err := rs.Prepare()
 	assert.Nil(t, err)
 	assert.True(t, rs.captureRepl)
 	_, ok := rs.metrics["Seconds_Behind_Master"]
@@ -39,26 +40,26 @@ func TestMysqlCollection(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, hash)
 
-	assert.Equal(t, metricMap{"Connections": 20, "Queries": 62, "Table_locks_waited": 0, "Seconds_Behind_Master": 12}, hash)
+	assert.Equal(t, MetricMap{"Connections": 20, "Queries": 62, "Table_locks_waited": 0, "Seconds_Behind_Master": 12}, hash)
 
 	rs.Watch("bad_metric")
 	hash, err = rs.runStatus(testExec("fixtures/mysql.output.txt"))
 	assert.Nil(t, err)
 	assert.NotNil(t, hash)
 
-	assert.Equal(t, metricMap{"Connections": 20, "Queries": 62, "Table_locks_waited": 0}, hash)
+	assert.Equal(t, MetricMap{"Connections": 20, "Queries": 62, "Table_locks_waited": 0}, hash)
 }
 
 func TestRealMysqlConnection(t *testing.T) {
 	t.Parallel()
 	rs := mysqlSource("Connections", "Seconds_Behind_Master")
-	err := rs.Prepare(execCmd)
+	err := rs.Prepare()
 	assert.NotNil(t, err, "This test will fail if you don't have mysql installed")
 	assert.True(t, strings.Contains(err.Error(), "slave not running"))
 
 	rs = mysqlSource()
 	assert.NotNil(t, rs)
-	err = rs.Prepare(execCmd)
+	err = rs.Prepare()
 	assert.Nil(t, err)
 	hash, err := rs.Capture()
 	assert.Nil(t, err)

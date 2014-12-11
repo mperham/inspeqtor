@@ -17,7 +17,7 @@ import (
 */
 
 type collectorBuilder func(map[string]string) (Collector, error)
-type metricMap map[string]float64
+type MetricMap map[string]float64
 type executor func(string, []string, []byte) ([]byte, error)
 type metric struct {
 	name  string
@@ -52,7 +52,7 @@ type Store struct {
 }
 
 func Prepare(ds *Store) error {
-	return ds.DaemonSpecific.Prepare(execCmd)
+	return ds.DaemonSpecific.Prepare()
 }
 
 func (ds *Store) Load(values ...interface{}) {
@@ -96,9 +96,10 @@ func (ds *Store) Collect(pid int) error {
 
 type Collector interface {
 	Name() string
-	// return a hash of metric:value pairs
-	Capture() (metricMap, error)
-	Prepare(executor) error
+	// Called once before any metrics are captured
+	Prepare() error
+	// Called every cycle to collect metrics
+	Capture() (MetricMap, error)
 	Watch(metricName string)
 	ValidMetrics() []metric
 }

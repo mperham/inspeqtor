@@ -20,20 +20,20 @@ func TestPostgresqlCollection(t *testing.T) {
 	assert.NotNil(t, rs)
 
 	rs.execFunk = testExec("fixtures/pg.dbStats.output.txt")
-	data := metricMap{}
+	data := MetricMap{}
 	err := populate(rs, data, "deadlocks")
 	assert.Nil(t, err)
-	assert.Equal(t, metricMap{"blk_hit_rate": 99.55268047622324}, data)
+	assert.Equal(t, MetricMap{"blk_hit_rate": 99.55268047622324}, data)
 
 	rs.execFunk = testExec("fixtures/pg.sizeStats.output.txt")
 	err = populate(rs, data, "total_size")
 	assert.Nil(t, err)
-	assert.Equal(t, metricMap{"blk_hit_rate": 99.55268047622324, "total_size": 122880.0}, data)
+	assert.Equal(t, MetricMap{"blk_hit_rate": 99.55268047622324, "total_size": 122880.0}, data)
 
 	rs.execFunk = testExec("fixtures/pg.userStats.output.txt")
 	err = populate(rs, data, "seq_scans")
 	assert.Nil(t, err)
-	assert.Equal(t, metricMap{"blk_hit_rate": 99.55268047622324, "total_size": 122880.0, "seq_scans": 6.0}, data)
+	assert.Equal(t, MetricMap{"blk_hit_rate": 99.55268047622324, "total_size": 122880.0, "seq_scans": 6.0}, data)
 
 	err = populate(rs, data, "bad_metric")
 	assert.NotNil(t, err)
@@ -49,7 +49,7 @@ func TestRealPostgresqlConnection(t *testing.T) {
 
 	rs := psqlSource()
 	assert.NotNil(t, rs)
-	err := rs.Prepare(execCmd)
+	err := rs.Prepare()
 	assert.Nil(t, err)
 	hash, err := rs.Capture()
 	assert.Nil(t, err)

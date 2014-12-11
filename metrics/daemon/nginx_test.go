@@ -27,14 +27,14 @@ func TestNginxCollection(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, hash)
 
-	assert.Equal(t, metricMap{"Active_connections": 2, "requests": 3, "Waiting": 1}, hash)
+	assert.Equal(t, MetricMap{"Active_connections": 2, "requests": 3, "Waiting": 1}, hash)
 
 	rs.Watch("bad_metric")
 	hash, err = rs.runCli()
 	assert.Nil(t, err)
 	assert.NotNil(t, hash)
 
-	assert.Equal(t, metricMap{"Active_connections": 2, "requests": 3, "Waiting": 1}, hash)
+	assert.Equal(t, MetricMap{"Active_connections": 2, "requests": 3, "Waiting": 1}, hash)
 }
 
 func TestRealNginxConnection(t *testing.T) {

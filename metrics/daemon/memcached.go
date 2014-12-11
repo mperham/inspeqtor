@@ -23,11 +23,11 @@ func (rs *MemcachedSource) Watch(metricName string) {
 	rs.metrics[metricName] = true
 }
 
-func (rs *MemcachedSource) Capture() (metricMap, error) {
+func (rs *MemcachedSource) Capture() (MetricMap, error) {
 	return rs.runCli(execCmd)
 }
 
-func (rs *MemcachedSource) Prepare(funk executor) error {
+func (rs *MemcachedSource) Prepare() error {
 	return nil
 }
 
@@ -35,7 +35,7 @@ func (rs *MemcachedSource) ValidMetrics() []metric {
 	return memcachedMetrics
 }
 
-func (rs *MemcachedSource) runCli(funk executor) (metricMap, error) {
+func (rs *MemcachedSource) runCli(funk executor) (MetricMap, error) {
 	sout, err := funk("nc", []string{rs.Hostname, rs.Port}, []byte("stats\n"))
 	if err != nil {
 		return nil, err

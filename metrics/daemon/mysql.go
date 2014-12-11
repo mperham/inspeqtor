@@ -16,6 +16,7 @@ type MysqlSource struct {
 	Password    string
 	metrics     map[string]bool
 	captureRepl bool
+	exec        executor
 }
 
 func (rs *MysqlSource) Name() string {
@@ -26,7 +27,7 @@ func (rs *MysqlSource) Watch(metricName string) {
 	rs.metrics[metricName] = true
 }
 
-func (rs *MysqlSource) Capture() (metricMap, error) {
+func (rs *MysqlSource) Capture() (MetricMap, error) {
 	values, err := rs.runStatus(execCmd)
 	if err != nil {
 		return nil, err
@@ -37,14 +38,14 @@ func (rs *MysqlSource) Capture() (metricMap, error) {
 	return values, nil
 }
 
-func (rs *MysqlSource) Prepare(funk executor) error {
+func (rs *MysqlSource) Prepare() error {
 	if !rs.metrics["Seconds_Behind_Master"] {
 		return nil
 	}
 	args := rs.buildArgs()
 	args = append(args, "-e")
 	args = append(args, "show status like 'Slave_running'")
-	sout, err := funk("mysql", args, nil)
+	sout, err := rs.exec("mysql", args, nil)
 	if err != nil {
 		return err
 	}
@@ -66,7 +67,7 @@ func (rs *MysqlSource) ValidMetrics() []metric {
 	return mysqlMetrics
 }
 
-func (rs *MysqlSource) runRepl(values metricMap, funk executor) (metricMap, error) {
+func (rs *MysqlSource) runRepl(values MetricMap, funk executor) (MetricMap, error) {
 	args := rs.buildArgs()
 	args = append(args, "-e")
 	args = append(args, "show slave status\\G")
@@ -96,7 +97,7 @@ func (rs *MysqlSource) runRepl(values metricMap, funk executor) (metricMap, erro
 	return values, nil
 }
 
-func (rs *MysqlSource) runStatus(funk executor) (metricMap, error) {
+func (rs *MysqlSource) runStatus(funk executor) (MetricMap, error) {
 	args := rs.buildArgs()
 	args = append(args, "-e")
 	args = append(args, "show global status")
@@ -171,7 +172,7 @@ func (rs *MysqlSource) buildArgs() []string {
 }
 
 func buildMysqlSource(params map[string]string) (Collector, error) {
-	rs := &MysqlSource{"localhost", "3306", "/tmp/mysql.sock", "root", "", map[string]bool{}, false}
+	rs := &MysqlSource{"localhost", "3306", "/tmp/mysql.sock", "root", "", map[string]bool{}, false, execCmd}
 	for k, v := range params {
 		switch k {
 		case "username":

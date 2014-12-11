@@ -25,14 +25,14 @@ func TestMemcachedCollection(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, hash)
 
-	assert.Equal(t, metricMap{"curr_connections": 15, "total_items": 0}, hash)
+	assert.Equal(t, MetricMap{"curr_connections": 15, "total_items": 0}, hash)
 
 	rs.Watch("bad_metric")
 	hash, err = rs.runCli(testExec("fixtures/memcached.output.txt"))
 	assert.Nil(t, err)
 	assert.NotNil(t, hash)
 
-	assert.Equal(t, metricMap{"curr_connections": 15, "total_items": 0}, hash)
+	assert.Equal(t, MetricMap{"curr_connections": 15, "total_items": 0}, hash)
 }
 
 func TestRealMemcachedConnection(t *testing.T) {

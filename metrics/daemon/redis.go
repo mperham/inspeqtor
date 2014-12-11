@@ -25,7 +25,7 @@ func (rs *RedisSource) Watch(metricName string) {
 	rs.metrics[metricName] = true
 }
 
-func (rs *RedisSource) Capture() (metricMap, error) {
+func (rs *RedisSource) Capture() (MetricMap, error) {
 	return rs.runCli(execCmd)
 }
 
@@ -33,11 +33,11 @@ func (rs *RedisSource) ValidMetrics() []metric {
 	return redisMetrics
 }
 
-func (rs *RedisSource) Prepare(funk executor) error {
+func (rs *RedisSource) Prepare() error {
 	return nil
 }
 
-func (rs *RedisSource) runCli(funk executor) (metricMap, error) {
+func (rs *RedisSource) runCli(funk executor) (MetricMap, error) {
 	sout, err := funk("redis-cli", rs.buildArgs(), nil)
 	lines, err := util.ReadLines(sout)
 	if err != nil {

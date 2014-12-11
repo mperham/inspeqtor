@@ -41,11 +41,11 @@ func (rs *nginxSource) Watch(metricName string) {
 	rs.metrics[metricName] = true
 }
 
-func (rs *nginxSource) Capture() (metricMap, error) {
+func (rs *nginxSource) Capture() (MetricMap, error) {
 	return rs.runCli()
 }
 
-func (rs *nginxSource) Prepare(funk executor) error {
+func (rs *nginxSource) Prepare() error {
 	return nil
 }
 
@@ -68,7 +68,7 @@ var (
 	digits = regexp.MustCompile("(\\d+)")
 )
 
-func (rs *nginxSource) runCli() (metricMap, error) {
+func (rs *nginxSource) runCli() (MetricMap, error) {
 	sout, err := rs.client(rs.Hostname, rs.Port, rs.Endpoint)
 	if err != nil {
 		return nil, err

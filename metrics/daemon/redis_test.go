@@ -32,14 +32,14 @@ func TestRedisCollection(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, hash)
 
-	assert.Equal(t, metricMap{"connected_clients": 3, "latest_fork_usec": 758, "master_repl_offset": 0}, hash)
+	assert.Equal(t, MetricMap{"connected_clients": 3, "latest_fork_usec": 758, "master_repl_offset": 0}, hash)
 
 	rs.Watch("bad_metric")
 	hash, err = rs.runCli(testExec("fixtures/redis.6379.txt"))
 	assert.Nil(t, err)
 	assert.NotNil(t, hash)
 
-	assert.Equal(t, metricMap{"connected_clients": 3, "latest_fork_usec": 758, "master_repl_offset": 0}, hash)
+	assert.Equal(t, MetricMap{"connected_clients": 3, "latest_fork_usec": 758, "master_repl_offset": 0}, hash)
 }
 
 func TestRealRedisConnection(t *testing.T) {
