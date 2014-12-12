@@ -52,7 +52,7 @@ var (
 	Sources = map[string]SourceBuilder{}
 )
 
-// transform the raw collected data into something we can compare.  Used by cpu(*)
+// transform the raw collected data into something we can compare.  Used by cpu:*
 // to transform raw ticks into a percentage.
 type TransformFunc func(float64, float64) float64
 
@@ -361,7 +361,11 @@ func (store *storage) DeclareCounter(familyName string, name string, xform Trans
 }
 
 func (store *storage) Save(family string, name string, value float64) {
-	m := store.tree[family].metrics[name]
+	f := store.tree[family]
+	if f == nil {
+		panic("No such family: " + displayName(family, name))
+	}
+	m := f.metrics[name]
 	if m == nil {
 		panic("No such metric: " + displayName(family, name))
 	}
