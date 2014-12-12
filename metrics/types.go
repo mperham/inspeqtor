@@ -68,6 +68,10 @@ type Descriptor struct {
 	Transform  TransformFunc
 }
 
+type MandatorySource interface {
+	Mandatory() bool
+}
+
 type Source interface {
 	Name() string
 	// Called once before any metrics are captured

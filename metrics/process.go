@@ -70,6 +70,20 @@ func (ps *processStorage) AddSource(name string, config map[string]string) (Sour
 	if err != nil {
 		return nil, err
 	}
+
+	m, ok := src.(MandatorySource)
+	if ok && m.Mandatory() {
+		util.Debug("Registering all metrics for %s", name)
+		descs := src.ValidMetrics()
+		for _, d := range descs {
+			if d.MetricType == Counter {
+				ps.DeclareCounter(name, d.Name, nil, d.Display)
+			} else {
+				ps.DeclareGauge(name, d.Name, d.Display)
+			}
+		}
+	}
+
 	ps.daemonSpecific = append(ps.daemonSpecific, src)
 	return src, nil
 }
