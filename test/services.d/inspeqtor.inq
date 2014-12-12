@@ -1,0 +1,2 @@
+check service inspeqtor with port 4677
+  expose memstats
