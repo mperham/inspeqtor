@@ -5,10 +5,15 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/mperham/inspeqtor/metrics"
 	"github.com/mperham/inspeqtor/util"
 )
 
-type MysqlSource struct {
+func init() {
+	metrics.Sources["mysql"] = buildMysqlSource
+}
+
+type mysqlSource struct {
 	Hostname    string
 	Port        string
 	Socket      string
@@ -19,15 +24,15 @@ type MysqlSource struct {
 	exec        executor
 }
 
-func (rs *MysqlSource) Name() string {
+func (rs *mysqlSource) Name() string {
 	return "mysql"
 }
 
-func (rs *MysqlSource) Watch(metricName string) {
+func (rs *mysqlSource) Watch(metricName string) {
 	rs.metrics[metricName] = true
 }
 
-func (rs *MysqlSource) Capture() (MetricMap, error) {
+func (rs *mysqlSource) Capture() (metrics.Map, error) {
 	values, err := rs.runStatus(execCmd)
 	if err != nil {
 		return nil, err
@@ -38,7 +43,7 @@ func (rs *MysqlSource) Capture() (MetricMap, error) {
 	return values, nil
 }
 
-func (rs *MysqlSource) Prepare() error {
+func (rs *mysqlSource) Prepare() error {
 	if !rs.metrics["Seconds_Behind_Master"] {
 		return nil
 	}
@@ -63,11 +68,11 @@ func (rs *MysqlSource) Prepare() error {
 	return nil
 }
 
-func (rs *MysqlSource) ValidMetrics() []Metric {
+func (rs *mysqlSource) ValidMetrics() []metrics.Descriptor {
 	return mysqlMetrics
 }
 
-func (rs *MysqlSource) runRepl(values MetricMap, funk executor) (MetricMap, error) {
+func (rs *mysqlSource) runRepl(values metrics.Map, funk executor) (metrics.Map, error) {
 	args := rs.buildArgs()
 	args = append(args, "-e")
 	args = append(args, "show slave status\\G")
@@ -97,7 +102,7 @@ func (rs *MysqlSource) runRepl(values MetricMap, funk executor) (MetricMap, erro
 	return values, nil
 }
 
-func (rs *MysqlSource) runStatus(funk executor) (MetricMap, error) {
+func (rs *mysqlSource) runStatus(funk executor) (metrics.Map, error) {
 	args := rs.buildArgs()
 	args = append(args, "-e")
 	args = append(args, "show global status")
@@ -134,7 +139,7 @@ func (rs *MysqlSource) runStatus(funk executor) (MetricMap, error) {
 	return values, nil
 }
 
-func (rs *MysqlSource) buildArgs() []string {
+func (rs *mysqlSource) buildArgs() []string {
 	args := []string{"-B"}
 	socket := false
 
@@ -171,8 +176,8 @@ func (rs *MysqlSource) buildArgs() []string {
 	return args
 }
 
-func buildMysqlSource(params map[string]string) (Collector, error) {
-	rs := &MysqlSource{"localhost", "3306", "/tmp/mysql.sock", "root", "", map[string]bool{}, false, execCmd}
+func buildMysqlSource(params map[string]string) (metrics.Source, error) {
+	rs := &mysqlSource{"localhost", "3306", "/tmp/mysql.sock", "root", "", map[string]bool{}, false, execCmd}
 	for k, v := range params {
 		switch k {
 		case "username":
@@ -195,62 +200,62 @@ func buildMysqlSource(params map[string]string) (Collector, error) {
 }
 
 var (
-	mysqlMetrics = []Metric{
-		Metric{"Aborted_clients", c, nil, nil},
-		Metric{"Aborted_connects", c, nil, nil},
-		Metric{"Bytes_received", c, inMB, nil},
-		Metric{"Bytes_sent", c, inMB, nil},
-		Metric{"Com_delete", c, nil, nil},
-		Metric{"Com_delete_multi", c, nil, nil},
-		Metric{"Com_insert", c, nil, nil},
-		Metric{"Com_insert_select", c, nil, nil},
-		Metric{"Com_select", c, nil, nil},
-		Metric{"Com_update", c, nil, nil},
-		Metric{"Com_update_multi", c, nil, nil},
-		Metric{"Connections", c, nil, nil},
-		Metric{"Created_tmp_disk_tables", c, nil, nil},
-		Metric{"Created_tmp_files", c, nil, nil},
-		Metric{"Created_tmp_tables", c, nil, nil},
-		Metric{"Innodb_buffer_pool_pages_data", g, nil, nil},
-		Metric{"Innodb_buffer_pool_bytes_data", g, inMB, nil},
-		Metric{"Innodb_buffer_pool_pages_free", g, nil, nil},
-		Metric{"Innodb_buffer_pool_pages_total", g, nil, nil},
-		Metric{"Innodb_buffer_pool_reads", c, nil, nil},
-		Metric{"Innodb_data_read", c, nil, nil},
-		Metric{"Innodb_data_reads", c, nil, nil},
-		Metric{"Innodb_data_writes", c, nil, nil},
-		Metric{"Innodb_data_written", c, nil, nil},
-		Metric{"Innodb_deadlocks", c, nil, nil},
-		Metric{"Innodb_pages_created", c, nil, nil},
-		Metric{"Innodb_pages_read", c, nil, nil},
-		Metric{"Innodb_pages_written", c, nil, nil},
-		Metric{"Innodb_rows_deleted", c, nil, nil},
-		Metric{"Innodb_rows_inserted", c, nil, nil},
-		Metric{"Innodb_rows_read", c, nil, nil},
-		Metric{"Innodb_rows_updated", c, nil, nil},
-		Metric{"Innodb_num_open_files", g, nil, nil},
-		Metric{"Key_reads", c, nil, nil},
-		Metric{"Key_writes", c, nil, nil},
-		Metric{"Max_used_connections", g, nil, nil},
-		Metric{"Open_files", g, nil, nil},
-		Metric{"Open_tables", g, nil, nil},
-		Metric{"Prepared_stmt_count", g, nil, nil},
-		Metric{"Qcache_free_blocks", g, nil, nil},
-		Metric{"Qcache_free_memory", g, inMB, nil},
-		Metric{"Qcache_hits", c, nil, nil},
-		Metric{"Qcache_inserts", c, nil, nil},
-		Metric{"Qcache_lowmem_prunes", c, nil, nil},
-		Metric{"Qcache_not_cached", c, nil, nil},
-		Metric{"Qcache_queries_in_cache", g, nil, nil},
-		Metric{"Queries", c, nil, nil},
-		Metric{"Questions", c, nil, nil},
-		Metric{"Seconds_Behind_Master", g, nil, nil},
-		Metric{"Slow_queries", c, nil, nil},
-		Metric{"Table_locks_immediate", c, nil, nil},
-		Metric{"Table_locks_waited", c, nil, nil},
-		Metric{"Threads_cached", g, nil, nil},
-		Metric{"Threads_connected", g, nil, nil},
-		Metric{"Threads_created", c, nil, nil},
-		Metric{"Threads_running", g, nil, nil},
+	mysqlMetrics = []metrics.Descriptor{
+		metrics.Descriptor{"Aborted_clients", c, nil, nil},
+		metrics.Descriptor{"Aborted_connects", c, nil, nil},
+		metrics.Descriptor{"Bytes_received", c, inMB, nil},
+		metrics.Descriptor{"Bytes_sent", c, inMB, nil},
+		metrics.Descriptor{"Com_delete", c, nil, nil},
+		metrics.Descriptor{"Com_delete_multi", c, nil, nil},
+		metrics.Descriptor{"Com_insert", c, nil, nil},
+		metrics.Descriptor{"Com_insert_select", c, nil, nil},
+		metrics.Descriptor{"Com_select", c, nil, nil},
+		metrics.Descriptor{"Com_update", c, nil, nil},
+		metrics.Descriptor{"Com_update_multi", c, nil, nil},
+		metrics.Descriptor{"Connections", c, nil, nil},
+		metrics.Descriptor{"Created_tmp_disk_tables", c, nil, nil},
+		metrics.Descriptor{"Created_tmp_files", c, nil, nil},
+		metrics.Descriptor{"Created_tmp_tables", c, nil, nil},
+		metrics.Descriptor{"Innodb_buffer_pool_pages_data", g, nil, nil},
+		metrics.Descriptor{"Innodb_buffer_pool_bytes_data", g, inMB, nil},
+		metrics.Descriptor{"Innodb_buffer_pool_pages_free", g, nil, nil},
+		metrics.Descriptor{"Innodb_buffer_pool_pages_total", g, nil, nil},
+		metrics.Descriptor{"Innodb_buffer_pool_reads", c, nil, nil},
+		metrics.Descriptor{"Innodb_data_read", c, nil, nil},
+		metrics.Descriptor{"Innodb_data_reads", c, nil, nil},
+		metrics.Descriptor{"Innodb_data_writes", c, nil, nil},
+		metrics.Descriptor{"Innodb_data_written", c, nil, nil},
+		metrics.Descriptor{"Innodb_deadlocks", c, nil, nil},
+		metrics.Descriptor{"Innodb_pages_created", c, nil, nil},
+		metrics.Descriptor{"Innodb_pages_read", c, nil, nil},
+		metrics.Descriptor{"Innodb_pages_written", c, nil, nil},
+		metrics.Descriptor{"Innodb_rows_deleted", c, nil, nil},
+		metrics.Descriptor{"Innodb_rows_inserted", c, nil, nil},
+		metrics.Descriptor{"Innodb_rows_read", c, nil, nil},
+		metrics.Descriptor{"Innodb_rows_updated", c, nil, nil},
+		metrics.Descriptor{"Innodb_num_open_files", g, nil, nil},
+		metrics.Descriptor{"Key_reads", c, nil, nil},
+		metrics.Descriptor{"Key_writes", c, nil, nil},
+		metrics.Descriptor{"Max_used_connections", g, nil, nil},
+		metrics.Descriptor{"Open_files", g, nil, nil},
+		metrics.Descriptor{"Open_tables", g, nil, nil},
+		metrics.Descriptor{"Prepared_stmt_count", g, nil, nil},
+		metrics.Descriptor{"Qcache_free_blocks", g, nil, nil},
+		metrics.Descriptor{"Qcache_free_memory", g, inMB, nil},
+		metrics.Descriptor{"Qcache_hits", c, nil, nil},
+		metrics.Descriptor{"Qcache_inserts", c, nil, nil},
+		metrics.Descriptor{"Qcache_lowmem_prunes", c, nil, nil},
+		metrics.Descriptor{"Qcache_not_cached", c, nil, nil},
+		metrics.Descriptor{"Qcache_queries_in_cache", g, nil, nil},
+		metrics.Descriptor{"Queries", c, nil, nil},
+		metrics.Descriptor{"Questions", c, nil, nil},
+		metrics.Descriptor{"Seconds_Behind_Master", g, nil, nil},
+		metrics.Descriptor{"Slow_queries", c, nil, nil},
+		metrics.Descriptor{"Table_locks_immediate", c, nil, nil},
+		metrics.Descriptor{"Table_locks_waited", c, nil, nil},
+		metrics.Descriptor{"Threads_cached", g, nil, nil},
+		metrics.Descriptor{"Threads_connected", g, nil, nil},
+		metrics.Descriptor{"Threads_created", c, nil, nil},
+		metrics.Descriptor{"Threads_running", g, nil, nil},
 	}
 )

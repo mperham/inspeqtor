@@ -122,7 +122,7 @@ func convertHost(global *ConfigFile, inqhost *ast.HostCheck) (*Host, error) {
 		if err != nil {
 			return nil, err
 		}
-		err = storage.Prepare(rule.MetricFamily, rule.MetricName)
+		err = storage.Watch(rule.MetricFamily, rule.MetricName)
 		if err != nil {
 			return nil, err
 		}
@@ -194,20 +194,37 @@ func convertService(global *ConfigFile, inqsvc *ast.ProcessCheck) (*Service, err
 		if err != nil {
 			return nil, err
 		}
-		err = storage.Prepare(rule.MetricFamily, rule.MetricName)
-		if err != nil {
-			return nil, err
-		}
 		util.DebugDebug("Rule: %+v", *rule)
 		rules[idx] = rule
 	}
 	svc.rules = rules
+
+	for _, r := range rules {
+		source, err := storage.AddSource(r.MetricFamily, svc.Parameters())
+		if err != nil {
+			return nil, err
+		}
+		if source == nil {
+			continue
+		}
+
+		err = storage.Watch(r.MetricFamily, r.MetricName)
+		if err != nil {
+			return nil, err
+		}
+		util.Debug("Watching %s:%s", r.MetricFamily, r.MetricName)
+	}
 
 	if len(inqsvc.Exposed) > 0 {
 		err := BuildExpose(global, svc, inqsvc.Exposed, inqsvc.Parameters)
 		if err != nil {
 			return nil, err
 		}
+	}
+
+	err = storage.Prepare()
+	if err != nil {
+		return nil, err
 	}
 	return svc, nil
 }

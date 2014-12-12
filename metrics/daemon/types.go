@@ -16,85 +16,33 @@ import (
    if redis(latest_fork_usec) > 10000 then alert ops
 */
 
-type collectorBuilder func(map[string]string) (Collector, error)
-type MetricMap map[string]float64
-type executor func(string, []string, []byte) ([]byte, error)
-type Metric struct {
-	Name       string
-	MetricType metrics.Type
-	Display    metrics.DisplayFunc
-	Transform  metrics.TransformFunc
-}
-
 var (
-	c       = metrics.Counter
-	g       = metrics.Gauge
-	Sources = map[string]collectorBuilder{
-		"redis":      buildRedisSource,
-		"mysql":      buildMysqlSource,
-		"memcached":  buildMemcachedSource,
-		"nginx":      buildNginxSource,
-		"postgresql": buildPostgresqlSource,
-	}
+	c    = metrics.Counter
+	g    = metrics.Gauge
 	inMB = metrics.DisplayInMB
 )
 
-func NewStore(store metrics.Store, ds Collector) *Store {
-	return &Store{store, ds}
-}
+type executor func(string, []string, []byte) ([]byte, error)
 
-type Store struct {
-	metrics.Store
-	DaemonSpecific Collector
-}
-
-func Prepare(ds *Store) error {
-	return ds.DaemonSpecific.Prepare()
-}
-
-func (ds *Store) Load(values ...interface{}) {
-	ds.Store.(metrics.Loadable).Load(values...)
-}
-
-func (ds *Store) Watch(metricName string) {
-	valid := ds.DaemonSpecific.ValidMetrics()
-	for _, m := range valid {
-		if m.Name == metricName {
-			if m.MetricType == metrics.Counter {
-				ds.Store.DeclareCounter(ds.DaemonSpecific.Name(), metricName, nil, m.Display)
-			} else {
-				ds.Store.DeclareGauge(ds.DaemonSpecific.Name(), metricName, m.Display)
-			}
+/*
+func (s *Store) Collect(pid int) error {
+	err := s.Store.Collect(pid)
+	if err != nil {
+		return err
+	}
+	for _, ds := range s.DaemonSpecific {
+		util.Debug("Collecting %s metrics", ds.Name())
+		hash, err := ds.Capture()
+		if err != nil {
+			return err
 		}
-	}
-	ds.DaemonSpecific.Watch(metricName)
-}
-
-func (ds *Store) Collect(pid int) error {
-	err := ds.Store.Collect(pid)
-	if err != nil {
-		return err
-	}
-	util.Debug("Collecting %s metrics", ds.DaemonSpecific.Name())
-	hash, err := ds.DaemonSpecific.Capture()
-	if err != nil {
-		return err
-	}
-	for k, v := range hash {
-		ds.Store.Save(ds.DaemonSpecific.Name(), k, v)
+		for k, v := range hash {
+			s.Store.Save(ds.Name(), k, v)
+		}
 	}
 	return nil
 }
-
-type Collector interface {
-	Name() string
-	// Called once before any metrics are captured
-	Prepare() error
-	// Called every cycle to collect metrics
-	Capture() (MetricMap, error)
-	Watch(metricName string)
-	ValidMetrics() []Metric
-}
+*/
 
 func execCmd(command string, args []string, stdin []byte) ([]byte, error) {
 	cmd := exec.Command(command, args...)

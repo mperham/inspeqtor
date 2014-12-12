@@ -10,6 +10,10 @@ import (
 	"github.com/mperham/inspeqtor/util"
 )
 
+func init() {
+	metrics.Sources["postgresql"] = buildPostgresqlSource
+}
+
 type pgSource struct {
 	Database    string
 	Hostname    string
@@ -28,8 +32,8 @@ func (pg *pgSource) Watch(metricName string) {
 	pg.metrics[metricName] = true
 }
 
-func (pg *pgSource) Capture() (MetricMap, error) {
-	data := MetricMap{}
+func (pg *pgSource) Capture() (metrics.Map, error) {
+	data := metrics.Map{}
 
 	for name := range pg.metrics {
 		if _, ok := data[name]; !ok {
@@ -48,7 +52,7 @@ func (pg *pgSource) Prepare() error {
 	return err
 }
 
-func (pg *pgSource) ValidMetrics() []Metric {
+func (pg *pgSource) ValidMetrics() []metrics.Descriptor {
 	return pgMetrics
 }
 
@@ -80,7 +84,7 @@ func (pg *pgSource) buildArgs() []string {
 	return args
 }
 
-func buildPostgresqlSource(params map[string]string) (Collector, error) {
+func buildPostgresqlSource(params map[string]string) (metrics.Source, error) {
 	rs := &pgSource{"", "localhost", "5432", "postgres", map[string]bool{}, false, execCmd}
 	for k, v := range params {
 		switch k {
@@ -101,8 +105,8 @@ func buildPostgresqlSource(params map[string]string) (Collector, error) {
 	return rs, nil
 }
 
-func populate(pg *pgSource, data MetricMap, name string) error {
-	var sqlfunk func(*pgSource, MetricMap) error
+func populate(pg *pgSource, data metrics.Map, name string) error {
+	var sqlfunk func(*pgSource, metrics.Map) error
 	switch name {
 	case "rollbacks", "deadlocks", "numbackends", "blk_hit_rate":
 		sqlfunk = dbStats
@@ -116,7 +120,7 @@ func populate(pg *pgSource, data MetricMap, name string) error {
 	return sqlfunk(pg, data)
 }
 
-func userStats(pg *pgSource, data MetricMap) error {
+func userStats(pg *pgSource, data metrics.Map) error {
 	sql := "select sum(seq_scan) from pg_stat_user_tables"
 	results, err := runSql(pg, sql)
 	if err != nil {
@@ -141,7 +145,7 @@ func userStats(pg *pgSource, data MetricMap) error {
 	return nil
 }
 
-func sizeStats(pg *pgSource, data MetricMap) error {
+func sizeStats(pg *pgSource, data metrics.Map) error {
 	sql := `select sum(pg_total_relation_size(pg_class.oid))
 					FROM pg_class LEFT JOIN pg_namespace N ON (N.oid = pg_class.relnamespace)
 					WHERE nspname NOT IN ('pg_catalog', 'information_schema') AND
@@ -169,7 +173,7 @@ func sizeStats(pg *pgSource, data MetricMap) error {
 	return nil
 }
 
-func dbStats(pg *pgSource, data MetricMap) error {
+func dbStats(pg *pgSource, data metrics.Map) error {
 	sql := "select sum(xact_rollback), sum(deadlocks), sum(numbackends), sum(blks_hit) / (sum(blks_read) + sum(blks_hit)) from pg_stat_database"
 	results, err := runSql(pg, sql)
 	if err != nil {
@@ -253,12 +257,12 @@ func runSql(pg *pgSource, stmt string) ([][]string, error) {
 }
 
 var (
-	pgMetrics = []Metric{
-		Metric{"rollbacks", c, nil, nil},
-		Metric{"deadlocks", c, nil, nil},
-		Metric{"numbackends", g, nil, nil},
-		Metric{"blk_hit_rate", g, metrics.DisplayPercent, nil},
-		Metric{"seq_scans", c, nil, nil},
-		Metric{"total_size", g, inMB, nil},
+	pgMetrics = []metrics.Descriptor{
+		metrics.Descriptor{"rollbacks", c, nil, nil},
+		metrics.Descriptor{"deadlocks", c, nil, nil},
+		metrics.Descriptor{"numbackends", g, nil, nil},
+		metrics.Descriptor{"blk_hit_rate", g, metrics.DisplayPercent, nil},
+		metrics.Descriptor{"seq_scans", c, nil, nil},
+		metrics.Descriptor{"total_size", g, inMB, nil},
 	}
 )

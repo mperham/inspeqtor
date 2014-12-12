@@ -26,6 +26,7 @@ const (
 	Slots = 3600 / 15
 )
 
+type SourceBuilder func(map[string]string) (Source, error)
 type Type uint8
 
 const (
@@ -48,6 +49,7 @@ var (
 	DisplayInMB = func(val float64) string {
 		return strconv.FormatFloat(val/(1024*1024), 'f', 2, 64) + "m"
 	}
+	Sources = map[string]SourceBuilder{}
 )
 
 // transform the raw collected data into something we can compare.  Used by cpu(*)
@@ -57,15 +59,32 @@ type TransformFunc func(float64, float64) float64
 // Convert the raw metric value into something displayable to the user.
 type DisplayFunc func(float64) string
 
+type Map map[string]float64
+
+type Descriptor struct {
+	Name       string
+	MetricType Type
+	Display    DisplayFunc
+	Transform  TransformFunc
+}
+
+type Source interface {
+	Name() string
+	// Called once before any metrics are captured
+	Prepare() error
+	// Called every cycle to collect metrics
+	Capture() (Map, error)
+	// opt into watching this metric.
+	// collectors don't have to collect every possible metric,
+	// for efficiency reasons.
+	Watch(metricName string)
+	ValidMetrics() []Descriptor
+}
+
 type Store interface {
 	Readable
 	Writable
 	Collectable
-}
-
-type BareStore interface {
-	Readable
-	Writable
 }
 
 type Readable interface {
@@ -78,11 +97,14 @@ type Readable interface {
 }
 
 type Collectable interface {
+	AddSource(name string, config map[string]string) (Source, error)
+	Prepare() error
+
 	Collect(pid int) error
 	// declare that a rule wants to act on this metric.
 	// useful if we only want to collect a metric if a
 	// rule will act upon it.
-	Prepare(family, name string) error
+	Watch(family, name string) error
 }
 
 type Writable interface {
@@ -97,10 +119,6 @@ type Loadable interface {
 
 type storage struct {
 	tree map[string]*family
-}
-
-func NewStore() BareStore {
-	return &storage{map[string]*family{}}
 }
 
 func (store *storage) Each(iter func(family, name string, metric Metric)) {

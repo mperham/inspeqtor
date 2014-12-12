@@ -5,10 +5,15 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/mperham/inspeqtor/metrics"
 	"github.com/mperham/inspeqtor/util"
 )
 
-type RedisSource struct {
+func init() {
+	metrics.Sources["redis"] = buildRedisSource
+}
+
+type redisSource struct {
 	Hostname string
 	Port     string
 	Socket   string
@@ -17,27 +22,27 @@ type RedisSource struct {
 	args     []string
 }
 
-func (rs *RedisSource) Name() string {
+func (rs *redisSource) Name() string {
 	return "redis"
 }
 
-func (rs *RedisSource) Watch(metricName string) {
+func (rs *redisSource) Watch(metricName string) {
 	rs.metrics[metricName] = true
 }
 
-func (rs *RedisSource) Capture() (MetricMap, error) {
+func (rs *redisSource) Capture() (metrics.Map, error) {
 	return rs.runCli(execCmd)
 }
 
-func (rs *RedisSource) ValidMetrics() []Metric {
+func (rs *redisSource) ValidMetrics() []metrics.Descriptor {
 	return redisMetrics
 }
 
-func (rs *RedisSource) Prepare() error {
+func (rs *redisSource) Prepare() error {
 	return nil
 }
 
-func (rs *RedisSource) runCli(funk executor) (MetricMap, error) {
+func (rs *redisSource) runCli(funk executor) (metrics.Map, error) {
 	sout, err := funk("redis-cli", rs.buildArgs(), nil)
 	lines, err := util.ReadLines(sout)
 	if err != nil {
@@ -71,7 +76,7 @@ func (rs *RedisSource) runCli(funk executor) (MetricMap, error) {
 	return values, nil
 }
 
-func (rs *RedisSource) buildArgs() []string {
+func (rs *redisSource) buildArgs() []string {
 	if rs.args == nil {
 		args := []string{}
 		if rs.Socket != "" {
@@ -93,8 +98,8 @@ func (rs *RedisSource) buildArgs() []string {
 	return rs.args
 }
 
-func buildRedisSource(params map[string]string) (Collector, error) {
-	rs := &RedisSource{"localhost", "6379", "", "", map[string]bool{}, nil}
+func buildRedisSource(params map[string]string) (metrics.Source, error) {
+	rs := &redisSource{"localhost", "6379", "", "", map[string]bool{}, nil}
 	for k, v := range params {
 		switch k {
 		case "hostname":
@@ -115,36 +120,36 @@ func buildRedisSource(params map[string]string) (Collector, error) {
 }
 
 var (
-	redisMetrics = []Metric{
-		Metric{"connected_clients", g, nil, nil},
-		Metric{"client_longest_output_list", g, nil, nil},
-		Metric{"client_biggest_input_buf", g, nil, nil},
-		Metric{"blocked_clients", g, nil, nil},
-		Metric{"used_memory", g, inMB, nil},
-		Metric{"used_memory_rss", g, inMB, nil},
-		Metric{"used_memory_peak", g, inMB, nil},
-		Metric{"used_memory_lua", g, inMB, nil},
-		Metric{"rdb_changes_since_last_save", g, nil, nil},
-		Metric{"rdb_last_bgsave_time_sec", g, nil, nil},
-		Metric{"rdb_current_bgsave_time_sec", g, nil, nil},
-		Metric{"aof_last_rewrite_time_sec", g, nil, nil},
-		Metric{"aof_current_rewrite_time_sec", g, nil, nil},
-		Metric{"total_connections_received", c, nil, nil},
-		Metric{"total_commands_processed", c, nil, nil},
-		Metric{"instantaneous_ops_per_sec", g, nil, nil},
-		Metric{"rejected_connections", c, nil, nil},
-		Metric{"sync_full", c, nil, nil},
-		Metric{"sync_partial_ok", c, nil, nil},
-		Metric{"sync_partial_err", c, nil, nil},
-		Metric{"expired_keys", c, nil, nil},
-		Metric{"evicted_keys", c, nil, nil},
-		Metric{"keyspace_hits", c, nil, nil},
-		Metric{"keyspace_misses", c, nil, nil},
-		Metric{"pubsub_channels", c, nil, nil},
-		Metric{"pubsub_patterns", c, nil, nil},
-		Metric{"latest_fork_usec", g, nil, nil},
-		Metric{"master_last_io_seconds_ago", g, nil, nil},
-		Metric{"connected_slaves", g, nil, nil},
-		Metric{"repl_backlog_size", g, inMB, nil},
+	redisMetrics = []metrics.Descriptor{
+		metrics.Descriptor{"connected_clients", g, nil, nil},
+		metrics.Descriptor{"client_longest_output_list", g, nil, nil},
+		metrics.Descriptor{"client_biggest_input_buf", g, nil, nil},
+		metrics.Descriptor{"blocked_clients", g, nil, nil},
+		metrics.Descriptor{"used_memory", g, inMB, nil},
+		metrics.Descriptor{"used_memory_rss", g, inMB, nil},
+		metrics.Descriptor{"used_memory_peak", g, inMB, nil},
+		metrics.Descriptor{"used_memory_lua", g, inMB, nil},
+		metrics.Descriptor{"rdb_changes_since_last_save", g, nil, nil},
+		metrics.Descriptor{"rdb_last_bgsave_time_sec", g, nil, nil},
+		metrics.Descriptor{"rdb_current_bgsave_time_sec", g, nil, nil},
+		metrics.Descriptor{"aof_last_rewrite_time_sec", g, nil, nil},
+		metrics.Descriptor{"aof_current_rewrite_time_sec", g, nil, nil},
+		metrics.Descriptor{"total_connections_received", c, nil, nil},
+		metrics.Descriptor{"total_commands_processed", c, nil, nil},
+		metrics.Descriptor{"instantaneous_ops_per_sec", g, nil, nil},
+		metrics.Descriptor{"rejected_connections", c, nil, nil},
+		metrics.Descriptor{"sync_full", c, nil, nil},
+		metrics.Descriptor{"sync_partial_ok", c, nil, nil},
+		metrics.Descriptor{"sync_partial_err", c, nil, nil},
+		metrics.Descriptor{"expired_keys", c, nil, nil},
+		metrics.Descriptor{"evicted_keys", c, nil, nil},
+		metrics.Descriptor{"keyspace_hits", c, nil, nil},
+		metrics.Descriptor{"keyspace_misses", c, nil, nil},
+		metrics.Descriptor{"pubsub_channels", c, nil, nil},
+		metrics.Descriptor{"pubsub_patterns", c, nil, nil},
+		metrics.Descriptor{"latest_fork_usec", g, nil, nil},
+		metrics.Descriptor{"master_last_io_seconds_ago", g, nil, nil},
+		metrics.Descriptor{"connected_slaves", g, nil, nil},
+		metrics.Descriptor{"repl_backlog_size", g, inMB, nil},
 	}
 )

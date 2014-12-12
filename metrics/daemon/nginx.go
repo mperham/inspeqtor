@@ -8,6 +8,7 @@ import (
 	"regexp"
 	"strconv"
 
+	"github.com/mperham/inspeqtor/metrics"
 	"github.com/mperham/inspeqtor/util"
 )
 
@@ -23,6 +24,10 @@ import (
      deny all;
    }
 */
+
+func init() {
+	metrics.Sources["nginx"] = buildNginxSource
+}
 
 type nginxSource struct {
 	Hostname string
@@ -41,7 +46,7 @@ func (rs *nginxSource) Watch(metricName string) {
 	rs.metrics[metricName] = true
 }
 
-func (rs *nginxSource) Capture() (MetricMap, error) {
+func (rs *nginxSource) Capture() (metrics.Map, error) {
 	return rs.runCli()
 }
 
@@ -49,7 +54,7 @@ func (rs *nginxSource) Prepare() error {
 	return nil
 }
 
-func (rs *nginxSource) ValidMetrics() []Metric {
+func (rs *nginxSource) ValidMetrics() []metrics.Descriptor {
 	return nginxMetrics
 }
 
@@ -68,7 +73,7 @@ var (
 	digits = regexp.MustCompile("(\\d+)")
 )
 
-func (rs *nginxSource) runCli() (MetricMap, error) {
+func (rs *nginxSource) runCli() (metrics.Map, error) {
 	sout, err := rs.client(rs.Hostname, rs.Port, rs.Endpoint)
 	if err != nil {
 		return nil, err
@@ -106,7 +111,7 @@ func (rs *nginxSource) runCli() (MetricMap, error) {
 	return values, nil
 }
 
-func buildNginxSource(params map[string]string) (Collector, error) {
+func buildNginxSource(params map[string]string) (metrics.Source, error) {
 	rs := &nginxSource{"localhost", "80", "/status", map[string]bool{}, nil, defaultClient}
 	for k, v := range params {
 		switch k {
@@ -126,13 +131,13 @@ func buildNginxSource(params map[string]string) (Collector, error) {
 }
 
 var (
-	nginxMetrics = []Metric{
-		Metric{"Active_connections", g, nil, nil},
-		Metric{"accepts", c, nil, nil},
-		Metric{"handled", c, nil, nil},
-		Metric{"requests", c, nil, nil},
-		Metric{"Reading", g, nil, nil},
-		Metric{"Writing", g, nil, nil},
-		Metric{"Waiting", g, nil, nil},
+	nginxMetrics = []metrics.Descriptor{
+		metrics.Descriptor{"Active_connections", g, nil, nil},
+		metrics.Descriptor{"accepts", c, nil, nil},
+		metrics.Descriptor{"handled", c, nil, nil},
+		metrics.Descriptor{"requests", c, nil, nil},
+		metrics.Descriptor{"Reading", g, nil, nil},
+		metrics.Descriptor{"Writing", g, nil, nil},
+		metrics.Descriptor{"Waiting", g, nil, nil},
 	}
 )

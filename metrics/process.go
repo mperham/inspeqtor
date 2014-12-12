@@ -21,8 +21,10 @@ type dynamicCollector func(int, *processStorage) error
 
 type processStorage struct {
 	*storage
-	path   string
-	dyncol []dynamicCollector
+	path string
+	// TODO refactor this to be a Source
+	dyncol         []dynamicCollector
+	daemonSpecific []Source
 }
 
 func NewProcessStore(path string, cycleSeconds uint) Store {
@@ -43,11 +45,60 @@ func NewProcessStore(path string, cycleSeconds uint) Store {
 	return store
 }
 
-func (ps *processStorage) Prepare(metricFamily, metricName string) error {
-	if metricFamily == "memory" && metricName == "total_rss" {
+func (ps *processStorage) Prepare() error {
+	for _, x := range ps.daemonSpecific {
+		err := x.Prepare()
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (ps *processStorage) AddSource(name string, config map[string]string) (Source, error) {
+	for _, x := range ps.daemonSpecific {
+		if x.Name() == name {
+			return x, nil
+		}
+	}
+	builder := Sources[name]
+	if builder == nil {
+		return nil, nil
+	}
+	util.Info("Activating metrics for %s", name)
+	src, err := builder(config)
+	if err != nil {
+		return nil, err
+	}
+	ps.daemonSpecific = append(ps.daemonSpecific, src)
+	return src, nil
+}
+
+func (ps *processStorage) Watch(family, name string) error {
+	if family == "memory" && name == "total_rss" {
 		ps.DeclareGauge("memory", "total_rss", DisplayInMB)
 		ps.dyncol = append(ps.dyncol, totalRssCollector)
+		return nil
 	}
+
+	for _, x := range ps.daemonSpecific {
+		if x.Name() == family {
+			descs := x.ValidMetrics()
+			for _, d := range descs {
+				if d.Name == name {
+					if d.MetricType == Counter {
+						ps.DeclareCounter(family, name, nil, d.Display)
+					} else {
+						ps.DeclareGauge(family, name, d.Display)
+					}
+					x.Watch(name)
+					return nil
+				}
+			}
+			return fmt.Errorf("No such metric: %s:%s", family, name)
+		}
+	}
+
 	return nil
 }
 
@@ -176,6 +227,15 @@ func (ps *processStorage) Collect(pid int) error {
 		}
 	}
 
+	for _, x := range ps.daemonSpecific {
+		data, err := x.Capture()
+		if err != nil {
+			return err
+		}
+		for k, v := range data {
+			ps.Save(x.Name(), k, v)
+		}
+	}
 	return nil
 }
 

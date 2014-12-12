@@ -1,10 +1,11 @@
 package inspeqtor
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/mperham/inspeqtor/metrics"
-	"github.com/mperham/inspeqtor/metrics/daemon"
+	_ "github.com/mperham/inspeqtor/metrics/daemon"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -27,14 +28,14 @@ func TestRulesCheck(t *testing.T) {
 	loadValue(svc.metrics, "memory", "rss", 65*MB)
 	result = rule.Check(15)
 	assert.Nil(t, result)
-	assert.Equal(t, 65*MB, rule.CurrentValue)
+	assert.Equal(t, float64(65*MB), rule.CurrentValue)
 	assert.Equal(t, Ok, rule.State)
 
 	loadValue(svc.metrics, "memory", "rss", 63*MB)
 	result = rule.Check(15)
 	assert.Nil(t, result)
 	assert.Equal(t, 1, rule.TrippedCount)
-	assert.Equal(t, 63*MB, rule.CurrentValue)
+	assert.Equal(t, float64(63*MB), rule.CurrentValue)
 	assert.Equal(t, Ok, rule.State)
 
 	loadValue(svc.metrics, "memory", "rss", 62*MB)
@@ -42,27 +43,27 @@ func TestRulesCheck(t *testing.T) {
 	assert.NotNil(t, result)
 	assert.Equal(t, result.Type, RuleFailed)
 	assert.Equal(t, 2, rule.TrippedCount)
-	assert.Equal(t, 62*MB, rule.CurrentValue)
+	assert.Equal(t, float64(62*MB), rule.CurrentValue)
 	assert.Equal(t, Triggered, rule.State)
 
 	loadValue(svc.metrics, "memory", "rss", 62*MB)
 	result = rule.Check(15)
 	assert.Nil(t, result)
 	assert.Equal(t, 3, rule.TrippedCount)
-	assert.Equal(t, 62*MB, rule.CurrentValue)
+	assert.Equal(t, float64(62*MB), rule.CurrentValue)
 	assert.Equal(t, Triggered, rule.State)
 
 	loadValue(svc.metrics, "memory", "rss", 65*MB)
 	result = rule.Check(15)
 	assert.Nil(t, result)
-	assert.Equal(t, 65*MB, rule.CurrentValue)
+	assert.Equal(t, float64(65*MB), rule.CurrentValue)
 	assert.Equal(t, Recovered, rule.State)
 
 	loadValue(svc.metrics, "memory", "rss", 66*MB)
 	result = rule.Check(15)
 	assert.NotNil(t, result)
 	assert.Equal(t, result.Type, RuleRecovered)
-	assert.Equal(t, 66*MB, rule.CurrentValue)
+	assert.Equal(t, float64(66*MB), rule.CurrentValue)
 	assert.Equal(t, Ok, rule.State)
 }
 
@@ -71,16 +72,14 @@ func TestPerSecRulesCheck(t *testing.T) {
 
 	basic := metrics.NewProcessStore("/proc", 15)
 
-	funk := daemon.Sources["mysql"]
-	source, err := funk(map[string]string{})
-	assert.Nil(t, err)
+	fmt.Printf("%v\n", metrics.Sources)
+	source, err := basic.AddSource("mysql", map[string]string{})
 	assert.NotNil(t, source)
-	store := daemon.NewStore(basic, source)
-	store.Watch("Queries")
-	err = daemon.Prepare(store)
 	assert.Nil(t, err)
+	basic.Watch("mysql", "Queries")
+	basic.Watch("mysql", "Queries")
 
-	svc := Service{&Entity{"mysql", nil, store, nil}, nil, nil, nil}
+	svc := Service{&Entity{"mysql", nil, basic, nil}, nil, nil, nil}
 	rule := &Rule{&svc, "mysql", "Queries", GT, "1k/sec", 1024, 0, true, 2, 0, Ok, nil}
 
 	// no data in the buffer
@@ -89,19 +88,19 @@ func TestPerSecRulesCheck(t *testing.T) {
 	assert.Nil(t, result)
 
 	// Walk thru a series of cycles to verify state transitions
-	loadValue(store, "mysql", "Queries", 1000)
+	loadValue(basic, "mysql", "Queries", 1000)
 	result = rule.Check(15)
 	assert.Nil(t, result)
 	assert.Equal(t, 0, rule.CurrentValue)
 	assert.Equal(t, Ok, rule.State)
 
-	loadValue(store, "mysql", "Queries", 4000)
+	loadValue(basic, "mysql", "Queries", 4000)
 	result = rule.Check(15)
 	assert.Nil(t, result)
 	assert.Equal(t, 3000, rule.CurrentValue)
 	assert.Equal(t, Ok, rule.State)
 
-	loadValue(store, "mysql", "Queries", 20000)
+	loadValue(basic, "mysql", "Queries", 20000)
 	result = rule.Check(15)
 	assert.Nil(t, result)
 	assert.Equal(t, 1, rule.TrippedCount)

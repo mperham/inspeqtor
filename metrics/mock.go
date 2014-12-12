@@ -9,16 +9,21 @@ type mockStore struct{}
 func (*mockStore) Get(family, name string) float64 {
 	return 0
 }
-func (*mockStore) Prepare(family, name string) error {
+func (*mockStore) Watch(family, name string) error {
 	return nil
 }
 func (*mockStore) Display(family, name string) string {
 	return "0"
 }
+func (*mockStore) Prepare() error {
+	return nil
+}
 func (*mockStore) Collect(pid int) error {
 	return nil
 }
-
+func (*mockStore) AddSource(name string, config map[string]string) (Source, error) {
+	return nil, nil
+}
 func (*mockStore) Families() []string {
 	return []string{"cpu"}
 }

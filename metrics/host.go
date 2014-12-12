@@ -1,6 +1,7 @@
 package metrics
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os/exec"
 	"strconv"
@@ -41,7 +42,15 @@ func NewHostStore(path string, cycleSeconds uint) Store {
 	return store
 }
 
-func (hs *hostStorage) Prepare(metricFamily, metricName string) error {
+func (hs *hostStorage) Prepare() error {
+	return nil
+}
+
+func (hs *hostStorage) AddSource(name string, config map[string]string) (Source, error) {
+	return nil, fmt.Errorf("Host storage does not support dynamic metric sources")
+}
+
+func (hs *hostStorage) Watch(metricFamily, metricName string) error {
 	return nil
 }
 

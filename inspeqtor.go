@@ -13,13 +13,13 @@ import (
 	"time"
 
 	"github.com/mperham/inspeqtor/metrics"
-	"github.com/mperham/inspeqtor/metrics/daemon"
+	_ "github.com/mperham/inspeqtor/metrics/daemon"
 	"github.com/mperham/inspeqtor/services"
 	"github.com/mperham/inspeqtor/util"
 )
 
 const (
-	VERSION = "0.7.0"
+	VERSION = "0.8.0"
 )
 
 type Inspeqtor struct {
@@ -154,12 +154,6 @@ func (i *Inspeqtor) Parse() error {
 		util.DebugDebug("Service: %+v", val)
 	}
 
-	for _, s := range i.Services {
-		err := wrapService(s.(*Service))
-		if err != nil {
-			return err
-		}
-	}
 	return nil
 }
 
@@ -182,34 +176,6 @@ func HandleSignals() {
 }
 
 // private
-
-func wrapService(s *Service) error {
-	var store *daemon.Store
-
-	for _, r := range s.Rules() {
-		funk := daemon.Sources[r.MetricFamily]
-		if funk != nil {
-			if store == nil {
-				source, err := funk(s.Parameters())
-				if err != nil {
-					return err
-				}
-				util.Info("Activating %s-specific metrics", r.MetricFamily)
-				store = daemon.NewStore(s.Metrics(), source)
-				s.SetMetrics(store)
-			}
-			util.Debug("Watching %s(%s)", r.MetricFamily, r.MetricName)
-			store.Watch(r.MetricName)
-		}
-	}
-	if store != nil {
-		err := daemon.Prepare(store)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
 
 func basicReloader(oldcopy *Inspeqtor, newcopy *Inspeqtor) error {
 	newcopy.SilenceUntil = oldcopy.SilenceUntil

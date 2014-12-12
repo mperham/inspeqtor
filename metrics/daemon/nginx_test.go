@@ -4,16 +4,17 @@ import (
 	"io/ioutil"
 	"testing"
 
+	"github.com/mperham/inspeqtor/metrics"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestBadNginxConfig(t *testing.T) {
 	t.Parallel()
-	src, err := Sources["nginx"](map[string]string{"port": "885u"})
+	src, err := metrics.Sources["nginx"](map[string]string{"port": "885u"})
 	assert.Nil(t, src)
 	assert.NotNil(t, err)
 
-	src, err = Sources["nginx"](map[string]string{"port": "8080"})
+	src, err = metrics.Sources["nginx"](map[string]string{"port": "8080"})
 	assert.Nil(t, err)
 	assert.NotNil(t, src)
 }
@@ -27,14 +28,14 @@ func TestNginxCollection(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, hash)
 
-	assert.Equal(t, MetricMap{"Active_connections": 2, "requests": 3, "Waiting": 1}, hash)
+	assert.Equal(t, metrics.Map{"Active_connections": 2, "requests": 3, "Waiting": 1}, hash)
 
 	rs.Watch("bad_metric")
 	hash, err = rs.runCli()
 	assert.Nil(t, err)
 	assert.NotNil(t, hash)
 
-	assert.Equal(t, MetricMap{"Active_connections": 2, "requests": 3, "Waiting": 1}, hash)
+	assert.Equal(t, metrics.Map{"Active_connections": 2, "requests": 3, "Waiting": 1}, hash)
 }
 
 func TestRealNginxConnection(t *testing.T) {
@@ -51,15 +52,15 @@ func TestRealNginxConnection(t *testing.T) {
 	assert.True(t, hash["requests"] > 0, "This test will fail if you don't have nginx installed")
 }
 
-func testNginxSource(metrics []string) *nginxSource {
-	src, err := Sources["nginx"](map[string]string{})
+func testNginxSource(mets []string) *nginxSource {
+	src, err := metrics.Sources["nginx"](map[string]string{})
 	if err != nil {
 		panic(err)
 	}
-	if metrics == nil {
-		metrics = []string{"Active_connections", "requests", "Waiting"}
+	if mets == nil {
+		mets = []string{"Active_connections", "requests", "Waiting"}
 	}
-	for _, x := range metrics {
+	for _, x := range mets {
 		src.Watch(x)
 	}
 	return src.(*nginxSource)
