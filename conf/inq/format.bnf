@@ -54,6 +54,7 @@ check inspeqtor
 Check
   : "check" "service" name ParameterList RuleList              << ast.NewProcessCheck($2, $3, nil, $4), nil >>
   | "check" "service" name ParameterList ExposedList RuleList  << ast.NewProcessCheck($2, $3, $4, $5), nil >>
+  | "check" "service" name ParameterList ExposedList           << ast.NewProcessCheck($2, $3, $4, nil), nil >>
   | "check" "service" name ExposedList                         << ast.NewProcessCheck($2, nil, $3, nil), nil >>
   | "check" "service" name RuleList                            << ast.NewProcessCheck($2, nil, nil, $3), nil >>
   | "check" "service" name ExposedList RuleList                << ast.NewProcessCheck($2, nil, $3, $4), nil >>
@@ -66,8 +67,8 @@ ExposedList
 ;
 
 Exposed
-  : name "," Exposed    << ast.AddExposed($0, $2) >>
-  | name                << ast.AddExposed($0, nil) >>
+  : name                << ast.AddExposed($0, nil) >>
+  | name "," Exposed    << ast.AddExposed($0, $2) >>
 ;
 
 ActionList
