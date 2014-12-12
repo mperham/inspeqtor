@@ -48,7 +48,7 @@ func (pg *pgSource) Prepare() error {
 	return err
 }
 
-func (pg *pgSource) ValidMetrics() []metric {
+func (pg *pgSource) ValidMetrics() []Metric {
 	return pgMetrics
 }
 
@@ -253,12 +253,12 @@ func runSql(pg *pgSource, stmt string) ([][]string, error) {
 }
 
 var (
-	pgMetrics = []metric{
-		metric{"rollbacks", c, nil},
-		metric{"deadlocks", c, nil},
-		metric{"numbackends", g, nil},
-		metric{"blk_hit_rate", g, &funcWrapper{metrics.DisplayPercent, nil}},
-		metric{"seq_scans", c, nil},
-		metric{"total_size", g, &funcWrapper{inMB, nil}},
+	pgMetrics = []Metric{
+		Metric{"rollbacks", c, nil, nil},
+		Metric{"deadlocks", c, nil, nil},
+		Metric{"numbackends", g, nil, nil},
+		Metric{"blk_hit_rate", g, metrics.DisplayPercent, nil},
+		Metric{"seq_scans", c, nil, nil},
+		Metric{"total_size", g, inMB, nil},
 	}
 )

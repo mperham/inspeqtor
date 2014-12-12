@@ -31,7 +31,7 @@ func (rs *MemcachedSource) Prepare() error {
 	return nil
 }
 
-func (rs *MemcachedSource) ValidMetrics() []metric {
+func (rs *MemcachedSource) ValidMetrics() []Metric {
 	return memcachedMetrics
 }
 
@@ -90,39 +90,39 @@ func buildMemcachedSource(params map[string]string) (Collector, error) {
 }
 
 var (
-	memcachedMetrics = []metric{
-		metric{"curr_connections", g, nil},
-		metric{"total_connections", c, nil},
-		metric{"cmd_get", c, nil},
-		metric{"cmd_set", c, nil},
-		metric{"cmd_flush", c, nil},
-		metric{"cmd_touch", c, nil},
-		metric{"get_hits", c, nil},
-		metric{"get_misses", c, nil},
-		metric{"delete_hits", c, nil},
-		metric{"delete_misses", c, nil},
-		metric{"incr_hits", c, nil},
-		metric{"incr_misses", c, nil},
-		metric{"decr_hits", c, nil},
-		metric{"decr_misses", c, nil},
-		metric{"cas_hits", c, nil},
-		metric{"cas_misses", c, nil},
-		metric{"cas_badval", c, nil},
-		metric{"touch_hits", c, nil},
-		metric{"touch_misses", c, nil},
-		metric{"auth_cmds", c, nil},
-		metric{"auth_errors", c, nil},
-		metric{"bytes_read", c, &funcWrapper{inMB, nil}},
-		metric{"bytes_written", c, &funcWrapper{inMB, nil}},
-		metric{"threads", g, nil},
-		metric{"malloc_fails", c, nil},
-		metric{"bytes", g, nil},
-		metric{"curr_items", g, nil},
-		metric{"total_items", c, nil},
-		metric{"expired_unfetched", c, nil},
-		metric{"evicted_unfetched", c, nil},
-		metric{"evictions", c, nil},
-		metric{"reclaimed", c, nil},
-		metric{"crawler_reclaimed", c, nil},
+	memcachedMetrics = []Metric{
+		Metric{"curr_connections", g, nil, nil},
+		Metric{"total_connections", c, nil, nil},
+		Metric{"cmd_get", c, nil, nil},
+		Metric{"cmd_set", c, nil, nil},
+		Metric{"cmd_flush", c, nil, nil},
+		Metric{"cmd_touch", c, nil, nil},
+		Metric{"get_hits", c, nil, nil},
+		Metric{"get_misses", c, nil, nil},
+		Metric{"delete_hits", c, nil, nil},
+		Metric{"delete_misses", c, nil, nil},
+		Metric{"incr_hits", c, nil, nil},
+		Metric{"incr_misses", c, nil, nil},
+		Metric{"decr_hits", c, nil, nil},
+		Metric{"decr_misses", c, nil, nil},
+		Metric{"cas_hits", c, nil, nil},
+		Metric{"cas_misses", c, nil, nil},
+		Metric{"cas_badval", c, nil, nil},
+		Metric{"touch_hits", c, nil, nil},
+		Metric{"touch_misses", c, nil, nil},
+		Metric{"auth_cmds", c, nil, nil},
+		Metric{"auth_errors", c, nil, nil},
+		Metric{"bytes_read", c, inMB, nil},
+		Metric{"bytes_written", c, inMB, nil},
+		Metric{"threads", g, nil, nil},
+		Metric{"malloc_fails", c, nil, nil},
+		Metric{"bytes", g, nil, nil},
+		Metric{"curr_items", g, nil, nil},
+		Metric{"total_items", c, nil, nil},
+		Metric{"expired_unfetched", c, nil, nil},
+		Metric{"evicted_unfetched", c, nil, nil},
+		Metric{"evictions", c, nil, nil},
+		Metric{"reclaimed", c, nil, nil},
+		Metric{"crawler_reclaimed", c, nil, nil},
 	}
 )

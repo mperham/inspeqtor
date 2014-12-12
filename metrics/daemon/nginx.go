@@ -49,7 +49,7 @@ func (rs *nginxSource) Prepare() error {
 	return nil
 }
 
-func (rs *nginxSource) ValidMetrics() []metric {
+func (rs *nginxSource) ValidMetrics() []Metric {
 	return nginxMetrics
 }
 
@@ -85,14 +85,14 @@ func (rs *nginxSource) runCli() (MetricMap, error) {
 	}
 
 	for idx, met := range nginxMetrics {
-		if !rs.metrics[met.name] {
+		if !rs.metrics[met.Name] {
 			continue
 		}
 		val, err := strconv.ParseInt(results[idx][0], 10, 64)
 		if err != nil {
 			return nil, err
 		}
-		values[met.name] = float64(val)
+		values[met.Name] = float64(val)
 	}
 
 	if len(rs.metrics) > len(values) {
@@ -126,13 +126,13 @@ func buildNginxSource(params map[string]string) (Collector, error) {
 }
 
 var (
-	nginxMetrics = []metric{
-		metric{"Active_connections", g, nil},
-		metric{"accepts", c, nil},
-		metric{"handled", c, nil},
-		metric{"requests", c, nil},
-		metric{"Reading", g, nil},
-		metric{"Writing", g, nil},
-		metric{"Waiting", g, nil},
+	nginxMetrics = []Metric{
+		Metric{"Active_connections", g, nil, nil},
+		Metric{"accepts", c, nil, nil},
+		Metric{"handled", c, nil, nil},
+		Metric{"requests", c, nil, nil},
+		Metric{"Reading", g, nil, nil},
+		Metric{"Writing", g, nil, nil},
+		Metric{"Waiting", g, nil, nil},
 	}
 )

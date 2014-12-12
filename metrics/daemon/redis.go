@@ -29,7 +29,7 @@ func (rs *RedisSource) Capture() (MetricMap, error) {
 	return rs.runCli(execCmd)
 }
 
-func (rs *RedisSource) ValidMetrics() []metric {
+func (rs *RedisSource) ValidMetrics() []Metric {
 	return redisMetrics
 }
 
@@ -115,36 +115,36 @@ func buildRedisSource(params map[string]string) (Collector, error) {
 }
 
 var (
-	redisMetrics = []metric{
-		metric{"connected_clients", g, nil},
-		metric{"client_longest_output_list", g, nil},
-		metric{"client_biggest_input_buf", g, nil},
-		metric{"blocked_clients", g, nil},
-		metric{"used_memory", g, &funcWrapper{inMB, nil}},
-		metric{"used_memory_rss", g, &funcWrapper{inMB, nil}},
-		metric{"used_memory_peak", g, &funcWrapper{inMB, nil}},
-		metric{"used_memory_lua", g, &funcWrapper{inMB, nil}},
-		metric{"rdb_changes_since_last_save", g, nil},
-		metric{"rdb_last_bgsave_time_sec", g, nil},
-		metric{"rdb_current_bgsave_time_sec", g, nil},
-		metric{"aof_last_rewrite_time_sec", g, nil},
-		metric{"aof_current_rewrite_time_sec", g, nil},
-		metric{"total_connections_received", c, nil},
-		metric{"total_commands_processed", c, nil},
-		metric{"instantaneous_ops_per_sec", g, nil},
-		metric{"rejected_connections", c, nil},
-		metric{"sync_full", c, nil},
-		metric{"sync_partial_ok", c, nil},
-		metric{"sync_partial_err", c, nil},
-		metric{"expired_keys", c, nil},
-		metric{"evicted_keys", c, nil},
-		metric{"keyspace_hits", c, nil},
-		metric{"keyspace_misses", c, nil},
-		metric{"pubsub_channels", c, nil},
-		metric{"pubsub_patterns", c, nil},
-		metric{"latest_fork_usec", g, nil},
-		metric{"master_last_io_seconds_ago", g, nil},
-		metric{"connected_slaves", g, nil},
-		metric{"repl_backlog_size", g, &funcWrapper{inMB, nil}},
+	redisMetrics = []Metric{
+		Metric{"connected_clients", g, nil, nil},
+		Metric{"client_longest_output_list", g, nil, nil},
+		Metric{"client_biggest_input_buf", g, nil, nil},
+		Metric{"blocked_clients", g, nil, nil},
+		Metric{"used_memory", g, inMB, nil},
+		Metric{"used_memory_rss", g, inMB, nil},
+		Metric{"used_memory_peak", g, inMB, nil},
+		Metric{"used_memory_lua", g, inMB, nil},
+		Metric{"rdb_changes_since_last_save", g, nil, nil},
+		Metric{"rdb_last_bgsave_time_sec", g, nil, nil},
+		Metric{"rdb_current_bgsave_time_sec", g, nil, nil},
+		Metric{"aof_last_rewrite_time_sec", g, nil, nil},
+		Metric{"aof_current_rewrite_time_sec", g, nil, nil},
+		Metric{"total_connections_received", c, nil, nil},
+		Metric{"total_commands_processed", c, nil, nil},
+		Metric{"instantaneous_ops_per_sec", g, nil, nil},
+		Metric{"rejected_connections", c, nil, nil},
+		Metric{"sync_full", c, nil, nil},
+		Metric{"sync_partial_ok", c, nil, nil},
+		Metric{"sync_partial_err", c, nil, nil},
+		Metric{"expired_keys", c, nil, nil},
+		Metric{"evicted_keys", c, nil, nil},
+		Metric{"keyspace_hits", c, nil, nil},
+		Metric{"keyspace_misses", c, nil, nil},
+		Metric{"pubsub_channels", c, nil, nil},
+		Metric{"pubsub_patterns", c, nil, nil},
+		Metric{"latest_fork_usec", g, nil, nil},
+		Metric{"master_last_io_seconds_ago", g, nil, nil},
+		Metric{"connected_slaves", g, nil, nil},
+		Metric{"repl_backlog_size", g, inMB, nil},
 	}
 )

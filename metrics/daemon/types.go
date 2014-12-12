@@ -19,14 +19,11 @@ import (
 type collectorBuilder func(map[string]string) (Collector, error)
 type MetricMap map[string]float64
 type executor func(string, []string, []byte) ([]byte, error)
-type metric struct {
-	name  string
-	mtype metrics.Type
-	funks *funcWrapper
-}
-type funcWrapper struct {
-	disp  metrics.DisplayFunc
-	xform metrics.TransformFunc
+type Metric struct {
+	Name       string
+	MetricType metrics.Type
+	Display    metrics.DisplayFunc
+	Transform  metrics.TransformFunc
 }
 
 var (
@@ -62,16 +59,11 @@ func (ds *Store) Load(values ...interface{}) {
 func (ds *Store) Watch(metricName string) {
 	valid := ds.DaemonSpecific.ValidMetrics()
 	for _, m := range valid {
-		if m.name == metricName {
-			dispFunk := metrics.DisplayFunc(nil)
-			if m.funks != nil {
-				dispFunk = m.funks.disp
-			}
-
-			if m.mtype == metrics.Counter {
-				ds.Store.DeclareCounter(ds.DaemonSpecific.Name(), metricName, nil, dispFunk)
+		if m.Name == metricName {
+			if m.MetricType == metrics.Counter {
+				ds.Store.DeclareCounter(ds.DaemonSpecific.Name(), metricName, nil, m.Display)
 			} else {
-				ds.Store.DeclareGauge(ds.DaemonSpecific.Name(), metricName, dispFunk)
+				ds.Store.DeclareGauge(ds.DaemonSpecific.Name(), metricName, m.Display)
 			}
 		}
 	}
@@ -101,7 +93,7 @@ type Collector interface {
 	// Called every cycle to collect metrics
 	Capture() (MetricMap, error)
 	Watch(metricName string)
-	ValidMetrics() []metric
+	ValidMetrics() []Metric
 }
 
 func execCmd(command string, args []string, stdin []byte) ([]byte, error) {
