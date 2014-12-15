@@ -37,8 +37,7 @@ check service mysql
   #with username root, socket /var/run/mysqld/mysqld.sock
 
   #
-  # Add any specific metrics you want to verify.
-  # Any alerts will go to ops since they are the owner.
+  # Add any normal process metrics you want to verify.
   #
   if memory:rss > 2g then alert
 
