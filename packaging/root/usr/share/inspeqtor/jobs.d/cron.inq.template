@@ -1,6 +1,6 @@
 # Inspeqtor Pro can verify recurring job execution.
 #
-# Your job should call "inspeqtorctl job <name>" when it runs
+# Your job should call "inspeqtorctl job_done <name>" when it runs
 # successfully to confirm execution, where <name> is the name
 # of the job as noted below
 #
