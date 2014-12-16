@@ -26,7 +26,7 @@ prepare:
 	@echo Now you should be ready to run "make"
 
 test:
-	@go-bindata -pkg inspeqtor -o templates.go templates/...
+	@go generate
 	@go test -parallel 4 ./... | grep -v "no test files"
 
 # gocc produces ill-formated code, clean it up with fmt

@@ -15,6 +15,8 @@ type Action interface {
 	Trigger(event *Event) error
 }
 
+//go:generate go-bindata -pkg inspeqtor -o templates.go templates/...
+
 var (
 	emailTemplates = map[EventType]*template.Template{}
 )
