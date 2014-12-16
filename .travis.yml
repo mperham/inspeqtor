@@ -1,4 +1,6 @@
 language: go
+go:
+  - 1.4
 install: make prepare
 addons:
   postgresql: "9.2"
