@@ -2,8 +2,10 @@ package cli
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/mperham/inspeqtor"
 	"github.com/mperham/inspeqtor/util"
@@ -40,7 +42,7 @@ func ParseArguments() CmdOptions {
 	defaults := CmdOptions{false, false, "/etc/inspeqtor", "info", "/var/run/inspeqtor.sock"}
 
 	log.Println(inspeqtor.Name, inspeqtor.VERSION)
-	log.Println("Copyright © 2014 Contributed Systems LLC")
+	log.Println(fmt.Sprintf("Copyright © %d Contributed Systems LLC", time.Now().Year()))
 
 	if StartupInfo != nil {
 		StartupInfo()

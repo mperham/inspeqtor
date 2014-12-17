@@ -24,6 +24,8 @@ prepare:
 	# needed for `make fmt`
 	go get golang.org/x/tools/cmd/goimports
 	@echo Now you should be ready to run "make"
+	# To cross-compile from OSX to Linux, you need to run this:
+	# cd $GOROOT/src && GOOS=linux GOARCH=amd64 CGO_ENABLED=0 ./make.bash --no-clean
 
 test:
 	@go generate
