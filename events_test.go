@@ -5,13 +5,34 @@
 package inspeqtor
 
 import (
+	"fmt"
 	"os"
 	"testing"
 
 	"github.com/mperham/inspeqtor/metrics"
 	"github.com/mperham/inspeqtor/services"
+	"github.com/mperham/inspeqtor/util"
 	"github.com/stretchr/testify/assert"
 )
+
+func findDownPid() int {
+	if util.Darwin() {
+		return 2
+	}
+
+	pid := 2
+	for {
+		_, err := os.Stat(fmt.Sprintf("/proc/%d", pid))
+		if err != nil && os.IsNotExist(err) {
+			return pid
+		}
+		pid++
+		if pid == 1000 {
+			panic("Unable to find available PID slot")
+		}
+	}
+	return 2
+}
 
 func TestEventProcessDisappears(t *testing.T) {
 	t.Parallel()
@@ -21,7 +42,7 @@ func TestEventProcessDisappears(t *testing.T) {
 	act := mockAction()
 
 	assert.Equal(t, 0, act.Size())
-	svc := &Service{&Entity{"foo", nil, metrics.NewProcessStore("/proc", 15), nil}, act, services.WithStatus(10, services.Up), init}
+	svc := &Service{&Entity{"foo", nil, metrics.NewProcessStore("/proc", 15), nil}, act, services.WithStatus(findDownPid(), services.Up), init}
 	svc.Collect(false, func(_ Checkable) {})
 	assert.Equal(t, services.Down, svc.Process.Status)
 	assert.Equal(t, 0, svc.Process.Pid)
@@ -37,7 +58,7 @@ func TestEventProcessDisappearsDuringDeploy(t *testing.T) {
 	act := mockAction()
 
 	assert.Equal(t, 0, act.Size())
-	svc := &Service{&Entity{"foo", nil, metrics.NewProcessStore("/proc", 15), nil}, act, services.WithStatus(10, services.Up), init}
+	svc := &Service{&Entity{"foo", nil, metrics.NewProcessStore("/proc", 15), nil}, act, services.WithStatus(findDownPid(), services.Up), init}
 	svc.Collect(true, func(_ Checkable) {})
 	assert.Equal(t, services.Down, svc.Process.Status)
 	assert.Equal(t, 0, svc.Process.Pid)
