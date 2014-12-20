@@ -35,7 +35,7 @@ type Inspeqtor struct {
 	Expose          net.Listener
 	SilenceUntil    time.Time
 	Stopping        chan struct{}
-	Handlers        map[string][]func(*Inspeqtor)
+	Handlers        map[string][]func(*Inspeqtor) error
 }
 
 func New(dir string, socketpath string) (*Inspeqtor, error) {
@@ -46,7 +46,7 @@ func New(dir string, socketpath string) (*Inspeqtor, error) {
 		Host:         &Host{&Entity{name: "localhost", metrics: metrics.NewMockStore()}},
 		GlobalConfig: &ConfigFile{Defaults, map[string]*AlertRoute{}},
 		Stopping:     make(chan struct{}),
-		Handlers:     map[string][]func(*Inspeqtor){},
+		Handlers:     map[string][]func(*Inspeqtor) error{},
 	}
 	return i, nil
 }
@@ -350,10 +350,10 @@ func (i *Inspeqtor) TestAlertRoutes() int {
 	return bad
 }
 
-func (i *Inspeqtor) Listen(eventName string, handler func(*Inspeqtor)) {
+func (i *Inspeqtor) Listen(eventName string, handler func(*Inspeqtor) error) {
 	x := i.Handlers[eventName]
 	if x == nil {
-		x = []func(*Inspeqtor){}
+		x = []func(*Inspeqtor) error{}
 	}
 	i.Handlers[eventName] = append(x, handler)
 }
