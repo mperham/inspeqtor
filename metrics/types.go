@@ -157,7 +157,12 @@ func (store *storage) Families() []string {
 
 func (store *storage) MetricNames(family string) []string {
 	met := []string{}
-	for k := range store.tree[family].metrics {
+	fam := store.tree[family]
+	if fam == nil {
+		return met
+	}
+
+	for k := range fam.metrics {
 		met = append(met, k)
 	}
 	sort.Strings(met)
