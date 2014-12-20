@@ -31,7 +31,6 @@ func findDownPid() int {
 			panic("Unable to find available PID slot")
 		}
 	}
-	return 2
 }
 
 func TestEventProcessDisappears(t *testing.T) {
