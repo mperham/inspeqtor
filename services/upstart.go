@@ -114,7 +114,7 @@ func (u *Upstart) LookupService(serviceName string) (*ProcessStatus, error) {
 		return &ProcessStatus{int(pid), Up}, nil
 	}
 
-	if len(results) == 3 {
+	if len(results) == 4 {
 		switch {
 		case results[1] == "start":
 			return &ProcessStatus{0, Starting}, nil
