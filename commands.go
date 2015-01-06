@@ -32,6 +32,8 @@ var (
 		"export": export,
 		"show":   sparkline,
 		"♡":      heart,
+		"--help": showHelp,
+		"help":   showHelp,
 	}
 )
 
@@ -79,6 +81,23 @@ func (i *Inspeqtor) acceptCommand() bool {
 
 	funk(i, fields[1:], c)
 	return true
+}
+
+func showHelp(i *Inspeqtor, args []string, resp io.Writer) {
+	io.WriteString(resp, "inspeqtorctl [command] [args]\n")
+	io.WriteString(resp, "\n")
+	io.WriteString(resp, "Commands:\n")
+	io.WriteString(resp, "\n")
+	io.WriteString(resp, "status - show the current state of all tracked metrics\n")
+	io.WriteString(resp, "start deploy - start a deploy window, mutes all alerts\n")
+	io.WriteString(resp, "finish deploy - close a deploy window, enables alerts\n")
+	io.WriteString(resp, "export - dump the current state of all metrics as JSON\n")
+	io.WriteString(resp, "show [\"host\"|service] [metric] - show sparkline graph of metric\n")
+	io.WriteString(resp, "\n")
+	io.WriteString(resp, "Examples:\n")
+	io.WriteString(resp, "\n")
+	io.WriteString(resp, "inspeqtorctl show host load:5\n")
+	io.WriteString(resp, "inspeqtorctl show mysql mysql:Queries\n")
 }
 
 func startDeploy(i *Inspeqtor, args []string, resp io.Writer) {
