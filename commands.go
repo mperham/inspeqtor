@@ -72,6 +72,11 @@ func (i *Inspeqtor) acceptCommand() bool {
 	}
 
 	fields := strings.Fields(line)
+	if len(fields) == 0 {
+		showHelp(i, []string{}, c)
+		return true
+	}
+
 	funk := CommandHandlers[fields[0]]
 	if funk == nil {
 		util.Warn("Unknown command: %s", strings.TrimSpace(line))
