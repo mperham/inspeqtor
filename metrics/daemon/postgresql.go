@@ -258,11 +258,11 @@ func runSql(pg *pgSource, stmt string) ([][]string, error) {
 
 var (
 	pgMetrics = []metrics.Descriptor{
-		metrics.Descriptor{"rollbacks", c, nil, nil},
-		metrics.Descriptor{"deadlocks", c, nil, nil},
-		metrics.Descriptor{"numbackends", g, nil, nil},
-		metrics.Descriptor{"blk_hit_rate", g, metrics.DisplayPercent, nil},
-		metrics.Descriptor{"seq_scans", c, nil, nil},
-		metrics.Descriptor{"total_size", g, inMB, nil},
+		metrics.D("rollbacks", c, nil, nil),
+		metrics.D("deadlocks", c, nil, nil),
+		metrics.D("numbackends", g, nil, nil),
+		metrics.D("blk_hit_rate", g, metrics.DisplayPercent, nil),
+		metrics.D("seq_scans", c, nil, nil),
+		metrics.D("total_size", g, inMB, nil),
 	}
 )

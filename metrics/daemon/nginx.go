@@ -132,12 +132,12 @@ func buildNginxSource(params map[string]string) (metrics.Source, error) {
 
 var (
 	nginxMetrics = []metrics.Descriptor{
-		metrics.Descriptor{"Active_connections", g, nil, nil},
-		metrics.Descriptor{"accepts", c, nil, nil},
-		metrics.Descriptor{"handled", c, nil, nil},
-		metrics.Descriptor{"requests", c, nil, nil},
-		metrics.Descriptor{"Reading", g, nil, nil},
-		metrics.Descriptor{"Writing", g, nil, nil},
-		metrics.Descriptor{"Waiting", g, nil, nil},
+		metrics.D("Active_connections", g, nil, nil),
+		metrics.D("accepts", c, nil, nil),
+		metrics.D("handled", c, nil, nil),
+		metrics.D("requests", c, nil, nil),
+		metrics.D("Reading", g, nil, nil),
+		metrics.D("Writing", g, nil, nil),
+		metrics.D("Waiting", g, nil, nil),
 	}
 )

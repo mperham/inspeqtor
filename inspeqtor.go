@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/mperham/inspeqtor/metrics"
+	// Pull in daemon-specific sources
 	_ "github.com/mperham/inspeqtor/metrics/daemon"
 	"github.com/mperham/inspeqtor/services"
 	"github.com/mperham/inspeqtor/util"

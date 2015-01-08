@@ -68,6 +68,10 @@ type Descriptor struct {
 	Transform  TransformFunc
 }
 
+func D(name string, tipe Type, disp DisplayFunc, xform TransformFunc) Descriptor {
+	return Descriptor{Name: name, MetricType: tipe, Display: disp, Transform: xform}
+}
+
 type MandatorySource interface {
 	Mandatory() bool
 }
