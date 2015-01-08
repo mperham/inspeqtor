@@ -200,12 +200,9 @@ func convertService(global *ConfigFile, inqsvc *ast.ProcessCheck) (*Service, err
 	svc.rules = rules
 
 	for _, r := range rules {
-		source, err := storage.AddSource(r.MetricFamily, svc.Parameters())
+		_, err := storage.AddSource(r.MetricFamily, svc.Parameters())
 		if err != nil {
 			return nil, err
-		}
-		if source == nil {
-			continue
 		}
 
 		err = storage.Watch(r.MetricFamily, r.MetricName)
