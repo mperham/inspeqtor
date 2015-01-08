@@ -7,6 +7,16 @@ Version 1.0 will be released when it is stable and ready for widespread usage.
 
 See [Current Release Status](https://github.com/mperham/inspeqtor/milestones) here.
 
+## 0.8.0-1
+
+- Support for real-time memory monitoring for Go daemons **Pro** [#65]
+  ![memory monitor](https://cloud.githubusercontent.com/assets/2911/5670572/fde0b112-9735-11e4-8161-6df283d090bc.png)
+- Fix issue resolving Down services with Upstart [#73]
+- Add grace period for cron job checks **Pro** [#61]
+- Add grace period for deploy window alerts [#69]
+- **LOTS** of code cleanup based on **golint**, **go vet** and
+  **errcheck** static analysis tools. [#64, #63, #30]
+
 ## 0.7.0-2
 
 - Welcome new committer, @sorentwo!
