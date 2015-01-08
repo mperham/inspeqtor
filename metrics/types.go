@@ -177,8 +177,8 @@ func (store *storage) Get(family string, name string) float64 {
 	metric, _ := store.find(family, name)
 	if metric == nil {
 		// This can happen when using an Inspeqtor Pro .inq file
-		// with Inspeqtor, since metrics like mysql(Queries) won't exist.
-		util.Warn("BUG: Metric %s(%s) does not exist", family, name)
+		// with Inspeqtor, if the metric only exists in Pro (e.g. memstats)
+		util.Warn("BUG: Metric %s:%s does not exist", family, name)
 		return 0
 	}
 	return metric.Get()
