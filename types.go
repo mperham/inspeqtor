@@ -127,20 +127,13 @@ func (svc *Service) Collect(silenced bool, completeCallback func(Checkable)) {
 		// Couldn't resolve it when we started up so we can't collect it.
 		return
 	}
+
 	if svc.Process.Status != services.Up {
 		status, err := svc.Manager.LookupService(svc.Name())
 		if err != nil {
 			util.Warn("%s", err)
 		} else {
-			svc.Transition(status, func(et EventType) {
-				if !silenced {
-					counters.Add("events", 1)
-					err = svc.EventHandler.Trigger(&Event{et, svc, nil})
-					if err != nil {
-						util.Warn("Error firing event: %s", err.Error())
-					}
-				}
-			})
+			svc.transitionWithEventTrigger(status, silenced)
 		}
 	}
 
@@ -150,15 +143,7 @@ func (svc *Service) Collect(silenced bool, completeCallback func(Checkable)) {
 			err := syscall.Kill(svc.Process.Pid, syscall.Signal(0))
 			if err != nil {
 				util.Info("Service %s with process %d does not exist: %s", svc.Name(), svc.Process.Pid, err)
-				svc.Transition(services.WithStatus(0, services.Down), func(et EventType) {
-					if !silenced {
-						counters.Add("events", 1)
-						err = svc.EventHandler.Trigger(&Event{et, svc, nil})
-						if err != nil {
-							util.Warn("Error firing event: %s", err.Error())
-						}
-					}
-				})
+				svc.transitionWithEventTrigger(services.WithStatus(0, services.Down), silenced)
 			} else {
 				util.Warn("Error capturing metrics for process %d: %s", svc.Process.Pid, merr)
 			}
@@ -238,8 +223,9 @@ func (svc *Service) Reload() error {
 }
 
 /*
-  Resolve each defined service to its managing init system.  Called only
-  at startup, this is what maps services to init and fires ProcessDoesNotExist events.
+	Resolve each defined service to its managing init system. Called only at
+	startup, this is what maps services to init and fires ProcessDoesNotExist
+	events.
 */
 func (svc *Service) Resolve(mgrs []services.InitSystem) error {
 	for _, sm := range mgrs {
@@ -300,4 +286,16 @@ func (svc *Service) Transition(ps *services.ProcessStatus, emitter func(EventTyp
 
 func (svc *Service) String() string {
 	return fmt.Sprintf("%s [%s]", svc.Name(), svc.Process)
+}
+
+func (svc *Service) transitionWithEventTrigger(status *services.ProcessStatus, silenced bool) {
+	if !silenced {
+		svc.Transition(status, func(et EventType) {
+			counters.Add("events", 1)
+			err := svc.EventHandler.Trigger(&Event{et, svc, nil})
+			if err != nil {
+				util.Warn("Error firing event: %s", err.Error())
+			}
+		})
+	}
 }
