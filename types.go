@@ -285,13 +285,13 @@ func (svc *Service) String() string {
 }
 
 func (svc *Service) transitionWithEventTrigger(status *services.ProcessStatus, silenced bool) {
-	if !silenced {
-		svc.Transition(status, func(et EventType) {
+	svc.Transition(status, func(et EventType) {
+		if !silenced {
 			counters.Add("events", 1)
 			err := svc.EventHandler.Trigger(&Event{et, svc, nil})
 			if err != nil {
 				util.Warn("Error firing event: %s", err.Error())
 			}
-		})
-	}
+		}
+	})
 }
