@@ -52,15 +52,18 @@ func TestEventProcessDisappears(t *testing.T) {
 func TestEventProcessDisappearsDuringDeploy(t *testing.T) {
 	t.Parallel()
 
+	var inits []services.InitSystem
+
 	init := services.MockInit()
-	init.CurrentStatus = services.WithStatus(0, services.Down)
 	act := mockAction()
+	inits = append(inits, init)
+
+	init.CurrentStatus = services.WithStatus(0, services.Down)
 
 	assert.Equal(t, 0, act.Size())
 	svc := &Service{&Entity{"foo", nil, metrics.NewProcessStore("/proc", 15), nil}, act, services.WithStatus(findDownPid(), services.Up), init}
-	svc.Collect(true, func(_ Checkable) {})
 	assert.Equal(t, services.Down, svc.Process.Status)
-	assert.Equal(t, 0, svc.Process.Pid)
+	assert.Equal(t, 15, svc.Process.Pid)
 	assert.Equal(t, 0, act.Size())
 	assert.Nil(t, act.Latest())
 }
@@ -97,7 +100,29 @@ func TestEventProcessAppearsDuringDeploy(t *testing.T) {
 	assert.Nil(t, act.Latest())
 }
 
-func TestEventProcessDneAtStartup(t *testing.T) {
+func TestEventProcessDoesNotChangeDuringDeploy(t *testing.T) {
+	t.Parallel()
+
+	init := services.MockInit()
+	init.CurrentStatus = services.WithStatus(0, services.Up)
+
+	act := mockAction()
+	assert.Equal(t, 0, act.Size())
+
+	silent := true // Begin a deployment
+	svc := &Service{&Entity{"dne", nil, metrics.NewProcessStore("/proc", 15), nil}, act, services.WithStatus(0, services.Down), nil}
+	svc.Resolve(silent, []services.InitSystem{init})
+	assert.Equal(t, services.Down, svc.Process.Status)
+
+	silent = false // Complete the deployment
+	svc = &Service{&Entity{"dne", nil, metrics.NewProcessStore("/proc", 15), nil}, act, services.WithStatus(0, services.Up), nil}
+	svc.Resolve(silent, []services.InitSystem{init})
+	assert.Equal(t, services.Up, svc.Process.Status)
+
+	assert.Equal(t, 0, act.Size())
+}
+
+func TestEventProcessDoneAtStartup(t *testing.T) {
 	t.Parallel()
 
 	init := services.MockInit()
@@ -107,7 +132,7 @@ func TestEventProcessDneAtStartup(t *testing.T) {
 
 	assert.Equal(t, 0, act.Size())
 	svc := &Service{&Entity{"dne", nil, metrics.NewProcessStore("/proc", 15), nil}, act, services.WithStatus(0, services.Unknown), nil}
-	svc.Resolve([]services.InitSystem{init})
+	svc.Resolve(false, []services.InitSystem{init})
 	assert.Equal(t, services.Down, svc.Process.Status)
 	assert.Equal(t, 0, svc.Process.Pid)
 	assert.Equal(t, 1, act.Size())
@@ -124,7 +149,7 @@ func TestEventProcessExistsAtStartup(t *testing.T) {
 
 	assert.Equal(t, 0, act.Size())
 	svc := &Service{&Entity{"exists", nil, metrics.NewProcessStore("/proc", 15), nil}, act, services.WithStatus(0, services.Unknown), init}
-	svc.Resolve([]services.InitSystem{init})
+	svc.Resolve(false, []services.InitSystem{init})
 	assert.Equal(t, services.Up, svc.Process.Status)
 	assert.Equal(t, 100, svc.Process.Pid)
 	assert.Equal(t, 0, act.Size())
