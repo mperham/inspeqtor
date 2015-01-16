@@ -116,9 +116,12 @@ func startDeploy(i *Inspeqtor, args []string, resp io.Writer) {
 }
 
 func finishDeploy(i *Inspeqtor, args []string, resp io.Writer) {
-	// silence until after the next cycle, give the deploy a little time to
-	// settle before alerting again.
-	i.SilenceUntil = time.Now().Add(time.Duration(i.GlobalConfig.CycleTime) * time.Second)
+	// silence for two more cycles, give processes a little time to
+	// settle before alerting again.  Inspeqtor takes one cycle to see
+	// a process is Down and then another cycle to see a process is back
+	// Up again.  We don't want a restart during a deploy to send email
+	// for those events.
+	i.SilenceUntil = time.Now().Add(time.Duration(i.GlobalConfig.CycleTime) * time.Second * 2)
 
 	counters.Get("deploy").(*expvar.Int).Set(0)
 	util.Info("Finished deploy")
