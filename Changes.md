@@ -7,6 +7,11 @@ Version 1.0 will be released when it is stable and ready for widespread usage.
 
 See [Current Release Status](https://github.com/mperham/inspeqtor/milestones) here.
 
+## 0.8.1-1
+
+- Alerts could still firing during deploy due to a race condition in the
+  Inspeqtor's silence window. [#76]
+
 ## 0.8.0-1
 
 - Support for real-time memory monitoring for Go daemons **Pro** [#65]
