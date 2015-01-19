@@ -149,6 +149,7 @@ func (svc *Service) Collect(silenced bool, completeCallback func(Checkable)) {
 		if merr != nil {
 			err := syscall.Kill(svc.Process.Pid, syscall.Signal(0))
 			if err != nil {
+				// Process disappeared in the last cycle, mark it as Down.
 				util.Info("Service %s with process %d does not exist: %s", svc.Name(), svc.Process.Pid, err)
 				svc.Transition(services.WithStatus(0, services.Down), func(et EventType) {
 					if !silenced {
@@ -159,6 +160,24 @@ func (svc *Service) Collect(silenced bool, completeCallback func(Checkable)) {
 						}
 					}
 				})
+
+				// Immediately try to find the replacement PID so we don't have
+				// to wait for another cycle to mark it as Up.
+				status, err := svc.Manager.LookupService(svc.Name())
+				if err != nil {
+					util.Warn("%s", err)
+				} else {
+					svc.Transition(status, func(et EventType) {
+						if !silenced {
+							counters.Add("events", 1)
+							err = svc.EventHandler.Trigger(&Event{et, svc, nil})
+							if err != nil {
+								util.Warn("Error firing event: %s", err.Error())
+							}
+						}
+					})
+				}
+
 			} else {
 				util.Warn("Error capturing metrics for process %d: %s", svc.Process.Pid, merr)
 			}
