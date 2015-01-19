@@ -9,7 +9,7 @@ See [Current Release Status](https://github.com/mperham/inspeqtor/milestones) he
 
 ## 0.8.1-1
 
-- Alerts could still firing during deploy due to a race condition in the
+- Alerts could still fire during deploy due to a race condition in the
   Inspeqtor's silence window. [#76]
 
 ## 0.8.0-1
