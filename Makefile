@@ -150,8 +150,7 @@ build_deb_upstart: build
 		packaging/root/=/
 
 tag:
-	git tag v$(VERSION)-$(ITERATION)
-	git push --tags
+	git tag v$(VERSION)-$(ITERATION) && git push --tags || :
 
 upload:	package tag
 	package_cloud push contribsys/inspeqtor/ubuntu/precise packaging/output/upstart/$(NAME)_$(VERSION)-$(ITERATION)_amd64.deb
