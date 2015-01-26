@@ -33,8 +33,6 @@ func TestLaunchd(t *testing.T) {
 	assert.NotNil(t, err)
 
 	st1, err := l.LookupService("homebrew.mxcl.memcached")
-	assert.Nil(t, err)
-
 	if err == nil && st1.Pid > 0 && st1.Status == Up {
 		err = l.Restart("homebrew.mxcl.memcached")
 		assert.Nil(t, err)
