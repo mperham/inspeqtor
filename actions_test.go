@@ -165,7 +165,7 @@ func validProcessEvent(etype EventType) *Event {
 
 func validEmailSetup() *EmailNotifier {
 	return &EmailNotifier{
-		"mike", "fuzzbucket", "smtp.gmail.com", "mike@example.org", "mperham@gmail.com"}
+		"mike", "fuzzbucket", "smtp.gmail.com", "mike@example.org", "mperham@gmail.com", ""}
 }
 
 type TestAction struct {
