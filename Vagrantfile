@@ -10,9 +10,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.synced_folder '.', '/home/vagrant/src/github.com/mperham/inspeqtor'
 
   install_go_script = <<-SCRIPT
-    curl https://storage.googleapis.com/golang/go1.3.3.linux-amd64.tar.gz -O
-    tar -C /usr/local -xvf go1.3.3.linux-amd64.tar.gz
-    rm go1.3.3.linux-amd64.tar.gz
+    curl https://storage.googleapis.com/golang/go1.4.1.linux-amd64.tar.gz -O
+    tar -C /usr/local -xvf go1.4.1.linux-amd64.tar.gz
+    rm go1.4.1.linux-amd64.tar.gz
   SCRIPT
 
   environment_script = <<-SCRIPT
