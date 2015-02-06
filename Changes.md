@@ -7,6 +7,10 @@ Version 1.0 will be released when it is stable and ready for widespread usage.
 
 See [Current Release Status](https://github.com/mperham/inspeqtor/milestones) here.
 
+## HEAD
+
+- Add tls_port option for SMTP servers. [exploid, #79]
+
 ## 0.8.1-1
 
 - Alerts could still fire during deploy due to a race condition in the
