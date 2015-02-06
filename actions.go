@@ -141,6 +141,7 @@ type EmailNotifier struct {
 	Host     string
 	From     string
 	To       string
+	TLSPort  string
 }
 
 type EmailEvent struct {
@@ -183,7 +184,7 @@ func sendEmail(e *EmailNotifier, doc bytes.Buffer) error {
 		util.Debug("Sending email:\n%s", string(doc.Bytes()))
 		if e.Username != "" {
 			auth := smtp.PlainAuth("", e.Username, e.Password, e.Host)
-			err := smtp.SendMail(e.Host+":587", auth, e.From,
+			err := smtp.SendMail(e.Host+":"+e.TLSPort, auth, e.From,
 				[]string{e.To}, doc.Bytes())
 			if err != nil {
 				return err
@@ -219,12 +220,17 @@ func (e *EmailNotifier) setup(hash map[string]string) error {
 	if !ok {
 		from = "inspeqtor@example.com"
 	}
+  tls_port, ok := hash["tls_port"]
+  if !ok {
+    tls_port = "587"
+  }
 
 	e.Username = usr
 	e.Password = pwd
 	e.Host = host
 	e.From = from
 	e.To = to
+	e.TLSPort = tls_port
 
 	return nil
 }
