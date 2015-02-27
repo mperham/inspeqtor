@@ -10,6 +10,7 @@ See [Current Release Status](https://github.com/mperham/inspeqtor/milestones) he
 ## HEAD
 
 - Add tls_port option for SMTP servers. [exploid, #79]
+- Add gometalinter. [#83]
 
 ## 0.8.1-1
 

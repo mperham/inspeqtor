@@ -23,6 +23,9 @@ prepare:
 	go get code.google.com/p/gocc/...
 	# needed for `make fmt`
 	go get golang.org/x/tools/cmd/goimports
+	#linters
+	go get github.com/alecthomas/gometalinter
+	gometalinter --install
 	@echo Now you should be ready to run "make"
 	# To cross-compile from OSX to Linux, you need to run this:
 	# cd $GOROOT/src && GOOS=linux GOARCH=amd64 CGO_ENABLED=0 ./make.bash --no-clean
@@ -48,8 +51,7 @@ fmt:
 	find . -name "*.go" -exec goimports -w {} \;
 
 lint:
-	go vet ./...
-	golint ./... | grep -v exported
+	gometalinter
 
 clean:
 	rm -f main inspeqtor templates.go
