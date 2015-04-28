@@ -220,10 +220,10 @@ func (e *EmailNotifier) setup(hash map[string]string) error {
 	if !ok {
 		from = "inspeqtor@example.com"
 	}
-  tls_port, ok := hash["tls_port"]
-  if !ok {
-    tls_port = "587"
-  }
+	tls_port, ok := hash["tls_port"]
+	if !ok {
+		tls_port = "587"
+	}
 
 	e.Username = usr
 	e.Password = pwd
