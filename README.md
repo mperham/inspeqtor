@@ -22,6 +22,8 @@ What it doesn't:
 * monitor or control arbitrary processes, services must be init-managed
 * have *any* runtime dependencies at all, not even libc.
 
+If you've used `monit` before, Inspeqtor will look familiar.  Same
+high-level goals but in a modern package.
 
 ## Installation
 
