@@ -53,7 +53,7 @@ fmt:
 	find . -name "*.go" -exec goimports -w {} \;
 
 lint:
-	gometalinter
+	gometalinter ./...
 
 clean:
 	rm -f main inspeqtor templates.go
