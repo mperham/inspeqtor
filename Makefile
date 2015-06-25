@@ -20,7 +20,7 @@ prepare:
 	#sudo tar -C /usr/local -xzf go1.3.3.linux-amd64.tar.gz
 	go get github.com/stretchr/testify/...
 	go get github.com/jteeuwen/go-bindata/...
-	go get code.google.com/p/gocc/...
+	go get github.com/goccmack/gocc/...
 	# needed for `make fmt`
 	go get golang.org/x/tools/cmd/goimports
 	#linters
@@ -28,7 +28,9 @@ prepare:
 	gometalinter --install
 	@echo Now you should be ready to run "make"
 	# To cross-compile from OSX to Linux, you need to run this:
-	# cd $GOROOT/src && GOOS=linux GOARCH=amd64 CGO_ENABLED=0 ./make.bash --no-clean
+	#   cd $GOROOT/src && GOOS=linux GOARCH=amd64 CGO_ENABLED=0 ./make.bash --no-clean
+	# or ensure your Homebrew'd Go can cross compile:
+	#   brew install go --with-cc-common
 
 test:
 	@go generate
