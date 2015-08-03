@@ -131,7 +131,7 @@ func currentStatus(i *Inspeqtor, args []string, resp io.Writer) {
 		"%s %s, uptime: %s, pid: %d\n", Name, VERSION, time.Now().Sub(i.StartedAt).String(), os.Getpid()))
 
 	if i.silenced() {
-		io.WriteString(resp, fmt.Sprintf("Silenced until: %s\n", i.SilenceUntil))
+		io.WriteString(resp, fmt.Sprintf("Silenced until: %s\n", i.SilenceUntil.Format(time.RFC3339)))
 	}
 
 	io.WriteString(resp, "\n")
