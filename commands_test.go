@@ -137,6 +137,24 @@ func TestStatus(t *testing.T) {
 	assert.Equal(t, 0, idxs[0])
 }
 
+func TestStatusSilenced(t *testing.T) {
+	i, err := New("_", "")
+	assert.Nil(t, err)
+
+	proc := CommandHandlers["status"]
+
+	containsSilenced := func() bool {
+		var resp bytes.Buffer
+		proc(i, []string{}, &resp)
+		return strings.Contains(resp.String(), "Silenced until: ")
+	}
+
+	assert.False(t, containsSilenced())
+
+	i.SilenceUntil = time.Now().Add(10 * time.Second)
+	assert.True(t, containsSilenced())
+}
+
 func TestExport(t *testing.T) {
 	t.Parallel()
 	i, err := New("_", "")
