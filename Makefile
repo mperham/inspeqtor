@@ -1,5 +1,5 @@
 NAME=inspeqtor
-VERSION=0.8.1
+VERSION=1.0.0
 
 # when fixing packaging bugs but not changing the binary, we increment ITERATION
 ITERATION=1
@@ -16,8 +16,8 @@ BASENAME=$(NAME)_$(VERSION)-$(ITERATION)
 all: test
 
 prepare:
-	#wget https://storage.googleapis.com/golang/go1.3.3.linux-amd64.tar.gz
-	#sudo tar -C /usr/local -xzf go1.3.3.linux-amd64.tar.gz
+	#wget https://storage.googleapis.com/golang/go1.5.1.linux-amd64.tar.gz
+	#sudo tar -C /usr/local -xzf go1.5.1.linux-amd64.tar.gz
 	go get github.com/stretchr/testify/...
 	go get github.com/jteeuwen/go-bindata/...
 	go get github.com/goccmack/gocc/...
@@ -26,6 +26,7 @@ prepare:
 	#linters
 	go get github.com/alecthomas/gometalinter
 	gometalinter --install
+	gem install -N fpm
 	@echo Now you should be ready to run "make"
 	# To cross-compile from OSX to Linux, you need to run this:
 	#   cd $GOROOT/src && GOOS=linux GOARCH=amd64 CGO_ENABLED=0 ./make.bash --no-clean
