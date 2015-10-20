@@ -1,15 +1,11 @@
 # Inspeqtor Changelog
 
-Inspeqtor is brand new software; it very likely has bugs.
+Inspeqtor is stable and ready for production usage.
 Try it out and let us know how we can improve it for you.
 
-Version 1.0 will be released when it is stable and ready for widespread usage.
+## 1.0.0
 
-See [Current Release Status](https://github.com/mperham/inspeqtor/milestones) here.
-
-## HEAD
-
-- Add tls_port option for SMTP servers. [exploid, #79]
+- Add tls\_port option for SMTP servers. [exploid, #79]
 - Add gometalinter. [#83]
 - Show silenced until date in status output. [#101]
 
