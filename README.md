@@ -25,6 +25,12 @@ What it doesn't:
 If you've used `monit` before, Inspeqtor will look familiar.  Same
 high-level goals but in a modern package.
 
+## Status
+
+Inspeqtor is **feature complete**, reliable and (mostly?) bug-free.  This repo
+does not see a lot of code changes because of this, not because it is unmaintained.
+
+
 ## Installation
 
 See the [Inspeqtor wiki](https://github.com/mperham/inspeqtor/wiki) for complete documentation.
