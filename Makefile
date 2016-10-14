@@ -21,8 +21,6 @@ prepare:
 	go get github.com/stretchr/testify/...
 	go get github.com/jteeuwen/go-bindata/...
 	go get github.com/goccmack/gocc/...
-	# needed for `make fmt`
-	go get golang.org/x/tools/cmd/goimports
 	#linters
 	go get github.com/alecthomas/gometalinter
 	gometalinter --install
@@ -51,7 +49,7 @@ build: test
 
 # goimports produces slightly different formatted code from go fmt
 fmt:
-	find . -name "*.go" -exec goimports -w {} \;
+	go fmt ./...
 
 lint:
 	gometalinter ./...
