@@ -29,7 +29,7 @@ prepare:
 	gem install -N fpm
 	@echo Now you should be ready to run "make"
 	# To cross-compile from OSX to Linux, you need to run this:
-	#   cd $GOROOT/src && GOOS=linux GOARCH=amd64 CGO_ENABLED=0 ./make.bash --no-clean
+	#   cd \$GOROOT/src && GOOS=linux GOARCH=amd64 CGO_ENABLED=0 ./make.bash --no-clean
 	# or ensure your Homebrew'd Go can cross compile:
 	#   brew install go --with-cc-common
 
@@ -154,6 +154,22 @@ build_deb_upstart: build
 		inspeqtor=/usr/bin/inspeqtor \
 		packaging/root/=/
 
+build_deb_systemd: build
+	# gem install fpm
+	fpm -s dir -t deb -n $(NAME) -v $(VERSION) -p packaging/output/systemd \
+		--deb-priority optional --category admin \
+		--deb-compression bzip2 \
+	 	--after-install packaging/scripts/postinst.deb.systemd \
+	 	--before-remove packaging/scripts/prerm.deb.systemd \
+		--after-remove packaging/scripts/postrm.deb.systemd \
+		--url http://contribsys.com/inspeqtor \
+		--description "Application infrastructure monitoring" \
+		-m "Contributed Systems LLC <oss@contribsys.com>" \
+		--iteration $(ITERATION) --license "GPL 3.0" \
+		--vendor "Contributed Systems" -a amd64 \
+		inspeqtor=/usr/bin/inspeqtor \
+		packaging/root/=/
+
 tag:
 	git tag v$(VERSION)-$(ITERATION) && git push --tags || :
 
@@ -161,6 +177,7 @@ upload:	package tag
 	# gem install -N package_cloud
 	package_cloud push contribsys/inspeqtor/ubuntu/precise packaging/output/upstart/$(NAME)_$(VERSION)-$(ITERATION)_amd64.deb
 	package_cloud push contribsys/inspeqtor/ubuntu/trusty packaging/output/upstart/$(NAME)_$(VERSION)-$(ITERATION)_amd64.deb
+	package_cloud push contribsys/inspeqtor/ubuntu/xenial packaging/output/systemd/$(NAME)_$(VERSION)-$(ITERATION)_amd64.deb
 	package_cloud push contribsys/inspeqtor/el/7 packaging/output/systemd/$(NAME)-$(VERSION)-$(ITERATION).x86_64.rpm
 	package_cloud push contribsys/inspeqtor/el/6 packaging/output/upstart/$(NAME)-$(VERSION)-$(ITERATION).x86_64.rpm
 

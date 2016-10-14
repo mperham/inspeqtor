@@ -1,0 +1,67 @@
+#!/bin/sh
+
+set -e
+
+if [ ! -d /etc/inspeqtor ]; then
+  mkdir /etc/inspeqtor
+fi
+
+if [ -f /etc/inspeqtor/conf.d/host.inq ]; then
+  mv /etc/inspeqtor/conf.d/host.inq /etc/inspeqtor/host.inq
+else
+  cp /usr/share/inspeqtor/host.inq /etc/inspeqtor/host.inq
+fi
+
+if [ -d /etc/inspeqtor/conf.d ]; then
+  mv /etc/inspeqtor/conf.d /etc/inspeqtor/services.d
+fi
+
+for i in jobs.d services.d; do
+  if [ ! -d /etc/inspeqtor/$i ]; then
+    cp -r /usr/share/inspeqtor/$i /etc/inspeqtor/$i
+
+    if ! chown -R root:adm /etc/inspeqtor/$i ; then
+      true # ignore if adm doesn't exist
+    fi
+  fi
+done
+
+if [ ! -f /etc/inspeqtor/inspeqtor.conf ]; then
+  cp /usr/share/inspeqtor/inspeqtor.conf /etc/inspeqtor
+  # passwords in here, root readable only.
+  chmod 600 /etc/inspeqtor/inspeqtor.conf
+fi
+
+if which systemctl > /dev/null; then
+  echo "Using systemd to control Inspeqtor"
+  cp /usr/share/inspeqtor/systemd/inspeqtor.service /lib/systemd/system/inspeqtor.service
+
+  systemctl daemon-reload || :
+  if [ "$1" = 1 ] ; then
+    # first time install
+    systemctl enable inspeqtor || :
+    systemctl start inspeqtor || :
+  else
+    echo "Upgrading inspeqtor"
+  fi
+else
+  echo "Couldn't find systemd to control Inspeqtor, cannot proceed."
+  echo "Open an issue and tell us about your system."
+  exit 1
+fi
+
+cat <<"TXT"
+ _                            _
+(_)_ __  ___ _ __   ___  __ _| |_ ___  _ __
+| | '_ \/ __| '_ \ / _ \/ _  | __/ _ \| '__|
+| | | | \__ \ |_) |  __/ (_| | || (_) | |
+|_|_| |_|___/ .__/ \___|\__, |\__\___/|_|
+            |_|            |_|
+
+
+Thank you for installing Inspeqtor!
+
+TXT
+
+echo Please configure your alert settings in /etc/inspeqtor/inspeqtor.conf and then restart Inspeqtor with \"sudo systemctl restart inspeqtor\".
+exit 0
