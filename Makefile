@@ -101,7 +101,7 @@ cover:
 	go tool cover -html=cover.out
 
 build_rpm: build_rpm_upstart build_rpm_systemd
-build_deb: build_deb_upstart
+build_deb: build_deb_upstart build_deb_systemd
 
 build_rpm_upstart: build
 	# gem install fpm
