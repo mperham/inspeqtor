@@ -1,7 +1,12 @@
 # Inspeqtor Changelog
 
-Inspeqtor is stable and ready for production usage.
-Try it out and let us know how we can improve it for you.
+Please note that the Inspeqtor codebase does not change a lot because it is
+considered feature complete and stable.  It is maintained and not a dead project.
+
+## 1.0.1
+
+- Add binary and build support for Ubuntu 16.04 LTS (xenial)
+- Upgrade binaries to Go 1.7.1.
 
 ## 1.0.0
 

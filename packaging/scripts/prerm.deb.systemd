@@ -1,9 +1,9 @@
 #!/bin/sh
 set -e
 
-if [ "$1" -eq 0 ] ; then
+if [ "$1" = "remove" ] ; then
   echo Stopping and disabling systemd service
   # Package removal, not upgrade
   systemctl --no-reload disable inspeqtor || :
-  systemctl stop inspeqtor || :
 fi
+systemctl stop inspeqtor || :

@@ -37,13 +37,8 @@ if which systemctl > /dev/null; then
   cp /usr/share/inspeqtor/systemd/inspeqtor.service /lib/systemd/system/inspeqtor.service
 
   systemctl daemon-reload || :
-  if [ "$1" = 1 ] ; then
-    # first time install
-    systemctl enable inspeqtor || :
-    systemctl start inspeqtor || :
-  else
-    echo "Upgrading inspeqtor"
-  fi
+  systemctl enable inspeqtor || :
+  systemctl start inspeqtor || :
 else
   echo "Couldn't find systemd to control Inspeqtor, cannot proceed."
   echo "Open an issue and tell us about your system."
