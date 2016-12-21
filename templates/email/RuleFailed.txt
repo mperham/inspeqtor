@@ -2,7 +2,7 @@ To: <{{.Config.To}}>
 From: <{{.Config.From}}>
 Subject: {{.Target}} {{.Rule.Metric}} has failed its check{{.Rule.Consequence}}
 
-{{.Rule.Metric}} is {{.Rule.Op}} than {{.Rule.DisplayThreshold}} for {{.Target}}
+{{.Rule.Metric}} is {{.Rule.Op}} {{.Rule.DisplayThreshold}} for {{.Target}}
 
 Current:   {{.Rule.FetchDisplayCurrentValue}}
 Threshold: {{.Rule.DisplayThreshold}}
