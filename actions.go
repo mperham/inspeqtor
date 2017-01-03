@@ -7,6 +7,7 @@ import (
 	"net/smtp"
 	"strings"
 	"text/template"
+	"regexp"
 
 	"github.com/mperham/inspeqtor/util"
 )
@@ -182,15 +183,15 @@ func sendEmail(e *EmailNotifier, doc bytes.Buffer) error {
 	} else {
 		util.Debug("Sending email to %s", e.To)
 		util.Debug("Sending email:\n%s", string(doc.Bytes()))
+		recipients := regexp.MustCompile(`,\s*`).Split(e.To, -1)
 		if e.Username != "" {
 			auth := smtp.PlainAuth("", e.Username, e.Password, e.Host)
-			err := smtp.SendMail(e.Host+":"+e.TLSPort, auth, e.From,
-				[]string{e.To}, doc.Bytes())
+			err := smtp.SendMail(e.Host+":"+e.TLSPort, auth, e.From, recipients, doc.Bytes())
 			if err != nil {
 				return err
 			}
 		} else {
-			err := smtp.SendMail(e.Host+":25", nil, e.From, []string{e.To}, doc.Bytes())
+			err := smtp.SendMail(e.Host+":25", nil, e.From, recipients, doc.Bytes())
 			if err != nil {
 				return err
 			}
