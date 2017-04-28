@@ -29,15 +29,15 @@ func TestMysqlParsing(t *testing.T) {
 	assert.Equal(t, check.Name, "mysql")
 	assert.Equal(t, len(check.Parameters), 0)
 	assert.Equal(t, len(check.Rules), 4)
-	assert.Equal(t, check.Rules[1].Threshold.Parsed, 50)
+	assert.Equal(t, check.Rules[1].Threshold.Parsed, int64(50))
 	assert.Equal(t, check.Rules[1].Threshold.Raw, "50")
 	assert.Equal(t, check.Rules[1].Threshold.PerSec, false)
 
-	assert.Equal(t, check.Rules[2].Threshold.Parsed, 1024)
+	assert.Equal(t, check.Rules[2].Threshold.Parsed, int64(1024))
 	assert.Equal(t, check.Rules[2].Threshold.Raw, "1k/sec")
 	assert.Equal(t, check.Rules[2].Threshold.PerSec, true)
 
-	assert.Equal(t, check.Rules[3].Threshold.Parsed, 2)
+	assert.Equal(t, check.Rules[3].Threshold.Parsed, int64(2))
 	assert.Equal(t, check.Rules[3].Threshold.Raw, "2/sec")
 	assert.Equal(t, check.Rules[3].Threshold.PerSec, true)
 }
