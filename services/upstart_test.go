@@ -19,7 +19,7 @@ func TestDetectUpstart(t *testing.T) {
 	st, err := init.LookupService("mysql")
 	assert.Nil(t, err)
 	assert.Equal(t, 14190, st.Pid)
-	assert.Equal(t, Up, st.Status)
+	assert.Equal(t, Up, st.Status.String())
 	assert.Equal(t, st.String(), "Up/14190")
 
 	output = "mysql stop/waiting"
@@ -28,7 +28,7 @@ func TestDetectUpstart(t *testing.T) {
 	st, err = init.LookupService("mysql")
 	assert.Nil(t, err)
 	assert.Equal(t, 0, st.Pid)
-	assert.Equal(t, Down, st.Status)
+	assert.Equal(t, Down, st.Status.String())
 	assert.Equal(t, st.String(), "Down/0")
 
 	// conf exists, but job is invalid

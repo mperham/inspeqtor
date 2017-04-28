@@ -27,7 +27,7 @@ func TestInitd(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, st)
 	assert.Equal(t, 0, st.Pid)
-	assert.Equal(t, Down, st.Status)
+	assert.Equal(t, Down, st.Status.String())
 
 	// Need to be able to kill -0 the PID and our own process
 	// is the only one we can be sure of.
@@ -38,5 +38,5 @@ func TestInitd(t *testing.T) {
 	st, err = l.LookupService("redis")
 	assert.Nil(t, err)
 	assert.Equal(t, os.Getpid(), st.Pid)
-	assert.Equal(t, Up, st.Status)
+	assert.Equal(t, Up, st.Status.String())
 }

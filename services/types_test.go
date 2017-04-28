@@ -23,5 +23,5 @@ func TestMock(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, st)
 	assert.Equal(t, st.Pid, 123)
-	assert.Equal(t, st.Status, Up)
+	assert.Equal(t, st.Status.String(), Up)
 }

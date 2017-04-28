@@ -16,7 +16,7 @@ func TestDetectRunit(t *testing.T) {
 	assert.NotNil(t, st)
 	assert.Nil(t, err)
 	assert.Equal(t, 1234, st.Pid)
-	assert.Equal(t, Up, st.Status)
+	assert.Equal(t, Up, st.Status.String())
 
 	// bad service name
 	st, err = runit.LookupService("nonexistent")

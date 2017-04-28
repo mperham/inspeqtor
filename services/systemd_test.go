@@ -16,7 +16,7 @@ func TestDetectSystemd(t *testing.T) {
 	st, err := init.LookupService("mysql")
 	assert.Nil(t, err)
 	assert.Equal(t, 12345, st.Pid)
-	assert.Equal(t, Up, st.Status)
+	assert.Equal(t, Up, st.Status.String())
 
 	// bad name
 	upstart.dummyOutput = "MainPID=0"
@@ -32,7 +32,7 @@ func TestDetectSystemd(t *testing.T) {
 	assert.NotNil(t, st)
 	assert.Nil(t, err)
 	assert.Equal(t, 0, st.Pid)
-	assert.Equal(t, Down, st.Status)
+	assert.Equal(t, Down, st.Status.String())
 
 	err = init.Restart("rsyslog")
 	assert.Nil(t, err)

@@ -14,15 +14,15 @@ func TestCollectHost(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	assert.Equal(t, store.Get("cpu", ""), 0)
-	assert.Equal(t, store.Get("cpu", "user"), 0)
-	assert.Equal(t, store.Get("cpu", "system"), 0)
-	assert.Equal(t, store.Get("cpu", "iowait"), 0)
-	assert.Equal(t, store.Get("cpu", "steal"), 0)
+	assert.Equal(t, store.Get("cpu", ""), 0.0)
+	assert.Equal(t, store.Get("cpu", "user"), 0.0)
+	assert.Equal(t, store.Get("cpu", "system"), 0.0)
+	assert.Equal(t, store.Get("cpu", "iowait"), 0.0)
+	assert.Equal(t, store.Get("cpu", "steal"), 0.0)
 	assert.Equal(t, store.Get("load", "1"), 0.02)
 	assert.Equal(t, store.Get("load", "5"), 0.03)
 	assert.Equal(t, store.Get("load", "15"), 0.05)
-	assert.Equal(t, store.Get("swap", ""), 2)
+	assert.Equal(t, store.Get("swap", ""), 2.0)
 
 	assert.Equal(t, []string{"cpu", "disk", "load", "swap"}, store.Families())
 	assert.Equal(t, []string{"", "iowait", "steal", "system", "user"}, store.MetricNames(store.Families()[0]))
@@ -48,7 +48,7 @@ func TestCollectHost(t *testing.T) {
 	assert.Equal(t, store.Display("load", "5"), "0.03")
 	assert.Equal(t, store.Display("load", "15"), "0.05")
 
-	assert.Equal(t, store.Get("swap", ""), 2)
+	assert.Equal(t, store.Get("swap", ""), 2.0)
 	assert.Equal(t, store.Display("swap", ""), "2.0%")
 }
 

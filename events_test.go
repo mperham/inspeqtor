@@ -43,7 +43,7 @@ func TestEventProcessDisappears(t *testing.T) {
 	assert.Equal(t, 0, act.Size())
 	svc := &Service{&Entity{"foo", nil, metrics.NewProcessStore("/proc", 15), nil}, act, services.WithStatus(findDownPid(), services.Up), init}
 	svc.Collect(false, func(_ Checkable) {})
-	assert.Equal(t, services.Down, svc.Process.Status)
+	assert.Equal(t, services.Down, svc.Process.Status.String())
 	assert.Equal(t, 0, svc.Process.Pid)
 	assert.Equal(t, 1, act.Size())
 	assert.Equal(t, ProcessDoesNotExist, act.Latest().Type)
@@ -59,7 +59,7 @@ func TestEventProcessDisappearsDuringDeploy(t *testing.T) {
 	assert.Equal(t, 0, act.Size())
 	svc := &Service{&Entity{"foo", nil, metrics.NewProcessStore("/proc", 15), nil}, act, services.WithStatus(findDownPid(), services.Up), init}
 	svc.Collect(true, func(_ Checkable) {})
-	assert.Equal(t, services.Down, svc.Process.Status)
+	assert.Equal(t, services.Down, svc.Process.Status.String())
 	assert.Equal(t, 0, svc.Process.Pid)
 	assert.Equal(t, 0, act.Size())
 	assert.Nil(t, act.Latest())
@@ -75,7 +75,7 @@ func TestEventProcessAppears(t *testing.T) {
 	assert.Equal(t, 0, act.Size())
 	svc := &Service{&Entity{"foo", nil, metrics.NewProcessStore("/proc", 15), nil}, act, services.WithStatus(0, services.Down), init}
 	svc.Collect(false, func(_ Checkable) {})
-	assert.Equal(t, services.Up, svc.Process.Status)
+	assert.Equal(t, services.Up, svc.Process.Status.String())
 	assert.Equal(t, os.Getpid(), svc.Process.Pid)
 	assert.Equal(t, 1, act.Size())
 	assert.Equal(t, ProcessExists, act.Latest().Type)
@@ -91,7 +91,7 @@ func TestEventProcessAppearsDuringDeploy(t *testing.T) {
 	assert.Equal(t, 0, act.Size())
 	svc := &Service{&Entity{"foo", nil, metrics.NewProcessStore("/proc", 15), nil}, act, services.WithStatus(0, services.Down), init}
 	svc.Collect(true, func(_ Checkable) {})
-	assert.Equal(t, services.Up, svc.Process.Status)
+	assert.Equal(t, services.Up, svc.Process.Status.String())
 	assert.Equal(t, os.Getpid(), svc.Process.Pid)
 	assert.Equal(t, 0, act.Size())
 	assert.Nil(t, act.Latest())
@@ -108,7 +108,7 @@ func TestEventProcessDneAtStartup(t *testing.T) {
 	assert.Equal(t, 0, act.Size())
 	svc := &Service{&Entity{"dne", nil, metrics.NewProcessStore("/proc", 15), nil}, act, services.WithStatus(0, services.Unknown), nil}
 	svc.Resolve([]services.InitSystem{init})
-	assert.Equal(t, services.Down, svc.Process.Status)
+	assert.Equal(t, services.Down, svc.Process.Status.String())
 	assert.Equal(t, 0, svc.Process.Pid)
 	assert.Equal(t, 1, act.Size())
 	assert.Equal(t, ProcessDoesNotExist, act.Latest().Type)
@@ -125,7 +125,7 @@ func TestEventProcessExistsAtStartup(t *testing.T) {
 	assert.Equal(t, 0, act.Size())
 	svc := &Service{&Entity{"exists", nil, metrics.NewProcessStore("/proc", 15), nil}, act, services.WithStatus(0, services.Unknown), init}
 	svc.Resolve([]services.InitSystem{init})
-	assert.Equal(t, services.Up, svc.Process.Status)
+	assert.Equal(t, services.Up, svc.Process.Status.String())
 	assert.Equal(t, 100, svc.Process.Pid)
 	assert.Equal(t, 0, act.Size())
 }

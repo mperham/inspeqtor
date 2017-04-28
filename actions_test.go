@@ -34,10 +34,10 @@ func TestRestart(t *testing.T) {
 	assert.NotNil(t, res)
 
 	assert.Equal(t, 999, s.Process.Pid)
-	assert.Equal(t, services.Up, s.Process.Status)
+	assert.Equal(t, services.Up, s.Process.Status.String())
 	res.Trigger(nil)
 	assert.Equal(t, 0, s.Process.Pid)
-	assert.Equal(t, services.Starting, s.Process.Status)
+	assert.Equal(t, services.Starting, s.Process.Status.String())
 }
 
 func TestReload(t *testing.T) {

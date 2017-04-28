@@ -23,7 +23,7 @@ func TestLaunchd(t *testing.T) {
 	assert.NotNil(t, st)
 	assert.Nil(t, err)
 	assert.True(t, st.Pid > 0, "Expected positive value for PID")
-	assert.Equal(t, Up, st.Status)
+	assert.Equal(t, Up, st.Status.String())
 
 	st, err = l.LookupService("some.fake.service")
 	assert.Nil(t, st)
@@ -38,7 +38,7 @@ func TestLaunchd(t *testing.T) {
 		assert.Nil(t, err)
 		st2, err := l.LookupService("homebrew.mxcl.memcached")
 		assert.Nil(t, err)
-		assert.Equal(t, Up, st2.Status)
+		assert.Equal(t, Up, st2.Status.String())
 		assert.NotEqual(t, st1.Pid, st2.Pid)
 	}
 }

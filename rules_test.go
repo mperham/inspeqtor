@@ -91,20 +91,20 @@ func TestPerSecRulesCheck(t *testing.T) {
 	loadValue(basic, "mysql", "Queries", 1000)
 	result = rule.Check(15)
 	assert.Nil(t, result)
-	assert.Equal(t, 0, rule.CurrentValue)
+	assert.Equal(t, 0.0, rule.CurrentValue)
 	assert.Equal(t, Ok, rule.State)
 
 	loadValue(basic, "mysql", "Queries", 4000)
 	result = rule.Check(15)
 	assert.Nil(t, result)
-	assert.Equal(t, 3000, rule.CurrentValue)
+	assert.Equal(t, 3000.0, rule.CurrentValue)
 	assert.Equal(t, Ok, rule.State)
 
 	loadValue(basic, "mysql", "Queries", 20000)
 	result = rule.Check(15)
 	assert.Nil(t, result)
 	assert.Equal(t, 1, rule.TrippedCount)
-	assert.Equal(t, 16000, rule.CurrentValue)
+	assert.Equal(t, 16000.0, rule.CurrentValue)
 	assert.Equal(t, Ok, rule.State)
 }
 

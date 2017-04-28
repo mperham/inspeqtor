@@ -43,10 +43,10 @@ func TestBasicProcess(t *testing.T) {
 		t.Fatal(err)
 	}
 	assert.Equal(t, float64(1024*1024), store.Get("memory", "rss"))
-	assert.Equal(t, 0, store.Get("cpu", "user"))
-	assert.Equal(t, 0, store.Get("cpu", "system"))
-	assert.Equal(t, 0, store.Get("cpu", "total_user"))
-	assert.Equal(t, 0, store.Get("cpu", "total_system"))
+	assert.Equal(t, 0.0, store.Get("cpu", "user"))
+	assert.Equal(t, 0.0, store.Get("cpu", "system"))
+	assert.Equal(t, 0.0, store.Get("cpu", "total_user"))
+	assert.Equal(t, 0.0, store.Get("cpu", "total_system"))
 
 	store.(*processStorage).path = "proc2"
 	err = store.Collect(9051)
@@ -56,9 +56,9 @@ func TestBasicProcess(t *testing.T) {
 	assert.Equal(t, float64(1024*1024), store.Get("memory", "rss"))
 	// 499 ticks, 1500 cycle ticks = 33% CPU usage
 	assert.Equal(t, (float64(499)/1500)*100, store.Get("cpu", "user"))
-	assert.Equal(t, 0, store.Get("cpu", "system"))
-	assert.Equal(t, 0, store.Get("cpu", "total_user"))
-	assert.Equal(t, 0, store.Get("cpu", "total_system"))
+	assert.Equal(t, 0.0, store.Get("cpu", "system"))
+	assert.Equal(t, 0.0, store.Get("cpu", "total_user"))
+	assert.Equal(t, 0.0, store.Get("cpu", "total_system"))
 }
 
 // has real stats, no children
@@ -70,10 +70,10 @@ func TestMysqlProcess(t *testing.T) {
 		t.Fatal(err)
 	}
 	assert.Equal(t, float64(324072*1024), store.Get("memory", "rss"))
-	assert.Equal(t, 0, store.Get("cpu", "user"))
-	assert.Equal(t, 0, store.Get("cpu", "system"))
-	assert.Equal(t, 0, store.Get("cpu", "total_user"))
-	assert.Equal(t, 0, store.Get("cpu", "total_system"))
+	assert.Equal(t, 0.0, store.Get("cpu", "user"))
+	assert.Equal(t, 0.0, store.Get("cpu", "system"))
+	assert.Equal(t, 0.0, store.Get("cpu", "total_user"))
+	assert.Equal(t, 0.0, store.Get("cpu", "total_system"))
 
 	store.(*processStorage).path = "proc2"
 	err = store.Collect(14190)
@@ -83,8 +83,8 @@ func TestMysqlProcess(t *testing.T) {
 	assert.Equal(t, float64(324072*1024), store.Get("memory", "rss"))
 	assert.Equal(t, (float64(17)/1500)*100, store.Get("cpu", "user"))
 	assert.Equal(t, (float64(97)/1500)*100, store.Get("cpu", "system"))
-	assert.Equal(t, 0, store.Get("cpu", "total_user"))
-	assert.Equal(t, 0, store.Get("cpu", "total_system"))
+	assert.Equal(t, 0.0, store.Get("cpu", "total_user"))
+	assert.Equal(t, 0.0, store.Get("cpu", "total_system"))
 }
 
 // has real stats, child processes
@@ -96,10 +96,10 @@ func TestApacheProcess(t *testing.T) {
 		t.Fatal(err)
 	}
 	assert.Equal(t, float64(19728*1024), store.Get("memory", "rss"))
-	assert.Equal(t, 0, store.Get("cpu", "user"))
-	assert.Equal(t, 0, store.Get("cpu", "system"))
-	assert.Equal(t, 0, store.Get("cpu", "total_user"))
-	assert.Equal(t, 0, store.Get("cpu", "total_system"))
+	assert.Equal(t, 0.0, store.Get("cpu", "user"))
+	assert.Equal(t, 0.0, store.Get("cpu", "system"))
+	assert.Equal(t, 0.0, store.Get("cpu", "total_user"))
+	assert.Equal(t, 0.0, store.Get("cpu", "total_system"))
 
 	store.(*processStorage).path = "proc2"
 	err = store.Collect(3589)
