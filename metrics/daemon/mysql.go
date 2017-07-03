@@ -2,6 +2,7 @@ package daemon
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -169,8 +170,7 @@ func (rs *mysqlSource) buildArgs() []string {
 		args = append(args, rs.Username)
 	}
 	if rs.Password != "" {
-		args = append(args, "-p")
-		args = append(args, rs.Password)
+		args = append(args, fmt.Sprintf("-p%s", rs.Password))
 	}
 
 	return args
