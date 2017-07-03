@@ -72,13 +72,12 @@ func TestRealMysqlConnection(t *testing.T) {
 
 func TestRealMysqlConnectionWithPassword(t *testing.T) {
 	// This test doesn't run in parallel with the other test as it changes the password from the default.
-	assert.True(t, changeMysqlPassword("", "password.test.%$'#_(@*[|~`&"), "This test will fail if your database has a password set")
-	rs := testMysqlSource(map[string]string{"password": "password.test.%$'#_(@*[|~`&"}, "Connections", "Seconds_Behind_Master")
+	assert.True(t, changeMysqlPassword("", "password   .test.%$'#_(@*[|~` &"), "This test will fail if your database has a password set")
+	rs := testMysqlSource(map[string]string{"password": "password   .test.%$'#_(@*[|~` &"}, "Connections", "Seconds_Behind_Master")
 	err := rs.Prepare()
 	assert.NotNil(t, err, "This test will fail if you don't have mysql installed")
 	assert.True(t, strings.Contains(err.Error(), "slave not running"))
-
-	rs = testMysqlSource(map[string]string{"password": "password.test.%$'#_(@*[|~`&"})
+	rs = testMysqlSource(map[string]string{"password": "password   .test.%$'#_(@*[|~` &"})
 	assert.NotNil(t, rs)
 	err = rs.Prepare()
 	assert.Nil(t, err)
@@ -86,8 +85,36 @@ func TestRealMysqlConnectionWithPassword(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, hash)
 
+	assert.True(t, changeMysqlPassword("password   .test.%$'#_(@*[|~` &", "password.test.%$'#_(@*[|~`&"), "This test will fail if your database has a password set")
+	rs = testMysqlSource(map[string]string{"password": "password.test.%$'#_(@*[|~`&"}, "Connections", "Seconds_Behind_Master")
+	err = rs.Prepare()
+	assert.NotNil(t, err, "This test will fail if you don't have mysql installed")
+	assert.True(t, strings.Contains(err.Error(), "slave not running"))
+	rs = testMysqlSource(map[string]string{"password": "password.test.%$'#_(@*[|~`&"})
+	assert.NotNil(t, rs)
+	err = rs.Prepare()
+	assert.Nil(t, err)
+	hash, err = rs.Capture()
+	assert.Nil(t, err)
+	assert.NotNil(t, hash)
+
 	assert.True(t, hash["Connections"] > 0, "This test will fail if you don't have mysql installed")
 	assert.True(t, changeMysqlPassword("password.test.%$'#_(@*[|~`&", ""), "This test will fail if your database has a password set")
+
+	rs = testMysqlSource(map[string]string{}, "Connections", "Seconds_Behind_Master")
+	err = rs.Prepare()
+	assert.NotNil(t, err, "This test will fail if you don't have mysql installed")
+	assert.True(t, strings.Contains(err.Error(), "slave not running"))
+
+	rs = testMysqlSource(map[string]string{})
+	assert.NotNil(t, rs)
+	err = rs.Prepare()
+	assert.Nil(t, err)
+	hash, err = rs.Capture()
+	assert.Nil(t, err)
+	assert.NotNil(t, hash)
+
+	assert.True(t, hash["Connections"] > 0, "This test will fail if you don't have mysql installed")
 }
 
 func testMysqlSource(connectionStrings map[string]string, mets ...string) *mysqlSource {
