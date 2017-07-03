@@ -112,7 +112,7 @@ func changeMysqlPassword(currentPassword string, newPassword string) bool {
 		args = append(args, fmt.Sprintf("-p%s", currentPassword))
 	}
 	args = append(args, "-e")
-	args = append(args, fmt.Sprintf("SET PASSWORD FOR 'root'@'localhost' = PASSWORD(\"%s\")", newPassword))
+	args = append(args, fmt.Sprintf("SET PASSWORD FOR 'root'@'localhost' = PASSWORD(\"%s\")", strings.Replace(newPassword, "'", "\\'", -1)))
 	_, err := execCmd("mysql", args, nil)
 	return (err == nil)
 }
