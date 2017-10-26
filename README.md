@@ -75,4 +75,4 @@ to get the source code and build Inspeqtor locally.
 
 Inspeqtor is written by [Mike Perham](http://twitter.com/mperham) of [Contributed Systems](http://contribsys.com).  We build awesome open source-based infrastructure to help you build awesome apps.
 
-We also develop [Sidekiq](http://sidekiq.org) and sell [Sidekiq Pro](http://sidekiq.org/pro), the best Ruby background job processing system.
+We also develop [Sidekiq](http://sidekiq.org) and sell [Sidekiq Pro](https://sidekiq.org/products/pro.html), the best Ruby background job processing system.
