@@ -43,17 +43,8 @@ Linux 3.0+.  It will run on OS X.  FreeBSD is untested.  It uses about 5-10MB of
 
 ## Upgrade
 
-[Inspeqtor Pro](http://contribsys.com/inspeqtor) is the commercial upgrade for Inspeqtor and offers more
-features, dedicated support and a non-GPL license:
-
-* Monitor cron job execution
-* Export metrics to Statsd
-* Route alerts to different teams or individuals
-* Send alerts to Slack or other team chat rooms
-* More to come...
-
-To buy, go to the [homepage](http://contribsys.com/inspeqtor) and select
-the right plan for your organization.
+[Inspeqtor Pro](http://github.com/mperham/inspeqtor-pro) is an upgrade for Inspeqtor and offers more
+features.
 
 See the [wiki documentation](https://github.com/mperham/inspeqtor/wiki#inspeqtor-pro) for
 in-depth documentation around each Pro feature.
@@ -61,8 +52,7 @@ in-depth documentation around each Pro feature.
 
 ## License
 
-Inspeqtor is licensed under GPLv3.  Inspeqtor Pro is licensed under the
-custom commercial license in COMM-LICENSE.
+GPLv3.
 
 
 ## Want to Help?
