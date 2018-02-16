@@ -3,6 +3,8 @@
 Please note that the Inspeqtor codebase does not change a lot because it is
 considered feature complete and stable.  It is maintained and not a dead project.
 
+## HEAD
+
 - Fix MySQL connection with password
 
 ## 1.0.1

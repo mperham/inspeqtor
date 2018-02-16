@@ -1,5 +1,5 @@
 NAME=inspeqtor
-VERSION=1.0.1
+VERSION=1.1.0
 
 # when fixing packaging bugs but not changing the binary, we increment ITERATION
 ITERATION=1
