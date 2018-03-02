@@ -1,0 +1,8 @@
+To: {{.Config.To}} <{{.Config.To}}>
+From: {{.Config.From}} <{{.Config.From}}>
+Subject: Recurring job {{.Thing.Name}} just ran
+
+Recurring job {{.Thing.Name}} just ran on {{.Hostname}}.
+
+Your Pal,
+Inspeqtor

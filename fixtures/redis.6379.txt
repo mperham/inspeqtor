@@ -1,0 +1,93 @@
+# Server
+redis_version:2.8.6
+redis_git_sha1:00000000
+redis_git_dirty:0
+redis_build_id:66d45bf982c6004d
+redis_mode:standalone
+os:Linux 3.2.0-58-generic x86_64
+arch_bits:64
+multiplexing_api:epoll
+gcc_version:4.6.3
+process_id:30734
+run_id:3cfa402459f2eed6dacaca5be20f221d45ae99d2
+tcp_port:6379
+uptime_in_seconds:16196464
+uptime_in_days:187
+hz:10
+lru_clock:467162
+config_file:/etc/redis/6379.conf
+
+# Clients
+connected_clients:3
+client_longest_output_list:0
+client_biggest_input_buf:0
+blocked_clients:0
+
+# Memory
+used_memory:10911744
+used_memory_human:10.41M
+used_memory_rss:17920000
+used_memory_peak:183731640
+used_memory_peak_human:175.22M
+used_memory_lua:46080
+mem_fragmentation_ratio:1.64
+mem_allocator:jemalloc-3.2.0
+
+# Persistence
+loading:0
+rdb_changes_since_last_save:459
+rdb_bgsave_in_progress:0
+rdb_last_save_time:1409763446
+rdb_last_bgsave_status:ok
+rdb_last_bgsave_time_sec:0
+rdb_current_bgsave_time_sec:-1
+aof_enabled:0
+aof_rewrite_in_progress:0
+aof_rewrite_scheduled:0
+aof_last_rewrite_time_sec:-1
+aof_current_rewrite_time_sec:-1
+aof_last_bgrewrite_status:ok
+aof_last_write_status:ok
+
+# Stats
+total_connections_received:6
+total_commands_processed:490685144
+instantaneous_ops_per_sec:34
+rejected_connections:0
+sync_full:0
+sync_partial_ok:0
+sync_partial_err:0
+expired_keys:0
+evicted_keys:0
+keyspace_hits:29047232
+keyspace_misses:3
+pubsub_channels:0
+pubsub_patterns:0
+latest_fork_usec:758
+
+# Replication
+role:slave
+master_host:redis.prd.theclymb.com
+master_port:6379
+master_link_status:up
+master_last_io_seconds_ago:0
+master_sync_in_progress:0
+slave_repl_offset:44229738844
+slave_priority:100
+slave_read_only:1
+connected_slaves:0
+master_repl_offset:0
+repl_backlog_active:0
+repl_backlog_size:1048576
+repl_backlog_first_byte_offset:0
+repl_backlog_histlen:0
+
+# CPU
+used_cpu_sys:6827.20
+used_cpu_user:9131.49
+used_cpu_sys_children:1314.16
+used_cpu_user_children:13506.39
+
+# Keyspace
+db0:keys=10737,expires=10708,avg_ttl=0
+db2:keys=3364,expires=3001,avg_ttl=0

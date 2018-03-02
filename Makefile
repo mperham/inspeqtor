@@ -38,11 +38,12 @@ test:
 # gocc produces ill-formated code, clean it up with fmt
 parsers: gocc fmt
 
-# Generate parser and token package for conf/global/format.bnf and
-# conf/inq/format.bnf
+# Generate parser and token packages
 gocc:
 	cd $(shell pwd)/conf/global && $(GOPATH)/bin/gocc format.bnf
 	cd $(shell pwd)/conf/inq && $(GOPATH)/bin/gocc format.bnf
+	cd $(shell pwd)/jobs && $(GOPATH)/bin/gocc format.bnf
+
 
 build: test
 	@GOOS=linux GOARCH=amd64 go build -o inspeqtor cmd/main.go

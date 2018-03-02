@@ -19,16 +19,6 @@ type CmdOptions struct {
 	SocketPath      string
 }
 
-var (
-	StartupInfo = func() {
-		log.Println(inspeqtor.Licensing)
-		log.Println("")
-		log.Println("Want more? Upgrade to Inspeqtor Pro for more features and support.")
-		log.Println("See http://contribsys.com/inspeqtor for details.")
-		log.Println("")
-	}
-)
-
 func SetupLogging() {
 	// Modern POSIX processes should log to STDOUT only
 	// and use a smart init system to manage logging.  That
@@ -43,10 +33,7 @@ func ParseArguments() CmdOptions {
 
 	log.Println(inspeqtor.Name, inspeqtor.VERSION)
 	log.Println(fmt.Sprintf("Copyright © %d Contributed Systems LLC", time.Now().Year()))
-
-	if StartupInfo != nil {
-		StartupInfo()
-	}
+	log.Println(inspeqtor.Licensing)
 
 	flag.Usage = help
 	flag.BoolVar(&defaults.TestConfig, "tc", false, "Test configuration and exit")

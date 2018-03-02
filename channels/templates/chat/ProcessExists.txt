@@ -1,0 +1,1 @@
+{{.Hostname}}[{{.Thing.Name}}] now running with PID {{.Service.Process.Pid}}

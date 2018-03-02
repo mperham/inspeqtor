@@ -1,0 +1,1 @@
+[{{.Hostname}}] Overdue job "{{.Thing.Name}}" just ran successfully.

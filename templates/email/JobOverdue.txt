@@ -1,0 +1,8 @@
+To: {{.Config.To}} <{{.Config.To}}>
+From: {{.Config.From}} <{{.Config.From}}>
+Subject: Recurring job {{.Thing.Name}} is overdue
+
+Recurring job {{.Thing.Name}} has not run within the configured time window on {{.Hostname}}.
+
+Your Pal,
+Inspeqtor

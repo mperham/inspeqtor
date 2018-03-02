@@ -1,0 +1,4 @@
+check service homebrew.mxcl.memcached
+#  if not exists then start
+  if memory:rss > 1m for 2 cycles then restart
+  if cpu:user > 4% then alert, reload
