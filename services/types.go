@@ -86,6 +86,9 @@ var (
 		func() (InitSystem, error) {
 			return detectInitd("/")
 		},
+		func() (InitSystem, error) {
+			return &Self{}, nil
+		},
 	}
 )
 

@@ -1,0 +1,1 @@
+{{.Target}}: {{.Rule.Metric}} is {{.Rule.Op}} than {{.Rule.DisplayThreshold}}{{.Rule.Consequence}}

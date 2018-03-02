@@ -1,0 +1,301 @@
+<html lang='en'>
+<head>
+  <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Inspeqtor Pro - Expose</title>
+  <link href='/bootstrap.min.css' rel='stylesheet' type='text/css'>
+  <link href='/metricsgraphics.css' rel='stylesheet' type='text/css'>
+
+  <style>
+    .navbar-default {
+      background-color: #fff;
+      border: 0;
+    }
+    .navbar-brand {
+      padding: 5px 5px;
+    }
+    .navbar-brand img {
+      width: 200px;
+      height: 45px;
+    }
+    .mg-chart-title {
+      padding-top: 0;
+      margin-top: 10px;
+      margin-bottom: 0;
+    }
+    footer {
+      color: #888;
+      margin: 20px;
+      text-align: center;
+    }
+    #selected-service {
+      color: #49bdb9;
+    }
+    .mg-area1-color {
+        fill: #00bc8c;
+    }
+    .mg-line1-color {
+        stroke: #00bc8c;
+    }
+    .mg-line1-legend-color {
+        color: #00bc8c;
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-default" role="navigation">
+  <div class="container-fluid">
+
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#burger">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="http://contribsys.com/inspeqtor" target="new"><img alt="Inspeqtor Pro" src="/logo.svg"></a>
+    </div>
+
+    <div class="collapse navbar-collapse navbar-right" id="burger">
+      <ul class="nav navbar-nav">
+        <li class="dropdown">
+          <a href="#" id="selected-service" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">{{ .Selected }} <span class="caret"></span></a>
+          <ul class="dropdown-menu" role="menu">
+            {{range .AvailableServices}}
+              {{if ne $.Selected . }}
+                <li><a href="?service={{.}}#">{{.}}</a></li>
+              {{end}}
+            {{end}}
+          </ul>
+        </li>
+        <li><a href="https://github.com/mperham/inspeqtor/wiki" target="new"><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Help</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+
+<div role="tabpanel">
+  <ul class="nav nav-tabs" role="tablist">
+    <li role="presentation" class="active"><a href="#realtime" aria-controls="realtime" role="tab" data-toggle="tab">Realtime</a></li>
+    <li role="presentation"><a href="#hourly" aria-controls="hourly" role="tab" data-toggle="tab">Hourly</a></li>
+  </ul>
+
+  <div class="tab-content">
+    <div role="tabpanel" class="tab-pane active" id="realtime">
+      <figure id="total_mem"></figure>
+      <figure id="gc_time"></figure>
+      <figure id="alloc_mem"></figure>
+    </div>
+    <div role="tabpanel" class="tab-pane" id="hourly">
+      <figure id="hour_total_mem"></figure>
+      <figure id="hour_gc_time"></figure>
+    </div>
+  </div>
+</div>
+
+<footer class="container-fluid">
+  Inspeqtor Pro {{.Version}} &copy; 2015 Contributed System LLC
+</footer>
+
+    <script src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js'></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/d3/3.4.11/d3.min.js' charset='utf-8'></script>
+    <script src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js'></script>
+    <script src='/metricsgraphics.min.js'></script>
+    <script type="text/javascript">
+      $("#service-selector").on("change", function(e) {
+        $("#service-form").submit();
+      });
+      var xformat = function(d) {
+        var df = d3.time.format('%H:%M:%S');
+        return df(d);
+      }
+
+      function pull_hourly() {
+        d3.json('/metrics.json?service={{.Selected}}&family=memstats', function(data) {
+          var now = new Date();
+
+          var g = graphs.hour_total_mem;
+          g.last = g.next(g.data, now, g.last, data.memstats.Alloc)
+          var g = graphs.hour_gc_time;
+          g.last = g.next(g.data, now, g.last, data.memstats.PauseTotalNs / 1000000)
+
+          MG.data_graphic({
+            title: "Total Memory In Use",
+            data: graphs.hour_total_mem.data.toArray(),
+            width: 900,
+            height: 250,
+            target: '#hour_total_mem',
+            y_accessor: 'value',
+            interpolate: "monotone",
+            xax_format: xformat,
+            linked: true,
+            transition_on_update: false,
+          });
+          MG.data_graphic({
+            title: "GC Pause Time",
+            data: graphs.hour_gc_time.data.toArray(),
+            width: 900,
+            height: 250,
+            target: '#hour_gc_time',
+            y_accessor: 'value',
+            interpolate: "monotone",
+            y_label: 'milliseconds',
+            xax_format: xformat,
+            linked: true,
+            transition_on_update: false,
+          });
+          setTimeout(pull_hourly, 15000);
+        })
+      }
+
+      function pull_realtime() {
+        d3.json('/memstats.json?service={{.Selected}}', function(data) {
+          var now = new Date();
+
+          var g = graphs.total_mem;
+          g.last = g.next(g.data, now, g.last, data.memstats.Alloc)
+          var g = graphs.alloc_mem;
+          g.last = g.next(g.data, now, g.last, data.memstats.TotalAlloc)
+          var g = graphs.gc_time;
+          g.last = g.next(g.data, now, g.last, data.memstats.PauseTotalNs / 1000000)
+
+          MG.data_graphic({
+            title: "Total Memory In Use",
+            data: graphs.total_mem.data.toArray(),
+            width: 900,
+            height: 250,
+            target: '#total_mem',
+            y_accessor: 'value',
+            interpolate: "monotone",
+            xax_format: xformat,
+            linked: true,
+            transition_on_update: false,
+          });
+          MG.data_graphic({
+            title: "Allocated Memory",
+            data: graphs.alloc_mem.data.toArray(),
+            width: 900,
+            height: 250,
+            target: '#alloc_mem',
+            y_accessor: 'value',
+            interpolate: "monotone",
+            xax_format: xformat,
+            linked: true,
+            transition_on_update: false,
+          });
+          MG.data_graphic({
+            title: "GC Pause Time",
+            data: graphs.gc_time.data.toArray(),
+            width: 900,
+            height: 250,
+            target: '#gc_time',
+            y_accessor: 'value',
+            interpolate: "monotone",
+            y_label: 'milliseconds',
+            xax_format: xformat,
+            linked: true,
+            transition_on_update: false,
+          });
+          setTimeout(pull_realtime, 1000);
+        })
+      }
+
+      var ringBuffer = function(length){
+        var pointer = 0, buffer = [];
+
+        return {
+          push : function(item){
+            buffer[pointer] = item;
+            pointer = (length + pointer + 1) % length;
+          },
+          toArray: function() {
+            var arr = new Array();
+            var ridx = pointer,
+                widx = 0;
+            while (ridx > 0) {
+              arr[widx++] = buffer[--ridx];
+            }
+            if (buffer[pointer] !== undefined) {
+              // circle around and get the oldest values
+              ridx = length;
+              while (ridx > pointer) {
+                arr[widx++] = buffer[--ridx];
+              }
+            }
+            return arr;
+          },
+        };
+      };
+
+      graphs = {
+        hour_gc_time: {
+          last: 0,
+          data: ringBuffer(240),
+          next: function(buff, now, last, curr) {
+            if (last === 0) {
+              buff.push({ "date": now, "value": 0 });
+            } else {
+              buff.push({ "date": now, "value": curr });
+            }
+            return curr;
+          },
+        },
+        hour_total_mem: {
+          last: 0,
+          data: ringBuffer(240),
+          next: function(buff, now, last, curr) {
+            buff.push({ "date": now, "value": curr });
+            return curr;
+          },
+        },
+        gc_time: { // counter
+          last: 0,
+          data: ringBuffer(240),
+          next: function(buff, now, last, curr) {
+            if (last === 0) {
+              buff.push({ "date": now, "value": 0 });
+            } else {
+              buff.push({ "date": now, "value": curr - last });
+            }
+            return curr;
+          },
+        },
+        total_mem: { // gauge
+          last: 0,
+          data: ringBuffer(240),
+          next: function(buff, now, last, curr) {
+            buff.push({ "date": now, "value": curr });
+            return curr;
+          },
+        },
+        alloc_mem: { // counter
+          last: 0,
+          data: ringBuffer(240),
+          next: function(buff, now, last, curr) {
+            if (last === 0) {
+              buff.push({ "date": now, "value": 0 });
+            } else {
+              buff.push({ "date": now, "value": curr - last });
+            }
+            return curr;
+          },
+        },
+      }
+
+      pull_hourly();
+      setTimeout(pull_realtime, 1000);
+      setTimeout(pull_hourly, 15000);
+
+      $('#hourly a').click(function (e) {
+        e.preventDefault()
+        $(this).tab('show')
+      })
+      $('#realtime a').click(function (e) {
+        e.preventDefault()
+        $(this).tab('show')
+      })
+    </script>
+  </body>
+</html>

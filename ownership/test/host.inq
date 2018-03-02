@@ -1,0 +1,5 @@
+check host
+  if load:1 > 1 for 2 cycles then alert
+  if load:5 > 1 then alert
+  if cpu:user > 95 for 2 cycles then alert
+  if swap > 20% for 2 cycles then alert

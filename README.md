@@ -41,15 +41,6 @@ See the [Inspeqtor wiki](https://github.com/mperham/inspeqtor/wiki) for complete
 Linux 3.0+.  It will run on OS X.  FreeBSD is untested.  It uses about 5-10MB of RAM at runtime.
 
 
-## Upgrade
-
-[Inspeqtor Pro](http://github.com/mperham/inspeqtor-pro) is an upgrade for Inspeqtor and offers more
-features.
-
-See the [wiki documentation](https://github.com/mperham/inspeqtor/wiki#inspeqtor-pro) for
-in-depth documentation around each Pro feature.
-
-
 ## License
 
 GPLv3.

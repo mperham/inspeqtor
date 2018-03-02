@@ -1,0 +1,3 @@
+package channels
+
+//go:generate go-bindata -pkg channels -o templates.go templates/...
