@@ -31,8 +31,8 @@ prepare:
 	# or ensure your Homebrew'd Go can cross compile:
 	#   brew install go --with-cc-common
 
-test:
-	@go generate
+test: parsers gocc
+	@go generate ./...
 	@go test -parallel 4 ./... | grep -v "no test files"
 
 # gocc produces ill-formated code, clean it up with fmt
