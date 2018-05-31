@@ -358,6 +358,9 @@ func (ps *processStorage) captureVM(pid int) error {
 		return err
 	}
 	for _, line := range lines {
+		if len(line) == 0 {
+			continue
+		}
 		if line[0] == 'V' {
 			items := strings.Fields(line)
 			switch items[0] {

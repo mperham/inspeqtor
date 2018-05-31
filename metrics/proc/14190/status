@@ -14,6 +14,7 @@ VmSize: 1481648 kB
 VmLck:       0 kB
 VmPin:       0        kB
 VmHWM:  331608 kB
+
 VmRSS:  324072 kB
 VmData: 1436580 kB
 VmStk:            136 kB
