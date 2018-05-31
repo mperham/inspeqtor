@@ -155,6 +155,9 @@ func totalRssCollector(mypid int, ps *processStorage) error {
 			return err
 		}
 		for _, line := range lines {
+			if len(line) == 0 {
+				continue
+			}
 			if line[0] == 'V' || line[0] == 'P' {
 				items := strings.Split(line, ":")
 				switch items[0] {
@@ -320,6 +323,9 @@ func (ps *processStorage) captureCPU(pid int) error {
 		return err
 	}
 	for _, line := range lines {
+		if len(line) == 0 {
+			continue
+		}
 		fields := strings.Fields(line)
 		utime, err := strconv.ParseInt(fields[13], 10, 64)
 		if err != nil {
