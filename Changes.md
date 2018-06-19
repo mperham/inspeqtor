@@ -5,6 +5,7 @@ considered feature complete and stable.  It is maintained and not a dead project
 
 ## HEAD
 
+- Integrate Inspeqtor Pro functionality into Inspeqtor
 - Fix MySQL connection with password
 
 ## 1.0.1

@@ -1,6 +1,6 @@
 language: go
 go:
-  - 1.7.1
+  - 1.10.3
 sudo: false
 install: make prepare
 addons:

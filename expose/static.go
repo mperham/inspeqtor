@@ -90,7 +90,7 @@ func memoryIndexHtmlTmpl() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "memory/index.html.tmpl", size: 9383, mode: os.FileMode(420), modTime: time.Unix(1479919109, 0)}
+	info := bindataFileInfo{name: "memory/index.html.tmpl", size: 9383, mode: os.FileMode(420), modTime: time.Unix(1529440589, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -110,7 +110,7 @@ func staticBootstrapMinCss() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "static/bootstrap.min.css", size: 112212, mode: os.FileMode(420), modTime: time.Unix(1479919109, 0)}
+	info := bindataFileInfo{name: "static/bootstrap.min.css", size: 112212, mode: os.FileMode(420), modTime: time.Unix(1529440589, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -130,7 +130,7 @@ func staticFontsGlyphiconsHalflingsRegularEot() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "static/fonts/glyphicons-halflings-regular.eot", size: 20335, mode: os.FileMode(420), modTime: time.Unix(1479919109, 0)}
+	info := bindataFileInfo{name: "static/fonts/glyphicons-halflings-regular.eot", size: 20335, mode: os.FileMode(420), modTime: time.Unix(1529440589, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -150,7 +150,7 @@ func staticFontsGlyphiconsHalflingsRegularSvg() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "static/fonts/glyphicons-halflings-regular.svg", size: 62926, mode: os.FileMode(420), modTime: time.Unix(1479919109, 0)}
+	info := bindataFileInfo{name: "static/fonts/glyphicons-halflings-regular.svg", size: 62926, mode: os.FileMode(420), modTime: time.Unix(1529440589, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -170,7 +170,7 @@ func staticFontsGlyphiconsHalflingsRegularWoff() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "static/fonts/glyphicons-halflings-regular.woff", size: 23320, mode: os.FileMode(420), modTime: time.Unix(1479919109, 0)}
+	info := bindataFileInfo{name: "static/fonts/glyphicons-halflings-regular.woff", size: 23320, mode: os.FileMode(420), modTime: time.Unix(1529440589, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -190,7 +190,7 @@ func staticLogoSvg() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "static/logo.svg", size: 5551, mode: os.FileMode(420), modTime: time.Unix(1479919109, 0)}
+	info := bindataFileInfo{name: "static/logo.svg", size: 5551, mode: os.FileMode(420), modTime: time.Unix(1529440589, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -210,7 +210,7 @@ func staticMetricsgraphicsCss() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "static/metricsgraphics.css", size: 4767, mode: os.FileMode(420), modTime: time.Unix(1479919109, 0)}
+	info := bindataFileInfo{name: "static/metricsgraphics.css", size: 4767, mode: os.FileMode(420), modTime: time.Unix(1529440589, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -230,7 +230,7 @@ func staticMetricsgraphicsMinJs() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "static/metricsgraphics.min.js", size: 56302, mode: os.FileMode(420), modTime: time.Unix(1479919109, 0)}
+	info := bindataFileInfo{name: "static/metricsgraphics.min.js", size: 56302, mode: os.FileMode(420), modTime: time.Unix(1529440589, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
