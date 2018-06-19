@@ -60,7 +60,7 @@ lint:
 	gometalinter ./...
 
 clean:
-	rm -f main inspeqtor templates.go
+	rm -f main inspeqtor templates.go expose/static.go
 	rm -rf packaging/output
 	mkdir -p packaging/output/upstart
 	mkdir -p packaging/output/systemd
