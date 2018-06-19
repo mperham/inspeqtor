@@ -27,3 +27,4 @@ tags
 .local.sh
 realtest
 templates.go
+expose/static.go

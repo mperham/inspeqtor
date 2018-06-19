@@ -15,6 +15,11 @@ BASENAME=$(NAME)_$(VERSION)-$(ITERATION)
 
 all: test
 
+static:
+	@go-bindata -pkg inspeqtor -o templates.go templates/...
+	@go generate ./channels
+	@go generate ./expose
+
 prepare:
 	#wget https://storage.googleapis.com/golang/go1.5.1.linux-amd64.tar.gz
 	#sudo tar -C /usr/local -xzf go1.5.1.linux-amd64.tar.gz
@@ -31,19 +36,18 @@ prepare:
 	# or ensure your Homebrew'd Go can cross compile:
 	#   brew install go --with-cc-common
 
-test: parsers gocc
+test: assets
 	@go generate ./...
 	@go test -parallel 4 ./... | grep -v "no test files"
 
 # gocc produces ill-formated code, clean it up with fmt
-parsers: gocc fmt
+assets: gocc static fmt
 
 # Generate parser and token packages
 gocc:
 	cd $(shell pwd)/conf/global && $(GOPATH)/bin/gocc format.bnf
 	cd $(shell pwd)/conf/inq && $(GOPATH)/bin/gocc format.bnf
 	cd $(shell pwd)/jobs && $(GOPATH)/bin/gocc format.bnf
-
 
 build: test
 	@GOOS=linux GOARCH=amd64 go build -o inspeqtor cmd/main.go
