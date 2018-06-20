@@ -1,12 +1,17 @@
 # Inspeqtor Changelog
 
 Please note that the Inspeqtor codebase does not change a lot because it is
-considered feature complete and stable.  It is maintained and not a dead project.
+considered feature complete and stable.  It is maintained.
 
-## HEAD
+## 2.0.0
 
 - Integrate Inspeqtor Pro functionality into Inspeqtor
-- Fix MySQL connection with password
+- Fix crash on unexpected /proc content [#148]
+- Fix MySQL connection with password [#142]
+- Fix dozens of lint warnings
+- Upgrade to Go 1.10.3
+- Added package for Ubuntu 18.04 LTS (bionic).
+- Removed package for Ubuntu 12.04 LTS (precise).
 
 ## 1.0.1
 
