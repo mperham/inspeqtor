@@ -1,7 +1,6 @@
 package util
 
 import (
-	"sort"
 	"sync"
 )
 
@@ -77,37 +76,4 @@ func (buf *RingBuffer) Size() int {
 
 func (buf *RingBuffer) Capacity() int {
 	return cap(buf.values)
-}
-
-// Export the set of values in the Ring Buffer, where the latest value
-// will be last in the array.  If the Buffer was not full, 0 will be exported.
-func (buf *RingBuffer) Export() []float64 {
-	buf.mu.Lock()
-	defer buf.mu.Unlock()
-
-	length := len(buf.values)
-	data := make([]float64, length)
-
-	idx := 0
-	for i := buf.oldest; i < len(buf.values); i++ {
-		v := buf.values[i]
-		if v != nil {
-			data[idx] = *v
-			idx++
-		}
-	}
-
-	for i := 0; i < buf.oldest; i++ {
-		v := buf.values[i]
-		if v != nil {
-			data[idx] = *v
-			idx++
-		}
-	}
-
-	sort.Reverse(sort.Float64Slice(data))
-	shrink := make([]float64, idx)
-	copy(shrink, data)
-
-	return shrink
 }

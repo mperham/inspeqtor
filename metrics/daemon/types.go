@@ -1,7 +1,6 @@
 package daemon
 
 import (
-	"io/ioutil"
 	"os/exec"
 
 	"github.com/mperham/inspeqtor/metrics"
@@ -59,14 +58,4 @@ func execCmd(command string, args []string, stdin []byte) ([]byte, error) {
 	}
 
 	return util.SafeRun(cmd)
-}
-
-func testExec(path string) func(string, []string, []byte) ([]byte, error) {
-	return func(command string, args []string, stdin []byte) ([]byte, error) {
-		data, err := ioutil.ReadFile(path)
-		if err != nil {
-			return nil, err
-		}
-		return data, nil
-	}
 }

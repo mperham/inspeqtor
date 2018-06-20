@@ -68,7 +68,7 @@ func (e *hipchatNotifier) trigger(event *inspeqtor.Event, sender func(string, st
 		return err
 	}
 
-	txt := string(doc.Bytes())
+	txt := doc.String()
 
 	values := url.Values{}
 	values.Set("room_id", e.room)

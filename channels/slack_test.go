@@ -37,21 +37,21 @@ func TestSlack(t *testing.T) {
 	err = sn.triggerSlack(alert, sendHere)
 	assert.Nil(t, err)
 	assert.Equal(t, "https://acmecorp.slack.com/services/hooks/incoming-webhook?token=xxx/xxx/xxx", theurl)
-	assert.True(t, strings.Index(params["payload"][0], "localhost: swap is greater than than 20%") > 0)
+	assert.True(t, strings.Contains(params["payload"][0], "localhost: swap is greater than than 20%"))
 
 	alert = swapEvent(check, inspeqtor.RuleRecovered)
 	err = sn.triggerSlack(alert, sendHere)
 	assert.Nil(t, err)
-	assert.True(t, strings.Index(params["payload"][0], "localhost: swap has recovered.") > 0)
+	assert.True(t, strings.Contains(params["payload"][0], "localhost: swap has recovered."))
 
 	svc := inspeqtor.NewService("sidekiq")
 	alert = &inspeqtor.Event{Type: inspeqtor.ProcessDoesNotExist, Eventable: svc, Rule: nil}
 	err = sn.triggerSlack(alert, sendHere)
 	assert.Nil(t, err)
-	assert.True(t, strings.Index(params["payload"][0], "[sidekiq] does not exist.") > 0)
+	assert.True(t, strings.Contains(params["payload"][0], "[sidekiq] does not exist."))
 
 	alert = &inspeqtor.Event{Type: inspeqtor.ProcessExists, Eventable: svc, Rule: nil}
 	err = sn.triggerSlack(alert, sendHere)
 	assert.Nil(t, err)
-	assert.True(t, strings.Index(params["payload"][0], "[sidekiq] now running with PID 0") > 0)
+	assert.True(t, strings.Contains(params["payload"][0], "[sidekiq] now running with PID 0"))
 }

@@ -98,6 +98,9 @@ func (l *Launchd) Restart(serviceName string) error {
 	}
 
 	lines, err := util.ReadLines(sout)
+	if err != nil {
+		return &ServiceError{l.Name(), serviceName, err}
+	}
 	if len(lines) != 0 {
 		return &ServiceError{l.Name(), serviceName, errors.New("Unexpected output: " + strings.Join(lines, "\n"))}
 	}
@@ -109,6 +112,9 @@ func (l *Launchd) Restart(serviceName string) error {
 	}
 
 	lines, err = util.ReadLines(sout)
+	if err != nil {
+		return &ServiceError{l.Name(), serviceName, err}
+	}
 	if len(lines) != 0 {
 		return &ServiceError{l.Name(), serviceName, errors.New("Unexpected output: " + strings.Join(lines, "\n"))}
 	}

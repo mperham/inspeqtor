@@ -25,7 +25,7 @@ func NewHostStore(path string, cycleSeconds uint) Store {
 	}
 
 	tickPercentage := func(cur, prev float64) float64 {
-		return float64((float64(cur-prev) / float64(cycleSeconds*ClkTck)) * 100)
+		return (((cur - prev) / float64(cycleSeconds*ClkTck)) * 100)
 	}
 
 	store.DeclareGauge("swap", "", DisplayPercent)
@@ -55,9 +55,7 @@ func (hs *hostStorage) Watch(metricFamily, metricName string) error {
 }
 
 func (hs *hostStorage) Collect(_ int) error {
-	var err error
-
-	err = hs.collectLoadAverage()
+	err := hs.collectLoadAverage()
 	if err != nil {
 		return err
 	}
@@ -71,11 +69,7 @@ func (hs *hostStorage) Collect(_ int) error {
 	}
 
 	err = hs.collectDisk("")
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
 
 func (hs *hostStorage) collectMemory() error {
@@ -117,7 +111,7 @@ func (hs *hostStorage) collectMemory() error {
 		} else if free == total {
 			hs.Save("swap", "", 0)
 		} else {
-			hs.Save("swap", "", float64(100-int8(100*(float64(free)/float64(total)))))
+			hs.Save("swap", "", float64(100-int8(100*((free)/(total)))))
 		}
 	} else {
 		cmd := exec.Command("sysctl", "-n", "vm.swapusage")
@@ -153,7 +147,7 @@ func (hs *hostStorage) collectMemory() error {
 		if t == 0 {
 			hs.Save("swap", "", 100)
 		} else {
-			hs.Save("swap", "", float64(100*(u/t)))
+			hs.Save("swap", "", (100 * (u / t)))
 		}
 	}
 
@@ -194,13 +188,13 @@ func (hs *hostStorage) collectLoadAverage() error {
 	} else {
 		cmd := exec.Command("sysctl", "-n", "vm.loadavg")
 		cmd.Env = []string{"LANG=C"}
-		sout, err := util.SafeRun(cmd)
-		if err != nil {
-			return err
+		sout, er := util.SafeRun(cmd)
+		if er != nil {
+			return er
 		}
-		lines, err := util.ReadLines(sout)
-		if err != nil {
-			return err
+		lines, er := util.ReadLines(sout)
+		if er != nil {
+			return er
 		}
 		loadavgString = lines[0][2 : len(lines[0])-2] // trim braces
 	}

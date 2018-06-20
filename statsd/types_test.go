@@ -26,7 +26,7 @@ func TestStatsd(t *testing.T) {
 	var buff bytes.Buffer
 	Export(&buff, i)
 
-	actual := string(buff.Bytes())
+	actual := buff.String()
 
 	assert.Contains(t, actual, "local.host.cpu:0.00|c")
 	assert.Contains(t, actual, "local.host.cpu.iowait:0.00|c")

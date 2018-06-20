@@ -51,7 +51,7 @@ func detectRunit(root string) (InitSystem, error) {
 }
 
 func (r *Runit) serviceCommand(serviceName string, command string, timeout time.Duration) error {
-	out := []byte{}
+	var out []byte
 
 	if r.dummyOutput == nil {
 		cmd := exec.Command("sv", command, serviceName)
@@ -90,6 +90,9 @@ func (r *Runit) LookupService(serviceName string) (*ProcessStatus, error) {
 	}
 
 	content, err := ioutil.ReadFile(r.path + "/" + serviceName + "/supervise/pid")
+	if err != nil {
+		return nil, &ServiceError{r.Name(), serviceName, err}
+	}
 	if len(content) == 0 {
 		// service exists but is not running
 		return &ProcessStatus{0, Down}, nil

@@ -37,21 +37,21 @@ func TestFlowdock(t *testing.T) {
 	err = sn.trigger(alert, sendHere)
 	assert.Nil(t, err)
 	assert.Equal(t, theurl, "https://api.flowdock.com/v1/messages/team_inbox/abcdef123456")
-	assert.True(t, strings.Index(params["content"][0], "localhost: swap is greater than than 20%") > -1)
+	assert.True(t, strings.Contains(params["content"][0], "localhost: swap is greater than than 20%"))
 
 	alert = swapEvent(check, inspeqtor.RuleRecovered)
 	err = sn.trigger(alert, sendHere)
 	assert.Nil(t, err)
-	assert.True(t, strings.Index(params["content"][0], "localhost: swap has recovered.") > -1)
+	assert.True(t, strings.Contains(params["content"][0], "localhost: swap has recovered."))
 
 	svc := inspeqtor.NewService("sidekiq")
 	alert = &inspeqtor.Event{Type: inspeqtor.ProcessDoesNotExist, Eventable: svc, Rule: nil}
 	err = sn.trigger(alert, sendHere)
 	assert.Nil(t, err)
-	assert.True(t, strings.Index(params["content"][0], "[sidekiq] does not exist.") > -1)
+	assert.True(t, strings.Contains(params["content"][0], "[sidekiq] does not exist."))
 
 	alert = &inspeqtor.Event{Type: inspeqtor.ProcessExists, Eventable: svc, Rule: nil}
 	err = sn.trigger(alert, sendHere)
 	assert.Nil(t, err)
-	assert.True(t, strings.Index(params["content"][0], "[sidekiq] now running with PID 0") > -1)
+	assert.True(t, strings.Contains(params["content"][0], "[sidekiq] now running with PID 0"))
 }

@@ -19,6 +19,7 @@ func TestExpose(t *testing.T) {
 	svc := inspeqtor.MockCheckable("something")
 	assert.NotContains(t, svc.Metrics().Families(), "memstats")
 	err = exposeBuilder(nil, svc, []string{"memstats"}, map[string]string{})
+	assert.NoError(t, err)
 	assert.Contains(t, svc.Metrics().Families(), "memstats")
 	assert.Equal(t, 5, len(svc.Metrics().MetricNames("memstats")))
 	assert.True(t, memstatsRegistered)

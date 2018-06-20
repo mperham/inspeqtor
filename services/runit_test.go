@@ -23,8 +23,7 @@ func TestDetectRunit(t *testing.T) {
 	assert.Nil(t, st)
 	assert.NotNil(t, err)
 
-	var output string
-	output = "ok: run: memcached: (pid 28125) 1s"
+	output := "ok: run: memcached: (pid 28125) 1s"
 	runit.(*Runit).dummyOutput = &output
 	err = runit.Restart("memcached")
 	assert.Nil(t, err)

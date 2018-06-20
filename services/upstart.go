@@ -18,7 +18,7 @@ type Upstart struct {
 }
 
 var (
-	pidScanner = regexp.MustCompile(" (start|stop)\\/([a-z\\-]+)(?:, process (\\d+))?")
+	pidScanner = regexp.MustCompile(` (start|stop)\/([a-z\-]+)(?:, process (\d+))?`)
 )
 
 func detectUpstart(path string) (InitSystem, error) {
@@ -61,6 +61,9 @@ func (u *Upstart) serviceCommand(serviceName string, command string, timeout tim
 	}
 
 	lines, err := util.ReadLines(sout)
+	if err != nil {
+		return &ServiceError{u.Name(), serviceName, err}
+	}
 	if len(lines) != expectedLines {
 		return &ServiceError{u.Name(), serviceName, errors.New("Unexpected output: " + strings.Join(lines, "\n"))}
 	}
@@ -93,6 +96,9 @@ func (u *Upstart) LookupService(serviceName string) (*ProcessStatus, error) {
 	}
 
 	lines, err := util.ReadLines(sout)
+	if err != nil {
+		return nil, &ServiceError{u.Name(), serviceName, err}
+	}
 	if len(lines) != 1 {
 		return nil, &ServiceError{u.Name(), serviceName, errors.New("Unexpected output: " + strings.Join(lines, "\n"))}
 	}

@@ -57,7 +57,7 @@ func (e *Event) Target() string {
 	case *Service:
 		return fmt.Sprintf("%s[%s]", e.Hostname(), x.Name())
 	case *Host:
-		return fmt.Sprintf("%s", x.Name())
+		return x.Name()
 	default:
 		return fmt.Sprintf("Unknown: %s", e.Eventable)
 	}

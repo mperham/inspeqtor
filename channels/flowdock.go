@@ -65,7 +65,7 @@ func (e *FlowdockNotifier) trigger(event *inspeqtor.Event, sender func(string, s
 		return err
 	}
 
-	txt := string(doc.Bytes())
+	txt := doc.String()
 
 	values := url.Values{}
 	values.Set("from_address", "inspeqtor@contribsys.com")

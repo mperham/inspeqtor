@@ -29,7 +29,7 @@ func TestInspeqtorParse(t *testing.T) {
 	assert.Nil(t, err)
 	err = i.Parse()
 	assert.NotNil(t, err)
-	assert.True(t, strings.Index(err.Error(), "Missing required file") >= 0)
+	assert.True(t, strings.Contains(err.Error(), "Missing required file"))
 }
 
 func TestCreateSocket(t *testing.T) {

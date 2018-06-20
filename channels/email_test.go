@@ -22,9 +22,10 @@ func TestEmail(t *testing.T) {
 	emailer := action.(*inspeqtor.EmailNotifier)
 	alert := &inspeqtor.Event{Type: inspeqtor.ProcessDoesNotExist, Eventable: svc, Rule: nil}
 	err = emailer.TriggerEmail(alert, func(e *inspeqtor.EmailNotifier, doc bytes.Buffer) error {
-		content := string(doc.Bytes())
-		assert.True(t, strings.Index(content, "can't locate") > 0, "email does not contain expected content")
-		assert.True(t, strings.Index(content, "the sidekiq service") > 0, "email does not contain expected content")
+		content := doc.String()
+		assert.True(t, strings.Contains(content, "can't locate"), "email does not contain expected content")
+		assert.True(t, strings.Contains(content, "the sidekiq service"), "email does not contain expected content")
 		return nil
 	})
+	assert.NoError(t, err)
 }

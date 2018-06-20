@@ -35,12 +35,9 @@ const (
 )
 
 var (
-	meminfoParser = regexp.MustCompile("([^:]+):\\s+(\\d+)")
-	swapRegexp    = regexp.MustCompile("= (\\d+\\.\\d{2}[A-Z])(.*)")
-	multiplyBy100 = func(val float64) float64 {
-		return val * 100
-	}
-	displayLoad = func(val float64) string {
+	meminfoParser = regexp.MustCompile(`([^:]+):\s+(\d+)`)
+	swapRegexp    = regexp.MustCompile(`= (\d+\.\d{2}[A-Z])(.*)`)
+	displayLoad   = func(val float64) string {
 		return strconv.FormatFloat(val, 'f', 2, 64)
 	}
 	DisplayPercent = func(val float64) string {
@@ -355,7 +352,6 @@ func (store *storage) DeclareGauge(familyName string, name string, display Displ
 	data := fam.metrics[name]
 	if data == nil {
 		fam.metrics[name] = &gauge{util.NewRingBuffer(Slots), display}
-		data = fam.metrics[name]
 	}
 }
 
@@ -369,7 +365,6 @@ func (store *storage) DeclareCounter(familyName string, name string, xform Trans
 	data := fam.metrics[name]
 	if data == nil {
 		fam.metrics[name] = &counter{util.NewRingBuffer(Slots), xform, display}
-		data = fam.metrics[name]
 	}
 }
 

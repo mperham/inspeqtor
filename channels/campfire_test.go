@@ -43,21 +43,21 @@ func TestCampfire(t *testing.T) {
 	err = sn.trigger(alert, sendHere)
 	assert.Nil(t, err)
 	assert.Equal(t, theurl, "https://contribsys.campfirenow.com/room/12345/speak.json")
-	assert.True(t, strings.Index(params["body"], "localhost: swap is greater than than 20%") > -1)
+	assert.True(t, strings.Contains(params["body"], "localhost: swap is greater than than 20%"))
 
 	alert = swapEvent(check, inspeqtor.RuleRecovered)
 	err = sn.trigger(alert, sendHere)
 	assert.Nil(t, err)
-	assert.True(t, strings.Index(params["body"], "localhost: swap has recovered.") > -1)
+	assert.True(t, strings.Contains(params["body"], "localhost: swap has recovered."))
 
 	svc := inspeqtor.NewService("sidekiq")
 	alert = &inspeqtor.Event{Type: inspeqtor.ProcessDoesNotExist, Eventable: svc, Rule: nil}
 	err = sn.trigger(alert, sendHere)
 	assert.Nil(t, err)
-	assert.True(t, strings.Index(params["body"], "[sidekiq] does not exist.") > -1)
+	assert.True(t, strings.Contains(params["body"], "[sidekiq] does not exist."))
 
 	alert = &inspeqtor.Event{Type: inspeqtor.ProcessExists, Eventable: svc, Rule: nil}
 	err = sn.trigger(alert, sendHere)
 	assert.Nil(t, err)
-	assert.True(t, strings.Index(params["body"], "[sidekiq] now running with PID 0") > -1)
+	assert.True(t, strings.Contains(params["body"], "[sidekiq] now running with PID 0"))
 }

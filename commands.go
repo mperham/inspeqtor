@@ -128,7 +128,7 @@ func finishDeploy(i *Inspeqtor, args []string, resp io.Writer) {
 
 func currentStatus(i *Inspeqtor, args []string, resp io.Writer) {
 	io.WriteString(resp, fmt.Sprintf(
-		"%s %s, uptime: %s, pid: %d\n", Name, VERSION, time.Now().Sub(i.StartedAt).String(), os.Getpid()))
+		"%s %s, uptime: %s, pid: %d\n", Name, VERSION, time.Since(i.StartedAt).String(), os.Getpid()))
 
 	if i.silenced() {
 		io.WriteString(resp, fmt.Sprintf("Silenced until: %s\n", i.SilenceUntil.Format(time.RFC3339)))
@@ -334,7 +334,7 @@ func buildSparkline(target Checkable, metric string, buf func(string, string) di
 	}
 
 	resp.WriteString("\n")
-	return string(resp.Bytes())
+	return resp.String()
 }
 
 func parseMetric(metric string) (string, string) {

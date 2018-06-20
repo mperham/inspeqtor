@@ -12,8 +12,7 @@ func TestDetectUpstart(t *testing.T) {
 	init, err := detectUpstart("etc/init")
 	assert.Nil(t, err)
 
-	var output string
-	output = "mysql start/running, process 14190"
+	output := "mysql start/running, process 14190"
 	upstart := init.(*Upstart)
 	upstart.dummyOutput = &output
 	st, err := init.LookupService("mysql")

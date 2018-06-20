@@ -71,7 +71,7 @@ func (e *campfireNotifier) trigger(event *inspeqtor.Event, sender func(string, s
 		return err
 	}
 
-	txt := string(doc.Bytes())
+	txt := doc.String()
 
 	msg := map[string]map[string]string{
 		"message": map[string]string{

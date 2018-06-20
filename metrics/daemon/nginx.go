@@ -70,7 +70,7 @@ func defaultClient(host string, port string, ep string) ([]byte, error) {
 }
 
 var (
-	digits = regexp.MustCompile("(\\d+)")
+	digits = regexp.MustCompile(`(\d+)`)
 )
 
 func (rs *nginxSource) runCli() (metrics.Map, error) {

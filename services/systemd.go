@@ -82,9 +82,9 @@ func (s *Systemd) LookupService(serviceName string) (*ProcessStatus, error) {
 	line := lines[0]
 	fields := strings.Split(line, "=")
 	if fields[1] != "0" {
-		pid, err := strconv.ParseInt(fields[1], 10, 32)
-		if err != nil {
-			return nil, &ServiceError{s.Name(), serviceName, err}
+		pid, er := strconv.ParseInt(fields[1], 10, 32)
+		if er != nil {
+			return nil, &ServiceError{s.Name(), serviceName, er}
 		}
 		return &ProcessStatus{int(pid), Up}, nil
 	}

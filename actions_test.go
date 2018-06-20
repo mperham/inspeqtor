@@ -104,7 +104,7 @@ func TestEmailEventRuleFailed(t *testing.T) {
 	alert := validRuleEvent(RuleFailed)
 
 	err := validEmailSetup().TriggerEmail(alert, func(e *EmailNotifier, doc bytes.Buffer) error {
-		content := string(doc.Bytes())
+		content := doc.String()
 		assert.True(t, strings.Index(content, "[mysql]") > 0, "email does not contain expected content: "+content)
 		assert.True(t, strings.Index(content, "memory:rss") > 0, "email does not contain expected content: "+content)
 		return nil
@@ -117,7 +117,7 @@ func TestEmailEventProcessExists(t *testing.T) {
 	alert := validProcessEvent(ProcessExists)
 
 	err := validEmailSetup().TriggerEmail(alert, func(e *EmailNotifier, doc bytes.Buffer) error {
-		content := string(doc.Bytes())
+		content := doc.String()
 		assert.True(t, strings.Index(content, "PID 100") > 0, "email does not contain expected content")
 		assert.True(t, strings.Index(content, "The mysql service") > 0, "email does not contain expected content")
 		return nil
@@ -130,7 +130,7 @@ func TestEmailEventProcessDoesNotExist(t *testing.T) {
 	alert := validProcessEvent(ProcessDoesNotExist)
 
 	err := validEmailSetup().TriggerEmail(alert, func(e *EmailNotifier, doc bytes.Buffer) error {
-		content := string(doc.Bytes())
+		content := doc.String()
 		assert.True(t, strings.Index(content, "can't locate") > 0, "email does not contain expected content")
 		assert.True(t, strings.Index(content, "the mysql service") > 0, "email does not contain expected content")
 		return nil
@@ -143,7 +143,7 @@ func TestEmailEventRuleRecovered(t *testing.T) {
 	alert := validRuleEvent(RuleRecovered)
 
 	err := validEmailSetup().TriggerEmail(alert, func(e *EmailNotifier, doc bytes.Buffer) error {
-		content := string(doc.Bytes())
+		content := doc.String()
 		assert.True(t, strings.Index(content, "has recovered") > 0, "email does not contain expected content")
 		assert.True(t, strings.Index(content, "[mysql]") > 0, "email does not contain expected content")
 		return nil

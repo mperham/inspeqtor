@@ -1,11 +1,22 @@
 package daemon
 
 import (
+	"io/ioutil"
 	"testing"
 
 	"github.com/mperham/inspeqtor/metrics"
 	"github.com/stretchr/testify/assert"
 )
+
+func testExec(path string) func(string, []string, []byte) ([]byte, error) {
+	return func(command string, args []string, stdin []byte) ([]byte, error) {
+		data, err := ioutil.ReadFile(path)
+		if err != nil {
+			return nil, err
+		}
+		return data, nil
+	}
+}
 
 func TestBadRedisConfig(t *testing.T) {
 	t.Parallel()

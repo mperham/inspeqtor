@@ -178,10 +178,10 @@ func (e *EmailNotifier) TriggerEmail(event *Event, sender EmailSender) error {
 func sendEmail(e *EmailNotifier, doc bytes.Buffer) error {
 	if strings.Index(e.To, "@example.com") > 0 {
 		util.Warn("Invalid email configured: %s", e.To)
-		util.Warn(string(doc.Bytes()))
+		util.Warn(doc.String())
 	} else {
 		util.Debug("Sending email to %s", e.To)
-		util.Debug("Sending email:\n%s", string(doc.Bytes()))
+		util.Debug("Sending email:\n%s", doc.String())
 		if e.Username != "" {
 			auth := smtp.PlainAuth("", e.Username, e.Password, e.Host)
 			err := smtp.SendMail(e.Host+":"+e.TLSPort, auth, e.From,

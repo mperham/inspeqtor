@@ -163,7 +163,7 @@ func HandleSignal(sig os.Signal, handler func(*Inspeqtor)) {
 }
 
 func HandleSignals() {
-	signals := make(chan os.Signal)
+	signals := make(chan os.Signal, 2)
 	for k := range SignalHandlers {
 		signal.Notify(signals, k)
 	}
@@ -295,7 +295,7 @@ func (i *Inspeqtor) scan() {
 		})
 	}
 	barrier.Wait()
-	util.Debug("Collection complete in " + time.Now().Sub(start).String())
+	util.Debug("Collection complete in " + time.Since(start).String())
 }
 
 func (i *Inspeqtor) verify() {

@@ -22,9 +22,6 @@ func TestRingBuffer(t *testing.T) {
 	rb.Add(3)
 	rb.Add(4)
 
-	foo := rb.Export()
-	assert.Equal(t, []float64{1, 2, 3, 4}, foo)
-
 	assert.Nil(t, rb.At(1))
 
 	rb.Add(5)
@@ -45,12 +42,6 @@ func TestRingBuffer(t *testing.T) {
 	assert.Equal(t, 3.0, *val)
 	val = rb.At(-4)
 	assert.Equal(t, 2.0, *val)
-	val = rb.At(-5)
-	assert.Equal(t, 6.0, *val)
-
-	foo = rb.Export()
-	assert.Equal(t, []float64{2, 3, 4, 5, 6}, foo)
-
 	val = rb.At(-5)
 	assert.Equal(t, 6.0, *val)
 }

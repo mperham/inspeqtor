@@ -71,7 +71,7 @@ func (e *slackNotifier) triggerSlack(event *inspeqtor.Event, sender func(string,
 		return err
 	}
 
-	msg := slackMessage{string(doc.Bytes()), e.username, ":" + e.iconEmoji + ":"}
+	msg := slackMessage{doc.String(), e.username, ":" + e.iconEmoji + ":"}
 	data, err := json.Marshal(msg)
 	if err != nil {
 		return err

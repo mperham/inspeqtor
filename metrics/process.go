@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	timeRegexp = regexp.MustCompile("\\A(\\d+):(\\d\\d).(\\d\\d)\\z")
+	timeRegexp = regexp.MustCompile(`\A(\d+):(\d\d).(\d\d)\z`)
 )
 
 type dynamicCollector func(int, *processStorage) error
@@ -34,7 +34,7 @@ func NewProcessStore(path string, cycleSeconds uint) Store {
 	}
 
 	tickPercentage := func(cur, prev float64) float64 {
-		return float64(((cur - prev) / float64(cycleSeconds*ClkTck)) * 100)
+		return (((cur - prev) / float64(cycleSeconds*ClkTck)) * 100)
 	}
 
 	store.DeclareGauge("memory", "rss", DisplayInMB)
@@ -312,7 +312,7 @@ func (ps *processStorage) capturePs(pid int) error {
 }
 
 func (ps *processStorage) captureCPU(pid int) error {
-	dir := ps.path + "/" + strconv.Itoa(int(pid))
+	dir := ps.path + "/" + strconv.Itoa(pid)
 	data, err := ioutil.ReadFile(dir + "/stat")
 	if err != nil {
 		return err
@@ -353,7 +353,7 @@ func (ps *processStorage) captureCPU(pid int) error {
 }
 
 func (ps *processStorage) captureVM(pid int) error {
-	dir := ps.path + "/" + strconv.Itoa(int(pid))
+	dir := ps.path + "/" + strconv.Itoa(pid)
 	data, err := ioutil.ReadFile(dir + "/status")
 	if err != nil {
 		return err

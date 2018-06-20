@@ -64,7 +64,7 @@ func ParseGlobal(rootDir string) (*ConfigFile, error) {
 			return nil, err
 		}
 
-		s := lexer.NewLexer([]byte(data))
+		s := lexer.NewLexer(data)
 		p := parser.NewParser()
 		obj, err := p.Parse(s)
 		if err != nil {

@@ -34,7 +34,7 @@ func ParseHost(global *ConfigFile, hostInq string) (*Host, error) {
 		return nil, err
 	}
 
-	s := lexer.NewLexer([]byte(data))
+	s := lexer.NewLexer(data)
 	p := parser.NewParser()
 	obj, err := p.Parse(s)
 	if err != nil {
@@ -74,7 +74,7 @@ func ParseServices(global *ConfigFile, confDir string) ([]Checkable, error) {
 			return nil, err
 		}
 
-		s := lexer.NewLexer([]byte(data))
+		s := lexer.NewLexer(data)
 		p := parser.NewParser()
 		obj, err := p.Parse(s)
 		if err != nil {
@@ -189,10 +189,10 @@ func convertService(global *ConfigFile, inqsvc *ast.ProcessCheck) (*Service, err
 	}
 	svc.EventHandler = action
 
-	for idx, rule := range inqsvc.Rules {
-		rule, err := convertRule(global, svc, rule)
-		if err != nil {
-			return nil, err
+	for idx, irule := range inqsvc.Rules {
+		rule, er := convertRule(global, svc, irule)
+		if er != nil {
+			return nil, er
 		}
 		util.DebugDebug("Rule: %+v", *rule)
 		rules[idx] = rule
@@ -213,7 +213,7 @@ func convertService(global *ConfigFile, inqsvc *ast.ProcessCheck) (*Service, err
 	}
 
 	if len(inqsvc.Exposed) > 0 {
-		err := BuildExpose(global, svc, inqsvc.Exposed, inqsvc.Parameters)
+		err = BuildExpose(global, svc, inqsvc.Exposed, inqsvc.Parameters)
 		if err != nil {
 			return nil, err
 		}

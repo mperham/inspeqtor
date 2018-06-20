@@ -40,6 +40,9 @@ func (rs *mysqlSource) Capture() (metrics.Map, error) {
 	}
 	if rs.captureRepl {
 		values, err = rs.runRepl(values, execCmd)
+		if err != nil {
+			return nil, err
+		}
 	}
 	return values, nil
 }
@@ -78,6 +81,9 @@ func (rs *mysqlSource) runRepl(values metrics.Map, funk executor) (metrics.Map, 
 	args = append(args, "-e")
 	args = append(args, "show slave status\\G")
 	sout, err := funk("mysql", args, nil)
+	if err != nil {
+		return nil, err
+	}
 	lines, err := util.ReadLines(sout)
 	if err != nil {
 		return nil, err
@@ -108,6 +114,9 @@ func (rs *mysqlSource) runStatus(funk executor) (metrics.Map, error) {
 	args = append(args, "-e")
 	args = append(args, "show global status")
 	sout, err := funk("mysql", args, nil)
+	if err != nil {
+		return nil, err
+	}
 	lines, err := util.ReadLines(sout)
 	if err != nil {
 		return nil, err

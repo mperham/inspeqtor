@@ -44,6 +44,9 @@ func (rs *redisSource) Prepare() error {
 
 func (rs *redisSource) runCli(funk executor) (metrics.Map, error) {
 	sout, err := funk("redis-cli", rs.buildArgs(), nil)
+	if err != nil {
+		return nil, err
+	}
 	lines, err := util.ReadLines(sout)
 	if err != nil {
 		return nil, err
