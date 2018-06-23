@@ -44,7 +44,7 @@ func buildSlackNotifier(check inspeqtor.Eventable, config map[string]string) (in
 	if _, ok := config["icon_emoji"]; ok {
 		icon = config["icon_emoji"]
 	}
-	return &slackNotifier{config["url"], "Inspeqtor Pro", icon}, nil
+	return &slackNotifier{config["url"], "Inspeqtor", icon}, nil
 }
 
 type slackNotifier struct {

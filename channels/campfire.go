@@ -96,7 +96,7 @@ func sendCampfireAlert(url, token string, msg map[string]map[string]string) erro
 		return err
 	}
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("User-Agent", "Inspeqtor Pro")
+	req.Header.Set("User-Agent", "Inspeqtor")
 	req.SetBasicAuth(token, "X")
 	resp, err := client.Do(req)
 	if resp != nil {
