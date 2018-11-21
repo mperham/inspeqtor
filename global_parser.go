@@ -95,7 +95,7 @@ func ParseGlobal(rootDir string) (*ConfigFile, error) {
 		return &config, nil
 	}
 
-	util.Info("No configuration file found at " + rootDir + "/inspector.conf")
+	util.Info("No configuration file found at " + rootDir + "/inspeqtor.conf")
 	return &ConfigFile{Defaults, nil}, nil
 }
 
